@@ -1,0 +1,7 @@
+main: com.thenexusreborn.survivalgames.SurvivalGames
+version: ${project.version}
+name: SurvivalGames
+description: The Survival Games plugin for The Nexus Reborn
+depend: [NexusCore]
+commands:
+  tournament:
