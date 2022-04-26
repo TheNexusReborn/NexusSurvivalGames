@@ -1,6 +1,8 @@
 package com.thenexusreborn.survivalgames.game;
 
-import com.thenexusreborn.nexuscore.player.*;
+import com.thenexusreborn.api.player.Rank;
+import com.thenexusreborn.api.util.Operator;
+import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.nexuscore.util.helper.*;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
@@ -36,10 +38,10 @@ public class Game {
     private Timer timer, graceperiodTimer;
     private List<Location> lootedChests = new ArrayList<>();
     
-    public Game(GameMap gameMap, GameSettings settings, List<NexusPlayer> players, List<UUID> spectatingPlayers) {
+    public Game(GameMap gameMap, GameSettings settings, Collection<SpigotNexusPlayer> players, List<UUID> spectatingPlayers) {
         this.gameMap = gameMap;
         this.settings = settings;
-        for (NexusPlayer player : players) {
+        for (SpigotNexusPlayer player : players) {
             GamePlayer gamePlayer = new GamePlayer(player);
             if (spectatingPlayers.contains(player.getUniqueId())) {
                 gamePlayer.setTeam(GameTeam.SPECTATORS);
@@ -96,7 +98,7 @@ public class Game {
         return graceperiodTimer;
     }
     
-    public void addPlayer(NexusPlayer nexusPlayer) {
+    public void addPlayer(SpigotNexusPlayer nexusPlayer) {
         GamePlayer gamePlayer = new GamePlayer(nexusPlayer);
         gamePlayer.setTeam(GameTeam.SPECTATORS);
         gamePlayer.sendMessage(GameTeam.SPECTATORS.getJoinMessage());
@@ -107,7 +109,7 @@ public class Game {
         recalculateVisibiltiy();
     }
     
-    public void removePlayer(NexusPlayer nexusPlayer) {
+    public void removePlayer(SpigotNexusPlayer nexusPlayer) {
         GamePlayer gamePlayer = this.players.get(nexusPlayer.getUniqueId());
         EnumSet<GameState> ignoreStates = EnumSet.of(UNDEFINED, SETTING_UP, SETUP_COMPLETE, ASSIGN_TEAMS, TEAMS_ASSIGNED, TELEPORT_START, TELEPORT_START_DONE, ERROR, ENDING, ENDED);
         if (!ignoreStates.contains(this.state)) {

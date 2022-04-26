@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames;
 
 import com.thenexusreborn.nexuscore.NexusCore;
-import com.thenexusreborn.nexuscore.player.NexusPlayer;
+import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.nexuscore.util.ServerProperties;
 import com.thenexusreborn.survivalgames.cmd.*;
 import com.thenexusreborn.survivalgames.game.*;
@@ -109,7 +109,7 @@ public class SurvivalGames extends JavaPlugin {
                         }
                     }
                 } else {
-                    for (NexusPlayer player : lobby.getPlayers()) {
+                    for (SpigotNexusPlayer player : lobby.getPlayers()) {
                         updatePlayerHealthAndFood(player.getPlayer());
                     }
                 }

@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.cmd;
 
-import com.thenexusreborn.nexuscore.player.Rank;
+import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.nexuscore.util.command.*;
 import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.cmd.game.*;

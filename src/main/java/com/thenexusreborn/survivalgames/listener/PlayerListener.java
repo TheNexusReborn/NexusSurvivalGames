@@ -1,7 +1,9 @@
 package com.thenexusreborn.survivalgames.listener;
 
+import com.thenexusreborn.api.NexusAPI;
+import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.nexuscore.api.events.NexusPlayerLoadEvent;
-import com.thenexusreborn.nexuscore.player.NexusPlayer;
+import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.game.death.*;
@@ -389,7 +391,7 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onNexusPlayerLoad(NexusPlayerLoadEvent e) {
         SurvivalGames.PLAYER_QUEUE.offer(e.getNexusPlayer().getUniqueId());
-        NexusPlayer nexusPlayer = plugin.getNexusCore().getPlayerManager().getNexusPlayer(e.getNexusPlayer().getUniqueId());
+        NexusPlayer nexusPlayer = e.getNexusPlayer();
         if (plugin.getGame() != null) {
             GameState state = plugin.getGame().getState();
             if (state == GameState.ASSIGN_TEAMS) {
@@ -397,28 +399,28 @@ public class PlayerListener implements Listener {
                     @Override
                     public void run() {
                         if (plugin.getGame().getState() != GameState.ASSIGN_TEAMS) {
-                            plugin.getGame().addPlayer(nexusPlayer);
+                            plugin.getGame().addPlayer((SpigotNexusPlayer) nexusPlayer);
                             cancel();
                         }
                     }
                 }.runTaskTimer(plugin, 1L, 1L);
             } else {
-                plugin.getGame().addPlayer(nexusPlayer);
+                plugin.getGame().addPlayer((SpigotNexusPlayer) nexusPlayer);
             }
         } else {
-            plugin.getLobby().addPlayer(nexusPlayer);
+            plugin.getLobby().addPlayer((SpigotNexusPlayer) nexusPlayer);
         }
         e.setJoinMessage(null);
     }
     
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerQuit(PlayerQuitEvent e) {
         SurvivalGames.PLAYER_QUEUE.remove(e.getPlayer().getUniqueId());
-        NexusPlayer nexusPlayer = plugin.getNexusCore().getPlayerManager().getNexusPlayer(e.getPlayer().getUniqueId());
+        NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(e.getPlayer().getUniqueId());
         if (plugin.getGame() != null) {
-            plugin.getGame().removePlayer(nexusPlayer);
+            plugin.getGame().removePlayer((SpigotNexusPlayer) nexusPlayer);
         } else {
-            plugin.getLobby().removePlayer(nexusPlayer);
+            plugin.getLobby().removePlayer((SpigotNexusPlayer) nexusPlayer);
         }
         e.setQuitMessage(null);
     }

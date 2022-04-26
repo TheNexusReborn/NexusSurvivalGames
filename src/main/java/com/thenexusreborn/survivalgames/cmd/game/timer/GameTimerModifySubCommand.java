@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.cmd.game.timer;
 
-import com.thenexusreborn.nexuscore.util.Operator;
+import com.thenexusreborn.api.util.Operator;
 import com.thenexusreborn.nexuscore.util.command.*;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.SurvivalGames;

@@ -1,6 +1,7 @@
 package com.thenexusreborn.survivalgames.cmd;
 
-import com.thenexusreborn.nexuscore.player.*;
+import com.thenexusreborn.api.NexusAPI;
+import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.tournament.*;
@@ -94,7 +95,7 @@ public class TournamentCommand implements TabExecutor {
                         List<String> lines = new LinkedList<>();
                         int place = 1;
                         for (ScoreInfo scoreInfo : leaderboard) {
-                            NexusPlayer player = plugin.getNexusCore().getPlayerManager().getNexusPlayer(scoreInfo.getUuid());
+                            NexusPlayer player = NexusAPI.getApi().getPlayerManager().getNexusPlayer(scoreInfo.getUuid());
                             lines.add("  &a" + place + ". " + player.getRank().getColor() + player.getName() + " &7-> &f" + scoreInfo.getScore());
                             place++;
                         }
@@ -119,7 +120,7 @@ public class TournamentCommand implements TabExecutor {
             if (sender instanceof Player) {
                 Player player = (Player) sender;
                 isHost = player.getUniqueId().equals(tournament.getHost());
-                isAdmin = plugin.getNexusCore().getPlayerManager().getNexusPlayer(player.getUniqueId()).getRank().ordinal() <= Rank.ADMIN.ordinal();
+                isAdmin = NexusAPI.getApi().getPlayerManager().getNexusPlayer(player.getUniqueId()).getRank().ordinal() <= Rank.ADMIN.ordinal();
             } else {
                 isHost = false;
                 isAdmin = true;
@@ -173,7 +174,7 @@ public class TournamentCommand implements TabExecutor {
                     return true;
                 }
                 
-                NexusPlayer nexusPlayer = plugin.getNexusCore().getPlayerManager().getNexusPlayer(uuid);
+                NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(uuid);
                 String name;
                 if (nexusPlayer != null) {
                     name = nexusPlayer.getName();
@@ -219,7 +220,7 @@ public class TournamentCommand implements TabExecutor {
         try {
             uuid = UUID.fromString(input);
         } catch (Exception e) {
-            NexusPlayer nexusPlayer = plugin.getNexusCore().getPlayerManager().getNexusPlayer(input);
+            NexusPlayer nexusPlayer =NexusAPI.getApi().getPlayerManager().getNexusPlayer(input);
             if (nexusPlayer == null) {
                 sender.sendMessage(MCUtils.color("&cA player with that name has not joined the server. Please provide a valid UUID"));
                 return null;

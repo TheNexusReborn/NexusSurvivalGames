@@ -1,8 +1,7 @@
 package com.thenexusreborn.survivalgames.game.death;
 
-import com.thenexusreborn.nexuscore.player.NexusPlayer;
+import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.survivalgames.game.*;
-import org.bukkit.Bukkit;
 
 import java.util.UUID;
 
@@ -28,7 +27,7 @@ public class DeathInfoKilledSuicide extends DeathInfo {
     @Override
     public String getDeathMessage(Game game) {
         //String killerName = killerTeamColor + Bukkit.getPlayer(killer).getName();
-        NexusPlayer nexusPlayer = game.getPlayer(this.killer).getNexusPlayer();
+        SpigotNexusPlayer nexusPlayer = game.getPlayer(this.killer).getNexusPlayer();
         String killerName = nexusPlayer.getRank().getColor() + nexusPlayer.getName();
         this.deathMessage = "&4&l>> %playername% &7was killed by " + killerName + "&7's suicide.";
         return super.getDeathMessage(game);

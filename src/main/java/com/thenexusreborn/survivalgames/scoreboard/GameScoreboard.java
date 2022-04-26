@@ -1,6 +1,8 @@
 package com.thenexusreborn.survivalgames.scoreboard;
 
-import com.thenexusreborn.nexuscore.player.*;
+import com.thenexusreborn.api.scoreboard.NexusScoreboard;
+import com.thenexusreborn.api.scoreboard.wrapper.*;
+import com.thenexusreborn.nexuscore.scoreboard.SpigotScoreboardView;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -8,13 +10,12 @@ import com.thenexusreborn.survivalgames.game.*;
 import net.minecraft.server.v1_8_R3.MinecraftServer;
 import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
-import org.bukkit.scoreboard.*;
 
 import java.text.DecimalFormat;
 import java.util.*;
 
 @SuppressWarnings("DuplicatedCode")
-public class GameScoreboard extends ScoreboardView {
+public class GameScoreboard extends SpigotScoreboardView {
     
     private SurvivalGames plugin;
     
@@ -23,7 +24,7 @@ public class GameScoreboard extends ScoreboardView {
     playersValueName = "playersValue", blank4Name = "blank4", performanceLabelName = "performanceLabel", tpsValueName = "tpsValue", msptValueName = "msptValue";
     
     public GameScoreboard(NexusScoreboard nexusScoreboard, SurvivalGames plugin) {
-        super(nexusScoreboard);
+        super(nexusScoreboard, "survivalgames", MCUtils.color("&6&lSurvival Games"));
         this.plugin = plugin;
     }
     
@@ -33,55 +34,56 @@ public class GameScoreboard extends ScoreboardView {
     }
     
     @Override
-    public void registerTeams(Scoreboard scoreboard, Objective objective) {
-        Team modeLabel = scoreboard.registerNewTeam(modeLabelName);
-        addEntry(objective, modeLabel, MCUtils.color("&6&lMODE"), 15);
-        
-        Team modeValue = scoreboard.registerNewTeam(modeValueName);
+    public void registerTeams() {
+        IScoreboard scoreboard = this.scoreboard.getScoreboard();
+        ITeam modeLabel = scoreboard.registerNewTeam(modeLabelName);
+        addEntry(objective, modeLabel, MCUtils.color("&6&lMode"), 15);
+    
+        ITeam modeValue = scoreboard.registerNewTeam(modeValueName);
         modeValue.setPrefix(MCUtils.color("&f"));
         addEntry(objective, modeValue, ChatColor.AQUA.toString(), 14);
-        
-        Team blank1 = scoreboard.registerNewTeam(blank1Name);
+    
+        ITeam blank1 = scoreboard.registerNewTeam(blank1Name);
         addEntry(objective, blank1, ChatColor.BLACK.toString(), 13);
     
-        Team stateLabel = scoreboard.registerNewTeam(stateLabelName);
+        ITeam stateLabel = scoreboard.registerNewTeam(stateLabelName);
         addEntry(objective, stateLabel, MCUtils.color("&6&lState"), 12);
     
-        Team stateValue = scoreboard.registerNewTeam(stateValueName);
+        ITeam stateValue = scoreboard.registerNewTeam(stateValueName);
         stateValue.setPrefix(MCUtils.color("&f"));
         addEntry(objective, stateValue, ChatColor.YELLOW.toString(), 11);
     
-        Team blank2 = scoreboard.registerNewTeam(blank2Name);
+        ITeam blank2 = scoreboard.registerNewTeam(blank2Name);
         addEntry(objective, blank2, ChatColor.BLUE.toString(), 10);
     
-        Team secondsLabel = scoreboard.registerNewTeam(timeLabelName);
+        ITeam secondsLabel = scoreboard.registerNewTeam(timeLabelName);
         addEntry(objective, secondsLabel, MCUtils.color("&6&lTime"), 9);
     
-        Team secondsValue = scoreboard.registerNewTeam(timeValueName);
+        ITeam secondsValue = scoreboard.registerNewTeam(timeValueName);
         secondsValue.setPrefix(MCUtils.color("&f0"));
         addEntry(objective, secondsValue, ChatColor.DARK_AQUA.toString(), 8);
     
-        Team blank3 = scoreboard.registerNewTeam(blank3Name);
+        ITeam blank3 = scoreboard.registerNewTeam(blank3Name);
         addEntry(objective, blank3, ChatColor.DARK_BLUE.toString(), 7);
     
-        Team playersLabel = scoreboard.registerNewTeam(playersLabelName);
+        ITeam playersLabel = scoreboard.registerNewTeam(playersLabelName);
         addEntry(objective, playersLabel, MCUtils.color("&6&lPlayers"), 6);
     
-        Team playersValue = scoreboard.registerNewTeam(playersValueName);
+        ITeam playersValue = scoreboard.registerNewTeam(playersValueName);
         playersValue.setPrefix(MCUtils.color("&f0/0"));
         addEntry(objective, playersValue, ChatColor.DARK_GRAY.toString(), 5);
     
-        Team blank4 = scoreboard.registerNewTeam(blank4Name);
+        ITeam blank4 = scoreboard.registerNewTeam(blank4Name);
         addEntry(objective, blank4, ChatColor.DARK_GREEN.toString(), 4);
     
-        Team performanceLabel = scoreboard.registerNewTeam(performanceLabelName);
+        ITeam performanceLabel = scoreboard.registerNewTeam(performanceLabelName);
         addEntry(objective, performanceLabel, MCUtils.color("&6&lPerformance"), 3);
     
-        Team tpsValue = scoreboard.registerNewTeam(tpsValueName);
+        ITeam tpsValue = scoreboard.registerNewTeam(tpsValueName);
         tpsValue.setPrefix(MCUtils.color("&fTPS: "));
         addEntry(objective, tpsValue, ChatColor.GOLD.toString(), 2);
     
-        Team msptValue = scoreboard.registerNewTeam(msptValueName);
+        ITeam msptValue = scoreboard.registerNewTeam(msptValueName);
         msptValue.setPrefix(MCUtils.color("&fMS Per Tick: "));
         addEntry(objective, msptValue, ChatColor.GREEN.toString(), 1);
     }
@@ -94,7 +96,7 @@ public class GameScoreboard extends ScoreboardView {
         
         try {
             Game game = plugin.getGame();
-            scoreboard.getTeam(modeValueName).setPrefix(MCUtils.color("&f" + Game.getMode().toString()));
+            scoreboard.getScoreboard().getTeam(modeValueName).setPrefix(MCUtils.color("&f" + Game.getMode().toString()));
             GameState state = game.getState();
             String prefix = "&f", suffix = "&f";
             if (state.name().length() > 14) {
@@ -103,11 +105,11 @@ public class GameScoreboard extends ScoreboardView {
             } else {
                 prefix += state.name();
             }
-            Team stateValue = scoreboard.getTeam(stateValueName);
+            ITeam stateValue = scoreboard.getScoreboard().getTeam(stateValueName);
             stateValue.setPrefix(MCUtils.color(prefix));
             stateValue.setSuffix(MCUtils.color(suffix));
     
-            Team timeValue = scoreboard.getTeam(timeValueName);
+            ITeam timeValue = scoreboard.getScoreboard().getTeam(timeValueName);
             if (game.getTimer() != null) {
                 timeValue.setPrefix(MCUtils.color("&f" + Timer.formatTime(game.getTimer().getSecondsLeft())));
             } else {
@@ -123,28 +125,21 @@ public class GameScoreboard extends ScoreboardView {
                     }
                 }
             }
-            scoreboard.getTeam(playersValueName).setPrefix(MCUtils.color("&a" + playing + "&f/&c" + spectating));
+            scoreboard.getScoreboard().getTeam(playersValueName).setPrefix(MCUtils.color("&a" + playing + "&f/&c" + spectating));
             DecimalFormat numberFormat = new DecimalFormat("00.00");
             double tps = ((CraftServer) Bukkit.getServer()).getHandle().getServer().recentTps[0];
-            scoreboard.getTeam(tpsValueName).setSuffix(MCUtils.color("&f" + numberFormat.format(tps)));
+            scoreboard.getScoreboard().getTeam(tpsValueName).setSuffix(MCUtils.color("&f" + numberFormat.format(tps)));
             long nanoTime = 0;
-            for (long l : MinecraftServer.getServer().h) {
-                if (l > nanoTime) {
-                    nanoTime = l;
+            for (int i = MinecraftServer.getServer().h.length - 1; i > 0; i--) {
+                if (MinecraftServer.getServer().h[i] != 0) {
+                    nanoTime = MinecraftServer.getServer().h[i];
+                    break;
                 }
             }
             double tickTime = nanoTime / 1000000D;
-            scoreboard.getTeam(msptValueName).setSuffix(MCUtils.color("&f" + numberFormat.format(tickTime) + " ms"));
+            scoreboard.getScoreboard().getTeam(msptValueName).setSuffix(MCUtils.color("&f" + numberFormat.format(tickTime) + " ms"));
         } catch (Exception e) {
             
         }
-    }
-    
-    @Override
-    public Objective registerObjective(Scoreboard scoreboard) {
-        objective = scoreboard.registerNewObjective("game", "dummy");
-        objective.setDisplayName(MCUtils.color("&6&lSurvival Games"));
-        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        return objective;
     }
 }

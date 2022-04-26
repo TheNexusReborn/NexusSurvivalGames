@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.lobby;
 
-import com.thenexusreborn.nexuscore.player.NexusPlayer;
+import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.*;
@@ -16,7 +16,7 @@ import java.util.*;
 
 public class Lobby {
     private SurvivalGames plugin;
-    private List<NexusPlayer> players = new LinkedList<>();
+    private Map<UUID, SpigotNexusPlayer> players = new HashMap<>();
     private List<UUID> spectatingPlayers = new ArrayList<>();
     private Timer timer;
     private GameSettings gameSettings;
@@ -44,7 +44,9 @@ public class Lobby {
             }
         }
         
-        gameMap.delete(plugin);
+        if (gameMap != null) {
+            gameMap.delete(plugin);
+        }
     }
     
     public boolean checkMapEditing(Player player) {
@@ -60,7 +62,7 @@ public class Lobby {
     }
     
     public void sendMessage(String message) {
-        for (NexusPlayer player : this.players) {
+        for (SpigotNexusPlayer player : this.players.values()) {
             player.sendMessage(message);
         }
         Bukkit.getConsoleSender().sendMessage(MCUtils.color(message));
@@ -108,7 +110,7 @@ public class Lobby {
         if (this.gameSettings == null) {
             this.gameSettings = new GameSettings();
         }
-        Game game = new Game(gameMap, this.gameSettings, this.players, this.spectatingPlayers);
+        Game game = new Game(gameMap, this.gameSettings, this.players.values(), this.spectatingPlayers);
         plugin.setGame(game);
         if (Game.getMode() == Mode.AUTOMATIC) {
             this.state = LobbyState.STARTING;
@@ -134,8 +136,8 @@ public class Lobby {
         this.state = LobbyState.WAITING;
     }
     
-    public List<NexusPlayer> getPlayers() {
-        return this.players;
+    public Collection<SpigotNexusPlayer> getPlayers() {
+        return this.players.values();
     }
     
     public Timer getTimer() {
@@ -154,7 +156,7 @@ public class Lobby {
         return gameMap;
     }
     
-    public void addPlayer(NexusPlayer nexusPlayer) {
+    public void addPlayer(SpigotNexusPlayer nexusPlayer) {
         if (nexusPlayer == null) {
             System.out.println("Nexus Player was null");
             return;
@@ -162,9 +164,9 @@ public class Lobby {
         if (nexusPlayer.getPlayer() == null) {
             return;
         }
-        this.players.add(nexusPlayer);
+        this.players.put(nexusPlayer.getUniqueId(), nexusPlayer);
         int totalPlayers = 0;
-        for (NexusPlayer player : this.players) {
+        for (SpigotNexusPlayer player : this.players.values()) {
             if (!this.spectatingPlayers.contains(player.getUniqueId())) {
                 totalPlayers++;
             }
@@ -198,10 +200,10 @@ public class Lobby {
         }
     }
     
-    public void removePlayer(NexusPlayer nexusPlayer) {
-        this.players.remove(nexusPlayer);
+    public void removePlayer(SpigotNexusPlayer nexusPlayer) {
+        this.players.remove(nexusPlayer.getUniqueId());
         int totalPlayers = 0;
-        for (NexusPlayer player : this.players) {
+        for (SpigotNexusPlayer player : this.players.values()) {
             if (!this.spectatingPlayers.contains(player.getUniqueId())) {
                 totalPlayers++;
             }
@@ -252,7 +254,7 @@ public class Lobby {
     }
     
     public boolean hasPlayer(UUID uniqueId) {
-        for (NexusPlayer player : this.players) {
+        for (SpigotNexusPlayer player : this.players.values()) {
             if (player.getUniqueId().toString().equalsIgnoreCase(uniqueId.toString())) {
                 return true;
             }
@@ -293,7 +295,7 @@ public class Lobby {
     }
     
     public void playSound(Sound sound) {
-        for (NexusPlayer player : this.players) {
+        for (SpigotNexusPlayer player : this.players.values()) {
             if (player.getPlayer() != null) {
                 player.getPlayer().playSound(player.getPlayer().getLocation(), sound, 1, 1);
             }

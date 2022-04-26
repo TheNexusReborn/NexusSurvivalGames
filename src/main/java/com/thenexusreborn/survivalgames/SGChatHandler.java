@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames;
 
+import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.nexuscore.chat.ChatHandler;
 import com.thenexusreborn.nexuscore.player.*;
 import com.thenexusreborn.survivalgames.game.*;
