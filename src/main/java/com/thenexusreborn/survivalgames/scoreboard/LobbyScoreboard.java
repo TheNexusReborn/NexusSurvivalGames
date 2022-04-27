@@ -38,7 +38,7 @@ public class LobbyScoreboard extends SpigotScoreboardView {
     public void registerTeams() {
         IScoreboard scoreboard = this.scoreboard.getScoreboard();
         ITeam modeLabel = scoreboard.registerNewTeam(modeLabelName);
-        addEntry(objective, modeLabel, MCUtils.color("&6&lMODE"), 15);
+        addEntry(objective, modeLabel, MCUtils.color("&6&lMode"), 15);
     
         ITeam modeValue = scoreboard.registerNewTeam(modeValueName);
         modeValue.setPrefix(MCUtils.color("&f"));
