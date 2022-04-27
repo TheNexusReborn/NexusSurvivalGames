@@ -33,7 +33,7 @@ public class GameEndTimerCallback implements ReturnableCallback<TimerSnapshot, B
         
         if (MINUTES_ANNOUCNE.contains(remainingMinutes)) {
             if (!announcedMinutes.contains(remainingMinutes)) {
-                game.sendMessage("&6&l>> &eThe &c&lGAME &eends in &b" + Timer.formatTime(remainingSeconds) + "&e.");
+                game.sendMessage("&6&l>> &eThe game &c&lENDS &ein &b" + Timer.formatTime(remainingSeconds) + "&e.");
                 if (game.getSettings().isSounds()) {
                     game.playSound(Sound.CLICK);
                 }
