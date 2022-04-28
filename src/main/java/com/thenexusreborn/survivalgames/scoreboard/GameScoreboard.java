@@ -34,57 +34,20 @@ public class GameScoreboard extends SpigotScoreboardView {
     
     @Override
     public void registerTeams() {
-        IScoreboard scoreboard = this.scoreboard.getScoreboard();
-        ITeam mapLabel = scoreboard.registerNewTeam(mapLabelName);
-        addEntry(objective, mapLabel, MCUtils.color("&6&lMAP:"), 15);
-    
-        ITeam mapValue = scoreboard.registerNewTeam(mapValueName);
-        mapValue.setPrefix(MCUtils.color("&f"));
-        addEntry(objective, mapValue, ChatColor.AQUA.toString(), 14);
-    
-        ITeam blank1 = scoreboard.registerNewTeam(blank1Name);
-        addEntry(objective, blank1, ChatColor.BLACK.toString(), 13);
-    
-        ITeam stateLabel = scoreboard.registerNewTeam(playersLabelName);
-        addEntry(objective, stateLabel, MCUtils.color("&6&lPLAYERS:"), 12);
-    
-        ITeam tributesValue = scoreboard.registerNewTeam(tributesValueName);
-        tributesValue.setPrefix(MCUtils.color("&fTributes: "));
-        addEntry(objective, tributesValue, ChatColor.YELLOW.toString(), 11);
-    
-        ITeam watchingValue = scoreboard.registerNewTeam(watchingValueName);
-        watchingValue.setPrefix(MCUtils.color("&fWatching: "));
-        addEntry(objective, watchingValue, ChatColor.DARK_PURPLE.toString(), 10);
-    
-        ITeam blank2 = scoreboard.registerNewTeam(blank2Name);
-        addEntry(objective, blank2, ChatColor.BLUE.toString(), 9);
-    
-        ITeam infoLabel = scoreboard.registerNewTeam(infoLabelName);
-        addEntry(objective, infoLabel, MCUtils.color("&6&lINFO:"), 8);
-    
-        ITeam scoreValue = scoreboard.registerNewTeam(scoreValueName);
-        scoreValue.setPrefix(MCUtils.color("&fScore: "));
-        addEntry(objective, scoreValue, ChatColor.DARK_AQUA.toString(), 7);
-    
-        ITeam passesValue = scoreboard.registerNewTeam(passesValueName);
-        passesValue.setPrefix(MCUtils.color("&fPasses: "));
-        passesValue.setSuffix(MCUtils.color("&cWIP"));
-        addEntry(objective, passesValue, ChatColor.LIGHT_PURPLE.toString(), 6);
-    
-        ITeam killStreakValue = scoreboard.registerNewTeam(killStreakValueName);
-        killStreakValue.setPrefix(MCUtils.color("&fKS: "));
-        killStreakValue.setSuffix(MCUtils.color("&cWIP"));
-        addEntry(objective, killStreakValue, ChatColor.DARK_RED.toString(), 5);
-    
-        ITeam blank3 = scoreboard.registerNewTeam(blank3Name);
-        addEntry(objective, blank3, ChatColor.DARK_BLUE.toString(), 4);
-    
-        ITeam serverLabel = scoreboard.registerNewTeam(serverLabelName);
-        addEntry(objective, serverLabel, MCUtils.color("&6&lSERVER:"), 3);
-    
-        ITeam serverValue = scoreboard.registerNewTeam(serverValueName);
-        serverValue.setPrefix(MCUtils.color("&f" + plugin.getNexusCore().getConfig().getString("serverName")));
-        addEntry(objective, serverValue, ChatColor.DARK_GRAY.toString(), 2);
+        createTeam(mapLabelName, "&6&lMAP:", 15);
+        createTeam(mapValueName, ChatColor.AQUA.toString(), "&f", 14);
+        createTeam(blank1Name, ChatColor.BLACK.toString(), 13);
+        createTeam(playersLabelName, "&6&lPLAYERS:", 12);
+        createTeam(tributesValueName, ChatColor.YELLOW.toString(), "&fTributes: ", 11);
+        createTeam(watchingValueName, ChatColor.DARK_BLUE.toString(), "&fWatching: ", 10);
+        createTeam(blank2Name, ChatColor.BLUE.toString(), 9);
+        createTeam(infoLabelName, "&6&lINFO:", 8);    
+        createTeam(scoreValueName, ChatColor.DARK_AQUA.toString(), "&fScore: ", 7);
+        createTeam(passesValueName, ChatColor.LIGHT_PURPLE.toString(), "&fPasses: ", "&cWIP", 6);    
+        createTeam(killStreakValueName, ChatColor.DARK_RED.toString(), "&fKS: ", "&cWIP", 5);
+        createTeam(blank3Name, ChatColor.DARK_PURPLE.toString(), 4);    
+        createTeam(serverLabelName, "&6&lSERVER:", 3);
+        createTeam(serverValueName, ChatColor.DARK_GRAY.toString(), "&f" + plugin.getNexusCore().getConfig().getString("serverName"), 2);    
     }
     
     @Override
@@ -119,6 +82,8 @@ public class GameScoreboard extends SpigotScoreboardView {
             scoreboard.getScoreboard().getTeam(tributesValueName).setSuffix(MCUtils.color("&a" + tributes));
             scoreboard.getScoreboard().getTeam(watchingValueName).setSuffix(MCUtils.color("&c" + watching));
             scoreboard.getScoreboard().getTeam(scoreValueName).setSuffix(MCUtils.color("&e" + MCUtils.formatNumber(this.scoreboard.getPlayer().getStatValue("sg_score"))));
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
