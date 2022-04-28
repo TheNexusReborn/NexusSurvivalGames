@@ -571,8 +571,14 @@ public class Game {
         gamePlayer.setDeathInfo(deathInfo);
         GameTeam oldTeam = gamePlayer.getTeam();
         
-        gamePlayer.sendMessage(GameTeam.TRIBUTES.getLeaveMessage());
+    
+        int score = (int) gamePlayer.getNexusPlayer().getStatValue("sg_score");
+        int lost = (int) Math.ceil(score / 8D);
         
+        gamePlayer.getNexusPlayer().changeStat("sg_score", lost, Operator.SUBTRACT);
+        gamePlayer.sendMessage("&4&l>> &cYou lost " + lost + " Score for dying.");
+    
+        gamePlayer.sendMessage(GameTeam.TRIBUTES.getLeaveMessage());
         GamePlayer killer = null;
         String killerName = null;
         boolean mutationKill = false;
@@ -695,14 +701,16 @@ public class Game {
         }
     
         if (killer != null) {
+            killer.getNexusPlayer().changeStat("sg_score", lost, Operator.ADD);
+            killer.sendMessage("&2&l>> &a+" + lost + " Score!");
             double multiplier = killer.getNexusPlayer().getRank().getMultiplier();
             Rank rank = killer.getNexusPlayer().getRank();
-            String multiplierMessage = rank.getColor() + "&l * x" + multiplier + " " + StringHelper.capitalizeEveryWord(rank.name()) + " Bonus";
+            String multiplierMessage = rank.getColor() + "&l * x" + MCUtils.formatNumber(multiplier) + " " + StringHelper.capitalizeEveryWord(rank.name()) + " Bonus";
             if (settings.isGiveXp()) {
                 double xp = 2;
                 xp *= multiplier;
-                killer.getNexusPlayer().setStat("xp", xp, Operator.ADD);
-                String baseMessage = "&2&l>> &a&l+" + xp + " &2&lXP&a&l!";
+                killer.getNexusPlayer().changeStat("xp", xp, Operator.ADD);
+                String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(xp) + " &2&lXP&a&l!";
                 if (multiplier > 1) {
                     killer.sendMessage(baseMessage + multiplierMessage);
                 } else {
@@ -713,8 +721,8 @@ public class Game {
             if (settings.isGiveCredits()) {
                 double credits = 2;
                 credits *= multiplier;
-                killer.getNexusPlayer().setStat("credits", credits, Operator.ADD);
-                String baseMessage = "&2&l>> &a&l+" + credits + " &3&lCREDITS&a&l!";
+                killer.getNexusPlayer().changeStat("credits", credits, Operator.ADD);
+                String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(credits) + " &3&lCREDITS&a&l!";
                 if (multiplier > 1) {
                     killer.sendMessage(baseMessage + multiplierMessage);
                 } else {
