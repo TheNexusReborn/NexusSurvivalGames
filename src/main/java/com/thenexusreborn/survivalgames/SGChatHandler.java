@@ -2,7 +2,6 @@ package com.thenexusreborn.survivalgames;
 
 import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.nexuscore.chat.ChatHandler;
-import com.thenexusreborn.nexuscore.player.*;
 import com.thenexusreborn.survivalgames.game.*;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
@@ -33,7 +32,8 @@ public class SGChatHandler implements ChatHandler {
         }
         
         String displayName = prefix + team.getColor() + player.getName() + suffix;
-        String format = "&8<&3100&8> &8(&2&l0&8) &r" + displayName + "&8: " + chatColor + e.getMessage().replace("%", "%%");
+        String format = "&8<&3100&8> &8(&2&l{level}&8) &r" + displayName + "&8: " + chatColor + e.getMessage().replace("%", "%%");
+        format = format.replace("{level}", player.getLevel() + "");
         if (game.getState().ordinal() >= GameState.INGAME_GRACEPERIOD.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal()) {
             if (team != GameTeam.TRIBUTES) {
                 for (GamePlayer p : game.getPlayers().values()) {
