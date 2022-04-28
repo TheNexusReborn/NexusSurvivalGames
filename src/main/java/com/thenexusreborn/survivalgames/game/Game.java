@@ -10,7 +10,7 @@ import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.death.*;
 import com.thenexusreborn.survivalgames.game.timer.*;
 import com.thenexusreborn.survivalgames.map.GameMap;
-import com.thenexusreborn.survivalgames.scoreboard.GameScoreboard;
+import com.thenexusreborn.survivalgames.scoreboard.*;
 import com.thenexusreborn.survivalgames.settings.*;
 import com.thenexusreborn.survivalgames.tournament.Tournament;
 import com.thenexusreborn.survivalgames.util.SGUtils;
@@ -105,7 +105,7 @@ public class Game {
         teleportSpectator(nexusPlayer.getPlayer(), this.gameMap.getCenter().toLocation(this.gameMap.getWorld()));
         this.players.put(nexusPlayer.getUniqueId(), gamePlayer);
         sendMessage("&a&l>> &b" + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined as a spectator.");
-        nexusPlayer.getScoreboard().setView(new GameScoreboard(nexusPlayer.getScoreboard(), plugin));
+        nexusPlayer.getScoreboard().setView(new DebugGameBoard(nexusPlayer.getScoreboard(), plugin));
         recalculateVisibiltiy();
     }
     

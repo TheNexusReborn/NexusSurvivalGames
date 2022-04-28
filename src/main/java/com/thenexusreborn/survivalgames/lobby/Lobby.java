@@ -6,7 +6,7 @@ import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.map.GameMap;
-import com.thenexusreborn.survivalgames.scoreboard.LobbyScoreboard;
+import com.thenexusreborn.survivalgames.scoreboard.DebugLobbyBoard;
 import com.thenexusreborn.survivalgames.settings.*;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -25,7 +25,7 @@ public class Lobby {
     private Mode mode = Mode.MANUAL;
     private LobbyState state = LobbyState.WAITING;
     private Location spawnpoint;
-    private LobbyScoreboard lobbyScoreboard;
+    private DebugLobbyBoard lobbyScoreboard;
     
     public Lobby(SurvivalGames plugin) {
         this.plugin = plugin;
@@ -193,7 +193,7 @@ public class Lobby {
                 player.removePotionEffect(pe.getType());
             }
         }
-        nexusPlayer.getScoreboard().setView(new LobbyScoreboard(nexusPlayer.getScoreboard(), plugin));
+        nexusPlayer.getScoreboard().setView(new DebugLobbyBoard(nexusPlayer.getScoreboard(), plugin));
         for (Player online : Bukkit.getOnlinePlayers()) {
             online.showPlayer(player);
             player.showPlayer(online);
