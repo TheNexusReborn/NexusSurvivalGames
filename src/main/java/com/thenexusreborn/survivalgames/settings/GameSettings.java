@@ -19,11 +19,11 @@ public class GameSettings {
     private boolean unlimitedPasses = false;
     private boolean timeProgression = false;
     private boolean weatherProgression = false;
-    private boolean creditMultiplier = false;
+    private boolean multiplier = true;
     private boolean fishingrods = true;
     private boolean sounds = true;
-    private boolean giveCredits = false;
-    private boolean giveXp = false;
+    private boolean giveCredits = true;
+    private boolean giveXp = true;
     private ColorMode colorMode = ColorMode.RANK;
     private Time time = Time.NOON;
     private Weather weather = Weather.CLEAR;
@@ -189,12 +189,12 @@ public class GameSettings {
         return this;
     }
     
-    public boolean isCreditMultiplier() {
-        return creditMultiplier;
+    public boolean isMultiplier() {
+        return multiplier;
     }
     
-    public GameSettings setCreditMultiplier(boolean creditMultiplier) {
-        this.creditMultiplier = creditMultiplier;
+    public GameSettings setMultiplier(boolean multiplier) {
+        this.multiplier = multiplier;
         return this;
     }
     
