@@ -705,7 +705,7 @@ public class Game {
             killer.sendMessage("&2&l>> &a+" + lost + " Score!");
             double multiplier = killer.getNexusPlayer().getRank().getMultiplier();
             Rank rank = killer.getNexusPlayer().getRank();
-            String multiplierMessage = rank.getColor() + "&l * x" + MCUtils.formatNumber(multiplier) + " " + StringHelper.capitalizeEveryWord(rank.name()) + " Bonus";
+            String multiplierMessage = rank.getColor() + "&l * x" + MCUtils.formatNumber(multiplier) + " " + rank.getPrefix() + " Bonus";
             if (settings.isGiveXp()) {
                 double xp = 2;
                 xp *= multiplier;
