@@ -35,7 +35,7 @@ public class Game {
     private Map<UUID, GamePlayer> players = new HashMap<>();
     private Map<Integer, UUID> spawns = new HashMap<>();
     private GameState state = UNDEFINED;
-    private Timer timer, graceperiodTimer;
+    private Timer timer, graceperiodTimer, restockTimer;
     private List<Location> lootedChests = new ArrayList<>();
     
     public Game(GameMap gameMap, GameSettings settings, Collection<SpigotNexusPlayer> players, List<UUID> spectatingPlayers) {
@@ -46,6 +46,7 @@ public class Game {
             if (spectatingPlayers.contains(player.getUniqueId())) {
                 gamePlayer.setTeam(GameTeam.SPECTATORS);
             }
+            player.setActionBar(new GameActionBar(plugin, gamePlayer));
             this.players.put(gamePlayer.getUniqueId(), gamePlayer);
         }
     }
@@ -96,6 +97,10 @@ public class Game {
     
     public Timer getGraceperiodTimer() {
         return graceperiodTimer;
+    }
+    
+    public Timer getRestockTimer() {
+        return restockTimer;
     }
     
     public void addPlayer(SpigotNexusPlayer nexusPlayer) {
@@ -367,11 +372,21 @@ public class Game {
         } else {
             this.state = INGAME;
         }
+        this.restockTimer = new Timer(new RestockTimerCallback(this)).run(600050L);
         sendMessage("&6&l>> &a&lMAY THE ODDS BE EVER IN YOUR FAVOR.");
     }
     
     public void restockChests() {
         this.lootedChests.clear();
+        this.restockTimer.cancel();
+        this.restockTimer = null;
+        if (state == INGAME) {
+            int restocks = this.timer.getSecondsElapsed() / 600;
+            int totalRestocks = (this.settings.getGameLength() / 10) - 1;
+            if (restocks < totalRestocks) {
+                this.restockTimer = new Timer(new RestockTimerCallback(this)).run(600050L);
+            }
+        }
     }
     
     public void warmupComplete() {

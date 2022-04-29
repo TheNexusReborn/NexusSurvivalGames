@@ -10,6 +10,7 @@ public class GamePlayer {
     private GameTeam team;
     private DeathInfo deathInfo;
     private boolean spectatorByDeath;
+    private TrackerInfo trackerInfo;
     
     public GamePlayer(SpigotNexusPlayer nexusPlayer) {
         this.nexusPlayer = nexusPlayer;
@@ -21,6 +22,14 @@ public class GamePlayer {
     
     public void sendMessage(String message) {
         nexusPlayer.sendMessage(message);
+    }
+    
+    public TrackerInfo getTrackerInfo() {
+        return trackerInfo;
+    }
+    
+    public void setTrackerInfo(TrackerInfo trackerInfo) {
+        this.trackerInfo = trackerInfo;
     }
     
     public void setTeam(GameTeam team) {

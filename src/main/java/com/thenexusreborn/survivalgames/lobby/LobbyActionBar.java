@@ -24,7 +24,7 @@ public class LobbyActionBar extends ActionBar {
         }
         
         if (lobby.getState() == LobbyState.WAITING || lobby.getTimer() == null) {
-            return "&d&lNEXUS   &fPlaying on &f&l" + plugin.getNexusCore().getConfig().getString("serverName");
+            return "&d&lNEXUS &7- &fPlaying on &f&l" + plugin.getNexusCore().getConfig().getString("serverName");
         }
         
         if (lobby.getState() == LobbyState.COUNTDOWN && lobby.getTimer() != null) {

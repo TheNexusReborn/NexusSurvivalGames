@@ -101,7 +101,9 @@ public class PlayerTrackerTask extends BukkitRunnable {
             String targetName = "";
             
             if (holdingTracker) {
-                SpigotUtils.sendActionBar(player, "&f&lTARGET: &a" + target.getName() + "   &f&lDISTANCE: &a" + ((int) distance) + "m" + "   &f&lHEALTH: &a" + health + "&f/&a" + maxHealth + " HP");
+                gamePlayer.setTrackerInfo(new TrackerInfo(target.getName(), (int) distance, health, maxHealth));
+            } else {
+                gamePlayer.setTrackerInfo(null);
             }
         }
         
