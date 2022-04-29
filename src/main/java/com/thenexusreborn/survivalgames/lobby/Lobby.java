@@ -198,6 +198,7 @@ public class Lobby {
             online.showPlayer(player);
             player.showPlayer(online);
         }
+        nexusPlayer.setActionBar(new LobbyActionBar(plugin));
     }
     
     public void removePlayer(SpigotNexusPlayer nexusPlayer) {
