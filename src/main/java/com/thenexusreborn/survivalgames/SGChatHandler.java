@@ -36,9 +36,14 @@ public class SGChatHandler implements ChatHandler {
         }
         
         
-        String format = "&8<&3{score}&8> &8(&2&l{level}&8) &r" + displayName + "&8: " + chatColor + e.getMessage().replace("%", "%%");
+        String format = "&8<&3{score}&8> &8(&2&l{level}&8) &r" + displayName + "{tag}&8: " + chatColor + e.getMessage().replace("%", "%%");
         format = format.replace("{level}", player.getLevel() + "");
         format = format.replace("{score}", MCUtils.formatNumber(player.getStatValue("sg_score")));
+        if (player.getTag() != null) {
+            format = format.replace("{tag}", " " + player.getTag().getDisplayName());
+        } else {
+            format = format.replace("{tag}", "");
+        }
         if (game != null) {
             if (game.getState().ordinal() >= GameState.INGAME_GRACEPERIOD.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal()) {
                 if (game.getPlayer(player.getUniqueId()).getTeam() != GameTeam.TRIBUTES) {
