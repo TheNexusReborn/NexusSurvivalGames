@@ -306,4 +306,7 @@ public class Lobby {
     }
     
     
+    public boolean isPlayer(UUID uniqueId) {
+        return this.players.containsKey(uniqueId);
+    }
 }

@@ -8,6 +8,7 @@ import com.thenexusreborn.survivalgames.cmd.arg.MapNameArgument;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
 import com.thenexusreborn.survivalgames.map.GameMap;
 import com.thenexusreborn.survivalgames.util.SGUtils;
+import org.bukkit.entity.Player;
 
 import java.util.*;
 
@@ -51,8 +52,18 @@ public class LobbyCommand extends NexusCommand {
                 
                 if (mode == Mode.AUTOMATIC) {
                     plugin.getLobby().automatic();
+                    if (actor.getConsoleSender() instanceof Player) {
+                        if (!plugin.getLobby().isPlayer(actor.getPlayer().getUniqueId())) {
+                            actor.sendMessage("&eYou set the lobby to automatic mode.");
+                        }
+                    }
                     plugin.getLobby().sendMessage("&eThe lobby has been set to automatic mode.");
                 } else if (mode == Mode.MANUAL) {
+                    if (actor.getConsoleSender() instanceof Player) {
+                        if (!plugin.getLobby().isPlayer(actor.getPlayer().getUniqueId())) {
+                            actor.sendMessage("&eYou set the lobby to automatic mode.");
+                        }
+                    }
                     plugin.getLobby().manual();
                     plugin.getLobby().sendMessage("&eThe lobby has been set to manual mode.");
                 }
