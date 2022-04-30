@@ -96,6 +96,9 @@ public class TournamentCommand implements TabExecutor {
                         int place = 1;
                         for (ScoreInfo scoreInfo : leaderboard) {
                             NexusPlayer player = NexusAPI.getApi().getPlayerManager().getNexusPlayer(scoreInfo.getUuid());
+                            if (player == null) {
+                                player = NexusAPI.getApi().getDataManager().loadPlayer(scoreInfo.getUuid());
+                            }
                             lines.add("  &a" + place + ". " + player.getRank().getColor() + player.getName() + " &7-> &f" + scoreInfo.getScore());
                             place++;
                         }
