@@ -5,12 +5,17 @@ import com.thenexusreborn.survivalgames.game.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.bukkit.event.entity.*;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.*;
+
+import java.util.*;
 
 @SuppressWarnings("DuplicatedCode")
 public class EntityListener implements Listener {
     
     private SurvivalGames plugin;
+    
+    private static final Set<DamageCause> GRACE_DAMAGE_STOP = new HashSet<>(Arrays.asList(DamageCause.BLOCK_EXPLOSION, DamageCause.ENTITY_EXPLOSION, DamageCause.FIRE, DamageCause.FIRE_TICK));
     
     public EntityListener(SurvivalGames plugin) {
         this.plugin = plugin;
@@ -35,6 +40,12 @@ public class EntityListener implements Listener {
                 e.setCancelled(true);
                 e.getEntity().setFireTicks(0);
                 return;
+            }
+            
+            if (game.getState() == GameState.INGAME_GRACEPERIOD) {
+                if (GRACE_DAMAGE_STOP.contains(e.getCause())) {
+                    e.setCancelled(true);
+                }
             }
             
             GameState state = game.getState();
