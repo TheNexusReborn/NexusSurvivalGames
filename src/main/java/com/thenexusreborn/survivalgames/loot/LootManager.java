@@ -67,12 +67,13 @@ public class LootManager {
         Loot ender_pearl = new Loot(Material.ENDER_PEARL, 1);
         Loot wet_noodle = new Loot(Material.ROTTEN_FLESH, "Wet Noodle", 5);
         Loot golden_carrot = new Loot(Material.GOLDEN_CARROT, 20);
-        Loot diamond = new Loot(Material.DIAMOND, 2);
+        Loot diamond = new Loot(Material.DIAMOND, 5);
+        Loot apple = new Loot(Material.APPLE, 20);
         
         addLoot(leather_helmet, leather_chestplate, leather_leggings, leather_boots, chain_helmet, chain_chestplate, chain_leggings, chain_boots, iron_helmet, iron_chestplate, 
                 iron_leggings, iron_boots, gold_helmet, gold_chestplate, gold_leggings, gold_boots, wood_axe, wood_sword, stone_axe, stone_sword, bow, arrows, 
                 cooked_porkchop, steak, grilled_chicken, raw_porkchop, raw_beef, raw_chicken, carrots, potato, baked_potato, iron_ingot, gold_ingot, stick, flint_and_steel, tnt,
-                iron_axe, cake, pumpkin_pie, raw_fish, cooked_fish, feather, flint, fishing_rod, cobweb, enchantment_bottle, golden_apple, wet_noodle, ender_pearl, golden_carrot, diamond, egg_of_doom, slowball, player_tracker);
+                iron_axe, cake, pumpkin_pie, raw_fish, cooked_fish, feather, flint, fishing_rod, cobweb, enchantment_bottle, golden_apple, wet_noodle, ender_pearl, golden_carrot, diamond, egg_of_doom, slowball, player_tracker, apple);
     
         for (Loot loot : this.possibleLoot.values()) {
             for (int i = 0; i < loot.getWeight(); i++) {
