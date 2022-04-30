@@ -278,7 +278,7 @@ public class Game {
             while ((tribute = tributes.poll()) != null) {
                 SurvivalGames.PLAYER_QUEUE.offer(tribute);
             }
-    
+            
             for (GamePlayer player : new ArrayList<>(this.players.values())) {
                 player.getNexusPlayer().getScoreboard().setTablistHandler(new GameTablistHandler(player.getNexusPlayer().getScoreboard(), plugin));
             }
@@ -769,32 +769,44 @@ public class Game {
         }
         
         if (killer != null) {
-            killer.getNexusPlayer().changeStat("sg_score", lost, Operator.ADD);
-            killer.sendMessage("&2&l>> &a+" + lost + " Score!");
+            if (!killer.getUniqueId().equals(player.getUniqueId())) {
+                killer.getNexusPlayer().changeStat("sg_score", lost, Operator.ADD);
+                killer.sendMessage("&2&l>> &a+" + lost + " Score!");
+            } else {
+                killer.sendMessage("&2&l>> &cYou killed yourself. No score for you.");
+            }
             double multiplier = killer.getNexusPlayer().getRank().getMultiplier();
             Rank rank = killer.getNexusPlayer().getRank();
             String multiplierMessage = rank.getColor() + "&l * x" + MCUtils.formatNumber(multiplier) + " " + rank.getPrefix() + " Bonus";
             if (settings.isGiveXp()) {
                 double xp = 2;
                 xp *= multiplier;
-                killer.getNexusPlayer().changeStat("xp", xp, Operator.ADD);
-                String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(xp) + " &2&lXP&a&l!";
-                if (multiplier > 1) {
-                    killer.sendMessage(baseMessage + multiplierMessage);
+                if (!killer.getUniqueId().equals(player.getUniqueId())) {
+                    killer.getNexusPlayer().changeStat("xp", xp, Operator.ADD);
+                    String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(xp) + " &2&lXP&a&l!";
+                    if (multiplier > 1) {
+                        killer.sendMessage(baseMessage + multiplierMessage);
+                    } else {
+                        killer.sendMessage(baseMessage);
+                    }
                 } else {
-                    killer.sendMessage(baseMessage);
+                    killer.sendMessage("&2&l>> &cYou killed yourself. No XP for you.");
                 }
             }
             
             if (settings.isGiveCredits()) {
                 double credits = 2;
                 credits *= multiplier;
-                killer.getNexusPlayer().changeStat("credits", credits, Operator.ADD);
-                String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(credits) + " &3&lCREDITS&a&l!";
-                if (multiplier > 1) {
-                    killer.sendMessage(baseMessage + multiplierMessage);
+                if (!(killer.getUniqueId().equals(player.getUniqueId()))) {
+                    killer.getNexusPlayer().changeStat("credits", credits, Operator.ADD);
+                    String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(credits) + " &3&lCREDITS&a&l!";
+                    if (multiplier > 1) {
+                        killer.sendMessage(baseMessage + multiplierMessage);
+                    } else {
+                        killer.sendMessage(baseMessage);
+                    }
                 } else {
-                    killer.sendMessage(baseMessage);
+                    killer.sendMessage("&2&l>> &cYou killed yourself. No Credits for you.");
                 }
             }
         }
