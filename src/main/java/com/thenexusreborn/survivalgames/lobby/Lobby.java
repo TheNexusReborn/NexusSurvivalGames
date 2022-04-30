@@ -1,6 +1,7 @@
 package com.thenexusreborn.survivalgames.lobby;
 
 import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
+import com.thenexusreborn.nexuscore.scoreboard.impl.RankTablistHandler;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.*;
@@ -193,7 +194,8 @@ public class Lobby {
                 player.removePotionEffect(pe.getType());
             }
         }
-        nexusPlayer.getScoreboard().setView(new LobbyScoreboard(nexusPlayer.getScoreboard(), plugin));
+        nexusPlayer.getScoreboard().setView(new LobbyScoreboardView(nexusPlayer.getScoreboard(), plugin));
+        nexusPlayer.getScoreboard().setTablistHandler(new RankTablistHandler(nexusPlayer.getScoreboard()));
         for (Player online : Bukkit.getOnlinePlayers()) {
             online.showPlayer(player);
             player.showPlayer(online);

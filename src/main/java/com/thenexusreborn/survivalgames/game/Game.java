@@ -110,7 +110,8 @@ public class Game {
         teleportSpectator(nexusPlayer.getPlayer(), this.gameMap.getCenter().toLocation(this.gameMap.getWorld()));
         this.players.put(nexusPlayer.getUniqueId(), gamePlayer);
         sendMessage("&a&l>> &b" + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined as a spectator.");
-        nexusPlayer.getScoreboard().setView(new DebugGameBoard(nexusPlayer.getScoreboard(), plugin));
+        nexusPlayer.getScoreboard().setView(new GameScoreboardView(nexusPlayer.getScoreboard(), plugin));
+        nexusPlayer.getScoreboard().setTablistHandler(new GameTablistHandler(nexusPlayer.getScoreboard(), plugin));
         recalculateVisibiltiy();
     }
     
@@ -277,6 +278,10 @@ public class Game {
             while ((tribute = tributes.poll()) != null) {
                 SurvivalGames.PLAYER_QUEUE.offer(tribute);
             }
+    
+            for (GamePlayer player : new ArrayList<>(this.players.values())) {
+                player.getNexusPlayer().getScoreboard().setTablistHandler(new GameTablistHandler(player.getNexusPlayer().getScoreboard(), plugin));
+            }
             
             this.state = TEAMS_ASSIGNED;
         } catch (Exception e) {
@@ -289,7 +294,7 @@ public class Game {
         this.state = SETTING_UP;
         
         for (GamePlayer player : this.players.values()) {
-            player.getNexusPlayer().getScoreboard().setView(new GameScoreboard(player.getNexusPlayer().getScoreboard(), plugin));
+            player.getNexusPlayer().getScoreboard().setView(new GameScoreboardView(player.getNexusPlayer().getScoreboard(), plugin));
         }
         
         new BukkitRunnable() {

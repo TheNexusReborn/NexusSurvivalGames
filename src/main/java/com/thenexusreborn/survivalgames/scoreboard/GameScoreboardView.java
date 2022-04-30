@@ -12,7 +12,7 @@ import org.bukkit.ChatColor;
 import java.util.*;
 
 @SuppressWarnings("DuplicatedCode")
-public class GameScoreboard extends SpigotScoreboardView {
+public class GameScoreboardView extends SpigotScoreboardView {
     
     private SurvivalGames plugin;
     
@@ -21,7 +21,7 @@ public class GameScoreboard extends SpigotScoreboardView {
             blank2Name = "blank2", infoLabelName = "infoLabel", scoreValueName = "scoreValue", passesValueName = "passesValue", killStreakValueName = "killstreakValue", 
             blank3Name = "blank3", serverLabelName = "serverLabel", serverValueName = "serverValue";
     
-    public GameScoreboard(NexusScoreboard nexusScoreboard, SurvivalGames plugin) {
+    public GameScoreboardView(NexusScoreboard nexusScoreboard, SurvivalGames plugin) {
         super(nexusScoreboard, "survivalgames", MCUtils.color("&d&lSurvival Games"));
         this.plugin = plugin;
     }
