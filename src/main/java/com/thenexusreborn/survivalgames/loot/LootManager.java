@@ -50,13 +50,13 @@ public class LootManager {
         Loot gold_ingot = new Loot(Material.GOLD_INGOT, 15);
         Loot stick = new Loot(Material.STICK, 20);
         Loot flint_and_steel = new Loot(Material.FLINT_AND_STEEL, 15);
-        Loot tnt = new Loot(Material.TNT, "TNT", 15);
+        Loot tnt = new Loot(Material.TNT, "TNT", 8);
         Loot iron_axe = new Loot(Material.IRON_AXE, 7);
         Loot cake = new Loot(Material.CAKE, 20);
         Loot player_tracker = new Loot(Material.COMPASS, "Player Tracker", 20);
-        Loot pumpkin_pie = new Loot(Material.PUMPKIN_PIE, 20);
+        Loot pumpkin_pie = new Loot(Material.PUMPKIN_PIE, 25);
         Loot raw_fish = new Loot(Material.RAW_FISH, 50);
-        Loot cooked_fish = new Loot(Material.COOKED_FISH, "Vile Creature", 30);
+        Loot cooked_fish = new Loot(Material.COOKED_FISH, "Vile Creature", 35);
         Loot feather = new Loot(Material.FEATHER, 25);
         Loot flint = new Loot(Material.FLINT, 15);
         Loot fishing_rod = new Loot(Material.FISHING_ROD, 15);
@@ -67,7 +67,7 @@ public class LootManager {
         Loot ender_pearl = new Loot(Material.ENDER_PEARL, 1);
         Loot wet_noodle = new Loot(Material.ROTTEN_FLESH, "Wet Noodle", 5);
         Loot golden_carrot = new Loot(Material.GOLDEN_CARROT, 20);
-        Loot diamond = new Loot(Material.DIAMOND, 5);
+        Loot diamond = new Loot(Material.DIAMOND, 7);
         Loot apple = new Loot(Material.APPLE, 20);
         
         addLoot(leather_helmet, leather_chestplate, leather_leggings, leather_boots, chain_helmet, chain_chestplate, chain_leggings, chain_boots, iron_helmet, iron_chestplate, 
