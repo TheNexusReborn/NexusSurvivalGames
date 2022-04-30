@@ -552,6 +552,54 @@ public class Game {
         }
         
         sendMessage("&6&l>> " + winnerName + " &a&lhas won Survival Games!");
+    
+        if (winner != null) {
+            int winGain = 50;
+            double currentScore = winner.getNexusPlayer().getStatValue("sg_score");
+            if (currentScore < 100 && currentScore > 50) {
+                winGain *= 1.25;
+            } else if (currentScore <= 50 && currentScore > 25) {
+                winGain *= 1.5;
+            } else if (currentScore < 25) {
+                winGain *= 2;
+            } else if (currentScore >= 500) {
+                winGain *= .8;
+            } else if (currentScore < 1000 && currentScore > 500) {
+                winGain *= .75;
+            } else if (currentScore >= 1000) {
+                winGain *= .5;
+            }
+            winner.getNexusPlayer().changeStat("sg_score", winGain, Operator.ADD);
+            winner.sendMessage("&2&l>> &a+" + winGain + " Score!");
+            double multiplier = winner.getNexusPlayer().getRank().getMultiplier();
+            Rank rank = winner.getNexusPlayer().getRank();
+            String multiplierMessage = rank.getColor() + "&l * x" + MCUtils.formatNumber(multiplier) + " " + rank.getPrefix() + " Bonus";
+            if (settings.isGiveXp()) {
+                double xp = 10;
+                xp *= multiplier;
+                winner.getNexusPlayer().changeStat("xp", xp, Operator.ADD);
+                String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(xp) + " &2&lXP&a&l!";
+                if (multiplier > 1) {
+                    winner.sendMessage(baseMessage + multiplierMessage);
+                } else {
+                    winner.sendMessage(baseMessage);
+                }
+            }
+    
+            if (settings.isGiveCredits()) {
+                double credits = 10;
+                credits *= multiplier;
+                winner.getNexusPlayer().changeStat("credits", credits, Operator.ADD);
+                String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(credits) + " &3&lCREDITS&a&l!";
+                if (multiplier > 1) {
+                    winner.sendMessage(baseMessage + multiplierMessage);
+                } else {
+                    winner.sendMessage(baseMessage);
+                }
+            }
+            
+        }
+        
         this.timer = new Timer(new NextGameTimerCallback(this)).run(10000L);
     }
     
