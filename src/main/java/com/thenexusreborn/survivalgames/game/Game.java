@@ -206,7 +206,7 @@ public class Game {
     public void teleportStart() {
         try {
             this.state = TELEPORT_START;
-    
+            
             List<UUID> tributes = new LinkedList<>(), spectators = new LinkedList<>();
             for (GamePlayer player : this.players.values()) {
                 Player p = player.getNexusPlayer().getPlayer();
@@ -233,9 +233,9 @@ public class Game {
                     entity.remove();
                 }
             }
-    
+            
             recalculateVisibiltiy();
-    
+            
             this.state = TELEPORT_START_DONE;
         } catch (Exception e) {
             e.printStackTrace();
@@ -264,20 +264,20 @@ public class Game {
                         tributes.offer(uuid);
                     }
                 }
-        
+                
                 player.sendMessage(player.getTeam().getJoinMessage());
             }
-    
+            
             UUID spectator;
             while ((spectator = spectators.poll()) != null) {
                 SurvivalGames.PLAYER_QUEUE.offer(spectator);
             }
-    
+            
             UUID tribute;
             while ((tribute = tributes.poll()) != null) {
                 SurvivalGames.PLAYER_QUEUE.offer(tribute);
             }
-    
+            
             this.state = TEAMS_ASSIGNED;
         } catch (Exception e) {
             e.printStackTrace();
@@ -319,7 +319,7 @@ public class Game {
                             for (int i = 0; i < gameMap.getSpawns().size(); i++) {
                                 spawns.put(i, null);
                             }
-    
+                            
                             gameMap.getWorld().setGameRuleValue("naturalRegeneration", "" + settings.isRegeneration());
                             gameMap.getWorld().setGameRuleValue("doDaylightCycle", "" + settings.isTimeProgression());
                             gameMap.getWorld().setGameRuleValue("doWeatherCycle", "" + settings.isWeatherProgression());
@@ -381,9 +381,9 @@ public class Game {
         this.restockTimer.cancel();
         this.restockTimer = null;
         if (state == INGAME) {
-            int restocks = this.timer.getSecondsElapsed() / 600;
-            int totalRestocks = (this.settings.getGameLength() / 10) - 1;
-            if (restocks < totalRestocks) {
+            int secondsLeft = this.timer.getSecondsLeft();
+            int minutesLeft = secondsLeft / 60;
+            if (minutesLeft > 10) {
                 this.restockTimer = new Timer(new RestockTimerCallback(this)).run(600050L);
             }
         }
@@ -425,7 +425,7 @@ public class Game {
             Location mapSpawn = gameMap.getCenter().toLocation(gameMap.getWorld());
             teleportTributes(tributes, mapSpawn);
             teleportSpectators(spectators, mapSpawn);
-    
+            
             recalculateVisibiltiy();
             this.state = TELEPORT_DEATHMATCH_DONE;
         } catch (Exception e) {
@@ -457,7 +457,7 @@ public class Game {
         if (this.timer != null) {
             timer.cancel();
         }
-    
+        
         for (GamePlayer player : this.players.values()) {
             if (player.getTeam() == GameTeam.TRIBUTES) {
                 player.getNexusPlayer().getPlayer().removePotionEffect(PotionEffectType.BLINDNESS);
@@ -514,7 +514,7 @@ public class Game {
                 }
             }
         }
-        
+
 //        List<GamePlayer> winners = new ArrayList<>();
 //        for (GamePlayer player : this.players.values()) {
 //            if (player.getTeam() == GameTeam.TRIBUTES) {
@@ -552,7 +552,7 @@ public class Game {
         }
         
         sendMessage("&6&l>> " + winnerName + " &a&lhas won Survival Games!");
-    
+        
         if (winner != null) {
             int winGain = 50;
             double currentScore = winner.getNexusPlayer().getStatValue("sg_score");
@@ -585,7 +585,7 @@ public class Game {
                     winner.sendMessage(baseMessage);
                 }
             }
-    
+            
             if (settings.isGiveCredits()) {
                 double credits = 10;
                 credits *= multiplier;
@@ -634,13 +634,13 @@ public class Game {
         gamePlayer.setDeathInfo(deathInfo);
         gamePlayer.setTrackerInfo(null);
         GameTeam oldTeam = gamePlayer.getTeam();
-    
+        
         int score = (int) gamePlayer.getNexusPlayer().getStatValue("sg_score");
         int lost = (int) Math.ceil(score / 8D);
         
         gamePlayer.getNexusPlayer().changeStat("sg_score", lost, Operator.SUBTRACT);
         gamePlayer.sendMessage("&4&l>> &cYou lost " + lost + " Score for dying.");
-    
+        
         gamePlayer.sendMessage(GameTeam.TRIBUTES.getLeaveMessage());
         GamePlayer killer = null;
         String killerName = null;
@@ -762,7 +762,7 @@ public class Game {
                 }
             }
         }
-    
+        
         if (killer != null) {
             killer.getNexusPlayer().changeStat("sg_score", lost, Operator.ADD);
             killer.sendMessage("&2&l>> &a+" + lost + " Score!");
@@ -780,7 +780,7 @@ public class Game {
                     killer.sendMessage(baseMessage);
                 }
             }
-    
+            
             if (settings.isGiveCredits()) {
                 double credits = 2;
                 credits *= multiplier;

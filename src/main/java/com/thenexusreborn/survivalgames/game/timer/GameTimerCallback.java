@@ -53,16 +53,6 @@ public class GameTimerCallback implements ReturnableCallback<TimerSnapshot, Bool
             }
         }
         
-        if (restockChests) {
-            if (!chestsRestocked.contains(remainingMinutes)) {
-                if (remainingMinutes != game.getSettings().getGameLength()) {
-                    game.restockChests();
-                    game.sendMessage("&6&l>> &a&lALL CHESTS HAVE BEEN RESTOCKED");
-                    this.chestsRestocked.add(remainingMinutes);
-                }
-            }
-        }
-        
         if (timerSnapshot.getTimeLeft() <= 0) {
             if (Game.getMode() == Mode.AUTOMATIC) {
                 game.teleportDeathmatch();
