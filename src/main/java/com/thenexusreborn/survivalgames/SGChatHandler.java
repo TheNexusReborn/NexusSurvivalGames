@@ -4,6 +4,7 @@ import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.nexuscore.chat.ChatHandler;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.game.*;
+import org.bukkit.ChatColor;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 public class SGChatHandler implements ChatHandler {
@@ -32,7 +33,7 @@ public class SGChatHandler implements ChatHandler {
         }
         
         
-        String format = "&8<&3{score}&8> &8(&2&l{level}&8) &r" + displayName + "{tag}&8: " + chatColor + e.getMessage().replace("%", "%%");
+        String format = "&8<&3{score}&8> &8(&2&l{level}&8) &r" + displayName + "{tag}&8: " + chatColor + ChatColor.stripColor(MCUtils.color(e.getMessage().replace("%", "%%")));
         format = format.replace("{level}", player.getLevel() + "");
         format = format.replace("{score}", MCUtils.formatNumber(player.getStatValue("sg_score")));
         if (player.getTag() != null) {
