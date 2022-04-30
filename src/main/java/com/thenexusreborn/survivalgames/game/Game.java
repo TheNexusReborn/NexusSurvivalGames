@@ -632,8 +632,8 @@ public class Game {
         player.getInventory().clear();
         player.getInventory().setArmorContents(null);
         gamePlayer.setDeathInfo(deathInfo);
+        gamePlayer.setTrackerInfo(null);
         GameTeam oldTeam = gamePlayer.getTeam();
-        
     
         int score = (int) gamePlayer.getNexusPlayer().getStatValue("sg_score");
         int lost = (int) Math.ceil(score / 8D);
