@@ -686,7 +686,7 @@ public class Game {
         }
         
         if (totalTributes <= settings.getDeathmatchThreshold()) {
-            if (this.state == INGAME) {
+            if (this.state == INGAME || this.state == INGAME_GRACEPERIOD) {
                 if (totalTributes > 1) {
                     if (mode == Mode.AUTOMATIC) {
                         this.startDeathmatchTimer();
