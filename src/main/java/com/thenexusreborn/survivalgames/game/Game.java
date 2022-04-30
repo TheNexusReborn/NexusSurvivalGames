@@ -800,7 +800,7 @@ public class Game {
                     cancel();
                     return;
                 }
-                if (state == INGAME || state == DEATHMATCH || state == INGAME_DEATHMATCH) {
+                if (state == INGAME || state == INGAME_GRACEPERIOD || state == DEATHMATCH || state == INGAME_DEATHMATCH) {
                     checkGameEnd();
                 }
             }
