@@ -26,10 +26,6 @@ public class SGChatHandler implements ChatHandler {
                 prefix = player.getRank().getPrefix() + " ";
             }
     
-            if (player.getTag() != null) {
-                suffix = " " + player.getTag().getDisplayName();
-            }
-    
             displayName = prefix + team.getColor() + player.getName() + suffix;
         } else {
             displayName = player.getDisplayName();
