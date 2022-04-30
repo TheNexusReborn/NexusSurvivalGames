@@ -19,7 +19,7 @@ public class BlockListener implements Listener {
     public static final Set<Material> ALLOWED_BREAK, NO_DROPS, ALLOWED_PLACE;
     
     static {
-        ALLOWED_BREAK = new HashSet<>(Arrays.asList(LONG_GRASS, RED_ROSE, YELLOW_FLOWER, LEAVES, FIRE, WEB, MELON_BLOCK, CROPS, CARROT, POTATO, LEAVES, LEAVES_2, WEB));
+        ALLOWED_BREAK = new HashSet<>(Arrays.asList(LONG_GRASS, RED_ROSE, YELLOW_FLOWER, LEAVES, FIRE, WEB, MELON_BLOCK, CROPS, CARROT, POTATO, LEAVES, LEAVES_2, CAKE_BLOCK));
         NO_DROPS = new HashSet<>(Arrays.asList(YELLOW_FLOWER, LONG_GRASS, COCOA, LEAVES, LEAVES_2, RED_ROSE));
         ALLOWED_PLACE = new HashSet<>(Arrays.asList(CAKE_BLOCK, WEB, FIRE, TNT));
     }
