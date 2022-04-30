@@ -94,6 +94,7 @@ public class EntityListener implements Listener {
                             targetPlayer.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 160, 0));
                         } else {
                             targetPlayer.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 160, 1));
+                            targetPlayer.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 160, 1));
                         }
                     }
                 } else if (e.getDamager() instanceof Arrow) {
