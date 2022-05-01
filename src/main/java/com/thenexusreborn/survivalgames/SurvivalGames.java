@@ -91,6 +91,7 @@ public class SurvivalGames extends JavaPlugin {
         new SettingsCommand(this).register(nexusCore.getCommandManager());
         
         getCommand("tournament").setExecutor(new TournamentCommand(this));
+        getCommand("votestart").setExecutor(new VoteStartCommand(this));
     
         new GameSetupTask(this).runTaskTimer(this, 1L, 1L);
         new TimerCountdownCheck(this).runTaskTimer(this, 1L, 1L);

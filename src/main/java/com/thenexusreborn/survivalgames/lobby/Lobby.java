@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames.lobby;
 
+import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.nexuscore.scoreboard.impl.RankTablistHandler;
 import com.thenexusreborn.nexuscore.util.MCUtils;
@@ -7,7 +8,7 @@ import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.map.GameMap;
-import com.thenexusreborn.survivalgames.scoreboard.*;
+import com.thenexusreborn.survivalgames.scoreboard.LobbyScoreboardView;
 import com.thenexusreborn.survivalgames.settings.*;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -26,6 +27,7 @@ public class Lobby {
     private Mode mode = Mode.MANUAL;
     private LobbyState state = LobbyState.WAITING;
     private Location spawnpoint;
+    private Set<UUID> voteStart = new HashSet<>();
     
     public Lobby(SurvivalGames plugin) {
         this.plugin = plugin;
@@ -112,6 +114,7 @@ public class Lobby {
         }
         Game game = new Game(gameMap, this.gameSettings, this.players.values(), this.spectatingPlayers);
         plugin.getChatHandler().disableChat();
+        this.voteStart.clear();
         plugin.setGame(game);
         if (plugin.getGamesPlayed() + 1 >= this.lobbySettings.getMaxGames()) {
             plugin.setRestart(true);
@@ -217,12 +220,18 @@ public class Lobby {
     
         sendMessage("&c&l<< &b" + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft. &5(&d" + totalPlayers + "&5/&d" + lobbySettings.getMaxPlayers() + "&5)");
         
+        if (this.voteStart.contains(nexusPlayer.getUniqueId())) {
+            removeStartVote(nexusPlayer.getUniqueId());
+        }
+        
         if (this.state == LobbyState.COUNTDOWN) {
-            if (totalPlayers < lobbySettings.getMinPlayers()) {
+            if (totalPlayers < lobbySettings.getMinPlayers() && !(voteStart.size() >= 2)) {
                 sendMessage("&cNot enough players to start.");
-                this.timer.cancel();
-                this.timer = null;
-                this.state = LobbyState.WAITING;
+                if (this.timer != null) {
+                    this.timer.cancel();
+                    this.timer = null;
+                    this.state = LobbyState.WAITING;
+                }
             }
         }
     }
@@ -311,5 +320,24 @@ public class Lobby {
     
     public boolean isPlayer(UUID uniqueId) {
         return this.players.containsKey(uniqueId);
+    }
+    
+    public void addStartVote(NexusPlayer player) {
+        this.voteStart.add(player.getUniqueId());
+        sendMessage("&6&l>> " + player.getRank().getColor() + player.getName() + " &ehas voted to start the lobby.");
+        if (this.voteStart.size() >= 2) {
+            this.startTimer();
+        }
+    }
+    
+    public void removeStartVote(UUID uuid) {
+        this.voteStart.remove(uuid);
+        if (this.voteStart.size() <= 1) {
+            if (this.timer != null) {
+                sendMessage("&6&l>> &eNot enough votes to start.");
+                this.timer.cancel();
+                this.timer = null;
+            }
+        }
     }
 }

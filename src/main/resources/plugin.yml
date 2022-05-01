@@ -6,3 +6,4 @@ depend: [NexusCore]
 author: Firestar311
 commands:
   tournament:
+  votestart:
