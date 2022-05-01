@@ -69,11 +69,11 @@ public class SGChatHandler implements ChatHandler {
     
     public void enableChat() {
         this.enabled = true;
-        Bukkit.broadcastMessage("&d&l>> &7Chat &aenabled&7.");
+        Bukkit.broadcastMessage(MCUtils.color("&d&l>> &7Chat &aenabled&7."));
     }
     
     public void disableChat() {
         this.enabled = false;
-        Bukkit.broadcastMessage("&d&l>> &7Chat &cdisabled&7.");
+        Bukkit.broadcastMessage(MCUtils.color("&d&l>> &7Chat &cdisabled&7."));
     }
 }
