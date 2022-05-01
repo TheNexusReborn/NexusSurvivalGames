@@ -106,7 +106,7 @@ public class GameActionBar extends ActionBar {
             if (!plugin.restart()) {
                 return "&d&lNEXUS &7 - &eNext game starting... &7(" + game.getTimer().getSecondsLeft() + "s)";
             } else {
-                return "&d&lNEXUS &7 - &f&lSERVER RESTARTING IN &c&l" + game.getTimer().getSecondsLeft() + "s";
+                return "&d&lNEXUS &7 - &cServer Restarting &7(" + game.getTimer().getSecondsLeft() + "s)";
             }
         }
         

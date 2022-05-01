@@ -609,7 +609,7 @@ public class Game {
             
         }
         
-        this.timer = new Timer(new NextGameTimerCallback(this)).run(10000L);
+        this.timer = new Timer(new NextGameTimerCallback(this)).run(10050L);
     }
     
     public void resetPlayer(Player player) {
