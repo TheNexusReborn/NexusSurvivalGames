@@ -26,7 +26,6 @@ public class Lobby {
     private Mode mode = Mode.MANUAL;
     private LobbyState state = LobbyState.WAITING;
     private Location spawnpoint;
-    private DebugLobbyBoard lobbyScoreboard;
     
     public Lobby(SurvivalGames plugin) {
         this.plugin = plugin;
@@ -114,6 +113,9 @@ public class Lobby {
         Game game = new Game(gameMap, this.gameSettings, this.players.values(), this.spectatingPlayers);
         plugin.getChatHandler().disableChat();
         plugin.setGame(game);
+        if (plugin.getGamesPlayed() + 1 >= this.lobbySettings.getMaxGames()) {
+            plugin.setRestart(true);
+        }
         if (Game.getMode() == Mode.AUTOMATIC) {
             this.state = LobbyState.STARTING;
             game.setup();

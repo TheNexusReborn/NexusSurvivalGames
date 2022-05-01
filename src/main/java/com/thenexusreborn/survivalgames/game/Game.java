@@ -1,10 +1,13 @@
 package com.thenexusreborn.survivalgames.game;
 
+import com.google.common.io.*;
+import com.thenexusreborn.api.multicraft.MulticraftAPI;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.util.Operator;
+import com.thenexusreborn.nexuscore.*;
 import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.nexuscore.util.*;
-import com.thenexusreborn.nexuscore.util.helper.*;
+import com.thenexusreborn.nexuscore.util.helper.NumberHelper;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.death.*;
@@ -622,11 +625,31 @@ public class Game {
     public void nextGame() {
         this.state = ENDED;
         
-        for (GamePlayer player : this.players.values()) {
-            resetPlayer(player.getNexusPlayer().getPlayer());
+        if (plugin.restart()) {
+            ByteArrayDataOutput out = ByteStreams.newDataOutput();
+            out.writeUTF("Connect");
+            out.writeUTF("Hub");
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                player.sendPluginMessage(plugin.getNexusCore(), "BungeeCord", out.toByteArray());
+            }
+            
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (NexusCore.ENVIRONMENT != Environment.DEVELOPMENT) {
+                        MulticraftAPI.getInstance().restartServer(plugin.getNexusCore().getConfig().getInt("serverInfo.multicraftid"));
+                    } else {
+                        Bukkit.shutdown();
+                    }
+                }
+            }.runTaskLater(plugin, 100L);
+        } else {
+            for (GamePlayer player : this.players.values()) {
+                resetPlayer(player.getNexusPlayer().getPlayer());
+            }
+            
+            plugin.getLobby().fromGame(this);
         }
-        
-        plugin.getLobby().fromGame(this);
     }
     
     public void killPlayer(UUID uniqueId, DeathInfo deathInfo) {

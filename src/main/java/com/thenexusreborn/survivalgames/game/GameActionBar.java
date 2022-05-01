@@ -103,8 +103,11 @@ public class GameActionBar extends ActionBar {
         }
         
         if (game.getState() == GameState.ENDING) {
-            //TODO check for server restart
-            return "&d&lNEXUS &7 - &eNext game starting... &7(" + game.getTimer().getSecondsLeft() + "s)";
+            if (!plugin.restart()) {
+                return "&d&lNEXUS &7 - &eNext game starting... &7(" + game.getTimer().getSecondsLeft() + "s)";
+            } else {
+                return "&d&lNEXUS &7 - &f&lSERVER RESTARTING IN &c&l" + game.getTimer().getSecondsLeft() + "s";
+            }
         }
         
         return "";

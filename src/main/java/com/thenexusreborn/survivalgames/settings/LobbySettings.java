@@ -3,7 +3,7 @@ package com.thenexusreborn.survivalgames.settings;
 public class LobbySettings {
     private int maxPlayers = 24;
     private int minPlayers = 4;
-    private int maxGames = 5;
+    private int maxGames = 10;
     private int timerLength = 45;
     private int maxMapOptions = 5;
     private boolean voteWeight = false;

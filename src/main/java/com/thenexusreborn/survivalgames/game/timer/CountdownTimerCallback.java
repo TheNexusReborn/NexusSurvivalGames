@@ -2,8 +2,8 @@ package com.thenexusreborn.survivalgames.game.timer;
 
 import com.thenexusreborn.nexuscore.util.ReturnableCallback;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
-import com.thenexusreborn.nexuscore.util.timer.TimerSnapshot;
-import com.thenexusreborn.survivalgames.Mode;
+import com.thenexusreborn.nexuscore.util.timer.*;
+import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.Game;
 import org.bukkit.Sound;
 
@@ -15,7 +15,7 @@ public class CountdownTimerCallback implements ReturnableCallback<TimerSnapshot,
     
     private Game game;
     private Set<Integer> announced = new HashSet<>(), soundPlayed = new HashSet<>();
-    private boolean announcedInfo = false;
+    private boolean announcedInfo = false, announcedRestart = false;
     
     public CountdownTimerCallback(Game game) {
         this.game = game;
@@ -34,7 +34,7 @@ public class CountdownTimerCallback implements ReturnableCallback<TimerSnapshot,
             return false;
         }
         
-        if (remainingSeconds == 25) {
+        if (remainingSeconds == game.getSettings().getWarmupLength() - 5) {
             if (!announcedInfo) {
                 if (game.getSettings().isSounds()) {
                     game.playSound(Sound.WOLF_HOWL);
@@ -50,6 +50,15 @@ public class CountdownTimerCallback implements ReturnableCallback<TimerSnapshot,
                     game.sendMessage("&d&l>> &7There is a &e" + game.getSettings().getGracePeriodLength() + " second &7grace period.");
                 }
                 announcedInfo = true;
+            }
+        }
+        
+        if (remainingSeconds == game.getSettings().getWarmupLength() - 10) {
+            if (!announcedRestart) {
+                if (SurvivalGames.getPlugin(SurvivalGames.class).restart()) {
+                    game.sendMessage("&6&l>> &e&lTHE SERVER WILL RESTART AFTER THIS GAME.");
+                    this.announcedRestart = true;
+                }
             }
         }
     

@@ -37,6 +37,7 @@ public class SurvivalGames extends JavaPlugin {
     private int gamesPlayed = 0;
     
     private SGChatHandler chatHandler;
+    private boolean restart = false;
     
     @Override
     public void onEnable() {
@@ -205,5 +206,13 @@ public class SurvivalGames extends JavaPlugin {
     
     public SGChatHandler getChatHandler() {
         return chatHandler;
+    }
+    
+    public boolean restart() {
+        return restart;
+    }
+    
+    public void setRestart(boolean restart) {
+        this.restart = restart;
     }
 }
