@@ -379,6 +379,7 @@ public class Game {
         }
         this.restockTimer = new Timer(new RestockTimerCallback(this)).run(600050L);
         sendMessage("&6&l>> &a&lMAY THE ODDS BE EVER IN YOUR FAVOR.");
+        plugin.getChatHandler().enableChat();
     }
     
     public void restockChests() {

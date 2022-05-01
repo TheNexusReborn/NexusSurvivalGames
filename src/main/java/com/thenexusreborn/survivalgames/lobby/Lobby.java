@@ -112,6 +112,7 @@ public class Lobby {
             this.gameSettings = new GameSettings();
         }
         Game game = new Game(gameMap, this.gameSettings, this.players.values(), this.spectatingPlayers);
+        plugin.getChatHandler().disableChat();
         plugin.setGame(game);
         if (Game.getMode() == Mode.AUTOMATIC) {
             this.state = LobbyState.STARTING;

@@ -4,12 +4,14 @@ import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.nexuscore.chat.ChatHandler;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.game.*;
-import org.bukkit.ChatColor;
+import org.bukkit.*;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 public class SGChatHandler implements ChatHandler {
     
     private SurvivalGames plugin;
+    
+    private boolean enabled = true;
     
     public SGChatHandler(SurvivalGames plugin) {
         this.plugin = plugin;
@@ -17,6 +19,10 @@ public class SGChatHandler implements ChatHandler {
     
     @Override
     public boolean handleChat(NexusPlayer player, String chatColor, AsyncPlayerChatEvent e) {
+        if (!enabled) {
+            player.sendMessage("&cChat is currently disabled. You cannot speak.");
+            return true;
+        }
         String displayName;
         Game game = plugin.getGame();
         if (plugin.getGame() != null) {
@@ -59,5 +65,15 @@ public class SGChatHandler implements ChatHandler {
             plugin.getLobby().sendMessage(format);
         }
         return true;
+    }
+    
+    public void enableChat() {
+        this.enabled = true;
+        Bukkit.broadcastMessage("&d&l>> &7Chat &aenabled&7.");
+    }
+    
+    public void disableChat() {
+        this.enabled = false;
+        Bukkit.broadcastMessage("&d&l>> &7Chat &cdisabled&7.");
     }
 }

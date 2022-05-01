@@ -36,6 +36,8 @@ public class SurvivalGames extends JavaPlugin {
     
     private int gamesPlayed = 0;
     
+    private SGChatHandler chatHandler;
+    
     @Override
     public void onEnable() {
         saveDefaultConfig();
@@ -78,7 +80,8 @@ public class SurvivalGames extends JavaPlugin {
             }
         }
     
-        nexusCore.getChatManager().setHandler(new SGChatHandler(this));
+        this.chatHandler = new SGChatHandler(this);
+        nexusCore.getChatManager().setHandler(chatHandler);
     
         new MapCommand(this).register(nexusCore.getCommandManager());
         new LobbyCommand(this).register(nexusCore.getCommandManager());
@@ -198,5 +201,9 @@ public class SurvivalGames extends JavaPlugin {
     
     public void setTournament(Tournament tournament) {
         this.tournament = tournament;
+    }
+    
+    public SGChatHandler getChatHandler() {
+        return chatHandler;
     }
 }
