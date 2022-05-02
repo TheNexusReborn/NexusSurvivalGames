@@ -665,7 +665,7 @@ public class Game {
         GameTeam oldTeam = gamePlayer.getTeam();
         
         int score = (int) gamePlayer.getNexusPlayer().getStatValue("sg_score");
-        int lost = (int) Math.ceil(score / 8D);
+        int lost = (int) Math.ceil(score / 10D);
         
         gamePlayer.getNexusPlayer().changeStat("sg_score", lost, Operator.SUBTRACT);
         gamePlayer.sendMessage("&4&l>> &cYou lost " + lost + " Score for dying.");

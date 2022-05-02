@@ -34,7 +34,7 @@ public class CountdownTimerCallback implements ReturnableCallback<TimerSnapshot,
             return false;
         }
         
-        if (remainingSeconds == game.getSettings().getWarmupLength() - 5) {
+        if (remainingSeconds == game.getSettings().getWarmupLength() / 2) {
             if (!announcedInfo) {
                 if (game.getSettings().isSounds()) {
                     game.playSound(Sound.WOLF_HOWL);
