@@ -176,7 +176,7 @@ public class PlayerListener implements Listener {
         if (plugin.getLobby().checkMapEditing(e.getPlayer())) {
             return;
         }
-        if (e.getRightClicked() instanceof ArmorStand || e.getRightClicked() instanceof ItemFrame) {
+        if (e.getRightClicked() instanceof ArmorStand || e.getRightClicked() instanceof ItemFrame || e.getRightClicked() instanceof Painting) {
             e.setCancelled(true);
         }
     }
