@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames;
 
-import com.thenexusreborn.nexuscore.NexusCore;
+import com.thenexusreborn.nexuscore.*;
 import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.nexuscore.util.ServerProperties;
 import com.thenexusreborn.survivalgames.cmd.*;
@@ -46,6 +46,14 @@ public class SurvivalGames extends JavaPlugin {
         mapManager = new MapManager(this);
         lobby = new Lobby(this);
         lootManager = new LootManager(this);
+        
+        if (NexusCore.ENVIRONMENT == Environment.DEVELOPMENT) {
+            lobby.setMode(Mode.MANUAL);
+            Game.setMode(Mode.MANUAL);
+        } else {
+            lobby.setMode(Mode.AUTOMATIC);
+            Game.setMode(Mode.AUTOMATIC);
+        }
     
         if (this.getConfig().contains("spawnpoint")) {
             String worldName = this.getConfig().getString("spawnpoint.world");
