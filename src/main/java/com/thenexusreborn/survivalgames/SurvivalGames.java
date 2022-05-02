@@ -1,6 +1,8 @@
 package com.thenexusreborn.survivalgames;
 
 import com.thenexusreborn.api.*;
+import com.thenexusreborn.api.multicraft.MulticraftAPI;
+import com.thenexusreborn.api.server.ServerInfo;
 import com.thenexusreborn.nexuscore.*;
 import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.nexuscore.util.ServerProperties;
@@ -129,6 +131,25 @@ public class SurvivalGames extends JavaPlugin {
                 }
             }
         }.runTaskTimer(this, 1L, 20L);
+    
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                ServerInfo serverInfo = NexusAPI.getApi().getServerManager().getCurrentServer();
+                if (NexusAPI.getApi().getEnvironment() != Environment.DEVELOPMENT) {
+                    serverInfo.setStatus(MulticraftAPI.getInstance().getServerStatus(serverInfo.getMulticraftId()).status);
+                } else {
+                    serverInfo.setStatus("online");
+                }
+                serverInfo.setPlayers(Bukkit.getOnlinePlayers().size());
+                if (game != null) {
+                    serverInfo.setState("game:" + game.getState().toString());
+                } else {
+                    serverInfo.setState("lobby:" + lobby.getState().toString());
+                }
+                NexusAPI.getApi().getDataManager().pushServerInfo(serverInfo);
+            }
+        }.runTaskTimerAsynchronously(this, 20L, 20L);
     }
     
     private void updatePlayerHealthAndFood(Player player) {
