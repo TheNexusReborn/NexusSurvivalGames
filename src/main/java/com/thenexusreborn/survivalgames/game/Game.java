@@ -1,10 +1,10 @@
 package com.thenexusreborn.survivalgames.game;
 
 import com.google.common.io.*;
+import com.thenexusreborn.api.*;
 import com.thenexusreborn.api.multicraft.MulticraftAPI;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.util.Operator;
-import com.thenexusreborn.nexuscore.*;
 import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.nexuscore.util.helper.NumberHelper;
@@ -636,7 +636,7 @@ public class Game {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if (NexusCore.ENVIRONMENT != Environment.DEVELOPMENT) {
+                    if (NexusAPI.getApi().getEnvironment() != Environment.DEVELOPMENT) {
                         MulticraftAPI.getInstance().restartServer(plugin.getNexusCore().getConfig().getInt("serverInfo.multicraftid"));
                     } else {
                         Bukkit.shutdown();

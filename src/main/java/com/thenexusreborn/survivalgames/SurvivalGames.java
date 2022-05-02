@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames;
 
+import com.thenexusreborn.api.*;
 import com.thenexusreborn.nexuscore.*;
 import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.nexuscore.util.ServerProperties;
@@ -47,7 +48,7 @@ public class SurvivalGames extends JavaPlugin {
         lobby = new Lobby(this);
         lootManager = new LootManager(this);
         
-        if (NexusCore.ENVIRONMENT == Environment.DEVELOPMENT) {
+        if (NexusAPI.getApi().getEnvironment() == Environment.DEVELOPMENT) {
             lobby.setMode(Mode.MANUAL);
             Game.setMode(Mode.MANUAL);
         } else {
