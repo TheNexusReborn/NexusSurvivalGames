@@ -8,9 +8,12 @@ import com.thenexusreborn.survivalgames.cmd.arg.MapNameArgument;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
 import com.thenexusreborn.survivalgames.map.GameMap;
 import com.thenexusreborn.survivalgames.util.SGUtils;
+import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 public class LobbyCommand extends NexusCommand {
     public LobbyCommand(SurvivalGames plugin) {
@@ -153,6 +156,56 @@ public class LobbyCommand extends NexusCommand {
                     plugin.getLobby().stopEditingMaps();
                 } else {
                     plugin.getLobby().editMaps();
+                }
+            }
+        });
+        
+        this.addSubCommand(new SubCommand(this, "mapsigns", "Edit the display signs for map voting", getMinRank()) {
+            @Override
+            public void handleCommand(NexusCommand nexusCommand, CommandActor actor, String[] previousArgs, String label, String[] args) {
+                if (!(args.length > 0)) {
+                    actor.sendMessage("&cYou must provide a sub command.");
+                    return;
+                }
+    
+                Block targetBlock = actor.getPlayer().getTargetBlock((Set<Material>) null, 10);
+                if (targetBlock == null) {
+                    actor.sendMessage("&cYou are not looking at a block.");
+                    return;
+                }
+                
+                if (!(targetBlock.getType() == Material.SIGN || targetBlock.getType() == Material.WALL_SIGN)) {
+                    actor.sendMessage("&cYou are not looking at a sign.");
+                    return;
+                }
+                
+                if (args[0].equalsIgnoreCase("remove")) {
+                    Iterator<Entry<Integer, Location>> iterator = plugin.getLobby().getMapSigns().entrySet().iterator();
+                    while (iterator.hasNext()) {
+                        Entry<Integer, Location> entry = iterator.next();
+                        if (entry.getValue().equals(targetBlock.getLocation())) {
+                            iterator.remove();
+                            actor.sendMessage("&eYou removed a sign with the position &b" + entry.getKey());
+                            break;
+                        }
+                    }
+                } else if (args[0].equalsIgnoreCase("set")) {
+                    if (!(args.length > 1)) {
+                        actor.sendMessage("&cYou must provide a position number.");
+                        return;
+                    }
+                    
+                    int position;
+                    try {
+                        position = Integer.parseInt(args[1]);
+                    } catch (NumberFormatException e) {
+                        actor.sendMessage("&cYou provided an invalid number.");
+                        return;
+                    }
+                    
+                    plugin.getLobby().getMapSigns().put(position, targetBlock.getLocation());
+                    actor.sendMessage("&eYou set the sign you are looking at as a map sign in position &b" + position);
+                    plugin.getLobby().generateMapOptions(); //Refresh map options
                 }
             }
         });

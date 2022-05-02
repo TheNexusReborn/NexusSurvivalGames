@@ -7,6 +7,7 @@ import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.game.death.*;
+import com.thenexusreborn.survivalgames.lobby.LobbyState;
 import com.thenexusreborn.survivalgames.loot.Loot;
 import com.thenexusreborn.survivalgames.settings.ColorMode;
 import org.bukkit.*;
@@ -66,13 +67,12 @@ public class PlayerListener implements Listener {
         }
     
         Game game = plugin.getGame();
-        if (game == null) {
-            return;
-        }
-    
-        GamePlayer gamePlayer = game.getPlayer(e.getPlayer().getUniqueId());
-        if (gamePlayer.getTeam() == GameTeam.SPECTATORS || gamePlayer.getTeam() == GameTeam.HIDDEN_STAFF) {
-            e.setCancelled(true);
+        if (game != null) {
+            GamePlayer gamePlayer = game.getPlayer(e.getPlayer().getUniqueId());
+            if (gamePlayer.getTeam() == GameTeam.SPECTATORS || gamePlayer.getTeam() == GameTeam.HIDDEN_STAFF) {
+                e.setCancelled(true);
+                return;
+            }
             return;
         }
     
@@ -130,7 +130,10 @@ public class PlayerListener implements Listener {
                             game.addLootedChest(secondHalf.getLocation());
                         }
                     } else if (block.getState() instanceof Sign) {
-                        //Map sign voting
+                        NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(e.getPlayer().getUniqueId());
+                        if (plugin.getLobby().getState() == LobbyState.WAITING || plugin.getLobby().getState() == LobbyState.COUNTDOWN) {
+                            plugin.getLobby().addMapVote(nexusPlayer, block.getLocation());
+                        }
                     } else {
                         if (e.getItem() != null) {
                             return;

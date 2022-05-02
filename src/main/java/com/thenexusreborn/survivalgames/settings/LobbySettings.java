@@ -4,9 +4,8 @@ public class LobbySettings {
     private int maxPlayers = 24;
     private int minPlayers = 4;
     private int maxGames = 10;
-    private int timerLength = 45;
-    private int maxMapOptions = 5;
-    private boolean voteWeight = false;
+    private int timerLength = 30;
+    private boolean voteWeight = true;
     private boolean keepPreviousGameSettings = true;
     private boolean sounds = true;
     
@@ -43,15 +42,6 @@ public class LobbySettings {
     
     public LobbySettings setTimerLength(int timerLength) {
         this.timerLength = timerLength;
-        return this;
-    }
-    
-    public int getMaxMapOptions() {
-        return maxMapOptions;
-    }
-    
-    public LobbySettings setMaxMapOptions(int maxMapOptions) {
-        this.maxMapOptions = maxMapOptions;
         return this;
     }
     

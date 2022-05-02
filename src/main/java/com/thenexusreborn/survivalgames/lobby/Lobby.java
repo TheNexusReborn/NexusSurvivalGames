@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames.lobby;
 
+import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.nexuscore.scoreboard.impl.RankTablistHandler;
@@ -11,10 +12,14 @@ import com.thenexusreborn.survivalgames.map.GameMap;
 import com.thenexusreborn.survivalgames.scoreboard.LobbyScoreboardView;
 import com.thenexusreborn.survivalgames.settings.*;
 import org.bukkit.*;
+import org.bukkit.block.*;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 public class Lobby {
     private SurvivalGames plugin;
@@ -28,9 +33,75 @@ public class Lobby {
     private LobbyState state = LobbyState.WAITING;
     private Location spawnpoint;
     private Set<UUID> voteStart = new HashSet<>();
+    private Map<Integer, Location> mapSigns = new HashMap<>();
+    private Map<Integer, GameMap> mapOptions = new HashMap<>();
+    private Map<Integer, Set<UUID>> mapVotes = new HashMap<>();
     
     public Lobby(SurvivalGames plugin) {
         this.plugin = plugin;
+        
+        if (plugin.getConfig().contains("mapsigns")) {
+            ConfigurationSection signsSection = plugin.getConfig().getConfigurationSection("mapsigns");
+            for (String key : signsSection.getKeys(false)) {
+                int position = Integer.parseInt(key);
+                World world = Bukkit.getWorld(signsSection.getString(key + ".world"));
+                int x = signsSection.getInt(key + ".x");
+                int y = signsSection.getInt(key + ".y");
+                int z = signsSection.getInt(key + ".z");
+                Location location = new Location(world, x, y, z);
+                this.mapSigns.put(position, location);
+            }
+        }
+        
+        generateMapOptions();
+    
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (Entry<Integer, Location> entry : mapSigns.entrySet()) {
+                    GameMap map = mapOptions.get(entry.getKey());
+                    BlockState state = entry.getValue().getBlock().getState();
+                    if (!(state instanceof Sign)) {
+                        continue;
+                    }
+                    Sign sign = (Sign) state;
+                    String mapName;
+                    if (map.getName().length() > 16) {
+                        mapName = map.getName().substring(0, 16);
+                    } else {
+                        mapName = map.getName();
+                    }
+                    sign.setLine(1, mapName);
+                    int votes = 0;
+                    Set<UUID> playerVotes = mapVotes.get(entry.getKey());
+                    for (UUID vote : playerVotes) {
+                        NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(vote);
+                        if (nexusPlayer == null) {
+                            continue;
+                        }
+            
+                        if (lobbySettings.isVoteWeight()) {
+                            votes += nexusPlayer.getRank().getMultiplier();
+                        } else {
+                            votes++;
+                        }
+                    }
+                    
+                    sign.setLine(3, MCUtils.color("&n" + votes + " Vote(s)"));
+    
+                    for (SpigotNexusPlayer player : players.values()) {
+                        if (playerVotes.contains(player.getUniqueId())) {
+                            sign.setLine(0, MCUtils.color("&n#" + entry.getKey()));
+                            sign.setLine(2, MCUtils.color("&2&lVOTED!"));
+                        } else {
+                            sign.setLine(0, MCUtils.color("&nClick to Vote"));
+                            sign.setLine(2, "");
+                        }
+                        player.getPlayer().sendSignChange(sign.getLocation(), sign.getLines());
+                    }
+                }
+            }
+        }.runTaskTimer(plugin, 20L, 20L);
     }
     
     public void handleShutdown() {
@@ -48,6 +119,27 @@ public class Lobby {
         
         if (gameMap != null) {
             gameMap.delete(plugin);
+        }
+        
+        this.mapSigns.forEach((position, location) -> {
+            plugin.getConfig().set("mapsigns." + position + ".world", location.getWorld().getName());
+            plugin.getConfig().set("mapsigns." + position + ".x", location.getBlockX());
+            plugin.getConfig().set("mapsigns." + position + ".y", location.getBlockY());
+            plugin.getConfig().set("mapsigns." + position + ".z", location.getBlockZ());
+        });
+    }
+    
+    public void generateMapOptions() {
+        this.mapOptions.clear();
+        this.mapVotes.clear();
+    
+        List<GameMap> maps = new ArrayList<>(plugin.getMapManager().getMaps());
+        for (Integer position : new HashSet<>(this.mapSigns.keySet())) {
+            int index = new Random().nextInt(maps.size());
+            GameMap map = maps.get(index);
+            this.mapOptions.put(position, map);
+            this.mapVotes.put(position, new HashSet<>());
+            maps.remove(index);
         }
     }
     
@@ -141,6 +233,7 @@ public class Lobby {
         this.gameMap = null;
         this.gameSettings = null;
         this.state = LobbyState.WAITING;
+        generateMapOptions();
     }
     
     public Collection<SpigotNexusPlayer> getPlayers() {
@@ -317,6 +410,9 @@ public class Lobby {
         }
     }
     
+    public Map<Integer, Location> getMapSigns() {
+        return mapSigns;
+    }
     
     public boolean isPlayer(UUID uniqueId) {
         return this.players.containsKey(uniqueId);
@@ -339,5 +435,29 @@ public class Lobby {
                 this.timer = null;
             }
         }
+    }
+    
+    public void addMapVote(NexusPlayer nexusPlayer, Location location) {
+        for (Entry<Integer, Location> entry : this.mapSigns.entrySet()) {
+            boolean contains = this.mapVotes.get(entry.getKey()).contains(nexusPlayer.getUniqueId()); 
+            
+            if (entry.getValue().equals(location)) {
+                if (contains) {
+                    nexusPlayer.sendMessage("&cYou have already voted for this map.");
+                    return;
+                }
+                
+                this.mapVotes.get(entry.getKey()).add(nexusPlayer.getUniqueId());
+                nexusPlayer.sendMessage("&6&l>> &eYou voted for the map &b" + this.mapOptions.get(entry.getKey()).getName());
+                return;
+            } else {
+                if (contains) {
+                    nexusPlayer.sendMessage("&cYou cannot vote for more than one map.");
+                    return;
+                }
+            }
+        }
+        
+        nexusPlayer.sendMessage("&cInvalid map voting sign.");
     }
 }
