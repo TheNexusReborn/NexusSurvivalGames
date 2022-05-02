@@ -73,7 +73,6 @@ public class PlayerListener implements Listener {
                 e.setCancelled(true);
                 return;
             }
-            return;
         }
     
         Block block = e.getClickedBlock();

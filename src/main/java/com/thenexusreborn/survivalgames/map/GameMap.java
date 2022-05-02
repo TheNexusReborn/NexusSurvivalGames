@@ -31,6 +31,7 @@ public class GameMap {
     private Config config; //This the the loaded configuration information for the map, this populates the settings
     private Path worldFolder; //This is the folder that the world is located
     private boolean editing;
+    private int votes = 0;
     
     public GameMap(String fileName, String name) {
         this.fileName = fileName;
@@ -378,5 +379,13 @@ public class GameMap {
     
     public boolean isEditing() {
         return editing;
+    }
+    
+    public int getVotes() {
+        return votes;
+    }
+    
+    public void setVotes(int votes) {
+        this.votes = votes;
     }
 }

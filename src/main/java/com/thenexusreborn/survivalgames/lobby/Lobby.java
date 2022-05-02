@@ -72,25 +72,12 @@ public class Lobby {
                         mapName = map.getName();
                     }
                     sign.setLine(1, mapName);
-                    int votes = 0;
-                    Set<UUID> playerVotes = mapVotes.get(entry.getKey());
-                    for (UUID vote : playerVotes) {
-                        NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(vote);
-                        if (nexusPlayer == null) {
-                            continue;
-                        }
-            
-                        if (lobbySettings.isVoteWeight()) {
-                            votes += nexusPlayer.getRank().getMultiplier();
-                        } else {
-                            votes++;
-                        }
-                    }
+                    int votes = getTotalMapVotes(entry.getKey());
                     
                     sign.setLine(3, MCUtils.color("&n" + votes + " Vote(s)"));
     
                     for (SpigotNexusPlayer player : players.values()) {
-                        if (playerVotes.contains(player.getUniqueId())) {
+                        if (mapVotes.get(entry.getKey()).contains(player.getUniqueId())) {
                             sign.setLine(0, MCUtils.color("&n#" + entry.getKey()));
                             sign.setLine(2, MCUtils.color("&2&lVOTED!"));
                         } else {
@@ -194,11 +181,64 @@ public class Lobby {
         this.timer = new Timer(new LobbyTimerCallback(this)).run((lobbySettings.getTimerLength() * 1000L) + 50);
     }
     
+    private int getVoteCount(int position, UUID uuid) {
+        NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(uuid);
+        if (nexusPlayer == null) {
+            return 0;
+        }
+    
+        if (lobbySettings.isVoteWeight()) {
+            return (int) nexusPlayer.getRank().getMultiplier();
+        } else {
+            return 1;
+        }
+    }
+    
+    private int getTotalMapVotes(int position) {
+        int votes = 0;
+        Set<UUID> playerVotes = mapVotes.get(position);
+        for (UUID vote : playerVotes) {
+            NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(vote);
+            if (nexusPlayer == null) {
+                continue;
+            }
+        
+            if (lobbySettings.isVoteWeight()) {
+                votes += nexusPlayer.getRank().getMultiplier();
+            } else {
+                votes++;
+            }
+        }
+        return votes;
+    }
+    
     public void prepareGame() {
         this.state = LobbyState.PREPARING_GAME;
+        int mapVotes = 0;
         if (this.gameMap == null) {
-            this.gameMap = plugin.getMapManager().getMaps().get(new Random().nextInt(plugin.getMapManager().getMaps().size()));
-            sendMessage("&eThere was no map set, so the map &b" + this.gameMap.getName() + " &ewas selected at random.");
+            GameMap mostVoted = null;
+            int mostVotedVotes = 0;
+            for (Entry<Integer, GameMap> entry : this.mapOptions.entrySet()) {
+                if (mostVoted == null) {
+                    mostVoted = entry.getValue();
+                    mostVotedVotes = getTotalMapVotes(entry.getKey());
+                } else {
+                    int votes = getTotalMapVotes(entry.getKey());
+                    if (votes > mostVotedVotes) {
+                        mostVoted = entry.getValue();
+                        mostVotedVotes = votes;
+                    }
+                }
+            }
+            
+            if (mostVoted == null) {
+                this.gameMap = new ArrayList<>(this.mapOptions.values()).get(new Random().nextInt(this.mapOptions.size()));
+                this.gameMap.setVotes(0);
+                sendMessage("&eThere was no map voted, so the map &b" + this.gameMap.getName() + " &ewas selected at random.");
+            } else {
+                this.gameMap = mostVoted;
+                this.gameMap.setVotes(mostVotedVotes);
+            }
         }
         
         if (this.gameSettings == null) {
