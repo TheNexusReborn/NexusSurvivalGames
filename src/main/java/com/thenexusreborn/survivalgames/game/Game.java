@@ -426,7 +426,8 @@ public class Game {
             for (GamePlayer player : this.players.values()) {
                 if (player.getTeam() == GameTeam.TRIBUTES) {
                     tributes.add(player.getUniqueId());
-                } else if (player.getTeam() == GameTeam.SPECTATORS) {
+                    player.getNexusPlayer().changeStat("sg_deathmatches_reached", 1, Operator.ADD);
+                } else {
                     spectators.add(player.getUniqueId());
                 }
             }
@@ -515,6 +516,7 @@ public class Game {
         GamePlayer winner = null;
         for (GamePlayer player : this.players.values()) {
             if (player.getTeam() == GameTeam.TRIBUTES) {
+                player.getNexusPlayer().changeStat("sg_games", 1, Operator.ADD);
                 if (winner == null) {
                     winner = player;
                 } else {
@@ -563,6 +565,8 @@ public class Game {
         sendMessage("&6&l>> " + winnerName + " &a&lhas won Survival Games!");
         
         if (winner != null) {
+            winner.getNexusPlayer().changeStat("sg_wins", 1, Operator.ADD);
+            winner.getNexusPlayer().changeStat("sg_win_streak", 1, Operator.ADD);
             int winGain = 50;
             double currentScore = winner.getNexusPlayer().getStatValue("sg_score");
             if (currentScore < 100 && currentScore > 50) {
@@ -669,6 +673,10 @@ public class Game {
         
         gamePlayer.getNexusPlayer().changeStat("sg_score", lost, Operator.SUBTRACT);
         gamePlayer.sendMessage("&4&l>> &cYou lost " + lost + " Score for dying.");
+    
+        gamePlayer.getNexusPlayer().changeStat("sg_games", 1, Operator.ADD);
+        gamePlayer.getNexusPlayer().changeStat("sg_win_streak", 0, Operator.MULTIPLY);
+        gamePlayer.getNexusPlayer().changeStat("sg_deaths", 1, Operator.ADD);
         
         gamePlayer.sendMessage(GameTeam.TRIBUTES.getLeaveMessage());
         GamePlayer killer = null;
@@ -744,8 +752,60 @@ public class Game {
         recalculateVisibiltiy();
         
         if (killer != null) {
+            killer.setKills(killer.getKills() + 1);
+            killer.setKillStreak(killer.getKillStreak() + 1);
+            int highestKillStreak = (int) killer.getNexusPlayer().getStatValue("sg_highest_kill_streak");
+            if (highestKillStreak < killer.getKillStreak()) {
+                killer.getNexusPlayer().changeStat("sg_highest_kill_streak", killer.getKillStreak() - highestKillStreak, Operator.ADD);
+                if (!killer.isNewPersonalBestNotified()) {
+                    killer.sendMessage("&6&l>> &a&lNEW PERSONAL BEST!");
+                    killer.setNewPersonalBestNotified(true);
+                }
+            }
+            killer.sendMessage("&6&l>> &f&lCurrent Streak: &a" + killer.getKillStreak() + "  &f&lPersonal Best: &a" + highestKillStreak);
+            
             killerName += killer.getNexusPlayer().getName();
             gamePlayer.sendMessage("&4&l>> &cYour killer &8(" + killerName + "&8) &chad &4" + NumberHelper.formatNumber(killerHealth) + " HP &cremaining!");
+            if (!killer.getUniqueId().equals(player.getUniqueId())) {
+                killer.getNexusPlayer().changeStat("sg_score", lost, Operator.ADD);
+                killer.sendMessage("&2&l>> &a+" + lost + " Score!");
+            } else {
+                killer.sendMessage("&2&l>> &cYou killed yourself. No score for you.");
+            }
+            double multiplier = killer.getNexusPlayer().getRank().getMultiplier();
+            Rank rank = killer.getNexusPlayer().getRank();
+            String multiplierMessage = rank.getColor() + "&l * x" + MCUtils.formatNumber(multiplier) + " " + rank.getPrefix() + " Bonus";
+            if (settings.isGiveXp()) {
+                double xp = 2;
+                xp *= multiplier;
+                if (!killer.getUniqueId().equals(player.getUniqueId())) {
+                    killer.getNexusPlayer().changeStat("xp", xp, Operator.ADD);
+                    String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(xp) + " &2&lXP&a&l!";
+                    if (multiplier > 1) {
+                        killer.sendMessage(baseMessage + multiplierMessage);
+                    } else {
+                        killer.sendMessage(baseMessage);
+                    }
+                } else {
+                    killer.sendMessage("&2&l>> &cYou killed yourself. No XP for you.");
+                }
+            }
+    
+            if (settings.isGiveCredits()) {
+                double credits = 2;
+                credits *= multiplier;
+                if (!(killer.getUniqueId().equals(player.getUniqueId()))) {
+                    killer.getNexusPlayer().changeStat("credits", credits, Operator.ADD);
+                    String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(credits) + " &3&lCREDITS&a&l!";
+                    if (multiplier > 1) {
+                        killer.sendMessage(baseMessage + multiplierMessage);
+                    } else {
+                        killer.sendMessage(baseMessage);
+                    }
+                } else {
+                    killer.sendMessage("&2&l>> &cYou killed yourself. No Credits for you.");
+                }
+            }
         }
         
         int totalTributes = 0;
@@ -788,49 +848,6 @@ public class Game {
                         tournament.incrementScore(p.getUniqueId(), tournament.getPointsPerSurvival());
                         p.sendMessage("&2&l>> &a+" + tournament.getPointsPerSurvival() + " Points!");
                     }
-                }
-            }
-        }
-        
-        if (killer != null) {
-            if (!killer.getUniqueId().equals(player.getUniqueId())) {
-                killer.getNexusPlayer().changeStat("sg_score", lost, Operator.ADD);
-                killer.sendMessage("&2&l>> &a+" + lost + " Score!");
-            } else {
-                killer.sendMessage("&2&l>> &cYou killed yourself. No score for you.");
-            }
-            double multiplier = killer.getNexusPlayer().getRank().getMultiplier();
-            Rank rank = killer.getNexusPlayer().getRank();
-            String multiplierMessage = rank.getColor() + "&l * x" + MCUtils.formatNumber(multiplier) + " " + rank.getPrefix() + " Bonus";
-            if (settings.isGiveXp()) {
-                double xp = 2;
-                xp *= multiplier;
-                if (!killer.getUniqueId().equals(player.getUniqueId())) {
-                    killer.getNexusPlayer().changeStat("xp", xp, Operator.ADD);
-                    String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(xp) + " &2&lXP&a&l!";
-                    if (multiplier > 1) {
-                        killer.sendMessage(baseMessage + multiplierMessage);
-                    } else {
-                        killer.sendMessage(baseMessage);
-                    }
-                } else {
-                    killer.sendMessage("&2&l>> &cYou killed yourself. No XP for you.");
-                }
-            }
-            
-            if (settings.isGiveCredits()) {
-                double credits = 2;
-                credits *= multiplier;
-                if (!(killer.getUniqueId().equals(player.getUniqueId()))) {
-                    killer.getNexusPlayer().changeStat("credits", credits, Operator.ADD);
-                    String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(credits) + " &3&lCREDITS&a&l!";
-                    if (multiplier > 1) {
-                        killer.sendMessage(baseMessage + multiplierMessage);
-                    } else {
-                        killer.sendMessage(baseMessage);
-                    }
-                } else {
-                    killer.sendMessage("&2&l>> &cYou killed yourself. No Credits for you.");
                 }
             }
         }

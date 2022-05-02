@@ -2,6 +2,7 @@ package com.thenexusreborn.survivalgames.listener;
 
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
+import com.thenexusreborn.api.util.Operator;
 import com.thenexusreborn.nexuscore.api.events.NexusPlayerLoadEvent;
 import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -96,6 +97,9 @@ public class PlayerListener implements Listener {
                         if (game.isLootedChest(block)) {
                             return;
                         }
+                        
+                        game.getPlayer(e.getPlayer().getUniqueId()).getNexusPlayer().changeStat("sg_chests_looted", 1, Operator.ADD);
+                        
                         Inventory inv = ((Chest) block.getState()).getBlockInventory();
                         int maxAmount = 6;
                         
@@ -113,6 +117,10 @@ public class PlayerListener implements Listener {
                             secondHalf = east;
                         } else if (west != null && west.getType() == Material.CHEST) {
                             secondHalf = west;
+                        }
+                        
+                        if (secondHalf != null) {
+                            maxAmount += 2;
                         }
         
                         List<Loot> loot = plugin.getLootManager().generateLoot(new Random().nextInt(maxAmount) + 2);
