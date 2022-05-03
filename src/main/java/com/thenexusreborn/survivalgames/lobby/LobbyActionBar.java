@@ -28,7 +28,7 @@ public class LobbyActionBar extends ActionBar {
         }
         
         if (lobby.getState() == LobbyState.COUNTDOWN && lobby.getTimer() != null) {
-            return "&f&lGame starts in &e" + Timer.formatTimeShort(lobby.getTimer().getSecondsLeft());
+            return "&f&lVoting closes in &e&l" + Timer.formatTimeShort(lobby.getTimer().getSecondsLeft());
         }
         
         return "";

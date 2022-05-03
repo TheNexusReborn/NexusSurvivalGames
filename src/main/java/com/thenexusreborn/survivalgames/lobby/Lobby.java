@@ -335,7 +335,7 @@ public class Lobby {
         Location spawn = getSpawnpoint().clone();
         spawn.setY(spawn.getY() + 2);
         nexusPlayer.getPlayer().teleport(spawn);
-        sendMessage("&a&l>> &b" + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined. &5(&d" + totalPlayers + "&5/&d" + lobbySettings.getMaxPlayers() + "&5)");
+        sendMessage("&a&l>> &b" + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined.");
         Player player = nexusPlayer.getPlayer();
         player.setHealth(player.getMaxHealth());
         if (this.getState() != LobbyState.MAP_EDITING) {

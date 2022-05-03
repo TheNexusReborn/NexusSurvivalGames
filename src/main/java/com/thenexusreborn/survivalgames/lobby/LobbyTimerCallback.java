@@ -35,7 +35,7 @@ public class LobbyTimerCallback implements ReturnableCallback<TimerSnapshot, Boo
         
         if (ANNOUNCE_SECONDS.contains(remainingSeconds)) {
             if (!this.announced.contains(remainingSeconds)) {
-                lobby.sendMessage("&eThe game begins in &b" + remainingSeconds + " &eseconds");
+                lobby.sendMessage("&6&l>> &e&lVoting closes in &f&l" + remainingSeconds + "&f&ls&e&l.");
                 if (lobby.getLobbySettings().isSounds()) {
                     lobby.playSound(Sound.CLICK);
                 }
