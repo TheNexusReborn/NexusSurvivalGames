@@ -92,6 +92,15 @@ public class Lobby {
                 }
             }
         }.runTaskTimer(plugin, 20L, 20L);
+        
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (players.size() < lobbySettings.getMinPlayers()) {
+                    sendMessage("&6&l>> &e&lDid you know that you can use &f&l/votestart &e&lto start a game early?");
+                }
+            }
+        }.runTaskTimerAsynchronously(plugin, 20L, 1200L);
     }
     
     public void handleShutdown() {
