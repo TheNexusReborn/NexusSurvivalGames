@@ -103,6 +103,7 @@ public class SurvivalGames extends JavaPlugin {
         
         getCommand("tournament").setExecutor(new TournamentCommand(this));
         getCommand("votestart").setExecutor(new VoteStartCommand(this));
+        getCommand("stats").setExecutor(new StatsCommand(this));
     
         new GameSetupTask(this).runTaskTimer(this, 1L, 1L);
         new TimerCountdownCheck(this).runTaskTimer(this, 1L, 1L);

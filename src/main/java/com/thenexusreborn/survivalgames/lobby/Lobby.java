@@ -77,6 +77,9 @@ public class Lobby {
                     sign.setLine(3, MCUtils.color("&n" + votes + " Vote(s)"));
     
                     for (SpigotNexusPlayer player : players.values()) {
+                        if (!player.getPlayer().getWorld().getName().equalsIgnoreCase(spawnpoint.getWorld().getName())) {
+                            continue;
+                        }
                         if (mapVotes.get(entry.getKey()).contains(player.getUniqueId())) {
                             sign.setLine(0, MCUtils.color("&n#" + entry.getKey()));
                             sign.setLine(2, MCUtils.color("&2&lVOTED!"));

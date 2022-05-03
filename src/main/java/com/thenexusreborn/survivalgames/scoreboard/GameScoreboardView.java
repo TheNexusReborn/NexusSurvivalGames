@@ -44,7 +44,7 @@ public class GameScoreboardView extends SpigotScoreboardView {
         createTeam(infoLabelName, "&6&lINFO:", 8);    
         createTeam(scoreValueName, ChatColor.DARK_AQUA.toString(), "&fScore: ", 7);
         createTeam(passesValueName, ChatColor.LIGHT_PURPLE.toString(), "&fPasses: ", "&cWIP", 6);    
-        createTeam(killStreakValueName, ChatColor.DARK_RED.toString(), "&fKS: ", "&cWIP", 5);
+        createTeam(killStreakValueName, ChatColor.DARK_RED.toString(), "&fKS: ", "", 5);
         createTeam(blank3Name, ChatColor.DARK_PURPLE.toString(), 4);    
         createTeam(serverLabelName, "&6&lSERVER:", 3);
         createTeam(serverValueName, ChatColor.DARK_GRAY.toString(), "&f" + plugin.getNexusCore().getConfig().getString("serverName"), 2);    
@@ -82,6 +82,10 @@ public class GameScoreboardView extends SpigotScoreboardView {
             scoreboard.getScoreboard().getTeam(tributesValueName).setSuffix(MCUtils.color("&a" + tributes));
             scoreboard.getScoreboard().getTeam(watchingValueName).setSuffix(MCUtils.color("&c" + watching));
             scoreboard.getScoreboard().getTeam(scoreValueName).setSuffix(MCUtils.color("&e" + MCUtils.formatNumber(this.scoreboard.getPlayer().getStatValue("sg_score"))));
+            GamePlayer player = game.getPlayer(this.scoreboard.getPlayer().getUniqueId());
+            int kills = player.getKills();
+            int hks = (int) player.getNexusPlayer().getStatValue("sg_highest_kill_streak");
+            scoreboard.getScoreboard().getTeam(killStreakValueName).setSuffix(MCUtils.color("&e" + kills + "/" + hks));
         } catch (Exception e) {
             e.printStackTrace();
         }

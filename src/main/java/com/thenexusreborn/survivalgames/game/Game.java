@@ -753,6 +753,7 @@ public class Game {
         
         if (killer != null) {
             killer.setKills(killer.getKills() + 1);
+            killer.getNexusPlayer().changeStat("sg_kills", 1, Operator.ADD);
             killer.setKillStreak(killer.getKillStreak() + 1);
             int highestKillStreak = (int) killer.getNexusPlayer().getStatValue("sg_highest_kill_streak");
             if (highestKillStreak < killer.getKillStreak()) {
@@ -761,6 +762,7 @@ public class Game {
                     killer.sendMessage("&6&l>> &a&lNEW PERSONAL BEST!");
                     killer.setNewPersonalBestNotified(true);
                 }
+                highestKillStreak += 1;
             }
             killer.sendMessage("&6&l>> &f&lCurrent Streak: &a" + killer.getKillStreak() + "  &f&lPersonal Best: &a" + highestKillStreak);
             
