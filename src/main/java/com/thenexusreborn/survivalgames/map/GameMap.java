@@ -170,6 +170,7 @@ public class GameMap {
         this.config.set("center.y", this.center.getY());
         this.config.set("center.z", this.center.getZ());
         this.config.set("borderdistance", this.borderDistance + "");
+        this.config.set("creators", this.creators);
         this.config.set("deathmatchborderdistance", this.deathmatchBorderDistance + "");
         if (!this.spawns.isEmpty()) {
             this.spawns.forEach((id, position) -> {
