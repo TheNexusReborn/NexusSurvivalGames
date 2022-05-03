@@ -1,7 +1,8 @@
-package com.thenexusreborn.survivalgames.game;
+package com.thenexusreborn.survivalgames.game.timer;
 
 import com.thenexusreborn.nexuscore.util.ReturnableCallback;
 import com.thenexusreborn.nexuscore.util.timer.TimerSnapshot;
+import com.thenexusreborn.survivalgames.game.*;
 
 public class RestockTimerCallback implements ReturnableCallback<TimerSnapshot, Boolean> {
     private final Game game;
