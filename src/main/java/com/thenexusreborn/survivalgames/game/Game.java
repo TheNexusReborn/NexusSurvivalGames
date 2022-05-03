@@ -2,6 +2,7 @@ package com.thenexusreborn.survivalgames.game;
 
 import com.google.common.io.*;
 import com.thenexusreborn.api.*;
+import com.thenexusreborn.api.gamearchive.*;
 import com.thenexusreborn.api.multicraft.MulticraftAPI;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.util.Operator;
@@ -23,6 +24,7 @@ import org.bukkit.entity.*;
 import org.bukkit.potion.*;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -40,18 +42,43 @@ public class Game {
     private GameState state = UNDEFINED;
     private Timer timer, graceperiodTimer, restockTimer;
     private List<Location> lootedChests = new ArrayList<>();
+    private GameInfo gameInfo;
+    private long start, end;
+    private GamePlayer firstBlood;
     
     public Game(GameMap gameMap, GameSettings settings, Collection<SpigotNexusPlayer> players, List<UUID> spectatingPlayers) {
         this.gameMap = gameMap;
         this.settings = settings;
+        this.gameInfo = new GameInfo();
+        gameInfo.setMapName(this.gameMap.getName().replace("'", "''"));
+        gameInfo.setPlayerCount(players.size() - spectatingPlayers.size());
+        List<String> playerNames = new ArrayList<>();
         for (SpigotNexusPlayer player : players) {
             GamePlayer gamePlayer = new GamePlayer(player);
             if (spectatingPlayers.contains(player.getUniqueId())) {
                 gamePlayer.setTeam(GameTeam.SPECTATORS);
+            } else {
+                playerNames.add(player.getName());
             }
             player.setActionBar(new GameActionBar(plugin, gamePlayer));
             this.players.put(gamePlayer.getUniqueId(), gamePlayer);
         }
+        gameInfo.setPlayers(playerNames.toArray(new String[0]));
+        StringBuilder sb = new StringBuilder();
+        for (Field field : this.settings.getClass().getDeclaredFields()) {
+            field.setAccessible(true);
+            try {
+                sb.append(field.getName()).append("=").append(field.get(this.settings).toString()).append(",");
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        gameInfo.setSettings(sb.substring(0, sb.length() - 1));
+    }
+    
+    protected void setState(GameState state) {
+        this.state = state;
+        this.gameInfo.getActions().add(new GameAction(System.currentTimeMillis(), "statechange", state.name()));
     }
     
     public void handleShutdown() {
@@ -209,7 +236,7 @@ public class Game {
     
     public void teleportStart() {
         try {
-            this.state = TELEPORT_START;
+            setState(TELEPORT_START);
             
             List<UUID> tributes = new LinkedList<>(), spectators = new LinkedList<>();
             for (GamePlayer player : this.players.values()) {
@@ -240,7 +267,7 @@ public class Game {
             
             recalculateVisibiltiy();
             
-            this.state = TELEPORT_START_DONE;
+            setState(TELEPORT_START_DONE);
         } catch (Exception e) {
             e.printStackTrace();
             handleError("There was an error teleporting players to their starting positions.");
@@ -249,7 +276,7 @@ public class Game {
     
     public void assignStartingTeams() {
         try {
-            this.state = ASSIGN_TEAMS;
+            setState(ASSIGN_TEAMS);
             int totalTributes = 0;
             UUID uuid;
             Queue<UUID> tributes = new LinkedList<>(), spectators = new LinkedList<>();
@@ -286,7 +313,7 @@ public class Game {
                 player.getNexusPlayer().getScoreboard().setTablistHandler(new GameTablistHandler(player.getNexusPlayer().getScoreboard(), plugin));
             }
             
-            this.state = TEAMS_ASSIGNED;
+            setState(TEAMS_ASSIGNED);
         } catch (Exception e) {
             e.printStackTrace();
             handleError("There was an error assiging teams.");
@@ -294,7 +321,7 @@ public class Game {
     }
     
     public void setup() {
-        this.state = SETTING_UP;
+        setState(SETTING_UP);
         
         for (GamePlayer player : this.players.values()) {
             player.getNexusPlayer().getScoreboard().setView(new GameScoreboardView(player.getNexusPlayer().getScoreboard(), plugin));
@@ -336,7 +363,7 @@ public class Game {
                             gameMap.getWorld().setGameRuleValue("doFireTick", "false");
                             gameMap.getWorld().setGameRuleValue("keepInventory", "false");
                             gameMap.getWorld().setDifficulty(Difficulty.EASY);
-                            state = SETUP_COMPLETE;
+                            setState(SETUP_COMPLETE);
                             plugin.getLobby().resetLobby();
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -349,7 +376,7 @@ public class Game {
     }
     
     public void handleError(String message) {
-        this.state = ERROR;
+        setState(ERROR);
         sendMessage("&4&l>> &4" + message + " Resetting back to lobby.");
         plugin.getLobby().resetLobby();
         plugin.getLobby().fromGame(this);
@@ -368,17 +395,18 @@ public class Game {
     }
     
     public void startWarmup() {
-        this.state = WARMUP;
+        setState(WARMUP);
         this.timer = new Timer(new CountdownTimerCallback(this)).run((settings.getWarmupLength() * 1000L) + 50L);
     }
     
     public void startGame() {
         this.timer = new Timer(new GameTimerCallback(this)).run(((settings.getGameLength() * 60000L) + 50));
+        this.start = System.currentTimeMillis();
         if (this.settings.isGracePeriod()) {
             this.graceperiodTimer = new Timer(new GraceperiodCountdownCallback(this)).run((settings.getGracePeriodLength() * 1000L) + 50L);
-            this.state = INGAME_GRACEPERIOD;
+            setState(INGAME_GRACEPERIOD);
         } else {
-            this.state = INGAME;
+            setState(INGAME);
         }
         this.restockTimer = new Timer(new RestockTimerCallback(this)).run(600050L);
         sendMessage("&6&l>> &a&lMAY THE ODDS BE EVER IN YOUR FAVOR.");
@@ -399,7 +427,7 @@ public class Game {
     }
     
     public void warmupComplete() {
-        this.state = WARMUP_DONE;
+        setState(WARMUP_DONE);
     }
     
     public Timer getTimer() {
@@ -420,7 +448,7 @@ public class Game {
     
     public void teleportDeathmatch() {
         try {
-            this.state = TELEPORT_DEATHMATCH;
+            setState(TELEPORT_DEATHMATCH);
             sendMessage("&6&l>> &e&LPREPARE FOR DEATHMATCH...");
             List<UUID> tributes = new LinkedList<>(), spectators = new LinkedList<>();
             for (GamePlayer player : this.players.values()) {
@@ -437,7 +465,7 @@ public class Game {
             teleportSpectators(spectators, mapSpawn);
             
             recalculateVisibiltiy();
-            this.state = TELEPORT_DEATHMATCH_DONE;
+            setState(TELEPORT_DEATHMATCH_DONE);
         } catch (Exception e) {
             e.printStackTrace();
             handleError("There was an error teleporting tributes to the deathmatch.");
@@ -445,7 +473,7 @@ public class Game {
     }
     
     public void startDeathmatchWarmup() {
-        this.state = DEATHMATCH_WARMUP;
+        setState(DEATHMATCH_WARMUP);
         
         if (this.timer != null) {
             timer.cancel();
@@ -462,7 +490,7 @@ public class Game {
     }
     
     public void startDeathmatch() {
-        this.state = DEATHMATCH;
+        setState(DEATHMATCH);
         
         if (this.timer != null) {
             timer.cancel();
@@ -489,11 +517,12 @@ public class Game {
     }
     
     public void deathmatchWarmupDone() {
-        this.state = DEATHMATCH_WARMUP_DONE;
+        setState(DEATHMATCH_WARMUP_DONE);
     }
     
     public void end() {
-        this.state = ENDING;
+        setState(ENDING);
+        this.end = System.currentTimeMillis();
         plugin.incrementGamesPlayed();
         if (this.timer != null) {
             timer.cancel();
@@ -610,9 +639,33 @@ public class Game {
                     winner.sendMessage(baseMessage);
                 }
             }
-            
         }
         
+        gameInfo.setGameStart(this.start);
+        gameInfo.setGameEnd(this.end);
+        if (winner != null) {
+            gameInfo.setWinner(winner.getNexusPlayer().getName());
+        } else {
+            gameInfo.setWinner("No one");
+        }
+        
+        if (this.firstBlood != null) {
+            gameInfo.setFirstBlood(firstBlood.getNexusPlayer().getName());
+        } else {
+            gameInfo.setFirstBlood("No one");
+        }
+        
+        gameInfo.setLength(this.end - this.start);
+        
+        NexusAPI.getApi().getDataManager().pushGameInfoAsync(this.gameInfo, gameInfo -> {
+            if (gameInfo.getId() == 0) {
+                sendMessage("&4&l>> &cThere was a database error archiving the game. Please report with date and time.");
+            } else {
+                sendMessage("&6&l>> &aThis game has been archived!");
+                sendMessage("&6&l>> &aGame ID: &b" + gameInfo.getId() + " &7&oCustom Website Coming Soon.");
+            }
+        });
+    
         this.timer = new Timer(new NextGameTimerCallback(this)).run(10050L);
     }
     
@@ -627,7 +680,7 @@ public class Game {
     }
     
     public void nextGame() {
-        this.state = ENDED;
+        setState(ENDED);
         
         if (plugin.restart()) {
             ByteArrayDataOutput out = ByteStreams.newDataOutput();
@@ -661,6 +714,10 @@ public class Game {
         if (gamePlayer == null) {
             return;
         }
+    
+        String strippedDeathMessage = ChatColor.stripColor(MCUtils.color(deathInfo.getDeathMessage(this)));
+        this.gameInfo.getActions().add(new GameAction(System.currentTimeMillis(), "death", strippedDeathMessage.substring(3)));
+        
         Player player = Bukkit.getPlayer(gamePlayer.getUniqueId());
         player.getInventory().clear();
         player.getInventory().setArmorContents(null);
@@ -817,23 +874,24 @@ public class Game {
                     totalTributes++;
                 }
             }
+    
+            if (totalTributes <= settings.getDeathmatchThreshold()) {
+                if (this.state == INGAME || this.state == INGAME_GRACEPERIOD) {
+                    if (totalTributes > 1) {
+                        if (mode == Mode.AUTOMATIC) {
+                            this.startDeathmatchTimer();
+                        } else {
+                            sendMessage("&eTribute count reached or went below the deathmatch threashold, but was not automatically started due to being in manual mode.");
+                        }
+                    }
+                }
+            }
+            
             sendMessage("&6&l>> &c&l" + totalTributes + " tributes remain.");
         }
         
         if (sendDeathMessage) {
             this.sendMessage(deathInfo.getDeathMessage(this));
-        }
-        
-        if (totalTributes <= settings.getDeathmatchThreshold()) {
-            if (this.state == INGAME || this.state == INGAME_GRACEPERIOD) {
-                if (totalTributes > 1) {
-                    if (mode == Mode.AUTOMATIC) {
-                        this.startDeathmatchTimer();
-                    } else {
-                        sendMessage("&eTribute count reached or went below the deathmatch threashold, but was not automatically started due to being in manual mode.");
-                    }
-                }
-            }
         }
         
         if (oldTeam == GameTeam.TRIBUTES) {
@@ -893,7 +951,7 @@ public class Game {
     }
     
     public void startDeathmatchTimer() {
-        this.state = INGAME_DEATHMATCH;
+        setState(INGAME_DEATHMATCH);
         if (this.timer != null) {
             timer.cancel();
         }
@@ -916,11 +974,13 @@ public class Game {
     }
     
     public void endGracePeriod() {
-        this.state = INGAME;
+        setState(INGAME);
         sendMessage("&6&l>> &eThe &c&lGRACE PERIOD &ehas ended.");
         this.graceperiodTimer.cancel();
         this.graceperiodTimer = null;
     }
     
-    
+    public GameInfo getGameInfo() {
+        return gameInfo;
+    }
 }

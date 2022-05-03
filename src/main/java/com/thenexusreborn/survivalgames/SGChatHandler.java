@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames;
 
+import com.thenexusreborn.api.gamearchive.GameAction;
 import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.nexuscore.chat.ChatHandler;
 import com.thenexusreborn.nexuscore.util.MCUtils;
@@ -53,10 +54,12 @@ public class SGChatHandler implements ChatHandler {
                     for (GamePlayer p : game.getPlayers().values()) {
                         if (p.getTeam() != GameTeam.TRIBUTES) {
                             p.sendMessage(format);
+                            game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "deadchat", e.getPlayer().getName() + ":" + e.getMessage().replace("'", "''")));
                         }
                     }
                 } else {
                     game.sendMessage(format);
+                    game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "chat", e.getPlayer().getName() + ":" + e.getMessage().replace("'", "''")));
                 }
             } else {
                 game.sendMessage(format);

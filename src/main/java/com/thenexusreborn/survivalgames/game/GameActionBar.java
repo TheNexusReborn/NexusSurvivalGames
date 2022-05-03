@@ -103,6 +103,9 @@ public class GameActionBar extends ActionBar {
         }
         
         if (game.getState() == GameState.ENDING) {
+            if (game.getTimer() == null) {
+                return "&aArchiving game...";
+            }
             if (!plugin.restart()) {
                 return "&d&lNEXUS &7 - &eNext game starting... &7(" + game.getTimer().getSecondsLeft() + "s)";
             } else {
