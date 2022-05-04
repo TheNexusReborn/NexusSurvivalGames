@@ -10,7 +10,9 @@ import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.game.death.*;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
 import com.thenexusreborn.survivalgames.loot.Loot;
+import com.thenexusreborn.survivalgames.menu.TeamMenu;
 import com.thenexusreborn.survivalgames.settings.ColorMode;
+import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.*;
 import org.bukkit.block.*;
 import org.bukkit.entity.*;
@@ -21,6 +23,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.*;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Openable;
 import org.bukkit.potion.*;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -71,6 +74,39 @@ public class PlayerListener implements Listener {
         if (game != null) {
             GamePlayer gamePlayer = game.getPlayer(e.getPlayer().getUniqueId());
             if (gamePlayer.getTeam() == GameTeam.SPECTATORS || gamePlayer.getTeam() == GameTeam.HIDDEN_STAFF) {
+                if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
+                    if (e.getItem() != null) {
+                        ItemStack item = e.getItem();
+                        if (item.getType() == Material.ENCHANTED_BOOK) {
+                            ItemMeta itemMeta = item.getItemMeta();
+                            String displayName = itemMeta.getDisplayName();
+                            if (displayName != null && !displayName.equals("")) {
+                                GameTeam team = null;
+                                if (displayName.toLowerCase().contains("tributes")) {
+                                    team = GameTeam.TRIBUTES;
+                                } else if (displayName.toLowerCase().contains("mutations")) {
+                                    gamePlayer.sendMessage("&6&l>> &cThat feature is not implemented yet.");
+                                } else if (displayName.toLowerCase().contains("spectators")) {
+                                    team = GameTeam.SPECTATORS;
+                                }
+                                
+                                if (team != null) {
+                                    e.getPlayer().openInventory(new TeamMenu(plugin, team).getInventory());
+                                }
+                            }
+                        } else if (item.getType() == Material.ROTTEN_FLESH) {
+                            gamePlayer.sendMessage("&6&l>> &cThat is currently not implemented.");
+                        } else if (item.getType() == Material.WATCH) {
+                            e.getPlayer().teleport(game.getGameMap().getCenter().toLocation(game.getGameMap().getWorld()));
+                            gamePlayer.sendMessage("&6&l>> &eTeleported to the Map Center.");
+                        } else if (item.getType() == Material.WOODEN_DOOR) {
+                            gamePlayer.sendMessage("&6&l>> &eSending you to the hub.");
+                            SGUtils.sendToHub(e.getPlayer());
+                        }
+                    }
+                }
+                
+                
                 e.setCancelled(true);
                 return;
             }
@@ -206,6 +242,22 @@ public class PlayerListener implements Listener {
             }
         }
         //TODO custom guis when implemented
+    }
+    
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent e) {
+        Player player = (Player) e.getWhoClicked();
+        if (plugin.getLobby().checkMapEditing(player)) {
+            return;
+        }
+    
+        Game game = plugin.getGame();
+        if (game != null) {
+            GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
+            if (gamePlayer.getTeam() == GameTeam.SPECTATORS || gamePlayer.getTeam() == GameTeam.HIDDEN_STAFF) {
+                e.setCancelled(true);
+            }
+        }
     }
     
     @EventHandler

@@ -8,6 +8,7 @@ import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.util.Operator;
 import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.nexuscore.util.*;
+import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.nexuscore.util.helper.NumberHelper;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.*;
@@ -21,6 +22,7 @@ import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
+import org.bukkit.inventory.*;
 import org.bukkit.potion.*;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -800,6 +802,22 @@ public class Game {
             player.setFlying(true);
             player.spigot().setCollidesWithEntities(false);
             gamePlayer.sendMessage(newTeam.getJoinMessage());
+            ItemStack tributesBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&a&lTributes &7&o(Right Click)").build();
+            ItemStack mutationsBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&d&lMutations &c(WIP)").build();
+            ItemStack spectatorsBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&c&lSpectators &7&o(Right Click)").build();
+            ItemStack mutateItem = ItemBuilder.start(Material.ROTTEN_FLESH).displayName("&cWIP").build();
+            ItemStack compass = ItemBuilder.start(Material.COMPASS).displayName("&fPlayer Tracker").build();
+            ItemStack tpCenter = ItemBuilder.start(Material.WATCH).displayName("&e&lTeleport to Map Center &7&o(Right Click)").build();
+            ItemStack hubItem = ItemBuilder.start(Material.WOODEN_DOOR).displayName("&e&lReturn to Hub &7(Right Click)").build();
+            Player p = gamePlayer.getNexusPlayer().getPlayer().getPlayer();
+            PlayerInventory inv = p.getInventory();
+            inv.setItem(0, tributesBook);
+            inv.setItem(1, mutationsBook);
+            inv.setItem(2, spectatorsBook);
+            inv.setItem(5, mutateItem);
+            inv.setItem(6, compass);
+            inv.setItem(7, tpCenter);
+            inv.setItem(8, hubItem);
         }
         gamePlayer.setTeam(newTeam);
         

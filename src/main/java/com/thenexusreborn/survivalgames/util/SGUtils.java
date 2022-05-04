@@ -1,8 +1,11 @@
 package com.thenexusreborn.survivalgames.util;
 
+import com.google.common.io.*;
 import com.thenexusreborn.nexuscore.util.command.CommandActor;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.map.GameMap;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import java.text.DecimalFormat;
@@ -11,7 +14,12 @@ public class SGUtils {
     
     private static SurvivalGames plugin = SurvivalGames.getPlugin(SurvivalGames.class);
     
-    
+    public static void sendToHub(Player player) {
+        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        out.writeUTF("Connect");
+        out.writeUTF("Hub");
+        player.sendPluginMessage(plugin.getNexusCore(), "BungeeCord", out.toByteArray());
+    }
     
     public static GameMap getLoadedGameMap(String input, CommandActor actor) {
         GameMap gameMap = getGameMapFromInput(input, actor);
