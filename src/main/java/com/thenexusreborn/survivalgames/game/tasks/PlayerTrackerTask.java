@@ -27,9 +27,7 @@ public class PlayerTrackerTask extends BukkitRunnable {
         
         Set<UUID> players = new HashSet<>();
         for (GamePlayer player : game.getPlayers().values()) {
-            if (player.getTeam() == GameTeam.TRIBUTES || player.getTeam() == GameTeam.MUTATIONS) {
-                players.add(player.getUniqueId());
-            }
+            players.add(player.getUniqueId());
         }
         
         for (UUID p : players) {

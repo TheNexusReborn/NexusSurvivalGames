@@ -54,7 +54,7 @@ public class Game {
         this.gameInfo = new GameInfo();
         gameInfo.setMapName(this.gameMap.getName().replace("'", "''"));
         gameInfo.setPlayerCount(players.size() - spectatingPlayers.size());
-        gameInfo.setServerName(NexusAPI.getApi().getServerManager().getCurrentServer().getName());
+        gameInfo.setServerName(plugin.getNexusCore().getConfig().getString("serverName"));
         List<String> playerNames = new ArrayList<>();
         for (SpigotNexusPlayer player : players) {
             GamePlayer gamePlayer = new GamePlayer(player);
@@ -206,8 +206,6 @@ public class Game {
         spectator.setGameMode(GameTeam.SPECTATORS.getGameMode());
         spectator.setFoodLevel(20);
         spectator.setSaturation(20);
-        spectator.getInventory().clear();
-        spectator.getInventory().setArmorContents(null);
         spectator.setAllowFlight(true);
         spectator.setFlying(true);
     }
@@ -253,6 +251,7 @@ public class Game {
                     tributes.add(player.getUniqueId());
                 } else if (player.getTeam() == GameTeam.SPECTATORS) {
                     spectators.add(player.getUniqueId());
+                    giveSpectatorItems(player.getNexusPlayer().getPlayer());
                 }
                 for (PotionEffect potionEffect : p.getActivePotionEffects()) {
                     p.removePotionEffect(potionEffect.getType());
@@ -802,22 +801,7 @@ public class Game {
             player.setFlying(true);
             player.spigot().setCollidesWithEntities(false);
             gamePlayer.sendMessage(newTeam.getJoinMessage());
-            ItemStack tributesBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&a&lTributes &7&o(Right Click)").build();
-            ItemStack mutationsBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&d&lMutations &c(WIP)").build();
-            ItemStack spectatorsBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&c&lSpectators &7&o(Right Click)").build();
-            ItemStack mutateItem = ItemBuilder.start(Material.ROTTEN_FLESH).displayName("&cWIP").build();
-            ItemStack compass = ItemBuilder.start(Material.COMPASS).displayName("&fPlayer Tracker").build();
-            ItemStack tpCenter = ItemBuilder.start(Material.WATCH).displayName("&e&lTeleport to Map Center &7&o(Right Click)").build();
-            ItemStack hubItem = ItemBuilder.start(Material.WOODEN_DOOR).displayName("&e&lReturn to Hub &7(Right Click)").build();
-            Player p = gamePlayer.getNexusPlayer().getPlayer().getPlayer();
-            PlayerInventory inv = p.getInventory();
-            inv.setItem(0, tributesBook);
-            inv.setItem(1, mutationsBook);
-            inv.setItem(2, spectatorsBook);
-            inv.setItem(5, mutateItem);
-            inv.setItem(6, compass);
-            inv.setItem(7, tpCenter);
-            inv.setItem(8, hubItem);
+            giveSpectatorItems(gamePlayer.getNexusPlayer().getPlayer());
         }
         gamePlayer.setTeam(newTeam);
         
@@ -946,6 +930,24 @@ public class Game {
                 }
             }
         }.runTaskLater(plugin, 1L);
+    }
+    
+    public void giveSpectatorItems(Player p) {
+        ItemStack tributesBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&a&lTributes &7&o(Right Click)").build();
+        ItemStack mutationsBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&d&lMutations &c(WIP)").build();
+        ItemStack spectatorsBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&c&lSpectators &7&o(Right Click)").build();
+        ItemStack mutateItem = ItemBuilder.start(Material.ROTTEN_FLESH).displayName("&cWIP").build();
+        ItemStack compass = ItemBuilder.start(Material.COMPASS).displayName("&fPlayer Tracker").build();
+        ItemStack tpCenter = ItemBuilder.start(Material.WATCH).displayName("&e&lTeleport to Map Center &7&o(Right Click)").build();
+        ItemStack hubItem = ItemBuilder.start(Material.WOOD_DOOR).displayName("&e&lReturn to Hub &7(Right Click)").build();
+        PlayerInventory inv = p.getInventory();
+        inv.setItem(0, tributesBook);
+        inv.setItem(1, mutationsBook);
+        inv.setItem(2, spectatorsBook);
+        inv.setItem(5, mutateItem);
+        inv.setItem(6, compass);
+        inv.setItem(7, tpCenter);
+        inv.setItem(8, hubItem);
     }
     
     public void checkGameEnd() {

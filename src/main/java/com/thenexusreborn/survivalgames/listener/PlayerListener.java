@@ -99,7 +99,7 @@ public class PlayerListener implements Listener {
                         } else if (item.getType() == Material.WATCH) {
                             e.getPlayer().teleport(game.getGameMap().getCenter().toLocation(game.getGameMap().getWorld()));
                             gamePlayer.sendMessage("&6&l>> &eTeleported to the Map Center.");
-                        } else if (item.getType() == Material.WOODEN_DOOR) {
+                        } else if (item.getType() == Material.WOOD_DOOR) {
                             gamePlayer.sendMessage("&6&l>> &eSending you to the hub.");
                             SGUtils.sendToHub(e.getPlayer());
                         }
