@@ -140,6 +140,10 @@ public class Game {
         GamePlayer gamePlayer = new GamePlayer(nexusPlayer);
         gamePlayer.setTeam(GameTeam.SPECTATORS);
         gamePlayer.sendMessage(GameTeam.SPECTATORS.getJoinMessage());
+        nexusPlayer.getPlayer().getInventory().clear();
+        nexusPlayer.getPlayer().getInventory().setArmorContents(null);
+        giveSpectatorItems(nexusPlayer.getPlayer());
+        nexusPlayer.getPlayer().spigot().setCollidesWithEntities(false);
         teleportSpectator(nexusPlayer.getPlayer(), this.gameMap.getCenter().toLocation(this.gameMap.getWorld()));
         this.players.put(nexusPlayer.getUniqueId(), gamePlayer);
         sendMessage("&a&l>> &b" + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined as a spectator.");
