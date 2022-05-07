@@ -45,10 +45,20 @@ public class CountdownTimerCallback implements ReturnableCallback<TimerSnapshot,
                 game.sendMessage("&8- &7Outlast the other tributes and be the last one standing!");
                 game.sendMessage("&8- &7Arena deathmatch begins after &e" + game.getSettings().getGameLength() + " minutes&7.");
                 game.sendMessage("");
-                game.sendMessage("&d&l>> &7Playing on &a" + game.getGameMap().getName() + " &7created by &eWIP");
+                StringBuilder creatorBuilder = new StringBuilder();
+                for (String creator : game.getGameMap().getCreators()) {
+                    creatorBuilder.append("&e").append(creator).append("&7, ");
+                }
+                
+                if (creatorBuilder.length() < 2) {
+                    creatorBuilder.append("&eNot Configured, ");
+                }
+                
+                game.sendMessage("&d&l>> &7Playing on &a" + game.getGameMap().getName() + " &7created by " + creatorBuilder.substring(0, creatorBuilder.length() - 2));
                 if (game.getSettings().isGracePeriod()) {
                     game.sendMessage("&d&l>> &7There is a &e" + game.getSettings().getGracePeriodLength() + " second &7grace period.");
                 }
+                
                 announcedInfo = true;
             }
         }
@@ -61,7 +71,7 @@ public class CountdownTimerCallback implements ReturnableCallback<TimerSnapshot,
                 }
             }
         }
-    
+        
         if (game.getSettings().isSounds()) {
             if (!soundPlayed.contains(remainingSeconds)) {
                 game.playSound(Sound.NOTE_BASS);

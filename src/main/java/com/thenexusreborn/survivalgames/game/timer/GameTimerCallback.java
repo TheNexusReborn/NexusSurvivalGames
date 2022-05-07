@@ -25,7 +25,7 @@ public class GameTimerCallback implements ReturnableCallback<TimerSnapshot, Bool
     @Override
     public Boolean callback(TimerSnapshot timerSnapshot) {
         if (!(game.getState() == GameState.INGAME_GRACEPERIOD || game.getState() == GameState.INGAME)) {
-            return false; //The deathmatch being triggered by something else is a separate timer. 
+            return false;
         }
         
         int remainingSeconds = timerSnapshot.getSecondsLeft();

@@ -108,6 +108,10 @@ public class Lobby {
                     return;
                 }
                 
+                if (players.size() == 0) {
+                    return;
+                }
+                
                 if (getState() != LobbyState.WAITING) {
                     return;
                 }
