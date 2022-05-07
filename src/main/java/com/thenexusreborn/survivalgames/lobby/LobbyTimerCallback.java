@@ -2,7 +2,7 @@ package com.thenexusreborn.survivalgames.lobby;
 
 import com.thenexusreborn.nexuscore.util.ReturnableCallback;
 import com.thenexusreborn.nexuscore.util.timer.TimerSnapshot;
-import com.thenexusreborn.survivalgames.Mode;
+import com.thenexusreborn.survivalgames.ControlType;
 import org.bukkit.Sound;
 
 import java.util.*;
@@ -25,7 +25,7 @@ public class LobbyTimerCallback implements ReturnableCallback<TimerSnapshot, Boo
         }
         int remainingSeconds = timerSnapshot.getSecondsLeft();
         if (remainingSeconds <= 0) {
-            if (lobby.getMode() == Mode.AUTOMATIC) {
+            if (lobby.getControlType() == ControlType.AUTOMATIC) {
                 lobby.prepareGame();
             } else {
                 lobby.sendMessage("&eThe timer concluded but the mode is not automatic, skipping auto-start of the game.");

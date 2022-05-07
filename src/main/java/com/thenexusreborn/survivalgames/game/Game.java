@@ -35,7 +35,7 @@ import static com.thenexusreborn.survivalgames.game.GameState.*;
 @SuppressWarnings({"DuplicatedCode"})
 public class Game {
     private static final SurvivalGames plugin = SurvivalGames.getPlugin(SurvivalGames.class);
-    private static Mode mode = Mode.MANUAL;
+    private static ControlType controlType = ControlType.MANUAL;
     
     private GameMap gameMap;
     private GameSettings settings;
@@ -100,13 +100,13 @@ public class Game {
         }
     }
     
-    public static Mode getMode() {
-        return mode;
+    public static ControlType getControlType() {
+        return controlType;
     }
     
-    public static void setMode(Mode mode) {
-        Game.mode = mode;
-        if (mode == Mode.MANUAL) {
+    public static void setControlType(ControlType controlType) {
+        Game.controlType = controlType;
+        if (controlType == ControlType.MANUAL) {
             if (plugin.getGame() != null) {
                 if (plugin.getGame().getTimer() != null) {
                     plugin.getGame().getTimer().cancel();
@@ -417,8 +417,10 @@ public class Game {
     
     public void restockChests() {
         this.lootedChests.clear();
-        this.restockTimer.cancel();
-        this.restockTimer = null;
+        if(this.restockTimer != null) {
+            this.restockTimer.cancel();
+            this.restockTimer = null;
+        }
         if (state == INGAME) {
             int secondsLeft = this.timer.getSecondsLeft();
             int minutesLeft = secondsLeft / 60;
@@ -881,7 +883,7 @@ public class Game {
             if (totalTributes <= settings.getDeathmatchThreshold()) {
                 if (this.state == INGAME || this.state == INGAME_GRACEPERIOD) {
                     if (totalTributes > 1) {
-                        if (mode == Mode.AUTOMATIC) {
+                        if (controlType == ControlType.AUTOMATIC) {
                             this.startDeathmatchTimer();
                         } else {
                             sendMessage("&eTribute count reached or went below the deathmatch threashold, but was not automatically started due to being in manual mode.");

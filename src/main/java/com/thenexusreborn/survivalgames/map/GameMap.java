@@ -22,6 +22,7 @@ public class GameMap {
     private IncrementalMap<Position> spawns = new IncrementalMap<>();
     private int borderDistance = 0, deathmatchBorderDistance = 0;
     private List<String> creators = new ArrayList<>();
+    private boolean active;
     
     //Fields for using this map actively
     private UUID uniqueId; //This is for when the map is being used to prevent issues that can happen
@@ -388,5 +389,13 @@ public class GameMap {
     
     public void setVotes(int votes) {
         this.votes = votes;
+    }
+    
+    public boolean isActive() {
+        return active;
+    }
+    
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

@@ -5,7 +5,6 @@ import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.nexuscore.util.timer.TimerSnapshot;
 import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.*;
-import org.bukkit.Sound;
 
 import java.util.*;
 
@@ -39,7 +38,7 @@ public class NextGameTimerCallback implements ReturnableCallback<TimerSnapshot, 
         }
         
         if (timerSnapshot.getTimeLeft() <= 0) {
-            if (Game.getMode() == Mode.AUTOMATIC) {
+            if (Game.getControlType() == ControlType.AUTOMATIC) {
                 game.nextGame();
             } else {
                 game.sendMessage("&eThe next game timer has concluded, but the mode is not automatic. Skipped automatically performing next game tasks.");

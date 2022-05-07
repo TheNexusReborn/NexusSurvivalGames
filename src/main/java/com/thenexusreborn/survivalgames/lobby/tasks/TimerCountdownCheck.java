@@ -21,7 +21,7 @@ public class TimerCountdownCheck extends BukkitRunnable {
             return;
         }
         
-        if (lobby.getMode() == Mode.MANUAL) {
+        if (lobby.getControlType() == ControlType.MANUAL) {
             return;
         }
         

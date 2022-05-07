@@ -21,6 +21,14 @@ public class SGUtils {
         player.sendPluginMessage(plugin.getNexusCore(), "BungeeCord", out.toByteArray());
     }
     
+    public static String getMapNameFromCommand(String[] args, int startIndex) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = startIndex; i < args.length; i++) {
+            sb.append(args[i]).append(" ");
+        }
+        return sb.toString().trim();
+    }
+    
     public static GameMap getLoadedGameMap(String input, CommandActor actor) {
         GameMap gameMap = getGameMapFromInput(input, actor);
         if (gameMap == null) {

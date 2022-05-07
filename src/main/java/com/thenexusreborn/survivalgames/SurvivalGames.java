@@ -51,11 +51,11 @@ public class SurvivalGames extends JavaPlugin {
         lootManager = new LootManager(this);
         
         if (NexusAPI.getApi().getEnvironment() == Environment.DEVELOPMENT) {
-            lobby.setMode(Mode.MANUAL);
-            Game.setMode(Mode.MANUAL);
+            lobby.setControlType(ControlType.MANUAL);
+            Game.setControlType(ControlType.MANUAL);
         } else {
-            lobby.setMode(Mode.AUTOMATIC);
-            Game.setMode(Mode.AUTOMATIC);
+            lobby.setControlType(ControlType.AUTOMATIC);
+            Game.setControlType(ControlType.AUTOMATIC);
         }
     
         if (this.getConfig().contains("spawnpoint")) {
@@ -95,15 +95,12 @@ public class SurvivalGames extends JavaPlugin {
         this.chatHandler = new SGChatHandler(this);
         nexusCore.getChatManager().setHandler(chatHandler);
     
-        new MapCommand(this).register(nexusCore.getCommandManager());
-        new LobbyCommand(this).register(nexusCore.getCommandManager());
-        new GameCommand(this).register(nexusCore.getCommandManager());
         new SpectateCommand(this).register(nexusCore.getCommandManager());
-        new SettingsCommand(this).register(nexusCore.getCommandManager());
         
         getCommand("tournament").setExecutor(new TournamentCommand(this));
         getCommand("votestart").setExecutor(new VoteStartCommand(this));
         getCommand("stats").setExecutor(new StatsCommand(this));
+        getCommand("survivalgames").setExecutor(new SGCommand(this));
     
         new GameSetupTask(this).runTaskTimer(this, 1L, 1L);
         new TimerCountdownCheck(this).runTaskTimer(this, 1L, 1L);

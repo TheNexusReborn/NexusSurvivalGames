@@ -2,6 +2,7 @@ package com.thenexusreborn.survivalgames.lobby.tasks;
 
 import com.thenexusreborn.nexuscore.util.ServerProperties;
 import com.thenexusreborn.survivalgames.SurvivalGames;
+import com.thenexusreborn.survivalgames.lobby.LobbyState;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -26,9 +27,11 @@ public class LobbyWorldChecker extends BukkitRunnable {
             }
         }
         
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.getLocation().getBlockY() < plugin.getLobby().getSpawnpoint().getBlockX() - 20) {
-                player.teleport(plugin.getLobby().getSpawnpoint());
+        if (plugin.getLobby().getState() != LobbyState.MAP_EDITING) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (player.getLocation().getBlockY() < plugin.getLobby().getSpawnpoint().getBlockX() - 20) {
+                    player.teleport(plugin.getLobby().getSpawnpoint());
+                }
             }
         }
     }

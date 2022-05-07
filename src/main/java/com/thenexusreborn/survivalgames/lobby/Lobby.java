@@ -29,13 +29,14 @@ public class Lobby {
     private GameSettings gameSettings;
     private LobbySettings lobbySettings = new LobbySettings();
     private GameMap gameMap;
-    private Mode mode = Mode.MANUAL;
+    private ControlType controlType = ControlType.MANUAL;
     private LobbyState state = LobbyState.WAITING;
     private Location spawnpoint;
     private Set<UUID> voteStart = new HashSet<>();
     private Map<Integer, Location> mapSigns = new HashMap<>();
     private Map<Integer, GameMap> mapOptions = new HashMap<>();
     private Map<Integer, Set<UUID>> mapVotes = new HashMap<>();
+    private boolean forceStarted;
     
     public Lobby(SurvivalGames plugin) {
         this.plugin = plugin;
@@ -58,6 +59,12 @@ public class Lobby {
         new BukkitRunnable() {
             @Override
             public void run() {
+                if (getState() == LobbyState.MAP_EDITING) {
+                    return;
+                }
+                if (mapOptions.size() < 1) {
+                    return;
+                }
                 for (Entry<Integer, Location> entry : mapSigns.entrySet()) {
                     GameMap map = mapOptions.get(entry.getKey());
                     BlockState state = entry.getValue().getBlock().getState();
@@ -96,6 +103,9 @@ public class Lobby {
         new BukkitRunnable() {
             @Override
             public void run() {
+                if (getState() == LobbyState.MAP_EDITING) {
+                    return;
+                }
                 if (players.size() < lobbySettings.getMinPlayers()) {
                     sendMessage("&6&l>> &e&lDid you know that you can use &f&l/votestart &e&lto start a game early?");
                 }
@@ -131,14 +141,16 @@ public class Lobby {
     public void generateMapOptions() {
         this.mapOptions.clear();
         this.mapVotes.clear();
-    
-        List<GameMap> maps = new ArrayList<>(plugin.getMapManager().getMaps());
-        for (Integer position : new HashSet<>(this.mapSigns.keySet())) {
-            int index = new Random().nextInt(maps.size());
-            GameMap map = maps.get(index);
-            this.mapOptions.put(position, map);
-            this.mapVotes.put(position, new HashSet<>());
-            maps.remove(index);
+        
+        if (plugin.getMapManager().getMaps().size() >= this.mapSigns.size()) {
+            List<GameMap> maps = new ArrayList<>(plugin.getMapManager().getMaps());
+            for (Integer position : new HashSet<>(this.mapSigns.keySet())) {
+                int index = new Random().nextInt(maps.size());
+                GameMap map = maps.get(index);
+                this.mapOptions.put(position, map);
+                this.mapVotes.put(position, new HashSet<>());
+                maps.remove(index);
+            }
         }
     }
     
@@ -176,11 +188,11 @@ public class Lobby {
     }
     
     public void automatic() {
-        this.mode = Mode.AUTOMATIC;
+        this.controlType = ControlType.AUTOMATIC;
     }
     
     public void manual() {
-        this.mode = Mode.MANUAL;
+        this.controlType = ControlType.MANUAL;
         if (this.timer != null) {
             this.timer.cancel();
             this.timer = null;
@@ -263,7 +275,7 @@ public class Lobby {
         if (plugin.getGamesPlayed() + 1 >= this.lobbySettings.getMaxGames()) {
             plugin.setRestart(true);
         }
-        if (Game.getMode() == Mode.AUTOMATIC) {
+        if (Game.getControlType() == ControlType.AUTOMATIC) {
             this.state = LobbyState.STARTING;
             game.setup();
         } else {
@@ -285,6 +297,7 @@ public class Lobby {
         this.gameMap = null;
         this.gameSettings = null;
         this.state = LobbyState.WAITING;
+        this.forceStarted = false;
         generateMapOptions();
     }
     
@@ -371,22 +384,24 @@ public class Lobby {
         
         if (this.state == LobbyState.COUNTDOWN) {
             if (totalPlayers < lobbySettings.getMinPlayers() && !(voteStart.size() >= 2)) {
-                sendMessage("&cNot enough players to start.");
-                if (this.timer != null) {
-                    this.timer.cancel();
-                    this.timer = null;
-                    this.state = LobbyState.WAITING;
+                if (this.players.size() > 1 && !forceStarted) {
+                    sendMessage("&cNot enough players to start.");
+                    if (this.timer != null) {
+                        this.timer.cancel();
+                        this.timer = null;
+                        this.state = LobbyState.WAITING;
+                    }
                 }
             }
         }
     }
     
-    public Mode getMode() {
-        return mode;
+    public ControlType getControlType() {
+        return controlType;
     }
     
-    public void setMode(Mode mode) {
-        this.mode = mode;
+    public void setControlType(ControlType controlType) {
+        this.controlType = controlType;
     }
     
     public LobbyState getState() {
@@ -511,5 +526,14 @@ public class Lobby {
         }
         
         nexusPlayer.sendMessage("&cInvalid map voting sign.");
+    }
+    
+    public void forceStart() {
+        this.forceStarted = true;
+        this.startTimer();
+    }
+    
+    public boolean isForceStarted() {
+        return forceStarted;
     }
 }

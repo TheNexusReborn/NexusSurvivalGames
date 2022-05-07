@@ -3,7 +3,7 @@ package com.thenexusreborn.survivalgames.game.timer;
 import com.thenexusreborn.nexuscore.util.ReturnableCallback;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.nexuscore.util.timer.TimerSnapshot;
-import com.thenexusreborn.survivalgames.Mode;
+import com.thenexusreborn.survivalgames.ControlType;
 import com.thenexusreborn.survivalgames.game.*;
 import org.bukkit.Sound;
 
@@ -52,7 +52,7 @@ public class GameEndTimerCallback implements ReturnableCallback<TimerSnapshot, B
         }
         
         if (timerSnapshot.getTimeLeft() <= 0) {
-            if (Game.getMode() == Mode.AUTOMATIC) {
+            if (Game.getControlType() == ControlType.AUTOMATIC) {
                 game.end();
             } else {
                 game.sendMessage("&eThe game end timer has concluded, but the mode is not automatic. Skipped automatically performing end of game tasks.");

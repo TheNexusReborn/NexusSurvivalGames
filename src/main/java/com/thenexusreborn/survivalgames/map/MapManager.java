@@ -50,6 +50,14 @@ public class MapManager {
             if (gameMap.getName().equalsIgnoreCase(mapName)) {
                 return gameMap;
             }
+            
+            if (gameMap.getName().replace(" ", "_").replace("'", "").equalsIgnoreCase(mapName)) {
+                return gameMap;
+            }
+            
+            if (gameMap.getFileName().equalsIgnoreCase(mapName)) {
+                return gameMap;
+            }
         }
         return null;
     }

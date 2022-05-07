@@ -19,7 +19,7 @@ public class LobbyActionBar extends ActionBar {
             return "";
         }
         
-        if (lobby.getMode() == Mode.MANUAL) {
+        if (lobby.getControlType() == ControlType.MANUAL) {
             return "&aThe lobby is currently in manual mode.";
         }
         

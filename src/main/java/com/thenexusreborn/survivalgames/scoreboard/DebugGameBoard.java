@@ -96,7 +96,7 @@ public class DebugGameBoard extends SpigotScoreboardView {
         
         try {
             Game game = plugin.getGame();
-            scoreboard.getScoreboard().getTeam(modeValueName).setPrefix(MCUtils.color("&f" + Game.getMode().toString()));
+            scoreboard.getScoreboard().getTeam(modeValueName).setPrefix(MCUtils.color("&f" + Game.getControlType().toString()));
             GameState state = game.getState();
             String prefix = "&f", suffix = "&f";
             if (state.name().length() > 14) {

@@ -96,7 +96,7 @@ public class DebugLobbyBoard extends SpigotScoreboardView {
         }
         
         Lobby lobby = plugin.getLobby();
-        scoreboard.getScoreboard().getTeam(modeValueName).setPrefix(MCUtils.color("&f" + lobby.getMode().toString()));
+        scoreboard.getScoreboard().getTeam(modeValueName).setPrefix(MCUtils.color("&f" + lobby.getControlType().toString()));
         LobbyState state = lobby.getState();
         String prefix = "&f", suffix = "&f";
         if (state.name().length() > 14) {

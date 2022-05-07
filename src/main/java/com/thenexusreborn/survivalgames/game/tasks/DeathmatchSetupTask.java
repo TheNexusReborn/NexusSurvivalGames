@@ -17,7 +17,7 @@ public class DeathmatchSetupTask extends BukkitRunnable {
             return;
         }
         
-        if (Game.getMode() == Mode.MANUAL) {
+        if (Game.getControlType() == ControlType.MANUAL) {
             return;
         }
         Game game = plugin.getGame();

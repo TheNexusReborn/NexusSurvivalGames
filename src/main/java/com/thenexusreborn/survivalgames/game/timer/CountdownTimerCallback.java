@@ -25,7 +25,7 @@ public class CountdownTimerCallback implements ReturnableCallback<TimerSnapshot,
     public Boolean callback(TimerSnapshot timerSnapshot) {
         int remainingSeconds = timerSnapshot.getSecondsLeft();
         if (remainingSeconds <= 0) {
-            if (Game.getMode() == Mode.AUTOMATIC) {
+            if (Game.getControlType() == ControlType.AUTOMATIC) {
                 game.startGame();
             } else {
                 game.warmupComplete();

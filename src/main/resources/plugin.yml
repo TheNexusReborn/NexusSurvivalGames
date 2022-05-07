@@ -6,5 +6,9 @@ depend: [NexusCore]
 author: Firestar311
 commands:
   tournament:
+    aliases: [tm]
   votestart:
+    aliases: [vs]
   stats:
+  survivalgames:
+    aliases: [sg]

@@ -1,5 +1,5 @@
 package com.thenexusreborn.survivalgames;
 
-public enum Mode {
+public enum ControlType {
     MANUAL, AUTOMATIC
 }
