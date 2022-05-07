@@ -297,8 +297,10 @@ public class PlayerListener implements Listener {
         
         Game game = plugin.getGame();
         GamePlayer gamePlayer = game.getPlayer(e.getPlayer().getUniqueId());
-        if (gamePlayer.getTeam() != GameTeam.TRIBUTES) {
-            return;
+        if (gamePlayer != null) {
+            if (gamePlayer.getTeam() != GameTeam.TRIBUTES) {
+                return;
+            }
         }
         
         if (game.getState() == GameState.WARMUP || game.getState() == GameState.WARMUP_DONE ||
