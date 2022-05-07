@@ -895,7 +895,9 @@ public class Game {
             sendMessage("&6&l>> &c&l" + totalTributes + " tributes remain.");
             if (firstBlood == null) {
                 firstBlood = killer;
-                sendMessage("&6&l>> &c&l" + (firstBlood.getNexusPlayer().getName() + " claimed first blood!").toUpperCase());
+                if (firstBlood != null) {
+                    sendMessage("&6&l>> &c&l" + (firstBlood.getNexusPlayer().getName() + " claimed first blood!").toUpperCase());
+                }
             }
         }
         
