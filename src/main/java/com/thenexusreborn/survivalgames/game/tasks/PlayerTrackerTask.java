@@ -68,17 +68,19 @@ public class PlayerTrackerTask extends BukkitRunnable {
                     continue;
                 }
                 
-                double pd = player.getLocation().distance(t.getLocation());
-                if (target == null) {
-                    target = t;
-                    distance = pd;
-                } else if (distance == -1) {
-                    target = t;
-                    distance = pd;
-                } else {
-                    if (pd < distance) {
+                if (player.getLocation().getWorld().getName().equals(t.getLocation().getWorld().getName())) {
+                    double pd = player.getLocation().distance(t.getLocation());
+                    if (target == null) {
                         target = t;
                         distance = pd;
+                    } else if (distance == -1) {
+                        target = t;
+                        distance = pd;
+                    } else {
+                        if (pd < distance) {
+                            target = t;
+                            distance = pd;
+                        }
                     }
                 }
             }
