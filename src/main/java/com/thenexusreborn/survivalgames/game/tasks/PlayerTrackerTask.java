@@ -62,6 +62,12 @@ public class PlayerTrackerTask extends BukkitRunnable {
                 if (u.equals(p)) {
                     continue;
                 }
+                
+                GamePlayer targetPlayer = game.getPlayer(u);
+                if (targetPlayer.getTeam() != GameTeam.TRIBUTES) {
+                    continue;
+                }
+                
                 double pd = player.getLocation().distance(t.getLocation());
                 if (target == null) {
                     target = t;
