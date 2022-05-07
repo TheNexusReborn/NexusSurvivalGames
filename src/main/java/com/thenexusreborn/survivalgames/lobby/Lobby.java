@@ -62,6 +62,7 @@ public class Lobby {
                 if (getState() == LobbyState.MAP_EDITING) {
                     return;
                 }
+                
                 if (mapOptions.size() < 1) {
                     return;
                 }
@@ -103,9 +104,14 @@ public class Lobby {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (getState() == LobbyState.MAP_EDITING) {
+                if (plugin.getGame() != null) {
                     return;
                 }
+                
+                if (getState() != LobbyState.WAITING) {
+                    return;
+                }
+                
                 if (players.size() < lobbySettings.getMinPlayers()) {
                     sendMessage("&6&l>> &e&lDid you know that you can use &f&l/votestart &e&lto start a game early?");
                 }
