@@ -672,6 +672,22 @@ public class SGCommand implements CommandExecutor {
                         gameMap.addCreator(creator);
                         sender.sendMessage(MCUtils.color(MsgType.INFO + "You added " + MsgType.INFO.getVariableColor() + creator + MsgType.INFO.getBaseColor() + " as a creator on map " + MsgType.INFO.getVariableColor() + gameMap.getName()));
                     }
+                } else if (mapSubCommand.equals("setactive")) {
+                    int argIndex;
+                    if (mapFromArgument) {
+                        argIndex = 3;
+                    } else {
+                        argIndex = 2;
+                    }
+    
+                    if (!(args.length > argIndex)) {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "You must provide a true or false value."));
+                        return true;
+                    }
+                    
+                    boolean value = Boolean.parseBoolean(args[argIndex]);
+                    gameMap.setActive(value);
+                    sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the status of the map to " + MsgType.INFO.getVariableColor() + value));
                 }
                 GameMap finalGameMap = gameMap;
                 new BukkitRunnable() {
