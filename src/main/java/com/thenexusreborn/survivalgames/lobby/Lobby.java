@@ -120,12 +120,6 @@ public class Lobby {
             timer.cancel();
         }
         
-        if (state == LobbyState.MAP_EDITING) {
-            if (gameMap != null) {
-                gameMap.saveSettings();
-            }
-        }
-        
         if (gameMap != null) {
             gameMap.delete(plugin);
         }

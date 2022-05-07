@@ -10,7 +10,7 @@ public class MapNameArgument extends Argument {
     
         for (GameMap map : SurvivalGames.getPlugin(SurvivalGames.class).getMapManager().getMaps()) {
             getCompletions().add(map.getName().toLowerCase().replace(" ", "_").replace("'", ""));
-            getCompletions().add(map.getFileName().toLowerCase());
+            getCompletions().add(map.getUrl().toLowerCase());
         }
     }
 }

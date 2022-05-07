@@ -174,8 +174,6 @@ public class SurvivalGames extends JavaPlugin {
             lobby.handleShutdown();
         }
         
-        mapManager.save();
-        
         getConfig().set("spawnpoint.world", lobby.getSpawnpoint().getWorld().getName());
         getConfig().set("spawnpoint.x", lobby.getSpawnpoint().getBlockX() + "");
         getConfig().set("spawnpoint.y", lobby.getSpawnpoint().getBlockY() + "");

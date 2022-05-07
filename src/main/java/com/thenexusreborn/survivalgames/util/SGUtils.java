@@ -4,11 +4,8 @@ import com.google.common.io.*;
 import com.thenexusreborn.nexuscore.util.command.CommandActor;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.map.GameMap;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-
-import java.text.DecimalFormat;
 
 public class SGUtils {
     
@@ -45,7 +42,7 @@ public class SGUtils {
     public static GameMap getGameMapFromInput(String input, CommandActor actor) {
         GameMap gameMap = null;
         for (GameMap map : plugin.getMapManager().getMaps()) {
-            if (map.getName().toLowerCase().replace(" ", "_").replace("'", "").equalsIgnoreCase(input) || map.getFileName().equalsIgnoreCase(input)) {
+            if (map.getName().toLowerCase().replace(" ", "_").replace("'", "").equalsIgnoreCase(input) || map.getUrl().equalsIgnoreCase(input)) {
                 gameMap = map;
             }
         }

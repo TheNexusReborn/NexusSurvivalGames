@@ -8,7 +8,7 @@ import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
-import com.thenexusreborn.survivalgames.map.GameMap;
+import com.thenexusreborn.survivalgames.map.*;
 import com.thenexusreborn.survivalgames.settings.*;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.*;
@@ -52,6 +52,33 @@ public class SGCommand implements CommandExecutor {
             }
             
             String gameSubCommand = args[1].toLowerCase();
+    
+            if (gameSubCommand.equals("automatic") || gameSubCommand.equals("auto") || gameSubCommand.equals("manual") || gameSubCommand.equals("mnl")) {
+                ControlType controlType = null;
+                try {
+                    controlType = ControlType.valueOf(gameSubCommand.toUpperCase());
+                } catch (Exception e) {
+                    if (gameSubCommand.equals("auto")) {
+                        controlType = ControlType.AUTOMATIC;
+                    } else if (gameSubCommand.equals("mnl")) {
+                        controlType = ControlType.MANUAL;
+                    }
+                }
+        
+                if (controlType == null) {
+                    sender.sendMessage(MCUtils.color(MsgType.SEVERE + "Invalid control type detection. This is a bug, please report to Firestar311"));
+                    return true;
+                }
+        
+                if (Game.getControlType() == controlType) {
+                    sender.sendMessage(MCUtils.color(MsgType.WARN + "The game is already in " + controlType.name().toLowerCase() + " "));
+                    return true;
+                }
+        
+                Game.setControlType(controlType);
+                sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the game to " + MsgType.INFO.getVariableColor() + controlType.name().toLowerCase() + MsgType.INFO.getBaseColor() + " control."));
+                return true;
+            }
             
             if (game == null) {
                 sender.sendMessage(MCUtils.color(MsgType.WARN + "There is no prepared/running game."));
@@ -185,30 +212,6 @@ public class SGCommand implements CommandExecutor {
                 } else {
                     sender.sendMessage(MCUtils.color(MsgType.WARN + "Invalid game state. Must be playing, playing deathmatch, deathmatch countdown or deathmatch countdown complete."));
                 }
-            } else if (gameSubCommand.equals("automatic") || gameSubCommand.equals("auto") || gameSubCommand.equals("manual") || gameSubCommand.equals("mnl")) {
-                ControlType controlType = null;
-                try {
-                    controlType = ControlType.valueOf(gameSubCommand.toUpperCase());
-                } catch (Exception e) {
-                    if (gameSubCommand.equals("auto")) {
-                        controlType = ControlType.AUTOMATIC;
-                    } else if (gameSubCommand.equals("mnl")) {
-                        controlType = ControlType.MANUAL;
-                    }
-                }
-                
-                if (controlType == null) {
-                    sender.sendMessage(MCUtils.color(MsgType.SEVERE + "Invalid control type detection. This is a bug, please report to Firestar311"));
-                    return true;
-                }
-                
-                if (Game.getControlType() == controlType) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "The game is already in " + controlType.name().toLowerCase() + " "));
-                    return true;
-                }
-                
-                Game.setControlType(controlType);
-                sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the game to " + MsgType.INFO.getVariableColor() + controlType.name().toLowerCase() + MsgType.INFO.getBaseColor() + " control."));
             } else if (gameSubCommand.equals("nextgame") || gameSubCommand.equals("ng")) {
                 if (game.getState() == GameState.ENDING || game.getState() == GameState.ENDED) {
                     game.nextGame();
@@ -503,6 +506,13 @@ public class SGCommand implements CommandExecutor {
                 GameMap gameMap = new GameMap(url, mapName);
                 plugin.getMapManager().addMap(gameMap);
                 sender.sendMessage(MCUtils.color(MsgType.INFO + "Created a map with the name " + MsgType.INFO.getVariableColor() + gameMap.getName() + MsgType.INFO.getBaseColor() + "."));
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        plugin.getMapManager().saveToDatabase(gameMap);
+                        sender.sendMessage(MCUtils.color(MsgType.VERBOSE + "The map has been saved to the database."));
+                    }
+                }.runTaskAsynchronously(plugin);
             } else {
                 GameMap gameMap = null;
                 boolean mapFromArgument = false;
@@ -556,7 +566,7 @@ public class SGCommand implements CommandExecutor {
                     player.teleport(spawn);
                     player.sendMessage(MCUtils.color(MsgType.INFO + "Teleported to the map " + MsgType.INFO.getVariableColor() + gameMap.getName()));
                 } else if (mapSubCommand.equals("save")) {
-                    gameMap.saveSettings();
+                    plugin.getMapManager().saveToDatabase(gameMap);
                     player.sendMessage(MCUtils.color(MsgType.INFO + "Saved the settings for the map " + MsgType.INFO.getVariableColor() + gameMap.getName()));
                 } else if (mapSubCommand.equals("delete")) {
                     gameMap.delete(plugin);
@@ -663,6 +673,14 @@ public class SGCommand implements CommandExecutor {
                         sender.sendMessage(MCUtils.color(MsgType.INFO + "You added " + MsgType.INFO.getVariableColor() + creator + MsgType.INFO.getBaseColor() + " as a creator on map " + MsgType.INFO.getVariableColor() + gameMap.getName()));
                     }
                 }
+                GameMap finalGameMap = gameMap;
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        plugin.getMapManager().saveToDatabase(finalGameMap);
+                        sender.sendMessage(MCUtils.color(MsgType.VERBOSE + "The map has been saved to the database."));
+                    }
+                }.runTaskAsynchronously(plugin);
             }
         } else if (subCommand.equals("timer") || subCommand.equals("t")) {
             if (!(args.length > 1)) {

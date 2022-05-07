@@ -14,28 +14,26 @@ import java.util.zip.*;
 
 public class GameMap {
     public static final int version = 1;
-    private String fileName; // This is the file name on the file url for this map. All other settings come from files in the ZIP file
-    private String name; // This is the map name. This is stored locally so that it doesn't have to be downloaded to get the name.
+    private int id;
+    private String url;
+    private String name;
     
-    //Settings from the config file in the ZIP file
     private Position center = new Position(0, 0, 0);
     private IncrementalMap<Position> spawns = new IncrementalMap<>();
     private int borderDistance = 0, deathmatchBorderDistance = 0;
     private List<String> creators = new ArrayList<>();
     private boolean active;
     
-    //Fields for using this map actively
-    private UUID uniqueId; //This is for when the map is being used to prevent issues that can happen
-    private World world; //This is the Bukkit world of the loaded map
-    private Path downloadedZip; // This is the path of the ZIP file that was downloaded
-    private Path unzippedFolder; //This is the path of the unzipped folder
-    private Config config; //This the the loaded configuration information for the map, this populates the settings
-    private Path worldFolder; //This is the folder that the world is located
+    private UUID uniqueId; 
+    private World world; 
+    private Path downloadedZip; 
+    private Path unzippedFolder; 
+    private Path worldFolder; 
     private boolean editing;
     private int votes = 0;
     
     public GameMap(String fileName, String name) {
-        this.fileName = fileName;
+        this.url = fileName;
         this.name = name;
     }
     
@@ -47,8 +45,6 @@ public class GameMap {
                 downloadedZip = null;
             }
             
-            saveSettings();
-            config = null;
             if (this.world != null) {
                 for (Player player : world.getPlayers()) {
                     player.teleport(plugin.getLobby().getSpawnpoint());
@@ -75,112 +71,11 @@ public class GameMap {
         }
     }
     
-    //Downloads the map and loads settings, but does not load the actual world or map
     public boolean download(SurvivalGames plugin) {
         Path downloadFolder = FileHelper.subPath(plugin.getDataFolder().toPath(), "mapdownloads");
         FileHelper.createDirectoryIfNotExists(downloadFolder);
-        downloadedZip = FileHelper.downloadFile(SurvivalGames.MAP_URL + fileName, downloadFolder, fileName, true);
-        
-        Path mapConfigsDirectory = FileHelper.subPath(plugin.getDataFolder().toPath(), "mapconfigs");
-        FileHelper.createDirectoryIfNotExists(mapConfigsDirectory);
-        byte[] buffer = new byte[1024];
-        boolean hasFile = false;
-        try {
-            ZipInputStream zis = new ZipInputStream(Files.newInputStream(downloadedZip));
-            ZipEntry zipEntry = zis.getNextEntry();
-            while (zipEntry != null) {
-                if (zipEntry.getName().equalsIgnoreCase("settings.yml")) {
-                    Path settingsFilePath = FileHelper.subPath(mapConfigsDirectory, name.toLowerCase().replace(" ", "_").replace("'", "") + ".yml");
-                    FileOutputStream fos = new FileOutputStream(settingsFilePath.toFile());
-                    int len;
-                    while ((len = zis.read(buffer)) > 0) {
-                        fos.write(buffer, 0, len);
-                    }
-                    fos.close();
-                    
-                    this.config = new Config(plugin, mapConfigsDirectory.getFileName().toString(), settingsFilePath.getFileName().toString());
-                    this.config.setup();
-                    if (config.contains("name")) {
-                        this.name = config.getString("name");
-                    }
-                    if (config.contains("borderdistance")) {
-                        this.borderDistance = Integer.parseInt(config.getString("borderdistance"));
-                    }
-                    if (config.contains("deathmatchborderdistance")) {
-                        this.deathmatchBorderDistance = Integer.parseInt(config.getString("deathmatchborderdistance"));
-                    }
-                    if (config.contains("center")) {
-                        int x = Integer.parseInt(config.getString("center.x"));
-                        int y = Integer.parseInt(config.getString("center.y"));
-                        int z = Integer.parseInt(config.getString("center.z"));
-                        this.center = new Position(x, y, z);
-                    }
-                    if (config.contains("spawns")) {
-                        for (String rawSpawnId : config.getConfigurationSection("spawns").getKeys(false)) {
-                            Integer spawnId = Integer.parseInt(rawSpawnId);
-                            int x = Integer.parseInt(config.getString("spawns." + rawSpawnId + ".x"));
-                            int y = Integer.parseInt(config.getString("spawns." + rawSpawnId + ".y"));
-                            int z = Integer.parseInt(config.getString("spawns." + rawSpawnId + ".z"));
-                            this.spawns.put(spawnId, new Position(x, y, z));
-                        }
-                    }
-                    if (config.contains("creators")) {
-                        this.creators.addAll(config.getStringList("creators"));
-                    }
-                    hasFile = true;
-                    break;
-                } else if (zipEntry.getName().contains("settings.properties")) {
-                    //From MCTheNexus settings
-                    Properties properties = new Properties();
-                    Path propertiesFile = FileHelper.subPath(mapConfigsDirectory, name.toLowerCase().replace(" ", "_").replace("'", "") + ".properties");
-                    FileOutputStream fos = new FileOutputStream(propertiesFile.toFile());
-                    int len;
-                    while ((len = zis.read(buffer)) > 0) {
-                        fos.write(buffer, 0, len);
-                    }
-                    fos.close();
-                    
-                    properties.load(Files.newInputStream(propertiesFile.toFile().toPath()));
-                    try {
-                        this.deathmatchBorderDistance = Integer.parseInt(properties.getProperty("dmradius"));
-                    } catch (Exception e) {}
-                }
-                
-                zipEntry = zis.getNextEntry();
-            }
-            zis.closeEntry();
-            zis.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-        
-        if (!hasFile) {
-            Path settingsFilePath = FileHelper.subPath(mapConfigsDirectory, name.toLowerCase().replace(" ", "_").replace("'", "") + ".yml");
-            FileHelper.createFileIfNotExists(settingsFilePath);
-            this.config = new Config(plugin, mapConfigsDirectory.getFileName().toString(), settingsFilePath.getFileName().toString());
-            this.config.setup();
-            saveSettings();
-        }
+        downloadedZip = FileHelper.downloadFile(url, downloadFolder, getName().toLowerCase().replace("'", "").replace(" ", "_"), true);
         return true;
-    }
-    
-    public void saveSettings() {
-        this.config.set("name", this.name);
-        this.config.set("center.x", this.center.getX());
-        this.config.set("center.y", this.center.getY());
-        this.config.set("center.z", this.center.getZ());
-        this.config.set("borderdistance", this.borderDistance + "");
-        this.config.set("creators", this.creators);
-        this.config.set("deathmatchborderdistance", this.deathmatchBorderDistance + "");
-        if (!this.spawns.isEmpty()) {
-            this.spawns.forEach((id, position) -> {
-                this.config.set("spawns." + id + ".x", position.getX());
-                this.config.set("spawns." + id + ".y", position.getY());
-                this.config.set("spawns." + id + ".z", position.getZ());
-            });
-        }
-        this.config.save();
     }
     
     public void addCreator(String creator) {
@@ -207,12 +102,12 @@ public class GameMap {
         this.spawns.remove(index);
     }
     
-    public String getFileName() {
-        return fileName;
+    public String getUrl() {
+        return url;
     }
     
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    public void setUrl(String url) {
+        this.url = url;
     }
     
     public String getName() {
@@ -277,10 +172,6 @@ public class GameMap {
     
     public void setDownloadedZip(Path downloadedZip) {
         this.downloadedZip = downloadedZip;
-    }
-    
-    public Config getConfig() {
-        return config;
     }
     
     public boolean unzip(SurvivalGames plugin) {
@@ -397,5 +288,13 @@ public class GameMap {
     
     public void setActive(boolean active) {
         this.active = active;
+    }
+    
+    public int getId() {
+        return id;
+    }
+    
+    public void setId(int id) {
+        this.id = id;
     }
 }
