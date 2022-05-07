@@ -257,6 +257,11 @@ public class SGCommand implements CommandExecutor {
                     return true;
                 }
                 
+                if (!gameMap.isActive()) {
+                    sender.sendMessage(MCUtils.color(MsgType.WARN + "That map is not active."));
+                    return true;
+                }
+                
                 plugin.getLobby().setGameMap(gameMap);
                 sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the map to " + MsgType.INFO.getVariableColor() + gameMap.getName()));
             } else if (lobbySubCommand.equals("automatic") || lobbySubCommand.equals("auto")) {
@@ -465,7 +470,7 @@ public class SGCommand implements CommandExecutor {
                     object = plugin.getLobby().getLobbySettings();
                 }
                 settingField.set(object, value);
-                sender.sendMessage(MCUtils.color("&6&l>> &eYou set the &b" + type.toLowerCase() + " &esetting &b" + settingField.getName() + " &eto &b" + value)); //TODO MsgType
+                sender.sendMessage(MCUtils.color("&6&l>> &eYou set the &b" + type.toLowerCase() + " &esetting &b" + settingField.getName() + " &eto &b" + value));
             } catch (Exception e) {
                 sender.sendMessage(MCUtils.color(MsgType.WARN + "Error while setting the value. Please report with the following message."));
                 sender.sendMessage(MCUtils.color(MsgType.WARN + "" + e.getClass().getName() + ": " + e.getMessage()));

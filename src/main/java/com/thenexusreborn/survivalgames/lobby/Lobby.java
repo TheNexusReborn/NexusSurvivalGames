@@ -55,7 +55,7 @@ public class Lobby {
         }
         
         generateMapOptions();
-    
+        
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -83,7 +83,7 @@ public class Lobby {
                     int votes = getTotalMapVotes(entry.getKey());
                     
                     sign.setLine(3, MCUtils.color("&n" + votes + " Vote(s)"));
-    
+                    
                     for (SpigotNexusPlayer player : players.values()) {
                         if (!player.getPlayer().getWorld().getName().equalsIgnoreCase(spawnpoint.getWorld().getName())) {
                             continue;
@@ -150,7 +150,10 @@ public class Lobby {
             List<GameMap> maps = new ArrayList<>(plugin.getMapManager().getMaps());
             for (Integer position : new HashSet<>(this.mapSigns.keySet())) {
                 int index = new Random().nextInt(maps.size());
-                GameMap map = maps.get(index);
+                GameMap map;
+                do {
+                    map = maps.get(index);
+                } while (!map.isActive());
                 this.mapOptions.put(position, map);
                 this.mapVotes.put(position, new HashSet<>());
                 maps.remove(index);
@@ -177,7 +180,7 @@ public class Lobby {
         Bukkit.getConsoleSender().sendMessage(MCUtils.color(message));
     }
     
-    public void editMaps()   {
+    public void editMaps() {
         this.state = LobbyState.MAP_EDITING;
         if (timer != null) {
             this.timer.cancel();
@@ -214,7 +217,7 @@ public class Lobby {
         if (nexusPlayer == null) {
             return 0;
         }
-    
+        
         if (lobbySettings.isVoteWeight()) {
             return (int) nexusPlayer.getRank().getMultiplier();
         } else {
@@ -230,7 +233,7 @@ public class Lobby {
             if (nexusPlayer == null) {
                 continue;
             }
-        
+            
             if (lobbySettings.isVoteWeight()) {
                 votes += nexusPlayer.getRank().getMultiplier();
             } else {
@@ -348,7 +351,7 @@ public class Lobby {
         if (totalPlayers > lobbySettings.getMaxPlayers()) {
             nexusPlayer.sendMessage("&eYou will be a spectator in the game as you joined with the player count above the maximum game amount. However, you can be a tribute if those before you leave or become spectators");
         }
-    
+        
         Location spawn = getSpawnpoint().clone();
         spawn.setY(spawn.getY() + 2);
         nexusPlayer.getPlayer().teleport(spawn);
@@ -379,7 +382,7 @@ public class Lobby {
                 totalPlayers++;
             }
         }
-    
+        
         sendMessage("&c&l<< &b" + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft.");
         
         if (this.voteStart.contains(nexusPlayer.getUniqueId())) {
@@ -510,7 +513,7 @@ public class Lobby {
     
     public void addMapVote(NexusPlayer nexusPlayer, Location location) {
         for (Entry<Integer, Location> entry : this.mapSigns.entrySet()) {
-            boolean contains = this.mapVotes.get(entry.getKey()).contains(nexusPlayer.getUniqueId()); 
+            boolean contains = this.mapVotes.get(entry.getKey()).contains(nexusPlayer.getUniqueId());
             
             if (entry.getValue().equals(location)) {
                 if (contains) {
