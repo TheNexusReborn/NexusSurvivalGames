@@ -376,7 +376,7 @@ public class Lobby {
             }
         }
     
-        sendMessage("&c&l<< &b" + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft. &5(&d" + totalPlayers + "&5/&d" + lobbySettings.getMaxPlayers() + "&5)");
+        sendMessage("&c&l<< &b" + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft.");
         
         if (this.voteStart.contains(nexusPlayer.getUniqueId())) {
             removeStartVote(nexusPlayer.getUniqueId());
