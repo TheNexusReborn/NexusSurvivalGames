@@ -145,6 +145,7 @@ public class Game {
         sendMessage("&a&l>> &b" + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined as a spectator.");
         nexusPlayer.getScoreboard().setView(new GameScoreboardView(nexusPlayer.getScoreboard(), plugin));
         nexusPlayer.getScoreboard().setTablistHandler(new GameTablistHandler(nexusPlayer.getScoreboard(), plugin));
+        nexusPlayer.setActionBar(new GameActionBar(plugin, gamePlayer));
         recalculateVisibiltiy();
     }
     
