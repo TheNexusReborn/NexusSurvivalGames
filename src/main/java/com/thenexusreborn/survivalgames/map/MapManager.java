@@ -16,18 +16,17 @@ public class MapManager {
     
     public MapManager(SurvivalGames plugin) {
         this.plugin = plugin;
-        
-        this.mapsConfig = new Config(plugin, "gamemaps.yml");
-        this.mapsConfig.setup();
         load();
     }
     
     public void load() {
+        plugin.getLogger().info("Loading the Maps...");
         try (Connection connection = plugin.getNexusCore().getConnection(); Statement mapStatement = connection.createStatement(); Statement spawnsStatement = connection.createStatement()) {
             ResultSet resultSet = mapStatement.executeQuery("select * from sgmaps;");
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
                 String name = resultSet.getString("name").replace("''", "'");
+                plugin.getLogger().info("Loading map " + name);
                 String url = resultSet.getString("url");
                 int centerX = resultSet.getInt("centerX");
                 int centerY = resultSet.getInt("centerY");
@@ -57,6 +56,7 @@ public class MapManager {
                     gameMap.setSpawn(spawnId, spawn);
                 }
                 this.gameMaps.add(gameMap);
+                plugin.getLogger().info("Map " + gameMap.getName() + " loaded");
             }
         } catch (SQLException e) {
             e.printStackTrace();

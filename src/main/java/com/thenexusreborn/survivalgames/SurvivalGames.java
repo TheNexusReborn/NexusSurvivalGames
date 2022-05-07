@@ -44,11 +44,16 @@ public class SurvivalGames extends JavaPlugin {
     
     @Override
     public void onEnable() {
+        getLogger().info("Loading NexusSurvivalGames v" + getDescription().getVersion());
         saveDefaultConfig();
         nexusCore = (NexusCore) Bukkit.getPluginManager().getPlugin("NexusCore");
+        getLogger().info("Loaded NexusCore");
         mapManager = new MapManager(this);
+        getLogger().info("Loaded Maps");
         lobby = new Lobby(this);
+        getLogger().info("Loaded Lobby Settings");
         lootManager = new LootManager(this);
+        getLogger().info("Loaded Loot");
         
         if (NexusAPI.getApi().getEnvironment() == Environment.DEVELOPMENT) {
             lobby.setControlType(ControlType.MANUAL);

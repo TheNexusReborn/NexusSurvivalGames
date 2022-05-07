@@ -40,8 +40,10 @@ public class Lobby {
     
     public Lobby(SurvivalGames plugin) {
         this.plugin = plugin;
+        plugin.getLogger().info("Setting up the lobby.");
         
         if (plugin.getConfig().contains("mapsigns")) {
+            plugin.getLogger().info("Loading Map Signs");
             ConfigurationSection signsSection = plugin.getConfig().getConfigurationSection("mapsigns");
             for (String key : signsSection.getKeys(false)) {
                 int position = Integer.parseInt(key);
@@ -52,6 +54,7 @@ public class Lobby {
                 Location location = new Location(world, x, y, z);
                 this.mapSigns.put(position, location);
             }
+            plugin.getLogger().info("Map Signs Loaded");
         }
         
         generateMapOptions();
@@ -143,15 +146,17 @@ public class Lobby {
     }
     
     public void generateMapOptions() {
+        plugin.getLogger().info("Generating Map Options");
         this.mapOptions.clear();
         this.mapVotes.clear();
         
         if (plugin.getMapManager().getMaps().size() >= this.mapSigns.size()) {
             List<GameMap> maps = new ArrayList<>(plugin.getMapManager().getMaps());
             for (Integer position : new HashSet<>(this.mapSigns.keySet())) {
-                int index = new Random().nextInt(maps.size());
                 GameMap map;
+                int index;
                 do {
+                    index = new Random().nextInt(maps.size());
                     map = maps.get(index);
                 } while (!map.isActive());
                 this.mapOptions.put(position, map);
