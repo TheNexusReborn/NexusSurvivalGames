@@ -523,9 +523,15 @@ public class Lobby {
     }
     
     public void addMapVote(NexusPlayer nexusPlayer, Location location) {
+        for (Set<UUID> value : this.mapVotes.values()) {
+            if (value.contains(nexusPlayer.getUniqueId())) {
+                nexusPlayer.sendMessage("&cYou cannot vote for more than one map.");
+                return;
+            }
+        }
+        
         for (Entry<Integer, Location> entry : this.mapSigns.entrySet()) {
             boolean contains = this.mapVotes.get(entry.getKey()).contains(nexusPlayer.getUniqueId());
-            
             if (entry.getValue().equals(location)) {
                 if (contains) {
                     nexusPlayer.sendMessage("&cYou have already voted for this map.");
@@ -535,11 +541,6 @@ public class Lobby {
                 this.mapVotes.get(entry.getKey()).add(nexusPlayer.getUniqueId());
                 nexusPlayer.sendMessage("&6&l>> &eYou voted for the map &b" + this.mapOptions.get(entry.getKey()).getName());
                 return;
-            } else {
-                if (contains) {
-                    nexusPlayer.sendMessage("&cYou cannot vote for more than one map.");
-                    return;
-                }
             }
         }
         
