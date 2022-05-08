@@ -885,23 +885,25 @@ public class Game {
                 }
             }
     
-            if (totalTributes <= settings.getDeathmatchThreshold()) {
-                if (this.state == INGAME || this.state == INGAME_GRACEPERIOD) {
-                    if (totalTributes > 1) {
-                        if (controlType == ControlType.AUTOMATIC) {
-                            this.startDeathmatchTimer();
-                        } else {
-                            sendMessage("&eTribute count reached or went below the deathmatch threashold, but was not automatically started due to being in manual mode.");
+            if (deathInfo.getType() != DeathType.LEAVE) {
+                if (totalTributes <= settings.getDeathmatchThreshold()) {
+                    if (this.state == INGAME || this.state == INGAME_GRACEPERIOD) {
+                        if (totalTributes > 1) {
+                            if (controlType == ControlType.AUTOMATIC) {
+                                this.startDeathmatchTimer();
+                            } else {
+                                sendMessage("&eTribute count reached or went below the deathmatch threashold, but was not automatically started due to being in manual mode.");
+                            }
                         }
                     }
                 }
-            }
-            
-            sendMessage("&6&l>> &c&l" + totalTributes + " tributes remain.");
-            if (firstBlood == null) {
-                firstBlood = killer;
-                if (firstBlood != null) {
-                    sendMessage("&6&l>> &c&l" + (firstBlood.getNexusPlayer().getName() + " claimed first blood!").toUpperCase());
+    
+                sendMessage("&6&l>> &c&l" + totalTributes + " tributes remain.");
+                if (firstBlood == null) {
+                    firstBlood = killer;
+                    if (firstBlood != null) {
+                        sendMessage("&6&l>> &c&l" + (firstBlood.getNexusPlayer().getName() + " claimed first blood!").toUpperCase());
+                    }
                 }
             }
         }
