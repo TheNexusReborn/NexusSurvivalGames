@@ -543,6 +543,11 @@ public class Game {
             this.graceperiodTimer = null;
         }
         
+        if (this.restockTimer != null) {
+            this.restockTimer.cancel();
+            this.restockTimer = null;
+        }
+        
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.setAllowFlight(true);
             for (Player p : Bukkit.getOnlinePlayers()) {
@@ -990,6 +995,16 @@ public class Game {
         setState(INGAME_DEATHMATCH);
         if (this.timer != null) {
             timer.cancel();
+        }
+        
+        if (this.graceperiodTimer != null) {
+            this.graceperiodTimer.cancel();
+            this.graceperiodTimer = null;
+        }
+        
+        if (this.restockTimer != null) {
+            this.restockTimer.cancel();
+            this.restockTimer = null;
         }
         
         sendMessage("&6&l>> &4&lTHE DEATHMATCH COUNTDOWN HAS STARTED");
