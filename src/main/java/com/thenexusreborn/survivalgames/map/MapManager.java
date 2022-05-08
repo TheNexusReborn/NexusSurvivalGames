@@ -114,9 +114,12 @@ public class MapManager {
                 mapStatement.setString(8, creators.substring(0, creators.length() - 1));
                 mapStatement.setString(9, gameMap.isActive() + "");
                 mapStatement.executeUpdate();
-                ResultSet generatedKeys = mapStatement.getGeneratedKeys();
-                generatedKeys.next();
-                gameMap.setId(generatedKeys.getInt(1));
+                if (mapSql.contains("insert into")) {
+                    ResultSet generatedKeys = mapStatement.getGeneratedKeys();
+                    if (generatedKeys.next()) {
+                        gameMap.setId(generatedKeys.getInt(1));
+                    }
+                }
     
                 for (Entry<Integer, Position> entry : gameMap.getSpawns().entrySet()) {
                     spawnsStatement.setInt(1, entry.getKey());

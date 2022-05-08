@@ -547,6 +547,7 @@ public class SGCommand implements CommandExecutor {
                         finalGameMap.download(plugin);
                         player.sendMessage(MCUtils.color(MsgType.INFO + "Downloaded the map " + MsgType.INFO.getVariableColor() + finalGameMap.getName() + MsgType.INFO.getBaseColor() + "."));
                     });
+                    return true;
                 } else if (mapSubCommand.equals("load") || mapSubCommand.equals("l")) {
                     gameMap.unzip(plugin);
                     gameMap.copyFolder(plugin, false);
@@ -556,6 +557,7 @@ public class SGCommand implements CommandExecutor {
                     } else {
                         sender.sendMessage(MCUtils.color(MsgType.ERROR + "Could not load the map " + MsgType.ERROR.getVariableColor() + gameMap.getName() + MsgType.ERROR.getBaseColor() + ". Please report as a bug."));
                     }
+                    return true;
                 } else if (mapSubCommand.equals("teleport") || mapSubCommand.equals("tp")) {
                     Location spawn;
                     if (gameMap.getWorld() == null) {
@@ -570,12 +572,14 @@ public class SGCommand implements CommandExecutor {
                     
                     player.teleport(spawn);
                     player.sendMessage(MCUtils.color(MsgType.INFO + "Teleported to the map " + MsgType.INFO.getVariableColor() + gameMap.getName()));
+                    return true;
                 } else if (mapSubCommand.equals("save")) {
                     plugin.getMapManager().saveToDatabase(gameMap);
                     player.sendMessage(MCUtils.color(MsgType.INFO + "Saved the settings for the map " + MsgType.INFO.getVariableColor() + gameMap.getName()));
                 } else if (mapSubCommand.equals("delete")) {
                     gameMap.delete(plugin);
                     player.sendMessage(MCUtils.color(MsgType.INFO + "Deleted the map " + MsgType.INFO.getVariableColor() + gameMap.getName() + MsgType.INFO.getBaseColor() + " from the server."));
+                    return true;
                 } else if (mapSubCommand.equals("addspawn") || mapSubCommand.equals("as")) {
                     Location location = player.getLocation();
                     int position = gameMap.addSpawn(new Position(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
