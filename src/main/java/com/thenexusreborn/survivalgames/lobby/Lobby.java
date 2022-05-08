@@ -500,9 +500,15 @@ public class Lobby {
     public void addStartVote(NexusPlayer player) {
         this.voteStart.add(player.getUniqueId());
         sendMessage("&6&l>> " + player.getRank().getColor() + player.getName() + " &ehas voted to start the lobby.");
-        if (this.voteStart.size() >= 2) {
-            this.startTimer();
+        if (this.state == LobbyState.WAITING) {
+            if (this.voteStart.size() >= 2) {
+                this.startTimer();
+            }
         }
+    }
+    
+    public boolean hasVotedToStart(NexusPlayer player) {
+        return this.voteStart.contains(player.getUniqueId());
     }
     
     public void removeStartVote(UUID uuid) {

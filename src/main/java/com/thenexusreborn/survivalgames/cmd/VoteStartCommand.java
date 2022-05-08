@@ -2,7 +2,7 @@ package com.thenexusreborn.survivalgames.cmd;
 
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
-import com.thenexusreborn.nexuscore.util.MCUtils;
+import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import org.bukkit.command.*;
@@ -34,6 +34,11 @@ public class VoteStartCommand implements CommandExecutor {
         Lobby lobby = plugin.getLobby();
         if (lobby.getSpectatingPlayers().contains(nexusPlayer.getUniqueId())) {
             nexusPlayer.sendMessage("&cYou are a spectator in the next game. You cannot vote to start the game.");
+            return true;
+        }
+        
+        if (lobby.hasVotedToStart(nexusPlayer)) {
+            nexusPlayer.sendMessage(MsgType.WARN + "You have already voted to start the lobby.");   
             return true;
         }
         
