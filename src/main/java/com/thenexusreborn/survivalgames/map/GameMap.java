@@ -21,7 +21,7 @@ public class GameMap {
     private Position center = new Position(0, 0, 0);
     private IncrementalMap<Position> spawns = new IncrementalMap<>();
     private int borderDistance = 0, deathmatchBorderDistance = 0;
-    private List<String> creators = new ArrayList<>();
+    private Set<String> creators = new HashSet<>();
     private boolean active;
     
     private UUID uniqueId; 
@@ -146,7 +146,7 @@ public class GameMap {
         this.deathmatchBorderDistance = deathmatchBorderDistance;
     }
     
-    public List<String> getCreators() {
+    public Set<String> getCreators() {
         return creators;
     }
     

@@ -21,6 +21,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.sql.*;
 import java.util.*;
 
 public class SurvivalGames extends JavaPlugin {
@@ -48,6 +49,18 @@ public class SurvivalGames extends JavaPlugin {
         saveDefaultConfig();
         nexusCore = (NexusCore) Bukkit.getPluginManager().getPlugin("NexusCore");
         getLogger().info("Loaded NexusCore");
+        
+        getLogger().info("Loading map database tables.");
+        try (Connection connection = getMapConnection(); Statement statement = connection.createStatement()) {
+            statement.execute("create table if not exists sgmaps(id int primary key not null auto_increment, name varchar(32), url varchar(1000), centerX int, centerY int, centerZ int, borderRadius int, dmBorderRadius int, creators varchar(1000), active varchar(5));");
+            statement.execute("create table if not exists sgmapspawns(id int, mapId int, x int, y int, z int);");
+        } catch (SQLException e) {
+            getLogger().severe("Error while creating map tables tables");
+            e.printStackTrace();
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+        
         mapManager = new MapManager(this);
         getLogger().info("Loaded Maps");
         lobby = new Lobby(this);
@@ -62,6 +75,8 @@ public class SurvivalGames extends JavaPlugin {
             lobby.setControlType(ControlType.AUTOMATIC);
             Game.setControlType(ControlType.AUTOMATIC);
         }
+        
+        getLogger().info("Loaded default control settings");
     
         if (this.getConfig().contains("spawnpoint")) {
             String worldName = this.getConfig().getString("spawnpoint.world");
@@ -76,6 +91,8 @@ public class SurvivalGames extends JavaPlugin {
         } else {
             lobby.setSpawnpoint(Bukkit.getWorld(ServerProperties.getLevelName()).getSpawnLocation());
         }
+        
+        getLogger().info("Loaded spawnpoint");
         
         if (getConfig().contains("tournament")) {
             UUID host = UUID.fromString(getConfig().getString("tournament.host"));
@@ -95,6 +112,7 @@ public class SurvivalGames extends JavaPlugin {
                     tournament.getScores().put(UUID.fromString(key), scoresSection.getInt(key));
                 }
             }
+            getLogger().info("Loaded tournament");
         }
     
         this.chatHandler = new SGChatHandler(this);
@@ -106,6 +124,8 @@ public class SurvivalGames extends JavaPlugin {
         getCommand("votestart").setExecutor(new VoteStartCommand(this));
         getCommand("stats").setExecutor(new StatsCommand(this));
         getCommand("survivalgames").setExecutor(new SGCommand(this));
+        
+        getLogger().info("Registered commands");
     
         new GameSetupTask(this).runTaskTimer(this, 1L, 1L);
         new TimerCountdownCheck(this).runTaskTimer(this, 1L, 1L);
@@ -114,9 +134,13 @@ public class SurvivalGames extends JavaPlugin {
         new LobbyWorldChecker(this).runTaskTimer(this, 1L, 20L);
         new PlayerTrackerTask().start();
         
+        getLogger().info("Registered Tasks");
+        
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         getServer().getPluginManager().registerEvents(new EntityListener(this), this);
         getServer().getPluginManager().registerEvents(new BlockListener(this), this);
+        
+        getLogger().info("Registered Listeners");
         
         new BukkitRunnable() {
             @Override
@@ -246,5 +270,10 @@ public class SurvivalGames extends JavaPlugin {
     
     public void setRestart(boolean restart) {
         this.restart = restart;
+    }
+    
+    public Connection getMapConnection() throws SQLException {
+        return nexusCore.getConnection("nexusmaps");
+        //return nexusCore.getConnection();
     }
 }

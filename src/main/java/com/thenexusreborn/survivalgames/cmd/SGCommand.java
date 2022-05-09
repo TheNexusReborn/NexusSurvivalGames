@@ -8,7 +8,7 @@ import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
-import com.thenexusreborn.survivalgames.map.*;
+import com.thenexusreborn.survivalgames.map.GameMap;
 import com.thenexusreborn.survivalgames.settings.*;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.*;
@@ -671,7 +671,12 @@ public class SGCommand implements CommandExecutor {
                         return true;
                     }
                     
-                    String[] creators = args[argIndex].split(",");
+                    StringBuilder cb = new StringBuilder();
+                    for (int i = argIndex; i < args.length; i++) {
+                        cb.append(args[i]).append(" ");
+                    }
+                    
+                    String[] creators = cb.toString().trim().split(",");
                     if (creators == null || creators.length == 0) {
                         sender.sendMessage(MCUtils.color(MsgType.WARN + "You must separate the creators with commas."));
                         return true;

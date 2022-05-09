@@ -21,7 +21,7 @@ public class MapManager {
     
     public void load() {
         plugin.getLogger().info("Loading the Maps...");
-        try (Connection connection = plugin.getNexusCore().getConnection(); Statement mapStatement = connection.createStatement(); Statement spawnsStatement = connection.createStatement()) {
+        try (Connection connection = plugin.getMapConnection(); Statement mapStatement = connection.createStatement(); Statement spawnsStatement = connection.createStatement()) {
             ResultSet resultSet = mapStatement.executeQuery("select * from sgmaps;");
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
@@ -81,22 +81,18 @@ public class MapManager {
     }
     
     public void saveToDatabase(GameMap gameMap) {
-        try (Connection connection = plugin.getNexusCore().getConnection()) {
-            String mapSql, spawnsSql;
+        try (Connection connection = plugin.getMapConnection()) {
+            String mapSql;
             
             if (gameMap.getId() > 0) {
                 //language=MySQL
                 mapSql = "update sgmaps set name=?, url=?, centerX=?, centerY=?, centerZ=?, borderRadius=?, dmBorderRadius=?, creators=?, active=? where id='" + gameMap.getId() + "';";
-                //language=MySQL
-                spawnsSql = "update sgmapspawns set x=?, y=?, z=? where id='{spawnId}' and mapId='{mapId}';";
             } else {
                 //language=MySQL
                 mapSql = "insert into sgmaps(name, url, centerX, centerY, centerZ, borderRadius, dmBorderRadius, creators, active) values(?, ?, ?, ?, ?, ?, ?, ?, ?);";
-                //language=MySQL
-                spawnsSql = "insert into sgmapspawns(id, mapId, x, y, z) values(?, ?, ?, ?, ?);";
             }
             
-            try (PreparedStatement mapStatement = connection.prepareStatement(mapSql, Statement.RETURN_GENERATED_KEYS); PreparedStatement spawnsStatement = connection.prepareStatement(spawnsSql)) {
+            try (PreparedStatement mapStatement = connection.prepareStatement(mapSql, Statement.RETURN_GENERATED_KEYS); PreparedStatement spawnUpdateStatement = connection.prepareStatement("update sgmapspawns set x=?, y=?, z=? where id=? and mapId=?;"); PreparedStatement spawnInsertStatement = connection.prepareStatement("insert into sgmapspawns(id, mapId, x, y, z) values(?, ?, ?, ?, ?);")) {
                 mapStatement.setString(1, gameMap.getName().replace("'", "''"));
                 mapStatement.setString(2, gameMap.getUrl());
                 mapStatement.setInt(3, gameMap.getCenter().getX());
@@ -120,16 +116,29 @@ public class MapManager {
                         gameMap.setId(generatedKeys.getInt(1));
                     }
                 }
-    
+                
                 for (Entry<Integer, Position> entry : gameMap.getSpawns().entrySet()) {
-                    spawnsStatement.setInt(1, entry.getKey());
-                    spawnsStatement.setInt(2, gameMap.getId());
-                    spawnsStatement.setInt(3, entry.getValue().getX());
-                    spawnsStatement.setInt(4, entry.getValue().getY());
-                    spawnsStatement.setInt(5, entry.getValue().getZ());
-                    spawnsStatement.addBatch();
+                    try (Statement spawnQuery = connection.createStatement()) {
+                        ResultSet resultSet = spawnQuery.executeQuery("select * from nexusmaps.sgmapspawns where id='" + entry.getKey() + "' and mapId='" + gameMap.getId() + "';");
+                        if (resultSet.next()) {
+                            spawnUpdateStatement.setInt(1, entry.getValue().getX());
+                            spawnUpdateStatement.setInt(2, entry.getValue().getY());
+                            spawnUpdateStatement.setInt(3, entry.getValue().getZ());
+                            spawnUpdateStatement.setInt(4, entry.getKey());
+                            spawnUpdateStatement.setInt(5, gameMap.getId());
+                            spawnUpdateStatement.addBatch();
+                        } else {
+                            spawnInsertStatement.setInt(1, entry.getKey());
+                            spawnInsertStatement.setInt(2, gameMap.getId());
+                            spawnInsertStatement.setInt(3, entry.getValue().getX());
+                            spawnInsertStatement.setInt(4, entry.getValue().getY());
+                            spawnInsertStatement.setInt(5, entry.getValue().getZ());
+                            spawnInsertStatement.addBatch();
+                        }
+                    }
                 }
-                spawnsStatement.executeBatch();
+                spawnUpdateStatement.executeBatch();
+                spawnInsertStatement.executeBatch();
             }
         } catch (SQLException e) {
             e.printStackTrace();
