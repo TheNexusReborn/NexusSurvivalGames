@@ -118,12 +118,11 @@ public class SurvivalGames extends JavaPlugin {
         this.chatHandler = new SGChatHandler(this);
         nexusCore.getChatManager().setHandler(chatHandler);
     
-        new SpectateCommand(this).register(nexusCore.getCommandManager());
-        
         getCommand("tournament").setExecutor(new TournamentCommand(this));
         getCommand("votestart").setExecutor(new VoteStartCommand(this));
         getCommand("stats").setExecutor(new StatsCommand(this));
         getCommand("survivalgames").setExecutor(new SGCommand(this));
+        getCommand("spectate").setExecutor(new SpectateCommand(this));
         
         getLogger().info("Registered commands");
     
