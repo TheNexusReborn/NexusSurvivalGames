@@ -5,11 +5,13 @@ import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.util.Operator;
 import com.thenexusreborn.nexuscore.api.events.NexusPlayerLoadEvent;
 import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
+import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.game.death.*;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
 import com.thenexusreborn.survivalgames.loot.Loot;
+import com.thenexusreborn.survivalgames.lootv2.LootManager;
 import com.thenexusreborn.survivalgames.menu.TeamMenu;
 import com.thenexusreborn.survivalgames.settings.ColorMode;
 import com.thenexusreborn.survivalgames.util.SGUtils;
@@ -156,22 +158,84 @@ public class PlayerListener implements Listener {
                         }
                         
                         if (secondHalf != null) {
-                            maxAmount += 2;
+                            maxAmount += 3;
                         }
-        
-                        List<Loot> loot = plugin.getLootManager().generateLoot(new Random().nextInt(maxAmount) + 2);
-                        inv.clear();
-                        for (Loot l : loot) {
+                        
+                        List<ItemStack> items = new ArrayList<>();
+                        if (!game.getSettings().isUseNewLoot()) {
+                            List<Loot> loot = plugin.getLootManager().generateLoot(new Random().nextInt(maxAmount) + 2);
+                            inv.clear();
+                            for (Loot l : loot) {
+                                items.add(l.generateItemStack());
+                            }
+                        } else {
+                            items = LootManager.getInstance().getLootTable("basic").generateLoot(new Random().nextInt(maxAmount) + 2, game.getLootChances());
+                        }
+    
+                        for (ItemStack item : items) {
                             int slot;
                             do {
                                 slot = new Random().nextInt(inv.getSize());
                             } while (inv.getItem(slot) != null);
-                            inv.setItem(slot, l.generateItemStack());
+                            inv.setItem(slot, item);
                         }
+    
                         game.addLootedChest(block.getLocation());
                         if (secondHalf != null) {
                             game.addLootedChest(secondHalf.getLocation());
                         }
+                    } else if (block.getType() == Material.ENDER_CHEST) {
+                        if (game == null) {
+                            return;
+                        }
+                        
+                        if (game.getPlayer(e.getPlayer().getUniqueId()).getTeam() != GameTeam.TRIBUTES) {
+                            e.setCancelled(true);
+                            return;
+                        }
+                        
+                        if (!game.getSettings().isAllowEnderchests()) {
+                            e.getPlayer().sendMessage(MCUtils.color(MsgType.WARN + "You cannot open ender chests."));
+                            e.setCancelled(true);
+                            return;
+                        }
+                        
+                        Inventory inventory = game.getEnderchestInventories().get(block.getLocation());
+                        if (inventory == null) {
+                            inventory = Bukkit.createInventory(null, 27, "Ender Chest");
+                            game.getEnderchestInventories().put(block.getLocation(), inventory);
+                        }
+    
+                        if (!game.isLootedChest(block)) {
+                            List<ItemStack> items = new ArrayList<>();
+                            if (!game.getSettings().isUseNewLoot()) {
+                                List<Loot> loot = plugin.getLootManager().generateLoot(new Random().nextInt(6) + 2);
+                                inventory.clear();
+                                for (Loot l : loot) {
+                                    items.add(l.generateItemStack());
+                                }
+                            } else {
+                                items = LootManager.getInstance().getLootTable("basic").generateLoot(new Random().nextInt(6) + 2, game.getLootChances());
+                            }
+        
+                            for (ItemStack item : items) {
+                                int slot;
+                                do {
+                                    slot = new Random().nextInt(inventory.getSize());
+                                } while (inventory.getItem(slot) != null);
+                                inventory.setItem(slot, item);
+                            }
+        
+                            game.addLootedChest(block.getLocation());
+                        }
+    
+                        Inventory finalInventory = inventory;
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                e.getPlayer().openInventory(finalInventory);
+                            }
+                        }.runTaskLater(plugin, 1L);
                     } else if (block.getState() instanceof Sign) {
                         NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(e.getPlayer().getUniqueId());
                         if (plugin.getLobby().getState() == LobbyState.WAITING || plugin.getLobby().getState() == LobbyState.COUNTDOWN) {

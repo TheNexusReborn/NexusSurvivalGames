@@ -1,9 +1,11 @@
 package com.thenexusreborn.survivalgames.util;
 
 import com.google.common.io.*;
+import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.nexuscore.util.command.CommandActor;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.map.GameMap;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -26,20 +28,20 @@ public class SGUtils {
         return sb.toString().trim();
     }
     
-    public static GameMap getLoadedGameMap(String input, CommandActor actor) {
+    public static GameMap getLoadedGameMap(String input, CommandSender actor) {
         GameMap gameMap = getGameMapFromInput(input, actor);
         if (gameMap == null) {
             return null;
         }
         
         if (gameMap.getWorld() == null) {
-            actor.sendMessage("&cThat map is not loaded, please load before teleporting.");
+            actor.sendMessage(MCUtils.color(MsgType.WARN + "That map is not loaded, please load before teleporting."));
             return null;
         }
         return gameMap;
     }
     
-    public static GameMap getGameMapFromInput(String input, CommandActor actor) {
+    public static GameMap getGameMapFromInput(String input, CommandSender actor) {
         GameMap gameMap = null;
         for (GameMap map : plugin.getMapManager().getMaps()) {
             if (map.getName().toLowerCase().replace(" ", "_").replace("'", "").equalsIgnoreCase(input) || map.getUrl().equalsIgnoreCase(input)) {
@@ -48,7 +50,7 @@ public class SGUtils {
         }
         
         if (gameMap == null) {
-            actor.sendMessage("&cCould not find a map with that name or file name.");
+            actor.sendMessage(MCUtils.color(MsgType.WARN + "Could not find a map with that name or file name."));
         }
         
         return gameMap;

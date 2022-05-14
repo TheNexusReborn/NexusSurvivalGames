@@ -24,6 +24,8 @@ public class GameSettings {
     private boolean sounds = true;
     private boolean giveCredits = true;
     private boolean giveXp = true;
+    private boolean useNewLoot = false;
+    private boolean allowEnderchests = false;
     private ColorMode colorMode = ColorMode.RANK;
     private Time time = Time.NOON;
     private Weather weather = Weather.CLEAR;
@@ -250,5 +252,22 @@ public class GameSettings {
     public GameSettings setGiveXp(boolean giveXp) {
         this.giveXp = giveXp;
         return this;
+    }
+    
+    public boolean isUseNewLoot() {
+        return useNewLoot;
+    }
+    
+    public GameSettings setUseNewLoot(boolean useNewLoot) {
+        this.useNewLoot = useNewLoot;
+        return this;
+    }
+    
+    public boolean isAllowEnderchests() {
+        return allowEnderchests;
+    }
+    
+    public void setAllowEnderchests(boolean allowEnderchests) {
+        this.allowEnderchests = allowEnderchests;
     }
 }

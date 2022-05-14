@@ -14,6 +14,7 @@ import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.death.*;
 import com.thenexusreborn.survivalgames.game.timer.*;
+import com.thenexusreborn.survivalgames.lootv2.*;
 import com.thenexusreborn.survivalgames.map.GameMap;
 import com.thenexusreborn.survivalgames.scoreboard.*;
 import com.thenexusreborn.survivalgames.settings.*;
@@ -47,6 +48,8 @@ public class Game {
     private GameInfo gameInfo;
     private long start, end;
     private GamePlayer firstBlood;
+    private LootChances lootChances;
+    private Map<Location, Inventory> enderchestInventories = new HashMap<>();
     
     public Game(GameMap gameMap, GameSettings settings, Collection<SpigotNexusPlayer> players, List<UUID> spectatingPlayers) {
         this.gameMap = gameMap;
@@ -82,6 +85,10 @@ public class Game {
     protected void setState(GameState state) {
         this.state = state;
         this.gameInfo.getActions().add(new GameAction(System.currentTimeMillis(), "statechange", state.name()));
+    }
+    
+    public LootChances getLootChances() {
+        return lootChances;
     }
     
     public void handleShutdown() {
@@ -382,6 +389,10 @@ public class Game {
         }.runTaskAsynchronously(plugin);
     }
     
+    public void setLootChances(LootChances lootChances) {
+        this.lootChances = lootChances;
+    }
+    
     public void handleError(String message) {
         setState(ERROR);
         sendMessage("&4&l>> &4" + message + " Resetting back to lobby.");
@@ -437,6 +448,10 @@ public class Game {
     
     public void warmupComplete() {
         setState(WARMUP_DONE);
+    }
+    
+    public Map<Location, Inventory> getEnderchestInventories() {
+        return enderchestInventories;
     }
     
     public Timer getTimer() {

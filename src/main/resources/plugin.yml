@@ -13,3 +13,4 @@ commands:
   survivalgames:
     aliases: [sg]
   spectate:
+  map:

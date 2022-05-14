@@ -4,13 +4,17 @@ import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.nexuscore.scoreboard.impl.RankTablistHandler;
-import com.thenexusreborn.nexuscore.util.MCUtils;
+import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.*;
+import com.thenexusreborn.survivalgames.lootv2.*;
 import com.thenexusreborn.survivalgames.map.GameMap;
 import com.thenexusreborn.survivalgames.scoreboard.LobbyScoreboardView;
 import com.thenexusreborn.survivalgames.settings.*;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.*;
+import net.md_5.bungee.api.chat.ClickEvent.Action;
 import org.bukkit.*;
 import org.bukkit.block.*;
 import org.bukkit.configuration.ConfigurationSection;
@@ -37,6 +41,7 @@ public class Lobby {
     private Map<Integer, GameMap> mapOptions = new HashMap<>();
     private Map<Integer, Set<UUID>> mapVotes = new HashMap<>();
     private boolean forceStarted;
+    private LootChances lootChances;
     
     public Lobby(SurvivalGames plugin) {
         this.plugin = plugin;
@@ -58,7 +63,7 @@ public class Lobby {
         }
         
         generateMapOptions();
-        
+    
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -115,6 +120,27 @@ public class Lobby {
                     return;
                 }
                 
+                if (!(getState() == LobbyState.WAITING || getState() == LobbyState.COUNTDOWN)) {
+                    return;
+                }
+                
+                for (SpigotNexusPlayer nexusPlayer : players.values()) {
+                    sendMapOptions(nexusPlayer);
+                }
+            }
+        }.runTaskTimer(plugin, 60L, 1200);
+        
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (plugin.getGame() != null) {
+                    return;
+                }
+                
+                if (players.size() == 0) {
+                    return;
+                }
+                
                 if (getState() != LobbyState.WAITING) {
                     return;
                 }
@@ -124,6 +150,70 @@ public class Lobby {
                 }
             }
         }.runTaskTimerAsynchronously(plugin, 20L, 1200L);
+    }
+    
+    public void generateLootChances() {
+        List<String> categoryChances = new ArrayList<>();
+        Map<String, List<Material>> entryChances = new HashMap<>();
+        for (LootCategory category : LootManager.getInstance().getLootTable("basic").getCategories()) {
+            int amount = new Random().nextInt(category.getRarity().getMax() - category.getRarity().getMin()) + category.getRarity().getMin();
+            for (int i = 0; i < amount; i++) {
+                categoryChances.add(category.getName());
+                for (LootEntry entry : category.getEntries()) {
+                    int entryAmount = new Random().nextInt(entry.getRarity().getMax() - entry.getRarity().getMin()) + entry.getRarity().getMin();
+                    List<Material> materials = entryChances.computeIfAbsent(category.getName(), k -> new ArrayList<>());
+                    for (int h = 0; h < entryAmount; h++) {
+                        materials.add(entry.getMaterial());
+                    }
+                    
+                    if (materials != null) {
+                        Collections.shuffle(materials);
+                    }
+                }
+            }
+        }
+    
+        if (categoryChances != null) {
+            Collections.shuffle(categoryChances);
+        }
+        setLootChances(new LootChances(categoryChances, entryChances));
+    }
+    
+    public void setLootChances(LootChances lootChances) {
+        this.lootChances = lootChances;
+    }
+    
+    public void sendMapOptions(SpigotNexusPlayer nexusPlayer) {
+        nexusPlayer.sendMessage(MsgType.INFO + "&e&lVOTING OPTIONS - &7Click an option to vote!");
+        for (Entry<Integer, GameMap> entry : mapOptions.entrySet()) {
+            String mapName = entry.getValue().getName();
+            StringBuilder creatorBuilder = new StringBuilder();
+            for (String creator : entry.getValue().getCreators()) {
+                if (creator != null && !creator.equals("") && !creator.equals(" ")) {
+                    creatorBuilder.append(creator).append(", ");
+                }
+            }
+            if (creatorBuilder.length() == 0) {
+                creatorBuilder.append(" ");
+            }
+            String creators = creatorBuilder.substring(0, creatorBuilder.length() - 2);
+            String votesText = " (" + getTotalMapVotes(entry.getKey()) + " votes)";
+    
+            ComponentBuilder builder = new ComponentBuilder("").append("> ").color(ChatColor.GOLD).bold(true)
+                    .append(entry.getKey() + "").color(ChatColor.RED).bold(true).append(": ").color(ChatColor.DARK_RED).bold(false)
+                    .append(mapName).color(ChatColor.AQUA).append(" by ").color(ChatColor.GRAY).italic(true)
+                    .append(creators).italic(false).color(ChatColor.DARK_AQUA).append(votesText).color(ChatColor.GRAY).italic(true);
+            
+            TextComponent line = new TextComponent(builder.create());
+            line.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/map " + entry.getKey()));
+            line.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to vote").create()));
+
+            nexusPlayer.getPlayer().spigot().sendMessage(line);
+        }
+    }
+    
+    public Map<Integer, GameMap> getMapOptions() {
+        return mapOptions;
     }
     
     public void handleShutdown() {
@@ -281,6 +371,7 @@ public class Lobby {
             this.gameSettings = new GameSettings();
         }
         Game game = new Game(gameMap, this.gameSettings, this.players.values(), this.spectatingPlayers);
+        game.setLootChances(lootChances);
         plugin.getChatHandler().disableChat();
         this.voteStart.clear();
         plugin.setGame(game);
@@ -311,6 +402,12 @@ public class Lobby {
         this.state = LobbyState.WAITING;
         this.forceStarted = false;
         generateMapOptions();
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                generateLootChances();
+            }
+        }.runTaskAsynchronously(plugin);
     }
     
     public Collection<SpigotNexusPlayer> getPlayers() {
@@ -377,6 +474,7 @@ public class Lobby {
             player.showPlayer(online);
         }
         nexusPlayer.setActionBar(new LobbyActionBar(plugin));
+        sendMapOptions(nexusPlayer);
     }
     
     public void removePlayer(SpigotNexusPlayer nexusPlayer) {
@@ -467,6 +565,7 @@ public class Lobby {
         game.getPlayers().clear();
         plugin.getGame().getGameMap().delete(plugin);
         plugin.setGame(null);
+        plugin.getChatHandler().enableChat();
     }
     
     public Location getSpawnpoint() {
@@ -523,6 +622,9 @@ public class Lobby {
     }
     
     public void addMapVote(NexusPlayer nexusPlayer, Location location) {
+        if (plugin.getGame() != null) {
+            return;
+        }
         for (Set<UUID> value : this.mapVotes.values()) {
             if (value.contains(nexusPlayer.getUniqueId())) {
                 nexusPlayer.sendMessage("&cYou cannot vote for more than one map.");
