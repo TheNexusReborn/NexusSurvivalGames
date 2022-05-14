@@ -185,8 +185,18 @@ public class PlayerListener implements Listener {
                             game.addLootedChest(secondHalf.getLocation());
                         }
                     } else if (block.getType() == Material.ENDER_CHEST) {
+                        if (game == null) {
+                            return;
+                        }
+                        
+                        if (game.getPlayer(e.getPlayer().getUniqueId()).getTeam() != GameTeam.TRIBUTES) {
+                            e.setCancelled(true);
+                            return;
+                        }
+                        
                         if (!game.getSettings().isAllowEnderchests()) {
                             e.getPlayer().sendMessage(MCUtils.color(MsgType.WARN + "You cannot open ender chests."));
+                            e.setCancelled(true);
                             return;
                         }
                         
@@ -218,8 +228,14 @@ public class PlayerListener implements Listener {
         
                             game.addLootedChest(block.getLocation());
                         }
-                        
-                        e.getPlayer().openInventory(inventory);
+    
+                        Inventory finalInventory = inventory;
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                e.getPlayer().openInventory(finalInventory);
+                            }
+                        }.runTaskLater(plugin, 1L);
                     } else if (block.getState() instanceof Sign) {
                         NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(e.getPlayer().getUniqueId());
                         if (plugin.getLobby().getState() == LobbyState.WAITING || plugin.getLobby().getState() == LobbyState.COUNTDOWN) {
