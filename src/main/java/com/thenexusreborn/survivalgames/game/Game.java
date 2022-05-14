@@ -49,6 +49,7 @@ public class Game {
     private long start, end;
     private GamePlayer firstBlood;
     private LootChances lootChances;
+    private Map<Location, Inventory> enderchestInventories = new HashMap<>();
     
     public Game(GameMap gameMap, GameSettings settings, Collection<SpigotNexusPlayer> players, List<UUID> spectatingPlayers) {
         this.gameMap = gameMap;
@@ -471,6 +472,10 @@ public class Game {
     
     public void warmupComplete() {
         setState(WARMUP_DONE);
+    }
+    
+    public Map<Location, Inventory> getEnderchestInventories() {
+        return enderchestInventories;
     }
     
     public Timer getTimer() {
