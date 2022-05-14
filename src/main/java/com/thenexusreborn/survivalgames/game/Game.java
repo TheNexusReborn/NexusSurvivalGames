@@ -368,30 +368,6 @@ public class Game {
                             for (int i = 0; i < gameMap.getSpawns().size(); i++) {
                                 spawns.put(i, null);
                             }
-    
-                            
-                            
-                            List<String> categoryChances = new ArrayList<>();
-                            Map<String, List<Material>> entryChances = new HashMap<>();
-                            for (LootCategory category : LootManager.getInstance().getLootTable("basic").getCategories()) {
-                                int amount = new Random().nextInt(category.getRarity().getMax() - category.getRarity().getMin()) + category.getRarity().getMin();
-                                for (int i = 0; i < amount; i++) {
-                                    categoryChances.add(category.getName());
-                                    for (LootEntry entry : category.getEntries()) {
-                                        int entryAmount = new Random().nextInt(entry.getRarity().getMax() - entry.getRarity().getMin()) + entry.getRarity().getMin();
-                                        for (int h = 0; h < entryAmount; h++) {
-                                            List<Material> materials = entryChances.computeIfAbsent(category.getName(), k -> new ArrayList<>());
-                                            materials.add(entry.getMaterial());
-                                        }
-                
-                                        Collections.shuffle(entryChances.get(category.getName()));
-                                    }
-                                }
-                            }
-    
-                            Collections.shuffle(categoryChances);
-                            
-                            setLootChances(new LootChances(categoryChances, entryChances)); 
                             
                             gameMap.getWorld().setGameRuleValue("naturalRegeneration", "" + settings.isRegeneration());
                             gameMap.getWorld().setGameRuleValue("doDaylightCycle", "" + settings.isTimeProgression());
@@ -413,7 +389,7 @@ public class Game {
         }.runTaskAsynchronously(plugin);
     }
     
-    private void setLootChances(LootChances lootChances) {
+    public void setLootChances(LootChances lootChances) {
         this.lootChances = lootChances;
     }
     

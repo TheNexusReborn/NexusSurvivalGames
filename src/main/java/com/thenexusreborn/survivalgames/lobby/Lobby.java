@@ -8,6 +8,7 @@ import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.*;
+import com.thenexusreborn.survivalgames.lootv2.*;
 import com.thenexusreborn.survivalgames.map.GameMap;
 import com.thenexusreborn.survivalgames.scoreboard.LobbyScoreboardView;
 import com.thenexusreborn.survivalgames.settings.*;
@@ -40,6 +41,7 @@ public class Lobby {
     private Map<Integer, GameMap> mapOptions = new HashMap<>();
     private Map<Integer, Set<UUID>> mapVotes = new HashMap<>();
     private boolean forceStarted;
+    private LootChances lootChances;
     
     public Lobby(SurvivalGames plugin) {
         this.plugin = plugin;
@@ -61,7 +63,7 @@ public class Lobby {
         }
         
         generateMapOptions();
-        
+    
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -148,6 +150,34 @@ public class Lobby {
                 }
             }
         }.runTaskTimerAsynchronously(plugin, 20L, 1200L);
+    }
+    
+    public void generateLootChances() {
+        List<String> categoryChances = new ArrayList<>();
+        Map<String, List<Material>> entryChances = new HashMap<>();
+        for (LootCategory category : LootManager.getInstance().getLootTable("basic").getCategories()) {
+            int amount = new Random().nextInt(category.getRarity().getMax() - category.getRarity().getMin()) + category.getRarity().getMin();
+            for (int i = 0; i < amount; i++) {
+                categoryChances.add(category.getName());
+                for (LootEntry entry : category.getEntries()) {
+                    int entryAmount = new Random().nextInt(entry.getRarity().getMax() - entry.getRarity().getMin()) + entry.getRarity().getMin();
+                    for (int h = 0; h < entryAmount; h++) {
+                        List<Material> materials = entryChances.computeIfAbsent(category.getName(), k -> new ArrayList<>());
+                        materials.add(entry.getMaterial());
+                    }
+                
+                    Collections.shuffle(entryChances.get(category.getName()));
+                }
+            }
+        }
+    
+        Collections.shuffle(categoryChances);
+    
+        setLootChances(new LootChances(categoryChances, entryChances));
+    }
+    
+    public void setLootChances(LootChances lootChances) {
+        this.lootChances = lootChances;
     }
     
     public void sendMapOptions(SpigotNexusPlayer nexusPlayer) {
@@ -338,6 +368,7 @@ public class Lobby {
             this.gameSettings = new GameSettings();
         }
         Game game = new Game(gameMap, this.gameSettings, this.players.values(), this.spectatingPlayers);
+        game.setLootChances(lootChances);
         plugin.getChatHandler().disableChat();
         this.voteStart.clear();
         plugin.setGame(game);
@@ -368,6 +399,12 @@ public class Lobby {
         this.state = LobbyState.WAITING;
         this.forceStarted = false;
         generateMapOptions();
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                generateLootChances();
+            }
+        }.runTaskAsynchronously(plugin);
     }
     
     public Collection<SpigotNexusPlayer> getPlayers() {
