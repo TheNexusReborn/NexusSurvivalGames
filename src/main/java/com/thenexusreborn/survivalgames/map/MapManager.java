@@ -102,7 +102,9 @@ public class MapManager {
                 mapStatement.setInt(7, gameMap.getDeathmatchBorderDistance());
                 StringBuilder creators = new StringBuilder();
                 for (String creator : gameMap.getCreators()) {
-                    creators.append(creator).append(",");
+                    if (creator != null && !creator.equals("") && !creator.equals(" ")) {
+                        creators.append(creator).append(",");
+                    }
                 }
                 if (creators.length() == 0) {
                     creators.append(" ");
