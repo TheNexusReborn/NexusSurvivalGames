@@ -161,18 +161,21 @@ public class Lobby {
                 categoryChances.add(category.getName());
                 for (LootEntry entry : category.getEntries()) {
                     int entryAmount = new Random().nextInt(entry.getRarity().getMax() - entry.getRarity().getMin()) + entry.getRarity().getMin();
+                    List<Material> materials = entryChances.computeIfAbsent(category.getName(), k -> new ArrayList<>());
                     for (int h = 0; h < entryAmount; h++) {
-                        List<Material> materials = entryChances.computeIfAbsent(category.getName(), k -> new ArrayList<>());
                         materials.add(entry.getMaterial());
                     }
-                
-                    Collections.shuffle(entryChances.get(category.getName()));
+                    
+                    if (materials != null) {
+                        Collections.shuffle(materials);
+                    }
                 }
             }
         }
     
-        Collections.shuffle(categoryChances);
-    
+        if (categoryChances != null) {
+            Collections.shuffle(categoryChances);
+        }
         setLootChances(new LootChances(categoryChances, entryChances));
     }
     
