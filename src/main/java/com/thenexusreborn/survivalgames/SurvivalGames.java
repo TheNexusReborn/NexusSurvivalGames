@@ -123,6 +123,7 @@ public class SurvivalGames extends JavaPlugin {
         getCommand("stats").setExecutor(new StatsCommand(this));
         getCommand("survivalgames").setExecutor(new SGCommand(this));
         getCommand("spectate").setExecutor(new SpectateCommand(this));
+        getCommand("map").setExecutor(new MapCommand(this));
         
         getLogger().info("Registered commands");
     
