@@ -562,6 +562,7 @@ public class Lobby {
         game.getPlayers().clear();
         plugin.getGame().getGameMap().delete(plugin);
         plugin.setGame(null);
+        plugin.getChatHandler().enableChat();
     }
     
     public Location getSpawnpoint() {
