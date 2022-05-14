@@ -27,6 +27,11 @@ public class LobbyWorldChecker extends BukkitRunnable {
             }
         }
         
+        world.setThundering(false);
+        world.setStorm(false);
+        
+        world.setGameRuleValue("doFireSpread", "false");
+        
         if (plugin.getLobby().getState() != LobbyState.MAP_EDITING) {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (player.getLocation().getBlockY() < plugin.getLobby().getSpawnpoint().getBlockX() - 20) {
