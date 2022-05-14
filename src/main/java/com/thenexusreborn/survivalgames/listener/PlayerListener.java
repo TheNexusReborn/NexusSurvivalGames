@@ -10,6 +10,7 @@ import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.game.death.*;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
 import com.thenexusreborn.survivalgames.loot.Loot;
+import com.thenexusreborn.survivalgames.lootv2.LootManager;
 import com.thenexusreborn.survivalgames.menu.TeamMenu;
 import com.thenexusreborn.survivalgames.settings.ColorMode;
 import com.thenexusreborn.survivalgames.util.SGUtils;
@@ -156,18 +157,28 @@ public class PlayerListener implements Listener {
                         }
                         
                         if (secondHalf != null) {
-                            maxAmount += 2;
+                            maxAmount += 3;
                         }
-        
-                        List<Loot> loot = plugin.getLootManager().generateLoot(new Random().nextInt(maxAmount) + 2);
-                        inv.clear();
-                        for (Loot l : loot) {
+                        
+                        List<ItemStack> items = new ArrayList<>();
+                        if (!game.getSettings().isUseNewLoot()) {
+                            List<Loot> loot = plugin.getLootManager().generateLoot(new Random().nextInt(maxAmount) + 2);
+                            inv.clear();
+                            for (Loot l : loot) {
+                                items.add(l.generateItemStack());
+                            }
+                        } else {
+                            items = LootManager.getInstance().getLootTable("basic").generateLoot(new Random().nextInt(maxAmount) + 2, game.getLootChances());
+                        }
+    
+                        for (ItemStack item : items) {
                             int slot;
                             do {
                                 slot = new Random().nextInt(inv.getSize());
                             } while (inv.getItem(slot) != null);
-                            inv.setItem(slot, l.generateItemStack());
+                            inv.setItem(slot, item);
                         }
+    
                         game.addLootedChest(block.getLocation());
                         if (secondHalf != null) {
                             game.addLootedChest(secondHalf.getLocation());

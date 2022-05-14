@@ -14,6 +14,7 @@ import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.tasks.*;
 import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.map.MapManager;
+import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.tournament.Tournament;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
@@ -68,16 +69,15 @@ public class SurvivalGames extends JavaPlugin {
         lootManager = new LootManager(this);
         getLogger().info("Loaded Loot");
         
+        lobby.setControlType(ControlType.AUTOMATIC);
+        Game.setControlType(ControlType.AUTOMATIC);
+        
         if (NexusAPI.getApi().getEnvironment() == Environment.DEVELOPMENT) {
-            lobby.setControlType(ControlType.MANUAL);
-            Game.setControlType(ControlType.MANUAL);
-        } else {
-            lobby.setControlType(ControlType.AUTOMATIC);
-            Game.setControlType(ControlType.AUTOMATIC);
+            lobby.getLobbySettings().setTimerLength(10);
+            GameSettings gameSettings = new GameSettings().setWarmupLength(10);
+            lobby.setGameSettings(gameSettings);
         }
         
-        getLogger().info("Loaded default control settings");
-    
         if (this.getConfig().contains("spawnpoint")) {
             String worldName = this.getConfig().getString("spawnpoint.world");
             int x = Integer.parseInt(this.getConfig().getString("spawnpoint.x"));

@@ -24,6 +24,7 @@ public class GameSettings {
     private boolean sounds = true;
     private boolean giveCredits = true;
     private boolean giveXp = true;
+    private boolean useNewLoot = false;
     private ColorMode colorMode = ColorMode.RANK;
     private Time time = Time.NOON;
     private Weather weather = Weather.CLEAR;
@@ -249,6 +250,15 @@ public class GameSettings {
     
     public GameSettings setGiveXp(boolean giveXp) {
         this.giveXp = giveXp;
+        return this;
+    }
+    
+    public boolean isUseNewLoot() {
+        return useNewLoot;
+    }
+    
+    public GameSettings setUseNewLoot(boolean useNewLoot) {
+        this.useNewLoot = useNewLoot;
         return this;
     }
 }
