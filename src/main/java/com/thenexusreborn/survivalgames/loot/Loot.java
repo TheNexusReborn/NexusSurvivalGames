@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.loot;
 
 import com.thenexusreborn.nexuscore.util.MCUtils;
-import com.thenexusreborn.nexuscore.util.helper.StringHelper;
+import com.thenexusreborn.api.helper.StringHelper;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;

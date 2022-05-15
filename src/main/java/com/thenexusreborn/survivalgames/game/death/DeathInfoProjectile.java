@@ -2,7 +2,7 @@ package com.thenexusreborn.survivalgames.game.death;
 
 import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.nexuscore.util.*;
-import com.thenexusreborn.nexuscore.util.helper.NumberHelper;
+import com.thenexusreborn.api.helper.NumberHelper;
 import com.thenexusreborn.survivalgames.game.Game;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
