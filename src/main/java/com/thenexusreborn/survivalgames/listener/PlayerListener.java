@@ -161,10 +161,10 @@ public class PlayerListener implements Listener {
                             maxAmount += 3;
                         }
                         
+                        inv.clear();
                         List<ItemStack> items = new ArrayList<>();
                         if (!game.getSettings().isUseNewLoot()) {
                             List<Loot> loot = plugin.getLootManager().generateLoot(new Random().nextInt(maxAmount) + 2);
-                            inv.clear();
                             for (Loot l : loot) {
                                 items.add(l.generateItemStack());
                             }
