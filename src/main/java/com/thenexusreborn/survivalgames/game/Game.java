@@ -9,7 +9,7 @@ import com.thenexusreborn.api.util.Operator;
 import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
-import com.thenexusreborn.nexuscore.util.helper.NumberHelper;
+import com.thenexusreborn.api.helper.NumberHelper;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.death.*;

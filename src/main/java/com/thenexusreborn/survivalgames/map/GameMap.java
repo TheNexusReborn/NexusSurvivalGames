@@ -2,8 +2,8 @@ package com.thenexusreborn.survivalgames.map;
 
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.nexuscore.util.*;
-import com.thenexusreborn.nexuscore.util.collection.IncrementalMap;
-import com.thenexusreborn.nexuscore.util.helper.FileHelper;
+import com.thenexusreborn.api.collection.IncrementalMap;
+import com.thenexusreborn.api.helper.FileHelper;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 

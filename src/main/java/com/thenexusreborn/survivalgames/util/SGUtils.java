@@ -2,7 +2,6 @@ package com.thenexusreborn.survivalgames.util;
 
 import com.google.common.io.*;
 import com.thenexusreborn.nexuscore.util.*;
-import com.thenexusreborn.nexuscore.util.command.CommandActor;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.map.GameMap;
 import org.bukkit.command.CommandSender;
