@@ -71,7 +71,7 @@ public class PlayerListener implements Listener {
         if (plugin.getLobby().checkMapEditing(e.getPlayer())) {
             return;
         }
-    
+        
         Game game = plugin.getGame();
         if (game != null) {
             GamePlayer gamePlayer = game.getPlayer(e.getPlayer().getUniqueId());
@@ -113,7 +113,7 @@ public class PlayerListener implements Listener {
                 return;
             }
         }
-    
+        
         Block block = e.getClickedBlock();
         if (block != null) {
             if (block.getType().name().contains("_DOOR") || block.getType().name().contains("_BUTTON") || block.getType() == Material.LEVER || block.getType().name().contains("_GATE")) {
@@ -163,7 +163,7 @@ public class PlayerListener implements Listener {
                         
                         inv.clear();
                         List<ItemStack> items = new ArrayList<>();
-                        if (!game.getSettings().isUseNewLoot()) {
+                        if (game.getLootChances() == null || !game.getSettings().isUseNewLoot()) {
                             List<Loot> loot = plugin.getLootManager().generateLoot(new Random().nextInt(maxAmount) + 2);
                             for (Loot l : loot) {
                                 items.add(l.generateItemStack());
@@ -171,7 +171,7 @@ public class PlayerListener implements Listener {
                         } else {
                             items = LootManager.getInstance().getLootTable("basic").generateLoot(new Random().nextInt(maxAmount) + 2, game.getLootChances());
                         }
-    
+                        
                         for (ItemStack item : items) {
                             int slot;
                             do {
@@ -179,7 +179,7 @@ public class PlayerListener implements Listener {
                             } while (inv.getItem(slot) != null);
                             inv.setItem(slot, item);
                         }
-    
+                        
                         game.addLootedChest(block.getLocation());
                         if (secondHalf != null) {
                             game.addLootedChest(secondHalf.getLocation());
@@ -205,7 +205,7 @@ public class PlayerListener implements Listener {
                             inventory = Bukkit.createInventory(null, 27, "Ender Chest");
                             game.getEnderchestInventories().put(block.getLocation(), inventory);
                         }
-    
+                        
                         if (!game.isLootedChest(block)) {
                             List<ItemStack> items = new ArrayList<>();
                             if (!game.getSettings().isUseNewLoot()) {
@@ -217,7 +217,7 @@ public class PlayerListener implements Listener {
                             } else {
                                 items = LootManager.getInstance().getLootTable("basic").generateLoot(new Random().nextInt(6) + 2, game.getLootChances());
                             }
-        
+                            
                             for (ItemStack item : items) {
                                 int slot;
                                 do {
@@ -225,10 +225,10 @@ public class PlayerListener implements Listener {
                                 } while (inventory.getItem(slot) != null);
                                 inventory.setItem(slot, item);
                             }
-        
+                            
                             game.addLootedChest(block.getLocation());
                         }
-    
+                        
                         Inventory finalInventory = inventory;
                         new BukkitRunnable() {
                             @Override
@@ -253,7 +253,7 @@ public class PlayerListener implements Listener {
                         if (BlockListener.ALLOWED_BREAK.contains(block.getType())) {
                             return;
                         }
-    
+                        
                         if (block.getState() instanceof Openable) {
                             return;
                         }
@@ -314,7 +314,7 @@ public class PlayerListener implements Listener {
         if (plugin.getLobby().checkMapEditing(player)) {
             return;
         }
-    
+        
         Game game = plugin.getGame();
         if (game != null) {
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
