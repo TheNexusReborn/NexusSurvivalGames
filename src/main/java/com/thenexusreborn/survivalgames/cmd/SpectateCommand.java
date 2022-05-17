@@ -55,7 +55,7 @@ public class SpectateCommand implements CommandExecutor {
             if (lobby.getState() == LobbyState.WAITING || lobby.getState() == LobbyState.COUNTDOWN) {
                 boolean spectating = false;
                 for (UUID spectatingPlayer : lobby.getSpectatingPlayers()) {
-                    if (spectatingPlayer.toString().equalsIgnoreCase(MCUtils.color(MsgType.WARN + player.getUniqueId().toString()))) {
+                    if (spectatingPlayer.equals(player.getUniqueId())) {
                         spectating = true;
                     }
                 }
