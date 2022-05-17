@@ -63,6 +63,7 @@ public class Lobby {
         }
         
         generateMapOptions();
+        generateLootChances();
     
         new BukkitRunnable() {
             @Override
@@ -176,7 +177,7 @@ public class Lobby {
         if (categoryChances != null) {
             Collections.shuffle(categoryChances);
         }
-        setLootChances(new LootChances(categoryChances, entryChances));
+        this.lootChances = new LootChances(categoryChances, entryChances);
     }
     
     public void setLootChances(LootChances lootChances) {
