@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames.lobby;
 
+import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.nexuscore.util.ActionBar;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.*;
@@ -24,7 +25,7 @@ public class LobbyActionBar extends ActionBar {
         }
         
         if (lobby.getState() == LobbyState.WAITING || lobby.getTimer() == null) {
-            return "&d&lNEXUS &7- &fPlaying on &f&l" + plugin.getNexusCore().getConfig().getString("serverName");
+            return "&d&lNEXUS &7- &fPlaying on &f&l" + NexusAPI.getApi().getServerManager().getCurrentServer().getName();
         }
         
         if (lobby.getState() == LobbyState.COUNTDOWN && lobby.getTimer() != null) {

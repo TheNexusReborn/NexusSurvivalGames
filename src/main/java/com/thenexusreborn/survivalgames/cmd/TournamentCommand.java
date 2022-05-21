@@ -223,7 +223,7 @@ public class TournamentCommand implements TabExecutor {
         try {
             uuid = UUID.fromString(input);
         } catch (Exception e) {
-            NexusPlayer nexusPlayer =NexusAPI.getApi().getPlayerManager().getNexusPlayer(input);
+            NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(input);
             if (nexusPlayer == null) {
                 sender.sendMessage(MCUtils.color("&cA player with that name has not joined the server. Please provide a valid UUID"));
                 return null;
