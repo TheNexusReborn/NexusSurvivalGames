@@ -321,6 +321,13 @@ public class PlayerListener implements Listener {
             if (gamePlayer.getTeam() == GameTeam.SPECTATORS || gamePlayer.getTeam() == GameTeam.HIDDEN_STAFF) {
                 e.setCancelled(true);
             }
+            
+            if (e.getInventory() instanceof EnchantingInventory) {
+                EnchantingInventory enchantingInventory = (EnchantingInventory) e.getInventory();
+                if (e.getCurrentItem() != null && e.getCurrentItem().getType().equals(Material.INK_SACK)) {
+                    e.setCancelled(true);
+                }
+            }
         }
     }
     
