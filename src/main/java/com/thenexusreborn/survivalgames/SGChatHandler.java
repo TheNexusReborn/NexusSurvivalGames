@@ -40,7 +40,7 @@ public class SGChatHandler implements ChatHandler {
         }
         
         
-        String format = "&8<&3{score}&8> &8(&2&l{level}&8) &r" + displayName + "{tag}&8: " + chatColor + ChatColor.stripColor(MCUtils.color(e.getMessage().replace("%", "%%")));
+        String format = "&8<&3{score}&8> &8(&2&l{level}&8) &r" + displayName + "{tag}&8: " + chatColor + ChatColor.stripColor(MCUtils.color(e.getMessage()));
         format = format.replace("{level}", player.getLevel() + "");
         format = format.replace("{score}", MCUtils.formatNumber(player.getStatValue("sg_score")));
         if (player.getTag() != null) {
