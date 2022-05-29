@@ -492,6 +492,10 @@ public class Lobby {
         if (this.voteStart.contains(nexusPlayer.getUniqueId())) {
             removeStartVote(nexusPlayer.getUniqueId());
         }
+    
+        for (Set<UUID> votes : this.mapVotes.values()) {
+            votes.remove(nexusPlayer.getUniqueId());
+        }
         
         if (this.state == LobbyState.COUNTDOWN) {
             if (totalPlayers < lobbySettings.getMinPlayers() && !(voteStart.size() >= 2)) {
