@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames.scoreboard;
 
+import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.scoreboard.wrapper.ITeam;
 import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
@@ -36,7 +37,7 @@ public class LobbyScoreboardView extends SpigotScoreboardView {
         createTeam(neededValueName, "&fNeeded: ", 10);
         createTeam(blank2Name, ChatColor.DARK_PURPLE.toString(), 9);
         createTeam(serverLabelName, "&6&lSERVER:", 2);
-        createTeam(serverValueName, plugin.getNexusCore().getConfig().getString("serverName"), 1);
+        createTeam(serverValueName, NexusAPI.getApi().getServerManager().getCurrentServer().getName(), 1);
     }
     
     @Override

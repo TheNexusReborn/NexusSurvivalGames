@@ -57,7 +57,7 @@ public class Game {
         this.gameInfo = new GameInfo();
         gameInfo.setMapName(this.gameMap.getName().replace("'", "''"));
         gameInfo.setPlayerCount(players.size() - spectatingPlayers.size());
-        gameInfo.setServerName(plugin.getNexusCore().getConfig().getString("serverName"));
+        gameInfo.setServerName(NexusAPI.getApi().getServerManager().getCurrentServer().getName());
         List<String> playerNames = new ArrayList<>();
         for (SpigotNexusPlayer player : players) {
             GamePlayer gamePlayer = new GamePlayer(player);
@@ -723,7 +723,7 @@ public class Game {
                 @Override
                 public void run() {
                     if (NexusAPI.getApi().getEnvironment() != Environment.DEVELOPMENT) {
-                        MulticraftAPI.getInstance().restartServer(plugin.getNexusCore().getConfig().getInt("serverInfo.multicraftid"));
+                        MulticraftAPI.getInstance().restartServer(NexusAPI.getApi().getServerManager().getCurrentServer().getMulticraftId());
                     } else {
                         Bukkit.shutdown();
                     }
