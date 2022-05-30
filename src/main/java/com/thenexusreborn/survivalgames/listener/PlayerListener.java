@@ -80,7 +80,7 @@ public class PlayerListener implements Listener {
         Game game = plugin.getGame();
         if (game != null) {
             GamePlayer gamePlayer = game.getPlayer(e.getPlayer().getUniqueId());
-            if (gamePlayer.getTeam() == GameTeam.SPECTATORS || gamePlayer.getTeam() == GameTeam.HIDDEN_STAFF) {
+            if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
                 if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
                     if (e.getItem() != null) {
                         ItemStack item = e.getItem();
@@ -323,7 +323,7 @@ public class PlayerListener implements Listener {
         Game game = plugin.getGame();
         if (game != null) {
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
-            if (gamePlayer.getTeam() == GameTeam.SPECTATORS || gamePlayer.getTeam() == GameTeam.HIDDEN_STAFF) {
+            if (gamePlayer.getTeam() == GameTeam.SPECTATORS ) {
                 e.setCancelled(true);
             }
             
@@ -402,7 +402,7 @@ public class PlayerListener implements Listener {
         }
         Player player = e.getEntity();
         GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
-        if (gamePlayer.getTeam() == GameTeam.SPECTATORS || gamePlayer.getTeam() == GameTeam.HIDDEN_STAFF) {
+        if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
             return;
         }
         

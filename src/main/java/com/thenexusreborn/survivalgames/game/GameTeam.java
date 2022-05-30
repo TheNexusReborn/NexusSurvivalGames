@@ -6,7 +6,6 @@ public enum GameTeam {
     TRIBUTES("Tributes", "&a", GameMode.SURVIVAL), 
     SPECTATORS("Spectators", "&c", GameMode.ADVENTURE), //Will be replaced with Adventure after proper spectator system is implemented
     MUTATIONS("Mutations", "&d", GameMode.ADVENTURE), //Not going to be implemented for a while
-    HIDDEN_STAFF("Hidden Staff", "&b", GameMode.SPECTATOR) //Will be implemented with vanish system and use the Adventure gamemode
     ;
     private final String name, color;
     private final GameMode gameMode;

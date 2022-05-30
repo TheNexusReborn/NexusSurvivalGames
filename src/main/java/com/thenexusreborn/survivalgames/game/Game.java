@@ -297,7 +297,7 @@ public class Game {
             while ((uuid = SurvivalGames.PLAYER_QUEUE.poll()) != null) {
                 GamePlayer player = this.players.get(uuid);
                 if (player.getTeam() != null) {
-                    if (player.getTeam() == GameTeam.SPECTATORS || player.getTeam() == GameTeam.HIDDEN_STAFF) {
+                    if (player.getTeam() == GameTeam.SPECTATORS) {
                         spectators.offer(player.getUniqueId());
                     }
                 } else {
