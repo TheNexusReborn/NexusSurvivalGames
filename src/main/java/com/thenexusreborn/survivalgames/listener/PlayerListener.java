@@ -67,6 +67,11 @@ public class PlayerListener implements Listener {
     }
     
     @EventHandler
+    public void onPlayerFish(PlayerFishEvent e) {
+        e.setCancelled(true);
+    }
+    
+    @EventHandler
     public void onPlayerInteract(PlayerInteractEvent e) {
         if (plugin.getLobby().checkMapEditing(e.getPlayer())) {
             return;
