@@ -58,7 +58,7 @@ public class SGChatHandler implements ChatHandler {
         format = format.replace("{score}", score);
         format = format.replace("{level}", level);
         format = format.replace("{displayName}", displayName);
-        format = format.replace("{message}", ChatColor.stripColor(e.getMessage()));
+        format = format.replace("{message}", chatColor + ChatColor.stripColor(e.getMessage()));
         
         if (game != null) {
             if (game.getState().ordinal() >= GameState.INGAME_GRACEPERIOD.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal()) {
