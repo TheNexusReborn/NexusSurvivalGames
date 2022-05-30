@@ -31,7 +31,7 @@ public class SGChatHandler implements ChatHandler {
         String level = "&8(&2&l" + player.getLevel() + "&8)";
         String spectators = "&8[&cSpectators&8]";
         String tag = "";
-        if (player.getTag() != null || !player.getTag().getName().equalsIgnoreCase("null")) {
+        if (player.getTag() != null && !player.getTag().getName().equalsIgnoreCase("null")) {
             tag = " " + player.getTag().getDisplayName();
         }
         
