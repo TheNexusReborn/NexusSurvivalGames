@@ -49,7 +49,7 @@ public class SGChatHandler implements ChatHandler {
         }
         
         String prefix = "";
-        if (player.getRank().ordinal() > Rank.MEMBER.ordinal()) {
+        if (player.getRank().ordinal() < Rank.MEMBER.ordinal()) {
             prefix = player.getRank().getPrefix() + " ";
         }
         
