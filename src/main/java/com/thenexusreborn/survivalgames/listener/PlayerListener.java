@@ -24,6 +24,7 @@ import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerFishEvent.State;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Openable;
@@ -68,7 +69,9 @@ public class PlayerListener implements Listener {
     
     @EventHandler
     public void onPlayerFish(PlayerFishEvent e) {
-        e.setCancelled(true);
+        if (e.getState() == State.CAUGHT_FISH) {
+            e.setCancelled(true);
+        }
     }
     
     @EventHandler
