@@ -15,6 +15,7 @@ import com.thenexusreborn.survivalgames.lootv2.LootManager;
 import com.thenexusreborn.survivalgames.menu.TeamMenu;
 import com.thenexusreborn.survivalgames.settings.ColorMode;
 import com.thenexusreborn.survivalgames.util.SGUtils;
+import me.vagdedes.spartan.api.PlayerViolationEvent;
 import org.bukkit.*;
 import org.bukkit.block.*;
 import org.bukkit.entity.*;
@@ -71,6 +72,16 @@ public class PlayerListener implements Listener {
     public void onPlayerFish(PlayerFishEvent e) {
         if (e.getState() == State.CAUGHT_FISH) {
             e.setCancelled(true);
+        }
+    }
+    
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerViolation(PlayerViolationEvent e) {
+        Game game = plugin.getGame();
+        if (game != null) {
+            if (game.getState() == GameState.WARMUP || game.getState() == GameState.DEATHMATCH_WARMUP) {
+                e.setCancelled(true);
+            }
         }
     }
     
