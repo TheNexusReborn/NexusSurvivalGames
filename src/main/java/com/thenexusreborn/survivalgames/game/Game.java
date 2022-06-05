@@ -428,6 +428,7 @@ public class Game {
         }
         this.restockTimer = new Timer(new RestockTimerCallback(this)).run(600050L);
         sendMessage("&6&l>> &a&lMAY THE ODDS BE EVER IN YOUR FAVOR.");
+        sendMessage("&6&l>> &4&lBUTTERFLY CLICKING COULD GET YOU BANNED.");
         plugin.getChatHandler().enableChat();
     }
     
