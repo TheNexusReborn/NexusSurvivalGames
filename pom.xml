@@ -80,7 +80,7 @@
             <groupId>me.vagdedes</groupId>
             <artifactId>Spartan</artifactId>
             <scope>system</scope>
-            <version>469</version>
+            <version>472</version>
             <systemPath>${basedir}/../lib/Spartan.jar</systemPath>
         </dependency>
     </dependencies>
