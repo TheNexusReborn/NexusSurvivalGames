@@ -34,7 +34,7 @@ public class LobbyWorldChecker extends BukkitRunnable {
         
         if (plugin.getLobby().getState() != LobbyState.MAP_EDITING) {
             for (Player player : Bukkit.getOnlinePlayers()) {
-                if (player.getLocation().getBlockY() < plugin.getLobby().getSpawnpoint().getBlockX() - 20) {
+                if (player.getLocation().getBlockY() < plugin.getLobby().getSpawnpoint().getBlockY() - 20) {
                     player.teleport(plugin.getLobby().getSpawnpoint());
                 }
             }

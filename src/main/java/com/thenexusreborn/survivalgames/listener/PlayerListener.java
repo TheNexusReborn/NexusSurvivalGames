@@ -15,6 +15,7 @@ import com.thenexusreborn.survivalgames.lootv2.LootManager;
 import com.thenexusreborn.survivalgames.menu.TeamMenu;
 import com.thenexusreborn.survivalgames.settings.ColorMode;
 import com.thenexusreborn.survivalgames.util.SGUtils;
+import me.vagdedes.spartan.api.PlayerViolationEvent;
 import org.bukkit.*;
 import org.bukkit.block.*;
 import org.bukkit.entity.*;
@@ -24,6 +25,7 @@ import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerFishEvent.State;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Openable;
@@ -67,6 +69,23 @@ public class PlayerListener implements Listener {
     }
     
     @EventHandler
+    public void onPlayerFish(PlayerFishEvent e) {
+        if (e.getState() == State.CAUGHT_FISH) {
+            e.setCancelled(true);
+        }
+    }
+    
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerViolation(PlayerViolationEvent e) {
+        Game game = plugin.getGame();
+        if (game != null) {
+            if (game.getState() == GameState.WARMUP || game.getState() == GameState.DEATHMATCH_WARMUP) {
+                e.setCancelled(true);
+            }
+        }
+    }
+    
+    @EventHandler
     public void onPlayerInteract(PlayerInteractEvent e) {
         if (plugin.getLobby().checkMapEditing(e.getPlayer())) {
             return;
@@ -75,7 +94,7 @@ public class PlayerListener implements Listener {
         Game game = plugin.getGame();
         if (game != null) {
             GamePlayer gamePlayer = game.getPlayer(e.getPlayer().getUniqueId());
-            if (gamePlayer.getTeam() == GameTeam.SPECTATORS || gamePlayer.getTeam() == GameTeam.HIDDEN_STAFF) {
+            if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
                 if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
                     if (e.getItem() != null) {
                         ItemStack item = e.getItem();
@@ -318,8 +337,15 @@ public class PlayerListener implements Listener {
         Game game = plugin.getGame();
         if (game != null) {
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
-            if (gamePlayer.getTeam() == GameTeam.SPECTATORS || gamePlayer.getTeam() == GameTeam.HIDDEN_STAFF) {
+            if (gamePlayer.getTeam() == GameTeam.SPECTATORS ) {
                 e.setCancelled(true);
+            }
+            
+            if (e.getInventory() instanceof EnchantingInventory) {
+                EnchantingInventory enchantingInventory = (EnchantingInventory) e.getInventory();
+                if (e.getCurrentItem() != null && e.getCurrentItem().getType().equals(Material.INK_SACK)) {
+                    e.setCancelled(true);
+                }
             }
         }
     }
@@ -390,7 +416,7 @@ public class PlayerListener implements Listener {
         }
         Player player = e.getEntity();
         GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
-        if (gamePlayer.getTeam() == GameTeam.SPECTATORS || gamePlayer.getTeam() == GameTeam.HIDDEN_STAFF) {
+        if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
             return;
         }
         

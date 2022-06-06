@@ -20,7 +20,6 @@ public class GameTablistHandler extends TablistHandler {
         BEGIN_CHARS.put(GameTeam.TRIBUTES, "a");
         BEGIN_CHARS.put(GameTeam.MUTATIONS, "b");
         BEGIN_CHARS.put(GameTeam.SPECTATORS, "c");
-        BEGIN_CHARS.put(GameTeam.HIDDEN_STAFF, "d");
     }
     
     private SurvivalGames plugin;

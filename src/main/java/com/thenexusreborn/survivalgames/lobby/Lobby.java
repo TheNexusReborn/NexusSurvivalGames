@@ -461,6 +461,7 @@ public class Lobby {
         sendMessage("&a&l>> &b" + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined.");
         Player player = nexusPlayer.getPlayer();
         player.setHealth(player.getMaxHealth());
+        player.setGameMode(GameMode.SURVIVAL);
         if (this.getState() != LobbyState.MAP_EDITING) {
             player.getInventory().clear();
             player.getInventory().setArmorContents(null);
@@ -491,6 +492,10 @@ public class Lobby {
         
         if (this.voteStart.contains(nexusPlayer.getUniqueId())) {
             removeStartVote(nexusPlayer.getUniqueId());
+        }
+    
+        for (Set<UUID> votes : this.mapVotes.values()) {
+            votes.remove(nexusPlayer.getUniqueId());
         }
         
         if (this.state == LobbyState.COUNTDOWN) {

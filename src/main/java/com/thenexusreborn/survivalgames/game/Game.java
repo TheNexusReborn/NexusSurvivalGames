@@ -297,7 +297,7 @@ public class Game {
             while ((uuid = SurvivalGames.PLAYER_QUEUE.poll()) != null) {
                 GamePlayer player = this.players.get(uuid);
                 if (player.getTeam() != null) {
-                    if (player.getTeam() == GameTeam.SPECTATORS || player.getTeam() == GameTeam.HIDDEN_STAFF) {
+                    if (player.getTeam() == GameTeam.SPECTATORS) {
                         spectators.offer(player.getUniqueId());
                     }
                 } else {
@@ -428,6 +428,9 @@ public class Game {
         }
         this.restockTimer = new Timer(new RestockTimerCallback(this)).run(600050L);
         sendMessage("&6&l>> &a&lMAY THE ODDS BE EVER IN YOUR FAVOR.");
+        sendMessage("");
+        sendMessage("&6&l>> &4&lWARNING: &c&lClicking higher than 16 will likely result in a ban.");
+        sendMessage("");
         plugin.getChatHandler().enableChat();
     }
     

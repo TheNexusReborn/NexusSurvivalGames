@@ -36,7 +36,7 @@ public class EntityListener implements Listener {
             
             GamePlayer gamePlayer = game.getPlayer(e.getEntity().getUniqueId());
             
-            if (gamePlayer.getTeam() == GameTeam.SPECTATORS || gamePlayer.getTeam() == GameTeam.HIDDEN_STAFF) {
+            if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
                 e.setCancelled(true);
                 e.getEntity().setFireTicks(0);
                 return;
@@ -67,7 +67,7 @@ public class EntityListener implements Listener {
             
             if (e.getDamager() instanceof Player) {
                 GamePlayer gamePlayer = game.getPlayer(e.getDamager().getUniqueId());
-                if (gamePlayer.getTeam() == GameTeam.SPECTATORS || gamePlayer.getTeam() == GameTeam.HIDDEN_STAFF) {
+                if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
                     e.setCancelled(true);
                     return;
                 }

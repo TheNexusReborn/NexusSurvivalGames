@@ -24,30 +24,42 @@ public class SGChatHandler implements ChatHandler {
             player.sendMessage("&cChat is currently disabled. You cannot speak.");
             return true;
         }
-        String displayName;
+        
+        String format = "{score} {level} &r{displayName}&8: {message}";
+        String nameColor; 
+        String score = "&8<&3" + MCUtils.formatNumber(player.getStatValue("sg_score")) + "&8>";
+        String level = "&8(&2&l" + player.getLevel() + "&8)";
+        String spectators = "&8[&cSpectators&8]";
+        String tag = "";
+        if (player.getTag() != null && !player.getTag().getName().equalsIgnoreCase("null")) {
+            tag = " " + player.getTag().getDisplayName();
+        }
+        
         Game game = plugin.getGame();
-        if (plugin.getGame() != null) {
+        if (game != null) {
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
-            GameTeam team = gamePlayer.getTeam();
-            String prefix = "", suffix = "";
-            if (player.getRank() != Rank.MEMBER) {
-                prefix = player.getRank().getPrefix() + " ";
+            if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
+                format = "{score} &8[&cSpectators&8] {level} &r{displayName}&8: {message}";
+                nameColor = player.getRank().getColor();
+            } else {
+                nameColor = gamePlayer.getTeam().getColor();
             }
-    
-            displayName = prefix + team.getColor() + player.getName() + suffix;
         } else {
-            displayName = player.getDisplayName();
+            nameColor = "&f";
         }
         
-        
-        String format = "&8<&3{score}&8> &8(&2&l{level}&8) &r" + displayName + "{tag}&8: " + chatColor + ChatColor.stripColor(MCUtils.color(e.getMessage().replace("%", "%%")));
-        format = format.replace("{level}", player.getLevel() + "");
-        format = format.replace("{score}", MCUtils.formatNumber(player.getStatValue("sg_score")));
-        if (player.getTag() != null) {
-            format = format.replace("{tag}", " " + player.getTag().getDisplayName());
-        } else {
-            format = format.replace("{tag}", "");
+        String prefix = "";
+        if (player.getRank().ordinal() < Rank.MEMBER.ordinal()) {
+            prefix = player.getRank().getPrefix() + " ";
         }
+        
+        String displayName = prefix + nameColor + player.getName() + tag;
+        
+        format = format.replace("{score}", score);
+        format = format.replace("{level}", level);
+        format = format.replace("{displayName}", displayName);
+        format = format.replace("{message}", chatColor + ChatColor.stripColor(e.getMessage()));
+        
         if (game != null) {
             if (game.getState().ordinal() >= GameState.INGAME_GRACEPERIOD.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal()) {
                 if (game.getPlayer(player.getUniqueId()).getTeam() != GameTeam.TRIBUTES) {

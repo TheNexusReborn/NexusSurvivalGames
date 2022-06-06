@@ -48,7 +48,7 @@ public class BlockListener implements Listener {
         if (plugin.getGame() != null) {
             Game game = plugin.getGame();
             GamePlayer gamePlayer = game.getPlayer(e.getPlayer().getUniqueId());
-            if (gamePlayer.getTeam() == GameTeam.SPECTATORS || gamePlayer.getTeam() == GameTeam.HIDDEN_STAFF) {
+            if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
                 e.setCancelled(true);
                 return;
             }
