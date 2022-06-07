@@ -45,7 +45,11 @@ public class SGChatHandler implements ChatHandler {
                 nameColor = gamePlayer.getTeam().getColor();
             }
         } else {
-            nameColor = "&f";
+            if (player.getRank() != Rank.MEMBER) {
+                nameColor = "&f";   
+            } else {
+                nameColor = Rank.MEMBER.getColor();
+            }
         }
         
         String prefix = "";
