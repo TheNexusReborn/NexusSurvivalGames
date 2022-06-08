@@ -72,7 +72,7 @@ public class GameActionBar extends ActionBar {
         
         if (game.getState() == GameState.INGAME) {
             if (game.getRestockTimer() != null) {
-                return "&f&lChests restock in &e" + Timer.formatTimeShort(game.getRestockTimer().getSecondsLeft());
+                return "&f&lChests restock in &e" + Timer.formatTime(game.getRestockTimer().getSecondsLeft());
             } else {
                 return "&f&lDeathmatch in &e" + Timer.formatTime(game.getTimer().getSecondsLeft());
             }
