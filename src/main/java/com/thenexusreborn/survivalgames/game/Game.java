@@ -4,7 +4,8 @@ import com.google.common.io.*;
 import com.thenexusreborn.api.*;
 import com.thenexusreborn.api.gamearchive.*;
 import com.thenexusreborn.api.multicraft.MulticraftAPI;
-import com.thenexusreborn.api.player.Rank;
+import com.thenexusreborn.api.player.*;
+import com.thenexusreborn.api.tags.Tag;
 import com.thenexusreborn.api.util.Operator;
 import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.nexuscore.util.*;
@@ -695,6 +696,22 @@ public class Game {
             } else {
                 sendMessage("&6&l>> &aThis game has been archived!");
                 sendMessage("&6&l>> &aGame ID: &b" + gameInfo.getId() + " &7&oCustom Website Coming Soon.");
+                
+                if ((gameInfo.getId() % 1000) == 0) {
+                    for (String p : gameInfo.getPlayers()) {
+                        NexusAPI.getApi().getThreadFactory().runAsync(() -> {
+                            NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(p);
+                            if (nexusPlayer == null) {
+                                nexusPlayer = NexusAPI.getApi().getDataManager().loadPlayer(p);
+                            }
+    
+                            Tag tag = new Tag(gameInfo.getId() + "th");
+                            nexusPlayer.unlockTag(tag);
+                            nexusPlayer.sendMessage(MsgType.INFO + "Unlocked the tag " + tag.getDisplayName());
+                            NexusAPI.getApi().getDataManager().pushPlayerAsync(nexusPlayer);
+                        });
+                    }
+                }
             }
         });
     
