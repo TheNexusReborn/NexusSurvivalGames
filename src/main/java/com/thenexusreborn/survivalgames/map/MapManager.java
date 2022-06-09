@@ -56,7 +56,6 @@ public class MapManager {
                     gameMap.setSpawn(spawnId, spawn);
                 }
                 this.gameMaps.add(gameMap);
-                plugin.getLogger().info("Map " + gameMap.getName() + " loaded");
             }
         } catch (SQLException e) {
             e.printStackTrace();
