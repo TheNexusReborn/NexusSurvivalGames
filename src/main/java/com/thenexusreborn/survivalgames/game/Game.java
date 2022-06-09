@@ -154,7 +154,22 @@ public class Game {
         nexusPlayer.getPlayer().spigot().setCollidesWithEntities(false);
         teleportSpectator(nexusPlayer.getPlayer(), this.gameMap.getCenter().toLocation(this.gameMap.getWorld()));
         this.players.put(nexusPlayer.getUniqueId(), gamePlayer);
-        sendMessage("&a&l>> &b" + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined as a spectator.");
+        
+        if (nexusPlayer.getPreferences().get("vanish").getValue()) {
+            for (GamePlayer gp : this.players.values()) {
+                if (gp.getNexusPlayer().getRank().ordinal() <= Rank.HELPER.ordinal() || gp.getUniqueId().equals(nexusPlayer.getUniqueId())) {
+                    gp.sendMessage("&a&l>> " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined &e&overy silently&e.");
+                }
+            }        
+        } else if (nexusPlayer.getPreferences().get("incognito").getValue()) {
+            for (GamePlayer gp : this.players.values()) {
+                if (gp.getNexusPlayer().getRank().ordinal() <= Rank.HELPER.ordinal() || gp.getUniqueId().equals(nexusPlayer.getUniqueId())) {
+                    gp.sendMessage("&a&l>> " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined &e&osilently&e.");
+                }
+            }
+        } else {
+            sendMessage("&a&l>> &b" + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined.");
+        }
         nexusPlayer.getScoreboard().setView(new GameScoreboardView(nexusPlayer.getScoreboard(), plugin));
         nexusPlayer.getScoreboard().setTablistHandler(new GameTablistHandler(nexusPlayer.getScoreboard(), plugin));
         nexusPlayer.setActionBar(new GameActionBar(plugin, gamePlayer));
@@ -162,6 +177,9 @@ public class Game {
     }
     
     public void removePlayer(SpigotNexusPlayer nexusPlayer) {
+        if (!this.players.containsKey(nexusPlayer.getUniqueId())) {
+            return;
+        }
         GamePlayer gamePlayer = this.players.get(nexusPlayer.getUniqueId());
         EnumSet<GameState> ignoreStates = EnumSet.of(UNDEFINED, SETTING_UP, SETUP_COMPLETE, ASSIGN_TEAMS, TEAMS_ASSIGNED, TELEPORT_START, TELEPORT_START_DONE, ERROR, ENDING, ENDED);
         if (!ignoreStates.contains(this.state)) {
@@ -171,7 +189,22 @@ public class Game {
         }
         
         this.players.remove(nexusPlayer.getUniqueId());
-        sendMessage("&c&l<< &b" + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft.");
+    
+        if (nexusPlayer.getPreferences().get("vanish").getValue()) {
+            for (GamePlayer gp : this.players.values()) {
+                if (gp.getNexusPlayer().getRank().ordinal() <= Rank.HELPER.ordinal()) {
+                    gp.sendMessage("&c&l<< " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft &e&overy silently&e.");
+                }
+            }
+        } else if (nexusPlayer.getPreferences().get("incognito").getValue()) {
+            for (GamePlayer gp : this.players.values()) {
+                if (gp.getNexusPlayer().getRank().ordinal() <= Rank.HELPER.ordinal()) {
+                    gp.sendMessage("&c&l<< " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft &e&osilently&e.");
+                }
+            }
+        } else {
+            sendMessage("&c&l<< &b" + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft.");
+        }
     }
     
     public Map<UUID, GamePlayer> getPlayers() {
@@ -228,7 +261,17 @@ public class Game {
             GamePlayer gamePlayer = getPlayer(player.getUniqueId());
             for (Player other : Bukkit.getOnlinePlayers()) {
                 GamePlayer otherGamePlayer = getPlayer(other.getUniqueId());
-                if (gamePlayer.getTeam() == GameTeam.TRIBUTES && otherGamePlayer.getTeam() == GameTeam.TRIBUTES) {
+                
+                if (gamePlayer.getNexusPlayer().getPreferences().get("vanish").getValue()) {
+                    player.showPlayer(other);
+    
+                    SpigotNexusPlayer otherNexusPlayer = otherGamePlayer.getNexusPlayer();
+                    if (otherNexusPlayer.getRank().ordinal() <= Rank.HELPER.ordinal() && otherGamePlayer.getTeam() == GameTeam.SPECTATORS) {
+                        other.showPlayer(player);
+                    } else {
+                        other.hidePlayer(player);
+                    }
+                } else if (gamePlayer.getTeam() == GameTeam.TRIBUTES && otherGamePlayer.getTeam() == GameTeam.TRIBUTES) {
                     player.showPlayer(other);
                     other.showPlayer(player);
                 } else if (gamePlayer.getTeam() == GameTeam.SPECTATORS && otherGamePlayer.getTeam() == GameTeam.TRIBUTES) {
@@ -774,15 +817,17 @@ public class Game {
         gamePlayer.setTrackerInfo(null);
         GameTeam oldTeam = gamePlayer.getTeam();
         
+        boolean vanished = deathInfo.getType() == DeathType.VANISH;
+        
         int score = (int) gamePlayer.getNexusPlayer().getStatValue("sg_score");
         int lost = (int) Math.ceil(score / 10D);
         
-        gamePlayer.getNexusPlayer().changeStat("sg_score", lost, Operator.SUBTRACT);
-        gamePlayer.sendMessage("&4&l>> &cYou lost " + lost + " Score for dying.");
-    
-        gamePlayer.getNexusPlayer().changeStat("sg_games", 1, Operator.ADD);
-        gamePlayer.getNexusPlayer().changeStat("sg_win_streak", 0, Operator.MULTIPLY);
-        gamePlayer.getNexusPlayer().changeStat("sg_deaths", 1, Operator.ADD);
+        if (!vanished) {
+            gamePlayer.getNexusPlayer().changeStat("sg_score", lost, Operator.SUBTRACT);
+            gamePlayer.sendMessage("&4&l>> &cYou lost " + lost + " Score for dying."); gamePlayer.getNexusPlayer().changeStat("sg_games", 1, Operator.ADD);
+            gamePlayer.getNexusPlayer().changeStat("sg_win_streak", 0, Operator.MULTIPLY);
+            gamePlayer.getNexusPlayer().changeStat("sg_deaths", 1, Operator.ADD);
+        }
         
         gamePlayer.sendMessage(GameTeam.TRIBUTES.getLeaveMessage());
         GamePlayer killer = null;

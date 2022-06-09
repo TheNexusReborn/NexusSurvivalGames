@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.lobby;
 
 import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.api.player.NexusPlayer;
+import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.nexuscore.scoreboard.impl.RankTablistHandler;
 import com.thenexusreborn.nexuscore.util.*;
@@ -436,19 +436,21 @@ public class Lobby {
             System.out.println("Nexus Player was null");
             return;
         }
+        
         if (nexusPlayer.getPlayer() == null) {
             return;
         }
+        
         this.players.put(nexusPlayer.getUniqueId(), nexusPlayer);
+        if (nexusPlayer.getPreferences().get("vanish").getValue()) {
+            this.spectatingPlayers.add(nexusPlayer.getUniqueId());
+        }
+        
         int totalPlayers = 0;
         for (SpigotNexusPlayer player : this.players.values()) {
             if (!this.spectatingPlayers.contains(player.getUniqueId())) {
                 totalPlayers++;
             }
-        }
-        
-        if (this.spectatingPlayers.contains(nexusPlayer.getUniqueId())) {
-            sendMessage("&a&l>> &f" + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined as a spectator.");
         }
         
         if (totalPlayers > lobbySettings.getMaxPlayers()) {
@@ -458,8 +460,40 @@ public class Lobby {
         Location spawn = getSpawnpoint().clone();
         spawn.setY(spawn.getY() + 2);
         nexusPlayer.getPlayer().teleport(spawn);
-        sendMessage("&a&l>> &b" + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined.");
+    
         Player player = nexusPlayer.getPlayer();
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            online.showPlayer(player);
+            player.showPlayer(online);
+        }
+    
+        if (nexusPlayer.getPreferences().get("vanish").getValue()) {
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                SpigotNexusPlayer psp = this.players.get(p.getUniqueId());
+                if (psp.getRank().ordinal() > Rank.HELPER.ordinal() || psp.getUniqueId().equals(nexusPlayer.getUniqueId())) {
+                    p.hidePlayer(player);
+                } else {
+                    psp.sendMessage("&a&l>> " + nexusPlayer.getRank().getColor() + nexusPlayer.getRank() + " &ejoined &e&overy silently&e.");
+                }
+            }
+        } else if (nexusPlayer.getPreferences().get("incognito").getValue()) {
+            for (SpigotNexusPlayer np : this.players.values()) {
+                if (np.getRank().ordinal() <= Rank.HELPER.ordinal() || np.getUniqueId().equals(nexusPlayer.getUniqueId())) {
+                    np.sendMessage("&a&l>> " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined &e&osilently&e.");
+                }
+            }
+        } else {
+            sendMessage("&a&l>> " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined.");
+        }
+    
+        boolean joiningPlayerStaff = nexusPlayer.getRank().ordinal() <= Rank.HELPER.ordinal();
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            SpigotNexusPlayer psp = this.players.get(p.getUniqueId());
+            if (psp.getPreferences().get("vanish").getValue() && !joiningPlayerStaff) {
+                nexusPlayer.getPlayer().hidePlayer(p);
+            }
+        }
+        
         player.setHealth(player.getMaxHealth());
         player.setGameMode(GameMode.SURVIVAL);
         if (this.getState() != LobbyState.MAP_EDITING) {
@@ -471,15 +505,14 @@ public class Lobby {
         }
         nexusPlayer.getScoreboard().setView(new LobbyScoreboardView(nexusPlayer.getScoreboard(), plugin));
         nexusPlayer.getScoreboard().setTablistHandler(new RankTablistHandler(nexusPlayer.getScoreboard()));
-        for (Player online : Bukkit.getOnlinePlayers()) {
-            online.showPlayer(player);
-            player.showPlayer(online);
-        }
         nexusPlayer.setActionBar(new LobbyActionBar(plugin));
         sendMapOptions(nexusPlayer);
     }
     
     public void removePlayer(SpigotNexusPlayer nexusPlayer) {
+        if (!this.players.containsKey(nexusPlayer.getUniqueId())) {
+            return;
+        }
         this.players.remove(nexusPlayer.getUniqueId());
         int totalPlayers = 0;
         for (SpigotNexusPlayer player : this.players.values()) {
@@ -488,7 +521,21 @@ public class Lobby {
             }
         }
         
-        sendMessage("&c&l<< &b" + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft.");
+        if (nexusPlayer.getPreferences().get("vanish").getValue()) {
+            for (SpigotNexusPlayer snp : this.players.values()) {
+                if (snp.getRank().ordinal() <= Rank.HELPER.ordinal()) {
+                    snp.sendMessage("&c&l<< " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft &e&overy silently&e.");
+                }
+            }
+        } else if (nexusPlayer.getPreferences().get("incognito").getValue()) {
+            for (SpigotNexusPlayer snp : this.players.values()) {
+                if (snp.getRank().ordinal() <= Rank.HELPER.ordinal()) {
+                    snp.sendMessage("&c&l<< " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft &e&osilently&e.");
+                }
+            }
+        } else {
+            sendMessage("&c&l<< " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft.");
+        }
         
         if (this.voteStart.contains(nexusPlayer.getUniqueId())) {
             removeStartVote(nexusPlayer.getUniqueId());

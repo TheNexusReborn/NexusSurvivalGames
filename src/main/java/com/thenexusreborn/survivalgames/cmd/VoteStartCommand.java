@@ -32,8 +32,14 @@ public class VoteStartCommand implements CommandExecutor {
     
         NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(senderPlayer.getUniqueId());
         Lobby lobby = plugin.getLobby();
+        
+        if (nexusPlayer.getPreferences().get("vanish").getValue()) {
+            nexusPlayer.sendMessage(MsgType.WARN + "You cannot vote to start while in vanish mode.");
+            return true;
+        }
+        
         if (lobby.getSpectatingPlayers().contains(nexusPlayer.getUniqueId())) {
-            nexusPlayer.sendMessage("&cYou are a spectator in the next game. You cannot vote to start the game.");
+            nexusPlayer.sendMessage(MsgType.WARN + "You are a spectator in the next game. You cannot vote to start the game.");
             return true;
         }
         

@@ -1,9 +1,10 @@
 package com.thenexusreborn.survivalgames.listener;
 
+import com.google.common.io.*;
 import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.api.player.NexusPlayer;
+import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.api.util.Operator;
-import com.thenexusreborn.nexuscore.api.events.NexusPlayerLoadEvent;
+import com.thenexusreborn.nexuscore.api.events.*;
 import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -257,6 +258,10 @@ public class PlayerListener implements Listener {
                         }.runTaskLater(plugin, 1L);
                     } else if (block.getState() instanceof Sign) {
                         NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(e.getPlayer().getUniqueId());
+                        if (nexusPlayer.getPreferences().get("vanish").getValue()) {
+                            nexusPlayer.sendMessage(MsgType.WARN + "You cannot vote for a map while in vanish.");
+                            return;
+                        }
                         if (plugin.getLobby().getState() == LobbyState.WAITING || plugin.getLobby().getState() == LobbyState.COUNTDOWN) {
                             plugin.getLobby().addMapVote(nexusPlayer, block.getLocation());
                         }
@@ -286,6 +291,47 @@ public class PlayerListener implements Listener {
                 if (!block.getType().name().contains("_PLATE")) {
                     e.setCancelled(true);
                 }
+            }
+        }
+    }
+    
+    @EventHandler
+    public void onVanishToggle(VanishToggleEvent e) {
+        String coloredName = e.getNexusPlayer().getRank().getColor() + e.getNexusPlayer().getName();
+        if (e.getNewValue()) {
+            if (plugin.getGame() == null) {
+                if (e.getNexusPlayer().getPreferences().get("incognito").getValue()) {
+                    String message = "&c&l<< " + coloredName + " &eleft &e&osilently&e.";
+                    for (SpigotNexusPlayer player : plugin.getLobby().getPlayers()) {
+                        if (player.getRank().ordinal() <= Rank.HELPER.ordinal() || player.getUniqueId().equals(e.getNexusPlayer().getUniqueId())) {
+                            player.sendMessage(message);
+                        }
+                    }
+                } else {
+                    plugin.getLobby().sendMessage("&c&l<< " + coloredName + " &eleft.");
+                }
+            } else {
+                Game game = plugin.getGame();
+                GamePlayer gamePlayer = game.getPlayers().get(e.getNexusPlayer().getUniqueId());
+                if (gamePlayer.getTeam() == GameTeam.TRIBUTES || gamePlayer.getTeam() == GameTeam.MUTATIONS) {
+                    game.killPlayer(gamePlayer.getUniqueId(), new DeathInfoVanish(gamePlayer.getUniqueId()));
+                }
+                if (e.getNexusPlayer().getPreferences().get("incognito").getValue()) {
+                    String message = "&c&l<< " + coloredName + " &eleft &e&osilently&e.";
+                    for (SpigotNexusPlayer player : plugin.getLobby().getPlayers()) {
+                        if (player.getRank().ordinal() <= Rank.HELPER.ordinal() || player.getUniqueId().equals(e.getNexusPlayer().getUniqueId())) {
+                            player.sendMessage(message);
+                        }
+                    }
+                } else {
+                    game.sendMessage("&c&l<< " + coloredName + " &eleft.");
+                }
+            }
+        } else {
+            if (plugin.getGame() == null) {
+                
+            } else {
+                
             }
         }
     }
@@ -337,7 +383,7 @@ public class PlayerListener implements Listener {
         Game game = plugin.getGame();
         if (game != null) {
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
-            if (gamePlayer.getTeam() == GameTeam.SPECTATORS ) {
+            if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
                 e.setCancelled(true);
             }
             
@@ -544,8 +590,29 @@ public class PlayerListener implements Listener {
     
     @EventHandler
     public void onNexusPlayerLoad(NexusPlayerLoadEvent e) {
+        SpigotNexusPlayer nexusPlayer = (SpigotNexusPlayer) e.getNexusPlayer();
+        if (plugin.getGame() != null) {
+            if (plugin.getLobby().getPlayers().size() >= plugin.getLobby().getLobbySettings().getMaxPlayers()) {
+                boolean isStaff = nexusPlayer.getRank().ordinal() <= Rank.HELPER.ordinal();
+                boolean isInVanish = nexusPlayer.getPreferences().get("vanish").getValue();
+                if (!(isStaff && isInVanish)) {
+                    nexusPlayer.sendMessage("&cThe lobby is full.");
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            ByteArrayDataOutput out = ByteStreams.newDataOutput();
+                            out.writeUTF("Connect");
+                            out.writeUTF("Hub");
+                            nexusPlayer.getPlayer().sendPluginMessage(plugin.getNexusCore(), "BungeeCord", out.toByteArray());
+                        }
+                    }.runTaskLater(plugin, 10L);
+                    
+                    return;
+                }
+            }
+        }
+        
         SurvivalGames.PLAYER_QUEUE.offer(e.getNexusPlayer().getUniqueId());
-        NexusPlayer nexusPlayer = e.getNexusPlayer();
         if (plugin.getGame() != null) {
             GameState state = plugin.getGame().getState();
             if (state == GameState.ASSIGN_TEAMS) {
@@ -553,16 +620,16 @@ public class PlayerListener implements Listener {
                     @Override
                     public void run() {
                         if (plugin.getGame().getState() != GameState.ASSIGN_TEAMS) {
-                            plugin.getGame().addPlayer((SpigotNexusPlayer) nexusPlayer);
+                            plugin.getGame().addPlayer(nexusPlayer);
                             cancel();
                         }
                     }
                 }.runTaskTimer(plugin, 1L, 1L);
             } else {
-                plugin.getGame().addPlayer((SpigotNexusPlayer) nexusPlayer);
+                plugin.getGame().addPlayer(nexusPlayer);
             }
         } else {
-            plugin.getLobby().addPlayer((SpigotNexusPlayer) nexusPlayer);
+            plugin.getLobby().addPlayer(nexusPlayer);
         }
         e.setJoinMessage(null);
     }
