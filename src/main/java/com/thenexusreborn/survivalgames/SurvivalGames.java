@@ -5,12 +5,12 @@ import com.thenexusreborn.api.server.ServerInfo;
 import com.thenexusreborn.api.tournament.Tournament;
 import com.thenexusreborn.nexuscore.NexusCore;
 import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
-import com.thenexusreborn.nexuscore.util.ServerProperties;
+import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.survivalgames.cmd.*;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.game.tasks.*;
 import com.thenexusreborn.survivalgames.listener.*;
-import com.thenexusreborn.survivalgames.lobby.Lobby;
+import com.thenexusreborn.survivalgames.lobby.*;
 import com.thenexusreborn.survivalgames.lobby.tasks.*;
 import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.map.MapManager;
@@ -143,6 +143,19 @@ public class SurvivalGames extends JavaPlugin {
                 }
             }
         }.runTaskTimer(this, 20L, 20L);
+    
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                Tournament tournament = NexusAPI.getApi().getTournament();
+                if (tournament != null && tournament.isActive()) {
+                    Bukkit.broadcastMessage(MCUtils.color("&6&l>> &aThere is an active tournament going on right now."));
+                    Bukkit.broadcastMessage(MCUtils.color("&6&l> &aYou will be seeing some additional messages for Points in chat."));
+                    Bukkit.broadcastMessage(MCUtils.color("&6&l> &aYou can use &b/tournament (alias /tm) leaderboard &ato see the current leaderboards"));
+                    Bukkit.broadcastMessage(MCUtils.color("&6&l> &aYou can use &b/tournament score &ato see your score specifically"));
+                }
+            }
+        }.runTaskTimer(this, 20L, 2400L);
     }
     
     private void updatePlayerHealthAndFood(Player player) {

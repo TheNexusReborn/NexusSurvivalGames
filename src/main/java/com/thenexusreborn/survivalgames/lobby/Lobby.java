@@ -2,6 +2,7 @@ package com.thenexusreborn.survivalgames.lobby;
 
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.*;
+import com.thenexusreborn.api.tournament.Tournament;
 import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.nexuscore.scoreboard.impl.RankTablistHandler;
 import com.thenexusreborn.nexuscore.util.*;
@@ -129,7 +130,7 @@ public class Lobby {
                     sendMapOptions(nexusPlayer);
                 }
             }
-        }.runTaskTimer(plugin, 60L, 1200);
+        }.runTaskTimer(plugin, 60L, 2400);
         
         new BukkitRunnable() {
             @Override
@@ -150,7 +151,7 @@ public class Lobby {
                     sendMessage("&6&l>> &e&lDid you know that you can use &f&l/votestart &e&lto start a game early?");
                 }
             }
-        }.runTaskTimerAsynchronously(plugin, 20L, 1200L);
+        }.runTaskTimerAsynchronously(plugin, 20L, 2400L);
     }
     
     public void generateLootChances() {
