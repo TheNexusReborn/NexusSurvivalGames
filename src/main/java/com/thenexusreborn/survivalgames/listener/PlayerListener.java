@@ -298,40 +298,53 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onVanishToggle(VanishToggleEvent e) {
         String coloredName = e.getNexusPlayer().getRank().getColor() + e.getNexusPlayer().getName();
+        Game game = plugin.getGame();
+        
+        Collection<SpigotNexusPlayer> players;
+        if (game == null) {
+            players = plugin.getLobby().getPlayers();
+        } else {
+            players = new ArrayList<>();
+            for (GamePlayer value : game.getPlayers().values()) {
+                players.add(value.getNexusPlayer());
+            }
+        }
+        
+        String message;
+        boolean incognito = e.getNexusPlayer().getPreferences().get("incognito").getValue();
         if (e.getNewValue()) {
-            if (plugin.getGame() == null) {
-                if (e.getNexusPlayer().getPreferences().get("incognito").getValue()) {
-                    String message = "&c&l<< " + coloredName + " &eleft &e&osilently&e.";
-                    for (SpigotNexusPlayer player : plugin.getLobby().getPlayers()) {
-                        if (player.getRank().ordinal() <= Rank.HELPER.ordinal() || player.getUniqueId().equals(e.getNexusPlayer().getUniqueId())) {
-                            player.sendMessage(message);
-                        }
-                    }
-                } else {
-                    plugin.getLobby().sendMessage("&c&l<< " + coloredName + " &eleft.");
-                }
+            if (incognito) {
+                message = "";
             } else {
-                Game game = plugin.getGame();
-                GamePlayer gamePlayer = game.getPlayers().get(e.getNexusPlayer().getUniqueId());
-                if (gamePlayer.getTeam() == GameTeam.TRIBUTES || gamePlayer.getTeam() == GameTeam.MUTATIONS) {
-                    game.killPlayer(gamePlayer.getUniqueId(), new DeathInfoVanish(gamePlayer.getUniqueId()));
-                }
-                if (e.getNexusPlayer().getPreferences().get("incognito").getValue()) {
-                    String message = "&c&l<< " + coloredName + " &eleft &e&osilently&e.";
-                    for (SpigotNexusPlayer player : plugin.getLobby().getPlayers()) {
-                        if (player.getRank().ordinal() <= Rank.HELPER.ordinal() || player.getUniqueId().equals(e.getNexusPlayer().getUniqueId())) {
-                            player.sendMessage(message);
-                        }
+                message = "&c&l<< " + coloredName + " &eleft.";
+                if (game != null) {
+                    GamePlayer gamePlayer = game.getPlayers().get(e.getNexusPlayer().getUniqueId());
+                    if (gamePlayer.getTeam() == GameTeam.TRIBUTES || gamePlayer.getTeam() == GameTeam.MUTATIONS) {
+                        game.killPlayer(gamePlayer.getUniqueId(), new DeathInfoVanish(gamePlayer.getUniqueId()));
                     }
-                } else {
-                    game.sendMessage("&c&l<< " + coloredName + " &eleft.");
                 }
             }
         } else {
-            if (plugin.getGame() == null) {
-                
+            if (incognito) {
+                message = "&a&l>> " + coloredName + " &ejoined &e&osilently&e.";
             } else {
-                
+                message = "&a&l>> " + coloredName + " &ejoined.";
+            }
+        }
+    
+        if (!message.equals("")) {
+            if (incognito) {
+                for (SpigotNexusPlayer player : players) {
+                    if (player.getRank().ordinal() <= Rank.HELPER.ordinal() || player.getUniqueId().equals(e.getNexusPlayer().getUniqueId())) {
+                        player.sendMessage(message);
+                    }
+                }
+            } else {
+                if (game == null) {
+                    plugin.getLobby().sendMessage(message);
+                } else {
+                    game.sendMessage(message);
+                }
             }
         }
     }
@@ -349,9 +362,22 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onPrepareCraft(PrepareItemCraftEvent e) {
         CraftingInventory inv = e.getInventory();
+        if (inv.getRecipe() == null) return; 
         if (inv.getRecipe().getResult().getType() == Material.FLINT_AND_STEEL) {
             ItemStack itemStack = new ItemStack(Material.FLINT_AND_STEEL);
             itemStack.setDurability((short) (Material.FLINT_AND_STEEL.getMaxDurability() - 4));
+            inv.setResult(itemStack);
+        } else if (inv.getRecipe().getResult().getType() == Material.DIAMOND_AXE) {
+            ItemStack itemStack = new ItemStack(Material.DIAMOND_AXE);
+            ItemMeta itemMeta = itemStack.getItemMeta();
+            itemMeta.setDisplayName(MCUtils.color("&fBetty"));
+            itemStack.setItemMeta(itemMeta);
+            inv.setResult(itemStack);
+        } else if (inv.getRecipe().getResult().getType() == Material.IRON_AXE) {
+            ItemStack itemStack = new ItemStack(Material.IRON_AXE);
+            ItemMeta itemMeta = itemStack.getItemMeta();
+            itemMeta.setDisplayName(MCUtils.color("&fFrederick"));
+            itemStack.setItemMeta(itemMeta);
             inv.setResult(itemStack);
         }
     }
