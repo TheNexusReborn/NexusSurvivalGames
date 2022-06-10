@@ -1,6 +1,7 @@
 package com.thenexusreborn.survivalgames.scoreboard;
 
 import com.thenexusreborn.api.NexusAPI;
+import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.scoreboard.wrapper.ITeam;
 import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
@@ -46,6 +47,7 @@ public class LobbyScoreboardView extends SpigotScoreboardView {
             return;
         }
         Lobby lobby = plugin.getLobby();
+        NexusPlayer player = this.scoreboard.getPlayer();
         ITeam mapValue = scoreboard.getScoreboard().getTeam(mapValueName);
         if (lobby.getGameMap() != null) {
             GameMap map = lobby.getGameMap();
@@ -64,9 +66,11 @@ public class LobbyScoreboardView extends SpigotScoreboardView {
         }
         
         int waiting = 0;
-        for (SpigotNexusPlayer player : lobby.getPlayers()) {
-            if (!lobby.getSpectatingPlayers().contains(player.getUniqueId())) {
-                waiting++;
+        for (SpigotNexusPlayer waitingPlayer : lobby.getPlayers()) {
+            if (!lobby.getSpectatingPlayers().contains(waitingPlayer.getUniqueId())) {
+                if (!waitingPlayer.getPreferences().get("vanish").getValue() || lobby.getSpectatingPlayers().contains(waitingPlayer.getUniqueId())) {
+                    waiting++;
+                }
             }
         }
         

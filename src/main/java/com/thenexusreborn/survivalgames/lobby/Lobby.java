@@ -412,7 +412,7 @@ public class Lobby {
     }
     
     public Collection<SpigotNexusPlayer> getPlayers() {
-        return this.players.values();
+        return new ArrayList<>(this.players.values());
     }
     
     public Timer getTimer() {
@@ -470,16 +470,20 @@ public class Lobby {
         if (nexusPlayer.getPreferences().get("vanish").getValue()) {
             for (Player p : Bukkit.getOnlinePlayers()) {
                 SpigotNexusPlayer psp = this.players.get(p.getUniqueId());
-                if (psp.getRank().ordinal() > Rank.HELPER.ordinal() || psp.getUniqueId().equals(nexusPlayer.getUniqueId())) {
-                    p.hidePlayer(player);
-                } else {
-                    psp.sendMessage("&a&l>> " + nexusPlayer.getRank().getColor() + nexusPlayer.getRank() + " &ejoined &e&overy silently&e.");
+                if (psp != null) {
+                    if (psp.getRank().ordinal() > Rank.HELPER.ordinal()) {
+                        p.hidePlayer(player);
+                    } else {
+                        psp.sendMessage("&a&l>> " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined &e&overy silently&e.");
+                    }
                 }
             }
         } else if (nexusPlayer.getPreferences().get("incognito").getValue()) {
             for (SpigotNexusPlayer np : this.players.values()) {
-                if (np.getRank().ordinal() <= Rank.HELPER.ordinal() || np.getUniqueId().equals(nexusPlayer.getUniqueId())) {
-                    np.sendMessage("&a&l>> " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined &e&osilently&e.");
+                if (np != null) {
+                    if (np.getRank().ordinal() <= Rank.HELPER.ordinal()) {
+                        np.sendMessage("&a&l>> " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined &e&osilently&e.");
+                    }
                 }
             }
         } else {
@@ -489,8 +493,10 @@ public class Lobby {
         boolean joiningPlayerStaff = nexusPlayer.getRank().ordinal() <= Rank.HELPER.ordinal();
         for (Player p : Bukkit.getOnlinePlayers()) {
             SpigotNexusPlayer psp = this.players.get(p.getUniqueId());
-            if (psp.getPreferences().get("vanish").getValue() && !joiningPlayerStaff) {
-                nexusPlayer.getPlayer().hidePlayer(p);
+            if (psp != null) {
+                if (psp.getPreferences().get("vanish").getValue() && !joiningPlayerStaff) {
+                    nexusPlayer.getPlayer().hidePlayer(p);
+                }
             }
         }
         

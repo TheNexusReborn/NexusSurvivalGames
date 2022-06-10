@@ -343,6 +343,7 @@ public class PlayerListener implements Listener {
                 if (game == null) {
                     plugin.getLobby().sendMessage(message);
                 } else {
+                    game.recalculateVisibiltiy();
                     game.sendMessage(message);
                 }
             }

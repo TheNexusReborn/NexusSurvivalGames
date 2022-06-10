@@ -76,7 +76,9 @@ public class GameScoreboardView extends SpigotScoreboardView {
                 if (gamePlayer.getTeam() == GameTeam.TRIBUTES) {
                     tributes++;
                 } else if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
-                    watching++;
+                    if (!gamePlayer.getNexusPlayer().getPreferences().get("vanish").getValue()) {
+                        watching++;
+                    }
                 }
             }
             

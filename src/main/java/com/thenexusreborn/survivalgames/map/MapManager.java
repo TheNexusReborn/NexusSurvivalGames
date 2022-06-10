@@ -26,7 +26,6 @@ public class MapManager {
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
                 String name = resultSet.getString("name").replace("''", "'");
-                plugin.getLogger().info("Loading map " + name);
                 String url = resultSet.getString("url");
                 int centerX = resultSet.getInt("centerX");
                 int centerY = resultSet.getInt("centerY");

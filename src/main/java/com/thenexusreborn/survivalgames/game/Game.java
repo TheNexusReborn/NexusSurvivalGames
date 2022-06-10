@@ -264,13 +264,6 @@ public class Game {
                 
                 if (gamePlayer.getNexusPlayer().getPreferences().get("vanish").getValue()) {
                     player.showPlayer(other);
-    
-                    SpigotNexusPlayer otherNexusPlayer = otherGamePlayer.getNexusPlayer();
-                    if (otherNexusPlayer.getRank().ordinal() <= Rank.HELPER.ordinal() && otherGamePlayer.getTeam() == GameTeam.SPECTATORS) {
-                        other.showPlayer(player);
-                    } else {
-                        other.hidePlayer(player);
-                    }
                 } else if (gamePlayer.getTeam() == GameTeam.TRIBUTES && otherGamePlayer.getTeam() == GameTeam.TRIBUTES) {
                     player.showPlayer(other);
                     other.showPlayer(player);
