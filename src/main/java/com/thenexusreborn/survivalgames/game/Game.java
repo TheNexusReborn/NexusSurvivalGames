@@ -19,7 +19,7 @@ import com.thenexusreborn.survivalgames.lootv2.*;
 import com.thenexusreborn.survivalgames.map.GameMap;
 import com.thenexusreborn.survivalgames.scoreboard.*;
 import com.thenexusreborn.survivalgames.settings.*;
-import com.thenexusreborn.survivalgames.tournament.Tournament;
+import com.thenexusreborn.api.tournament.Tournament;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -624,38 +624,14 @@ public class Game {
             }
         }
 
-//        List<GamePlayer> winners = new ArrayList<>();
-//        for (GamePlayer player : this.players.values()) {
-//            if (player.getTeam() == GameTeam.TRIBUTES) {
-//                winners.add(player);
-//                if (plugin.getTournament() != null && plugin.getTournament().isActive()) {
-//                    plugin.getTournament().incrementScore(player.getUniqueId(), plugin.getTournament().getPointsPerWin());
-//                    player.sendMessage("&2&l>> &a+" + plugin.getTournament().getPointsPerWin() + " Points!");
-//                }
-//            }
-//        }
-        
         String winnerName;
-//        if (winners.size() > 0) {
-//            if (winners.size() == 1) {
-//                winnerName = new StringBuilder(winners.get(0).getNexusPlayer().getDisplayName());
-//            } else {
-//                Iterator<GamePlayer> iterator = winners.iterator();
-//                while (iterator.hasNext()) {
-//                    GamePlayer winner = iterator.next();
-//                    winnerName.append(winner.getNexusPlayer().getDisplayName());
-//                    if (iterator.hasNext()) {
-//                        winnerName.append("&f, ");
-//                    }
-//                }
-//            }
-//        } else {
-//            winnerName = new StringBuilder("&f&lNo one");
-//        }
-        
         if (winner != null) {
             winnerName = winner.getNexusPlayer().getDisplayName();
-            
+            Tournament tournament = NexusAPI.getApi().getTournament();
+            if (tournament != null && tournament.isActive()) {
+                winner.getNexusPlayer().changeStat("sg_tournament_points", tournament.getPointsPerWin(), Operator.ADD);
+                winner.sendMessage("&2&l>> &a+" + tournament.getPointsPerKill() + " Points!");
+            }
         } else {
             winnerName = "&f&lNo one";
         }
@@ -991,17 +967,17 @@ public class Game {
         }
         
         if (oldTeam == GameTeam.TRIBUTES) {
-            Tournament tournament = plugin.getTournament();
+            Tournament tournament = NexusAPI.getApi().getTournament();
             if (killer != null) {
                 if (tournament != null && tournament.isActive()) {
-                    tournament.incrementScore(killer.getUniqueId(), tournament.getPointsPerKill());
+                    killer.getNexusPlayer().changeStat("sg_tournament_points",tournament.getPointsPerKill(), Operator.ADD);
                     killer.sendMessage("&2&l>> &a+" + tournament.getPointsPerKill() + " Points!");
                 }
             }
             if (tournament != null && tournament.isActive()) {
                 for (GamePlayer p : this.players.values()) {
                     if (p.getTeam() == GameTeam.TRIBUTES) {
-                        tournament.incrementScore(p.getUniqueId(), tournament.getPointsPerSurvival());
+                        killer.getNexusPlayer().changeStat("sg_tournament_points",tournament.getPointsPerSurvival(), Operator.ADD);
                         p.sendMessage("&2&l>> &a+" + tournament.getPointsPerSurvival() + " Points!");
                     }
                 }

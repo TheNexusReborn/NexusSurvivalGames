@@ -1,9 +1,9 @@
 package com.thenexusreborn.survivalgames;
 
 import com.thenexusreborn.api.*;
-import com.thenexusreborn.api.multicraft.MulticraftAPI;
 import com.thenexusreborn.api.server.ServerInfo;
-import com.thenexusreborn.nexuscore.*;
+import com.thenexusreborn.api.tournament.Tournament;
+import com.thenexusreborn.nexuscore.NexusCore;
 import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.nexuscore.util.ServerProperties;
 import com.thenexusreborn.survivalgames.cmd.*;
@@ -15,9 +15,7 @@ import com.thenexusreborn.survivalgames.lobby.tasks.*;
 import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.map.MapManager;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
-import com.thenexusreborn.survivalgames.tournament.Tournament;
 import org.bukkit.*;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -37,7 +35,6 @@ public class SurvivalGames extends JavaPlugin {
     private LootManager lootManager;
     
     private Game game;
-    private Tournament tournament;
     
     private int gamesPlayed = 0;
     
@@ -92,33 +89,9 @@ public class SurvivalGames extends JavaPlugin {
             lobby.setSpawnpoint(Bukkit.getWorld(ServerProperties.getLevelName()).getSpawnLocation());
         }
         
-        getLogger().info("Loaded spawnpoint");
-        
-        if (getConfig().contains("tournament")) {
-            UUID host = UUID.fromString(getConfig().getString("tournament.host"));
-            String name = getConfig().getString("tournament.name");
-            this.tournament = new Tournament(host, name);
-            tournament.setActive(getConfig().getBoolean("tournament.active"));
-            tournament.setPointsPerWin(getConfig().getInt("tournament.pointsperwin"));
-            tournament.setPointsPerKill(getConfig().getInt("tournament.pointsperkill"));
-            tournament.setPointsPerSurvival(getConfig().getInt("tournament.pointspersurvival"));
-            for (String p : getConfig().getStringList("tournament.participants")) {
-                tournament.getParticipants().add(UUID.fromString(p));
-            }
-    
-            ConfigurationSection scoresSection = getConfig().getConfigurationSection("tournament.scores");
-            if (scoresSection != null) {
-                for (String key : scoresSection.getKeys(false)) {
-                    tournament.getScores().put(UUID.fromString(key), scoresSection.getInt(key));
-                }
-            }
-            getLogger().info("Loaded tournament");
-        }
-    
         this.chatHandler = new SGChatHandler(this);
         nexusCore.getChatManager().setHandler(chatHandler);
     
-        getCommand("tournament").setExecutor(new TournamentCommand(this));
         getCommand("votestart").setExecutor(new VoteStartCommand(this));
         getCommand("stats").setExecutor(new StatsCommand(this));
         getCommand("survivalgames").setExecutor(new SGCommand(this));
@@ -203,21 +176,6 @@ public class SurvivalGames extends JavaPlugin {
         getConfig().set("spawnpoint.yaw", lobby.getSpawnpoint().getYaw() + "");
         getConfig().set("spawnpoint.pitch", lobby.getSpawnpoint().getPitch() + "");
         
-        if (this.tournament != null) {
-            getConfig().set("tournament.host", tournament.getHost().toString());
-            getConfig().set("tournament.active", tournament.isActive());
-            getConfig().set("tournament.name", tournament.getName());
-            getConfig().set("tournament.pointsperwin", tournament.getPointsPerWin());
-            getConfig().set("tournament.pointsperkill", tournament.getPointsPerKill());
-            getConfig().set("tournament.pointspersurvival", tournament.getPointsPerSurvival());
-            List<String> participants = new ArrayList<>();
-            for (UUID participant : tournament.getParticipants()) {
-                participants.add(participant.toString());
-            }
-            getConfig().set("tournament.participants", participants);
-            tournament.getScores().forEach((uuid, score) -> getConfig().set("tournament.scores." + uuid.toString(), score));
-        }
-        
         saveConfig();
     }
     
@@ -243,14 +201,6 @@ public class SurvivalGames extends JavaPlugin {
     
     public void setGame(Game game) {
         this.game = game;
-    }
-    
-    public Tournament getTournament() {
-        return tournament;
-    }
-    
-    public void setTournament(Tournament tournament) {
-        this.tournament = tournament;
     }
     
     public SGChatHandler getChatHandler() {
