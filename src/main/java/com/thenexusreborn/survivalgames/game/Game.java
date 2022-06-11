@@ -574,7 +574,7 @@ public class Game {
         
         sendMessage("&6&l>> &a&lLAST PLAYER STANDING CLAIMS VICTORY!");
         sendMessage("&6&l>> &a&lALL CHESTS HAVE BEEN RESTOCKED.");
-        sendMessage("&6&l>> &d&lTHERE IS NO TEAMING ALLOW IN DEATHMATCH.");
+        sendMessage("&6&l>> &d&lTHERE IS NO TEAMING ALLOWED IN DEATHMATCH.");
         restockChests();
         
         World world = this.gameMap.getWorld();
