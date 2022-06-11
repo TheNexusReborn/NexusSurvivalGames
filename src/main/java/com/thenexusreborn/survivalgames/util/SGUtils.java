@@ -15,7 +15,7 @@ public class SGUtils {
     public static void sendToHub(Player player) {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("Connect");
-        out.writeUTF("Hub");
+        out.writeUTF("H1");
         player.sendPluginMessage(plugin.getNexusCore(), "BungeeCord", out.toByteArray());
     }
     

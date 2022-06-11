@@ -110,7 +110,7 @@ public class Lobby {
                     sign.setLine(3, MCUtils.color("&n" + votes + " Vote(s)"));
                     
                     for (SpigotNexusPlayer player : players.values()) {
-                        if (!player.getPlayer().getWorld().getName().equalsIgnoreCase(spawnpoint.getWorld().getName())) {
+                        if (!player.getPlayer().getWorld().getName().equalsIgnoreCase(spawnpoint.getWorld().getName())) { //TODO Error here
                             continue;
                         }
                         if (mapVotes.get(entry.getKey()).contains(player.getUniqueId())) {
@@ -773,5 +773,17 @@ public class Lobby {
                 }
             }
         }
+    }
+    
+    public int getPlayingCount() {
+        int playerCount = 0;
+        for (SpigotNexusPlayer player : getPlayers()) {
+            if (!getSpectatingPlayers().contains(player.getUniqueId())) {
+                if (!player.getPreferences().get("vanish").getValue()) {
+                    playerCount++;
+                }
+            }
+        }
+        return playerCount;
     }
 }

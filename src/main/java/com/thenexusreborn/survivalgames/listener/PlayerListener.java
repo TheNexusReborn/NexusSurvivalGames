@@ -618,8 +618,8 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onNexusPlayerLoad(NexusPlayerLoadEvent e) {
         SpigotNexusPlayer nexusPlayer = (SpigotNexusPlayer) e.getNexusPlayer();
-        if (plugin.getGame() != null) {
-            if (plugin.getLobby().getPlayers().size() >= plugin.getLobby().getLobbySettings().getMaxPlayers()) {
+        if (plugin.getGame() == null) {
+            if (plugin.getLobby().getPlayingCount() >= plugin.getLobby().getLobbySettings().getMaxPlayers()) {
                 boolean isStaff = nexusPlayer.getRank().ordinal() <= Rank.HELPER.ordinal();
                 boolean isInVanish = nexusPlayer.getPreferences().get("vanish").getValue();
                 if (!(isStaff && isInVanish)) {
@@ -629,7 +629,7 @@ public class PlayerListener implements Listener {
                         public void run() {
                             ByteArrayDataOutput out = ByteStreams.newDataOutput();
                             out.writeUTF("Connect");
-                            out.writeUTF("Hub");
+                            out.writeUTF("H1");
                             nexusPlayer.getPlayer().sendPluginMessage(plugin.getNexusCore(), "BungeeCord", out.toByteArray());
                         }
                     }.runTaskLater(plugin, 10L);
