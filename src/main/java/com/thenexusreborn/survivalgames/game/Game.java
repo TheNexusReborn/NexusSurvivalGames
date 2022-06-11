@@ -251,12 +251,18 @@ public class Game {
     }
     
     public void teleportSpectator(Player spectator, Location mapSpawn) {
-        spectator.teleport(mapSpawn);
-        spectator.setGameMode(GameTeam.SPECTATORS.getGameMode());
-        spectator.setFoodLevel(20);
-        spectator.setSaturation(20);
-        spectator.setAllowFlight(true);
-        spectator.setFlying(true);
+        try {
+            spectator.teleport(mapSpawn);
+            spectator.setGameMode(GameTeam.SPECTATORS.getGameMode());
+            spectator.setFoodLevel(20);
+            spectator.setSaturation(20);
+            spectator.setAllowFlight(true);
+            spectator.setFlying(true);
+        } catch (NullPointerException e) {
+            if (spectator != null) {
+                throw e;
+            }
+        }
     }
     
     public void recalculateVisibiltiy() {
