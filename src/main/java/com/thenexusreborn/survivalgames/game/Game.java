@@ -163,7 +163,7 @@ public class Game {
                 if (gp.getNexusPlayer().getRank().ordinal() <= Rank.HELPER.ordinal() || gp.getUniqueId().equals(nexusPlayer.getUniqueId())) {
                     gp.sendMessage("&a&l>> " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined &e&overy silently&e.");
                 }
-            }        
+            }
         } else if (nexusPlayer.getPreferences().get("incognito").getValue()) {
             for (GamePlayer gp : this.players.values()) {
                 if (gp.getNexusPlayer().getRank().ordinal() <= Rank.HELPER.ordinal() || gp.getUniqueId().equals(nexusPlayer.getUniqueId())) {
@@ -192,7 +192,7 @@ public class Game {
         }
         
         this.players.remove(nexusPlayer.getUniqueId());
-    
+        
         if (nexusPlayer.getPreferences().get("vanish").getValue()) {
             for (GamePlayer gp : this.players.values()) {
                 if (gp.getNexusPlayer().getRank().ordinal() <= Rank.HELPER.ordinal()) {
@@ -471,7 +471,7 @@ public class Game {
         sendMessage("&6&l>> &c&lCLICKING MORE THAN 16 CPS WILL LIKELY RESULT IN A BAN.");
         if (this.settings.isTeamingAllowed()) {
             sendMessage("&6&l>> &d&lTHERE IS A MAXIUMUM OF 2 PLAYER TEAMS.");
-        } else  {
+        } else {
             sendMessage("&6&l>> &d&lTEAMING IS NOT ALLOWED.");
         }
         plugin.getChatHandler().enableChat();
@@ -479,7 +479,7 @@ public class Game {
     
     public void restockChests() {
         this.lootedChests.clear();
-        if(this.restockTimer != null) {
+        if (this.restockTimer != null) {
             this.restockTimer.cancel();
             this.restockTimer = null;
         }
@@ -630,7 +630,7 @@ public class Game {
                 }
             }
         }
-
+        
         String winnerName;
         if (winner != null) {
             winnerName = winner.getNexusPlayer().getDisplayName();
@@ -723,7 +723,7 @@ public class Game {
                             if (nexusPlayer == null) {
                                 nexusPlayer = NexusAPI.getApi().getDataManager().loadPlayer(p);
                             }
-    
+                            
                             Tag tag = new Tag(gameInfo.getId() + "th");
                             nexusPlayer.unlockTag(tag);
                             nexusPlayer.sendMessage(MsgType.INFO + "Unlocked the tag " + tag.getDisplayName());
@@ -733,7 +733,7 @@ public class Game {
                 }
             }
         });
-    
+        
         this.timer = new Timer(new NextGameTimerCallback(this)).run(10050L);
     }
     
@@ -782,7 +782,7 @@ public class Game {
         if (gamePlayer == null) {
             return;
         }
-    
+        
         String strippedDeathMessage = ChatColor.stripColor(MCUtils.color(deathInfo.getDeathMessage(this)));
         this.gameInfo.getActions().add(new GameAction(System.currentTimeMillis(), "death", strippedDeathMessage.substring(3)));
         
@@ -800,7 +800,8 @@ public class Game {
         
         if (!vanished) {
             gamePlayer.getNexusPlayer().changeStat("sg_score", lost, Operator.SUBTRACT);
-            gamePlayer.sendMessage("&4&l>> &cYou lost " + lost + " Score for dying."); gamePlayer.getNexusPlayer().changeStat("sg_games", 1, Operator.ADD);
+            gamePlayer.sendMessage("&4&l>> &cYou lost " + lost + " Score for dying.");
+            gamePlayer.getNexusPlayer().changeStat("sg_games", 1, Operator.ADD);
             gamePlayer.getNexusPlayer().changeStat("sg_win_streak", 0, Operator.MULTIPLY);
             gamePlayer.getNexusPlayer().changeStat("sg_deaths", 1, Operator.ADD);
         }
@@ -920,7 +921,7 @@ public class Game {
                     killer.sendMessage("&2&l>> &cYou killed yourself. No XP for you.");
                 }
             }
-    
+            
             if (settings.isGiveCredits()) {
                 double credits = 2;
                 credits *= multiplier;
@@ -945,7 +946,7 @@ public class Game {
                     totalTributes++;
                 }
             }
-    
+            
             if (deathInfo.getType() != DeathType.LEAVE) {
                 if (totalTributes <= settings.getDeathmatchThreshold()) {
                     if (this.state == INGAME || this.state == INGAME_GRACEPERIOD) {
@@ -958,7 +959,7 @@ public class Game {
                         }
                     }
                 }
-    
+                
                 sendMessage("&6&l>> &c&l" + totalTributes + " tributes remain.");
                 if (firstBlood == null) {
                     firstBlood = killer;
@@ -979,13 +980,12 @@ public class Game {
                 if (awardTournamentPoints) {
                     killer.getNexusPlayer().changeStat("sg_tournament_points", tournament.getPointsPerKill(), Operator.ADD);
                     killer.sendMessage("&2&l>> &a+" + tournament.getPointsPerKill() + " Points!");
-                }
-            }
-            if (awardTournamentPoints) {
-                for (GamePlayer p : this.players.values()) {
-                    if (p.getTeam() == GameTeam.TRIBUTES) {
-                        killer.getNexusPlayer().changeStat("sg_tournament_points",tournament.getPointsPerSurvival(), Operator.ADD);
-                        p.sendMessage("&2&l>> &a+" + tournament.getPointsPerSurvival() + " Points!");
+                    
+                    for (GamePlayer p : this.players.values()) {
+                        if (p.getTeam() == GameTeam.TRIBUTES) {
+                            killer.getNexusPlayer().changeStat("sg_tournament_points", tournament.getPointsPerSurvival(), Operator.ADD);
+                            p.sendMessage("&2&l>> &a+" + tournament.getPointsPerSurvival() + " Points!");
+                        }
                     }
                 }
             }
