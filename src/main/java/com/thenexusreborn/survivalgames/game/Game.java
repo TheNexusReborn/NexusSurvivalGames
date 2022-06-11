@@ -753,7 +753,7 @@ public class Game {
         if (plugin.restart()) {
             ByteArrayDataOutput out = ByteStreams.newDataOutput();
             out.writeUTF("Connect");
-            out.writeUTF("Hub");
+            out.writeUTF("H1");
             for (Player player : Bukkit.getOnlinePlayers()) {
                 player.sendPluginMessage(plugin.getNexusCore(), "BungeeCord", out.toByteArray());
             }
