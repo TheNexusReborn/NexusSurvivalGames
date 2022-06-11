@@ -1,6 +1,11 @@
 package com.thenexusreborn.survivalgames.settings;
 
-public class LobbySettings {
+import java.lang.reflect.Field;
+
+@SuppressWarnings("DuplicatedCode")
+public class LobbySettings extends SGSettings {
+    private int id;
+    private String type = "default";
     private int maxPlayers = 24;
     private int minPlayers = 4;
     private int maxGames = 10;
@@ -9,13 +14,33 @@ public class LobbySettings {
     private boolean keepPreviousGameSettings = true;
     private boolean sounds = true;
     
+    public LobbySettings() {
+        super("sglobbysettings");
+    }
+    
     public int getMaxPlayers() {
         return maxPlayers;
+    }
+    
+    public int getId() {
+        return id;
+    }
+    
+    public void setId(int id) {
+        this.id = id;
     }
     
     public LobbySettings setMaxPlayers(int maxPlayers) {
         this.maxPlayers = maxPlayers;
         return this;
+    }
+    
+    public void setType(String type) {
+        this.type = type;
+    }
+    
+    public String getType() {
+        return type;
     }
     
     public int getMinPlayers() {
@@ -70,5 +95,27 @@ public class LobbySettings {
     public LobbySettings setSounds(boolean sounds) {
         this.sounds = sounds;
         return this;
+    }
+    
+    public static LobbySettings loadFromDatabase(String type) {
+        //TODO
+        return null;
+    }
+    
+    @Override
+    public LobbySettings clone() {
+        LobbySettings settings = new LobbySettings();
+    
+        for (Field field : getClass().getDeclaredFields()) {
+            field.setAccessible(true);
+            try {
+                field.set(settings, field.get(this));
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        
+        settings.setId(0);
+        return settings;
     }
 }

@@ -3,23 +3,23 @@ package com.thenexusreborn.survivalgames.game;
 import com.google.common.io.*;
 import com.thenexusreborn.api.*;
 import com.thenexusreborn.api.gamearchive.*;
+import com.thenexusreborn.api.helper.NumberHelper;
 import com.thenexusreborn.api.multicraft.MulticraftAPI;
 import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.api.tags.Tag;
+import com.thenexusreborn.api.tournament.Tournament;
 import com.thenexusreborn.api.util.Operator;
 import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
-import com.thenexusreborn.api.helper.NumberHelper;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.death.*;
 import com.thenexusreborn.survivalgames.game.timer.*;
-import com.thenexusreborn.survivalgames.lootv2.*;
+import com.thenexusreborn.survivalgames.lootv2.LootChances;
 import com.thenexusreborn.survivalgames.map.GameMap;
 import com.thenexusreborn.survivalgames.scoreboard.*;
 import com.thenexusreborn.survivalgames.settings.*;
-import com.thenexusreborn.api.tournament.Tournament;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -51,6 +51,7 @@ public class Game {
     private GamePlayer firstBlood;
     private LootChances lootChances;
     private Map<Location, Inventory> enderchestInventories = new HashMap<>();
+    private boolean awardTournamentPoints;
     
     public Game(GameMap gameMap, GameSettings settings, Collection<SpigotNexusPlayer> players, List<UUID> spectatingPlayers) {
         this.gameMap = gameMap;
@@ -62,7 +63,7 @@ public class Game {
         List<String> playerNames = new ArrayList<>();
         for (SpigotNexusPlayer player : players) {
             GamePlayer gamePlayer = new GamePlayer(player);
-            if (spectatingPlayers.contains(player.getUniqueId())) {
+            if (spectatingPlayers.contains(player.getUniqueId()) || player.getPreferences().get("vanish").getValue()) {
                 gamePlayer.setTeam(GameTeam.SPECTATORS);
             } else {
                 playerNames.add(player.getName());
@@ -81,6 +82,8 @@ public class Game {
             }
         }
         gameInfo.setSettings(sb.substring(0, sb.length() - 1));
+        this.awardTournamentPoints = NexusAPI.getApi().getTournament() != null && NexusAPI.getApi().getTournament().isActive();
+        plugin.getLogger().info("Award Tournament Points: " + this.awardTournamentPoints);
     }
     
     protected void setState(GameState state) {
@@ -465,9 +468,12 @@ public class Game {
         }
         this.restockTimer = new Timer(new RestockTimerCallback(this)).run(600050L);
         sendMessage("&6&l>> &a&lMAY THE ODDS BE EVER IN YOUR FAVOR.");
-        sendMessage("");
-        sendMessage("&6&l>> &4&lWARNING: &c&lClicking higher than 16 will likely result in a ban.");
-        sendMessage("");
+        sendMessage("&6&l>> &c&lCLICKING MORE THAN 16 CPS WILL LIKELY RESULT IN A BAN.");
+        if (this.settings.isTeamingAllowed()) {
+            sendMessage("&6&l>> &d&lTHERE IS A MAXIUMUM OF 2 PLAYER TEAMS.");
+        } else  {
+            sendMessage("&6&l>> &d&lTEAMING IS NOT ALLOWED.");
+        }
         plugin.getChatHandler().enableChat();
     }
     
@@ -567,7 +573,8 @@ public class Game {
         }
         
         sendMessage("&6&l>> &a&lLAST PLAYER STANDING CLAIMS VICTORY!");
-        sendMessage("&6&l>> &a&lALL CHESTS HAVE BEEN RESTOCKED");
+        sendMessage("&6&l>> &a&lALL CHESTS HAVE BEEN RESTOCKED.");
+        sendMessage("&6&l>> &d&lTHERE IS NO TEAMING ALLOW IN DEATHMATCH.");
         restockChests();
         
         World world = this.gameMap.getWorld();
@@ -627,10 +634,10 @@ public class Game {
         String winnerName;
         if (winner != null) {
             winnerName = winner.getNexusPlayer().getDisplayName();
-            Tournament tournament = NexusAPI.getApi().getTournament();
-            if (tournament != null && tournament.isActive()) {
+            if (awardTournamentPoints) {
+                Tournament tournament = NexusAPI.getApi().getTournament();
                 winner.getNexusPlayer().changeStat("sg_tournament_points", tournament.getPointsPerWin(), Operator.ADD);
-                winner.sendMessage("&2&l>> &a+" + tournament.getPointsPerKill() + " Points!");
+                winner.sendMessage("&2&l>> &a+" + tournament.getPointsPerWin() + " Points!");
             }
         } else {
             winnerName = "&f&lNo one";
@@ -969,12 +976,12 @@ public class Game {
         if (oldTeam == GameTeam.TRIBUTES) {
             Tournament tournament = NexusAPI.getApi().getTournament();
             if (killer != null) {
-                if (tournament != null && tournament.isActive()) {
-                    killer.getNexusPlayer().changeStat("sg_tournament_points",tournament.getPointsPerKill(), Operator.ADD);
+                if (awardTournamentPoints) {
+                    killer.getNexusPlayer().changeStat("sg_tournament_points", tournament.getPointsPerKill(), Operator.ADD);
                     killer.sendMessage("&2&l>> &a+" + tournament.getPointsPerKill() + " Points!");
                 }
             }
-            if (tournament != null && tournament.isActive()) {
+            if (awardTournamentPoints) {
                 for (GamePlayer p : this.players.values()) {
                     if (p.getTeam() == GameTeam.TRIBUTES) {
                         killer.getNexusPlayer().changeStat("sg_tournament_points",tournament.getPointsPerSurvival(), Operator.ADD);

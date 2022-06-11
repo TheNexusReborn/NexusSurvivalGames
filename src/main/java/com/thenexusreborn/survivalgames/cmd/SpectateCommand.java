@@ -24,7 +24,7 @@ public class SpectateCommand implements CommandExecutor {
     
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         Rank senderRank = MCUtils.getSenderRank(plugin.getNexusCore(), sender);
-        if (senderRank.ordinal() > Rank.HELPER.ordinal()) {
+        if (senderRank.ordinal() > Rank.MEDIA.ordinal()) {
             sender.sendMessage(MCUtils.color(MsgType.WARN + "You do not have permission to use that command."));
             return true;
         }

@@ -379,10 +379,48 @@ public class SGCommand implements CommandExecutor {
             }
         } else if (subCommand.equals("settings") || subCommand.equals("setting") || subCommand.equals("s")) {
             if (!(args.length > 3)) {
-                sender.sendMessage(MCUtils.color(MsgType.WARN + "Usage: /" + label + " " + args[0] + " <type> <name> <value>"));
+                sender.sendMessage(MCUtils.color(MsgType.WARN + "Usage: /" + label + " " + args[0] + " <type> <name | save> <value | savename>"));
                 return true;
             }
+            // /sg settings <type> <save> <name>
             String type = args[1];
+            
+            if (!(type.equalsIgnoreCase("game") || type.equalsIgnoreCase("lobby"))) {
+                sender.sendMessage(MCUtils.color(MsgType.WARN + "Invalid setting type. Can only be game or lobby"));
+                return true;
+            }
+            
+            if (args[2].equalsIgnoreCase("save")) {
+                String saveName = args[3];
+                SGSettings settings;
+                if (type.equalsIgnoreCase("lobby")) {
+                    settings = plugin.getLobby().getLobbySettings();
+                } else {
+                    if (game == null) {
+                        settings = plugin.getLobby().getGameSettings();
+                    } else {
+                        settings = game.getSettings();
+                    }
+                }
+                
+                settings.setId(0);
+                settings.setType(args[3].toLowerCase());
+                settings.pushToDatabase();
+                if (settings.getId() > 0) {
+                    sender.sendMessage(MCUtils.color(MsgType.INFO + "Successfully saved the settings with the name &b" + settings.getType()));
+                    if (type.equalsIgnoreCase("lobby")) {
+                        plugin.addLobbySettings((LobbySettings) settings);
+                    } else {
+                        if (type.equalsIgnoreCase("game")) {
+                            plugin.addGameSettings((GameSettings) settings);
+                        }
+                    }
+                } else {
+                    sender.sendMessage(MCUtils.color(MsgType.WARN + "There was a problem saving the settings, report to Firestar311"));
+                }
+                return true;
+            }
+            
             String settingName = args[2];
             String rawValue = args[3];
             
@@ -401,9 +439,6 @@ public class SGCommand implements CommandExecutor {
                         break;
                     }
                 }
-            } else {
-                sender.sendMessage(MCUtils.color(MsgType.WARN + "Invalid setting type. Only Lobby and Game are allowed (Case insensitive)"));
-                return true;
             }
             
             if (settingField == null) {
@@ -459,9 +494,6 @@ public class SGCommand implements CommandExecutor {
                 Object object = null;
                 if (type.equalsIgnoreCase("game")) {
                     if (game == null) {
-                        if (plugin.getLobby().getGameSettings() == null) {
-                            plugin.getLobby().setGameSettings(new GameSettings());
-                        }
                         object = plugin.getLobby().getGameSettings();
                     } else {
                         object = game.getSettings();

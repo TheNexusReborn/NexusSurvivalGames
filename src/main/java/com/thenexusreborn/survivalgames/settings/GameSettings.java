@@ -1,7 +1,11 @@
 package com.thenexusreborn.survivalgames.settings;
 
-public class GameSettings {
-    
+import java.lang.reflect.Field;
+
+@SuppressWarnings("DuplicatedCode")
+public class GameSettings extends SGSettings {
+    private int id;
+    private String type = "default";
     private int maxPlayers = 24;
     private int maxHealth = 20;
     private int gracePeriodLength = 60;
@@ -9,10 +13,9 @@ public class GameSettings {
     private int deathmatchLength = 5;
     private int warmupLength = 30;
     private int deathmatchThreshold = 4;
-    private int pearlCooldown = 5;
-    private int mutationDelay = 2;
     private int nextGameStart = 10;
     private int deathmatchTimerLength = 1;
+    private boolean teamingAllowed = true;
     private boolean mutations = false;
     private boolean regeneration = true;
     private boolean gracePeriod = false;
@@ -20,7 +23,6 @@ public class GameSettings {
     private boolean timeProgression = false;
     private boolean weatherProgression = false;
     private boolean multiplier = true;
-    private boolean fishingrods = true;
     private boolean sounds = true;
     private boolean giveCredits = true;
     private boolean giveXp = true;
@@ -30,12 +32,33 @@ public class GameSettings {
     private Time time = Time.NOON;
     private Weather weather = Weather.CLEAR;
     
-    public boolean isFishingrods() {
-        return fishingrods;
+    public GameSettings() {
+        super("sggamesettings");
     }
     
-    public void setFishingrods(boolean fishingrods) {
-        this.fishingrods = fishingrods;
+    public GameSettings setTeamingAllowed(boolean value) {
+        this.teamingAllowed = value;
+        return this;
+    }
+    
+    public boolean isTeamingAllowed() {
+        return teamingAllowed;
+    }
+    
+    public int getId() {
+        return id;
+    }
+    
+    public void setId(int id) {
+        this.id = id;
+    }
+    
+    public void setType(String type) {
+        this.type = type;
+    }
+    
+    public String getType() {
+        return type;
     }
     
     public int getMaxPlayers() {
@@ -107,24 +130,6 @@ public class GameSettings {
     
     public GameSettings setDeathmatchThreshold(int deathmatchThreshold) {
         this.deathmatchThreshold = deathmatchThreshold;
-        return this;
-    }
-    
-    public int getPearlCooldown() {
-        return pearlCooldown;
-    }
-    
-    public GameSettings setPearlCooldown(int pearlCooldown) {
-        this.pearlCooldown = pearlCooldown;
-        return this;
-    }
-    
-    public int getMutationDelay() {
-        return mutationDelay;
-    }
-    
-    public GameSettings setMutationDelay(int mutationDelay) {
-        this.mutationDelay = mutationDelay;
         return this;
     }
     
@@ -269,5 +274,27 @@ public class GameSettings {
     
     public void setAllowEnderchests(boolean allowEnderchests) {
         this.allowEnderchests = allowEnderchests;
+    }
+    
+    public static GameSettings loadFromDatabase(String type) {
+        //TODO
+        return null;
+    }
+    
+    @Override
+    public GameSettings clone() {
+        GameSettings settings = new GameSettings();
+    
+        for (Field field : getClass().getDeclaredFields()) {
+            field.setAccessible(true);
+            try {
+                field.set(settings, field.get(this));
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+    
+        settings.setId(0);
+        return settings;
     }
 }

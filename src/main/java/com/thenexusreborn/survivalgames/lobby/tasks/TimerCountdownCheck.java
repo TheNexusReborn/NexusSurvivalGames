@@ -32,7 +32,9 @@ public class TimerCountdownCheck extends BukkitRunnable {
         int playerCount = 0;
         for (SpigotNexusPlayer player : lobby.getPlayers()) {
             if (!lobby.getSpectatingPlayers().contains(player.getUniqueId())) {
-                playerCount++;
+                if (!player.getPreferences().get("vanish").getValue()) {
+                    playerCount++;
+                }
             }
         }
         

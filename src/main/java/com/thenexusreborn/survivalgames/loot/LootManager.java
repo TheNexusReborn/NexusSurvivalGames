@@ -70,11 +70,11 @@ public class LootManager {
         Loot diamond = new Loot(Material.DIAMOND, 7);
         Loot apple = new Loot(Material.APPLE, 20);
         
-        addLoot(leather_helmet, leather_chestplate, leather_leggings, leather_boots, chain_helmet, chain_chestplate, chain_leggings, chain_boots, iron_helmet, iron_chestplate, 
-                iron_leggings, iron_boots, gold_helmet, gold_chestplate, gold_leggings, gold_boots, wood_axe, wood_sword, stone_axe, stone_sword, bow, arrows, 
+        addLoot(leather_helmet, leather_chestplate, leather_leggings, leather_boots, chain_helmet, chain_chestplate, chain_leggings, chain_boots, iron_helmet, iron_chestplate,
+                iron_leggings, iron_boots, gold_helmet, gold_chestplate, gold_leggings, gold_boots, wood_axe, wood_sword, stone_axe, stone_sword, bow, arrows,
                 cooked_porkchop, steak, grilled_chicken, raw_porkchop, raw_beef, raw_chicken, carrots, potato, baked_potato, iron_ingot, gold_ingot, stick, flint_and_steel, tnt,
                 iron_axe, cake, pumpkin_pie, raw_fish, cooked_fish, feather, flint, fishing_rod, cobweb, enchantment_bottle, golden_apple, wet_noodle, ender_pearl, golden_carrot, diamond, egg_of_doom, slowball, player_tracker, apple);
-    
+        
         for (Loot loot : this.possibleLoot.values()) {
             for (int i = 0; i < loot.getWeight(); i++) {
                 this.lootChances.add(loot);
@@ -86,20 +86,12 @@ public class LootManager {
     
     public List<Loot> generateLoot(int amount) {
         List<Loot> loot = new ArrayList<>();
-    
+        
         for (int i = 0; i < amount; i++) {
             Loot l = lootChances.get(new Random().nextInt(lootChances.size()));
-            if (plugin.getGame() != null) {
-                if (!plugin.getGame().getSettings().isFishingrods()) {
-                    if (l.getMaterial() == Material.FISHING_ROD) {
-                        i--;
-                        continue;
-                    }
-                }
-            }
             loot.add(l);
         }
-    
+        
         return loot;
     }
     
