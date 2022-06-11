@@ -75,7 +75,9 @@ public class LobbyScoreboardView extends SpigotScoreboardView {
         }
         
         this.scoreboard.getScoreboard().getTeam(waitingValueName).setSuffix(MCUtils.color("&e" + waiting));
-        this.scoreboard.getScoreboard().getTeam(neededValueName).setSuffix(MCUtils.color("&e" + lobby.getLobbySettings().getMinPlayers()));
+        if (lobby.getLobbySettings() != null) {
+            this.scoreboard.getScoreboard().getTeam(neededValueName).setSuffix(MCUtils.color("&e" + lobby.getLobbySettings().getMinPlayers()));
+        }
     }
     
     @Override
