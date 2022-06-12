@@ -355,6 +355,7 @@ public class SurvivalGames extends JavaPlugin {
     }
     
     private void updatePlayerHealthAndFood(Player player) {
+        if (player == null) return;
         player.setHealth(player.getMaxHealth());
         player.setFoodLevel(20);
         player.setSaturation(2);
