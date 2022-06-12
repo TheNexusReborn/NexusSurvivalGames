@@ -41,9 +41,13 @@ public class GameTablistHandler extends TablistHandler {
                 if (otherTeam == null) {
                     createPlayerTeam(otherNexusPlayer);
                 } else {
-                    if (otherTeam.getName().startsWith(correctChar)) {
-                        updatePlayerTeam(otherNexusPlayer);
-                    } else {
+                    try {
+                        if (otherTeam.getName().startsWith(correctChar)) {
+                            updatePlayerTeam(otherNexusPlayer);
+                        } else {
+                            refreshPlayerTeam(otherNexusPlayer);
+                        }
+                    } catch (IllegalStateException e) {
                         refreshPlayerTeam(otherNexusPlayer);
                     }
                 }
