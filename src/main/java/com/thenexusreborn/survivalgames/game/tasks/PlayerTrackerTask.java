@@ -32,6 +32,7 @@ public class PlayerTrackerTask extends BukkitRunnable {
         
         for (UUID p : players) {
             Player player = Bukkit.getPlayer(p);
+            if (player == null) continue;
             boolean trackerInHotbar = false;
             boolean holdingTracker = false;
             for (int i = 0; i < 9; i++) {
