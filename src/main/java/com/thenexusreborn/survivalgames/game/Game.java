@@ -1044,7 +1044,7 @@ public class Game {
     }
     
     public GamePlayer getPlayer(UUID uniqueId) {
-        for (GamePlayer player : this.players.values()) {
+        for (GamePlayer player : new ArrayList<>(this.players.values())) {
             if (player.getUniqueId().toString().equalsIgnoreCase(uniqueId.toString())) {
                 return player;
             }
