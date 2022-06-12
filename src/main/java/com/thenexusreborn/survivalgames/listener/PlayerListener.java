@@ -137,10 +137,9 @@ public class PlayerListener implements Listener {
             if (block != null) {
                 if (block.getType() == Material.NOTE_BLOCK || block.getType() == Material.CHEST) {
                     e.setCancelled(true);
+                    return;
                 }
             }
-            
-            return;
         }
         
         Block block = e.getClickedBlock();
