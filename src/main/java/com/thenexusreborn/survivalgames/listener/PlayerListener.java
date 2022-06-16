@@ -88,6 +88,10 @@ public class PlayerListener implements Listener {
     
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent e) {
+        if (e.isCancelled()) {
+            return;
+        }
+        
         if (plugin.getLobby().checkMapEditing(e.getPlayer())) {
             return;
         }
