@@ -3,7 +3,7 @@ package com.thenexusreborn.survivalgames.listener;
 import com.google.common.io.*;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.*;
-import com.thenexusreborn.api.util.Operator;
+import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.nexuscore.api.events.*;
 import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.nexuscore.util.*;
@@ -169,7 +169,7 @@ public class PlayerListener implements Listener {
                             return;
                         }
                         
-                        game.getPlayer(e.getPlayer().getUniqueId()).getNexusPlayer().changeStat("sg_chests_looted", 1, Operator.ADD);
+                        game.getPlayer(e.getPlayer().getUniqueId()).getNexusPlayer().changeStat("sg_chests_looted", 1, StatOperator.ADD);
                         
                         Inventory inv = ((Chest) block.getState()).getBlockInventory();
                         int maxAmount = 6;

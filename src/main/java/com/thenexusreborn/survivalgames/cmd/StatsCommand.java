@@ -45,7 +45,7 @@ public class StatsCommand implements CommandExecutor {
         Consumer<NexusPlayer> consumer = nexusPlayer -> {
             //TODO Temporary print the stat name and the value
             sender.sendMessage(MCUtils.color("&6&l>> &aStats for " + nexusPlayer.getRank().getColor() + nexusPlayer.getName()));
-            for (Stat<Number> stat : nexusPlayer.getStats().values()) {
+            for (Stat stat : nexusPlayer.getStats().values()) {
                 String name = stat.getName();
                 if (name.contains("tournament") || name.contains("mutat") || name.contains("sponsor")) {
                     continue;
