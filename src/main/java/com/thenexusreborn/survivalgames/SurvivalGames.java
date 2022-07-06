@@ -1,9 +1,12 @@
 package com.thenexusreborn.survivalgames;
 
 import com.thenexusreborn.api.*;
+import com.thenexusreborn.api.registry.StatRegistry;
 import com.thenexusreborn.api.server.ServerInfo;
+import com.thenexusreborn.api.stats.*;
 import com.thenexusreborn.api.tournament.Tournament;
 import com.thenexusreborn.nexuscore.NexusCore;
+import com.thenexusreborn.nexuscore.api.NexusSpigotPlugin;
 import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.survivalgames.cmd.*;
@@ -18,7 +21,6 @@ import com.thenexusreborn.survivalgames.settings.Time;
 import com.thenexusreborn.survivalgames.settings.*;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.lang.reflect.Field;
@@ -26,7 +28,7 @@ import java.sql.*;
 import java.util.*;
 import java.util.Map.Entry;
 
-public class SurvivalGames extends JavaPlugin {
+public class SurvivalGames extends NexusSpigotPlugin {
     
     public static final String MAP_URL = "https://starmediadev.com/files/nexusreborn/sgmaps/";
     public static final Queue<UUID> PLAYER_QUEUE = new LinkedList<>();
@@ -352,6 +354,32 @@ public class SurvivalGames extends JavaPlugin {
                 }
             }
         }.runTaskTimer(this, 20L, 2450L);
+    }
+    
+    @Override
+    public void registerStats(StatRegistry registry) {
+        registry.register(new Stat.Info("sg_score", StatType.INTEGER, 100));
+        registry.register(new Stat.Info("sg_kills", StatType.INTEGER, 0));
+        registry.register(new Stat.Info("sg_highest_kill_streak", StatType.INTEGER, 0));
+        registry.register(new Stat.Info("sg_games", StatType.INTEGER, 0));
+        registry.register(new Stat.Info("sg_wins", StatType.INTEGER, 0));
+        registry.register(new Stat.Info("sg_winstreak", StatType.INTEGER, 0));
+        registry.register(new Stat.Info("sg_deaths", StatType.INTEGER, 0));
+        registry.register(new Stat.Info("sg_deathmatches_reached", StatType.INTEGER, 0));
+        registry.register(new Stat.Info("sg_chests_looted", StatType.INTEGER, 0));
+        registry.register(new Stat.Info("sg_assists", StatType.INTEGER, 0));
+//        registry.register(new Stat.Info("sg_times_mutated", StatType.INTEGER, 0));
+//        registry.register(new Stat.Info("sg_mutation_kills", StatType.INTEGER, 0));
+//        registry.register(new Stat.Info("sg_mutation_deaths", StatType.INTEGER, 0));
+//        registry.register(new Stat.Info("sg_mutation_passes", StatType.INTEGER, 0));
+//        registry.register(new Stat.Info("sg_sponsored_others", StatType.INTEGER, 0));
+//        registry.register(new Stat.Info("sg_sponsors_received", StatType.INTEGER, 0));
+        registry.register(new Stat.Info("sg_tournament_points", StatType.INTEGER, 0));
+//        registry.register(new Stat.Info("sg_tournament_kills", StatType.INTEGER, 0));
+//        registry.register(new Stat.Info("sg_tournament_wins", StatType.INTEGER, 0));
+//        registry.register(new Stat.Info("sg_tournament_survives", StatType.INTEGER, 0));
+//        registry.register(new Stat.Info("sg_tournament_chests_looted", StatType.INTEGER, 0));
+//        registry.register(new Stat.Info("sg_tournament_assists", StatType.INTEGER, 0));
     }
     
     private void updatePlayerHealthAndFood(Player player) {

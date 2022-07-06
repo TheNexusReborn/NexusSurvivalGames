@@ -655,7 +655,7 @@ public class Game {
             winner.getNexusPlayer().changeStat("sg_wins", 1, StatOperator.ADD);
             winner.getNexusPlayer().changeStat("sg_win_streak", 1, StatOperator.ADD);
             int winGain = 50;
-            double currentScore = winner.getNexusPlayer().getStatValue("sg_score");
+            double currentScore = (double) winner.getNexusPlayer().getStatValue("sg_score");
             if (currentScore < 100 && currentScore > 50) {
                 winGain *= 1.25;
             } else if (currentScore <= 50 && currentScore > 25) {
