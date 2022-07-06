@@ -358,28 +358,28 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
     @Override
     public void registerStats(StatRegistry registry) {
-        registry.register(new Stat.Info("sg_score", StatType.INTEGER, 100));
-        registry.register(new Stat.Info("sg_kills", StatType.INTEGER, 0));
-        registry.register(new Stat.Info("sg_highest_kill_streak", StatType.INTEGER, 0));
-        registry.register(new Stat.Info("sg_games", StatType.INTEGER, 0));
-        registry.register(new Stat.Info("sg_wins", StatType.INTEGER, 0));
-        registry.register(new Stat.Info("sg_winstreak", StatType.INTEGER, 0));
-        registry.register(new Stat.Info("sg_deaths", StatType.INTEGER, 0));
-        registry.register(new Stat.Info("sg_deathmatches_reached", StatType.INTEGER, 0));
-        registry.register(new Stat.Info("sg_chests_looted", StatType.INTEGER, 0));
-        registry.register(new Stat.Info("sg_assists", StatType.INTEGER, 0));
-//        registry.register(new Stat.Info("sg_times_mutated", StatType.INTEGER, 0));
-//        registry.register(new Stat.Info("sg_mutation_kills", StatType.INTEGER, 0));
-//        registry.register(new Stat.Info("sg_mutation_deaths", StatType.INTEGER, 0));
-//        registry.register(new Stat.Info("sg_mutation_passes", StatType.INTEGER, 0));
-//        registry.register(new Stat.Info("sg_sponsored_others", StatType.INTEGER, 0));
-//        registry.register(new Stat.Info("sg_sponsors_received", StatType.INTEGER, 0));
-        registry.register(new Stat.Info("sg_tournament_points", StatType.INTEGER, 0));
-//        registry.register(new Stat.Info("sg_tournament_kills", StatType.INTEGER, 0));
-//        registry.register(new Stat.Info("sg_tournament_wins", StatType.INTEGER, 0));
-//        registry.register(new Stat.Info("sg_tournament_survives", StatType.INTEGER, 0));
-//        registry.register(new Stat.Info("sg_tournament_chests_looted", StatType.INTEGER, 0));
-//        registry.register(new Stat.Info("sg_tournament_assists", StatType.INTEGER, 0));
+        registry.register("sg_score", StatType.INTEGER, 100);
+        registry.register("sg_kills", StatType.INTEGER, 0);
+        registry.register("sg_highest_kill_streak", StatType.INTEGER, 0);
+        registry.register("sg_games", StatType.INTEGER, 0);
+        registry.register("sg_wins", StatType.INTEGER, 0);
+        registry.register("sg_winstreak", StatType.INTEGER, 0);
+        registry.register("sg_deaths", StatType.INTEGER, 0);
+        registry.register("sg_deathmatches_reached", StatType.INTEGER, 0);
+        registry.register("sg_chests_looted", StatType.INTEGER, 0);
+        registry.register("sg_assists", StatType.INTEGER, 0);
+//        registry.register("sg_times_mutated", StatType.INTEGER, 0);
+//        registry.register("sg_mutation_kills", StatType.INTEGER, 0);
+//        registry.register("sg_mutation_deaths", StatType.INTEGER, 0);
+//        registry.register("sg_mutation_passes", StatType.INTEGER, 0);
+//        registry.register("sg_sponsored_others", StatType.INTEGER, 0);
+//        registry.register("sg_sponsors_received", StatType.INTEGER, 0);
+        registry.register("sg_tournament_points", StatType.INTEGER, 0);
+//        registry.register("sg_tournament_kills", StatType.INTEGER, 0);
+//        registry.register("sg_tournament_wins", StatType.INTEGER, 0);
+//        registry.register("sg_tournament_survives", StatType.INTEGER, 0);
+//        registry.register("sg_tournament_chests_looted", StatType.INTEGER, 0);
+//        registry.register("sg_tournament_assists", StatType.INTEGER, 0);
     }
     
     private void updatePlayerHealthAndFood(Player player) {
