@@ -50,6 +50,13 @@ public class SurvivalGames extends NexusSpigotPlugin {
     private Map<String, GameSettings> gameSettings = new HashMap<>();
     
     @Override
+    public void onLoad() {
+        nexusCore = (NexusCore) Bukkit.getPluginManager().getPlugin("NexusCore");
+        nexusCore.addNexusPlugin(this);
+        getLogger().info("Loaded NexusCore");
+    }
+    
+    @Override
     public void onEnable() {
         try {
             Driver mysqlDriver = new com.mysql.cj.jdbc.Driver();
@@ -62,8 +69,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
         
         getLogger().info("Loading NexusSurvivalGames v" + getDescription().getVersion());
         saveDefaultConfig();
-        nexusCore = (NexusCore) Bukkit.getPluginManager().getPlugin("NexusCore");
-        getLogger().info("Loaded NexusCore");
         
         getLogger().info("Creating Map Tables");
         try (Connection connection = getMapConnection(); Statement statement = connection.createStatement()) {
@@ -358,6 +363,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
     @Override
     public void registerStats(StatRegistry registry) {
+        System.out.println("Registering SG Stats");
         registry.register("sg_score", StatType.INTEGER, 100);
         registry.register("sg_kills", StatType.INTEGER, 0);
         registry.register("sg_highest_kill_streak", StatType.INTEGER, 0);
