@@ -103,6 +103,21 @@ public class LobbySettings extends SGSettings {
     }
     
     @Override
+    public String toString() {
+        return "LobbySettings{" +
+                "id=" + id +
+                ", type='" + type + '\'' +
+                ", maxPlayers=" + maxPlayers +
+                ", minPlayers=" + minPlayers +
+                ", maxGames=" + maxGames +
+                ", timerLength=" + timerLength +
+                ", voteWeight=" + voteWeight +
+                ", keepPreviousGameSettings=" + keepPreviousGameSettings +
+                ", sounds=" + sounds +
+                '}';
+    }
+    
+    @Override
     public LobbySettings clone() {
         LobbySettings settings = new LobbySettings();
     

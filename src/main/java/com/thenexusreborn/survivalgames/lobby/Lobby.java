@@ -25,6 +25,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.logging.Level;
 
 public class Lobby {
     private SurvivalGames plugin;
@@ -167,6 +168,22 @@ public class Lobby {
                 }
             }
         }.runTaskTimerAsynchronously(plugin, 20L, 2400L);
+    }
+    
+    public void resetInvalidState() {
+        NexusAPI.logMessage(Level.SEVERE, "Resetting Lobby from an Invalid State, see below for the stored information", this + "");
+        
+        this.players.entrySet().removeIf(entry -> Bukkit.getPlayer(entry.getKey()) == null);
+        
+        sendMessage(MsgType.ERROR + "Resetting lobby from an Invalid State...");
+        this.timer = null;
+        this.gameMap = null;
+        this.state = LobbyState.WAITING;
+        this.voteStart.clear();
+        this.generateMapOptions();
+        this.generateLootChances();
+        this.forceStarted = false;
+        sendMessage(MsgType.SUCCESS + "Lobby Reset from Invalid State complete");
     }
     
     public void generateLootChances() {
@@ -785,5 +802,27 @@ public class Lobby {
             }
         }
         return playerCount;
+    }
+    
+    @Override
+    public String toString() {
+        return "Lobby{" +
+                "plugin=" + plugin.getName() +
+                ", players=" + players +
+                ", spectatingPlayers=" + spectatingPlayers +
+                ", timer=" + timer +
+                ", gameSettings=" + gameSettings +
+                ", lobbySettings=" + lobbySettings +
+                ", gameMap=" + gameMap +
+                ", controlType=" + controlType +
+                ", state=" + state +
+                ", spawnpoint=" + spawnpoint +
+                ", voteStart=" + voteStart +
+                ", mapSigns=" + mapSigns +
+                ", mapOptions=" + mapOptions +
+                ", mapVotes=" + mapVotes +
+                ", forceStarted=" + forceStarted +
+                ", lootChances=" + lootChances +
+                '}';
     }
 }

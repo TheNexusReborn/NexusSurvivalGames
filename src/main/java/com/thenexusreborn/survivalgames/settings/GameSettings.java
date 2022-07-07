@@ -282,6 +282,39 @@ public class GameSettings extends SGSettings {
     }
     
     @Override
+    public String toString() {
+        return "GameSettings{" +
+                "id=" + id +
+                ", type='" + type + '\'' +
+                ", maxPlayers=" + maxPlayers +
+                ", maxHealth=" + maxHealth +
+                ", gracePeriodLength=" + gracePeriodLength +
+                ", gameLength=" + gameLength +
+                ", deathmatchLength=" + deathmatchLength +
+                ", warmupLength=" + warmupLength +
+                ", deathmatchThreshold=" + deathmatchThreshold +
+                ", nextGameStart=" + nextGameStart +
+                ", deathmatchTimerLength=" + deathmatchTimerLength +
+                ", teamingAllowed=" + teamingAllowed +
+                ", mutations=" + mutations +
+                ", regeneration=" + regeneration +
+                ", gracePeriod=" + gracePeriod +
+                ", unlimitedPasses=" + unlimitedPasses +
+                ", timeProgression=" + timeProgression +
+                ", weatherProgression=" + weatherProgression +
+                ", multiplier=" + multiplier +
+                ", sounds=" + sounds +
+                ", giveCredits=" + giveCredits +
+                ", giveXp=" + giveXp +
+                ", useNewLoot=" + useNewLoot +
+                ", allowEnderchests=" + allowEnderchests +
+                ", colorMode=" + colorMode +
+                ", time=" + time +
+                ", weather=" + weather +
+                '}';
+    }
+    
+    @Override
     public GameSettings clone() {
         GameSettings settings = new GameSettings();
     

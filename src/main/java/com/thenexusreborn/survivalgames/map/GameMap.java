@@ -297,4 +297,26 @@ public class GameMap {
     public void setId(int id) {
         this.id = id;
     }
+    
+    @Override
+    public String toString() {
+        return "GameMap{" +
+                "id=" + id +
+                ", url='" + url + '\'' +
+                ", name='" + name + '\'' +
+                ", center=" + center +
+                ", spawns=" + spawns +
+                ", borderDistance=" + borderDistance +
+                ", deathmatchBorderDistance=" + deathmatchBorderDistance +
+                ", creators=" + creators +
+                ", active=" + active +
+                ", uniqueId=" + uniqueId +
+                ", world=" + world +
+                ", downloadedZip=" + downloadedZip +
+                ", unzippedFolder=" + unzippedFolder +
+                ", worldFolder=" + worldFolder +
+                ", editing=" + editing +
+                ", votes=" + votes +
+                '}';
+    }
 }

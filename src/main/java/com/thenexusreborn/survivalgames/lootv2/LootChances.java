@@ -27,4 +27,12 @@ public class LootChances {
     public Material[] getMaterialChances(String category) {
         return materialChances.get(category);
     }
+    
+    @Override
+    public String toString() {
+        return "LootChances{" +
+                "categoryChances=" + Arrays.toString(categoryChances) +
+                ", materialChances=" + materialChances +
+                '}';
+    }
 }
