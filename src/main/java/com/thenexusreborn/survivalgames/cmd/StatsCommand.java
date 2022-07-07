@@ -44,9 +44,13 @@ public class StatsCommand implements CommandExecutor {
         String format = "#,##0.#";
         Consumer<NexusPlayer> consumer = nexusPlayer -> {
             //TODO Temporary print the stat name and the value
-            sender.sendMessage(MCUtils.color("&6&l>> &aStats for " + nexusPlayer.getRank().getColor() + nexusPlayer.getName()));
+            sender.sendMessage(MCUtils.color("&6&l>> &aSurvival Games Stats for " + nexusPlayer.getRank().getColor() + nexusPlayer.getName()));
             for (Stat stat : nexusPlayer.getStats().values()) {
                 String name = stat.getName();
+                if (!name.startsWith("sg_")) {
+                    continue;
+                }
+                
                 if (name.contains("tournament") || name.contains("mutat") || name.contains("sponsor")) {
                     continue;
                 }
