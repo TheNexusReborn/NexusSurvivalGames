@@ -37,7 +37,7 @@ import java.util.*;
 
 @SuppressWarnings("DuplicatedCode")
 public class PlayerListener implements Listener {
-    private SurvivalGames plugin;
+    private final SurvivalGames plugin;
     
     public PlayerListener(SurvivalGames plugin) {
         this.plugin = plugin;

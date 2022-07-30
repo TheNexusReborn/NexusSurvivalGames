@@ -8,11 +8,11 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.*;
 
 public class LootEntry {
-    protected int maxAmount;
-    protected Material material;
-    protected String name;
-    protected Rarity rarity;
-    protected List<String> lore;
+    protected final int maxAmount;
+    protected final Material material;
+    protected final String name;
+    protected final Rarity rarity;
+    protected final List<String> lore;
     
     public LootEntry(Material material, String name, Rarity rarity, int maxAmount, List<String> lore) {
         this.material = material;

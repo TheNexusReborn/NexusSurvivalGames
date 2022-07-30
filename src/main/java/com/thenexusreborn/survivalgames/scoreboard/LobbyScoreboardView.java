@@ -17,7 +17,7 @@ import java.util.*;
 @SuppressWarnings("DuplicatedCode")
 public class LobbyScoreboardView extends SpigotScoreboardView {
     
-    private SurvivalGames plugin;
+    private final SurvivalGames plugin;
     
     private final String mapLabelName = "mapLabel", mapValueName = "mapValue", blank1Name = "blank1",
             playersLabelName = "playersLabel", waitingValueName = "waitingValue", neededValueName = "neededValue", blank2Name = "blank2",

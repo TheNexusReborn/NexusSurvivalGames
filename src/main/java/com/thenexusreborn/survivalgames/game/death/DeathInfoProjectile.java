@@ -11,10 +11,10 @@ import java.util.UUID;
 
 public class DeathInfoProjectile extends DeathInfo {
     
-    private Entity shooter;
-    private double distance;
-    private String killerTeamColor;
-    private double killerHealth;
+    private final Entity shooter;
+    private final double distance;
+    private final String killerTeamColor;
+    private final double killerHealth;
     
     public DeathInfoProjectile(UUID player, Entity shooter, double distance, String teamColor, double health) {
         super(player, DeathType.PROJECTILE);

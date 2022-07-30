@@ -6,10 +6,10 @@ import org.bukkit.Material;
 import java.util.*;
 
 public class LootManager {
-    private Map<Material, Loot> possibleLoot = new HashMap<>();
-    private List<Loot> lootChances = new ArrayList<>();
+    private final Map<Material, Loot> possibleLoot = new HashMap<>();
+    private final List<Loot> lootChances = new ArrayList<>();
     
-    private SurvivalGames plugin;
+    private final SurvivalGames plugin;
     
     public LootManager(SurvivalGames plugin) {
         this.plugin = plugin;

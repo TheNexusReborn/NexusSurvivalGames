@@ -5,9 +5,9 @@ import org.bukkit.Material;
 import java.util.*;
 
 public class LootCategory {
-    private String name;
-    private Rarity rarity;
-    private List<LootEntry> entries;
+    private final String name;
+    private final Rarity rarity;
+    private final List<LootEntry> entries;
     
     public LootCategory(String name, Rarity rarity, List<LootEntry> entries) {
         this.name = name;

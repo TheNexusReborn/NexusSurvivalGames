@@ -23,7 +23,7 @@ import java.util.Map.Entry;
 
 public class SGCommand implements CommandExecutor {
     
-    private SurvivalGames plugin;
+    private final SurvivalGames plugin;
     
     public SGCommand(SurvivalGames plugin) {
         this.plugin = plugin;

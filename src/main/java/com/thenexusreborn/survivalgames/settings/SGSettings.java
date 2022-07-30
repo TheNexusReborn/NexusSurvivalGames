@@ -1,9 +1,6 @@
 package com.thenexusreborn.survivalgames.settings;
 
-import com.thenexusreborn.api.NexusAPI;
-
 import java.lang.reflect.Field;
-import java.sql.*;
 
 public abstract class SGSettings implements Cloneable {
     protected final String tableName;
@@ -62,18 +59,19 @@ public abstract class SGSettings implements Cloneable {
             sql = "update " + this.tableName + " set " + sb.substring(0, sb.length() - 1) + " where id='" + getId() + "';";
         }
     
-        try (Connection connection = NexusAPI.getApi().getConnection(); Statement statement = connection.createStatement()) {
-            if (getId() == 0) {
-                statement.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
-                ResultSet generatedKeys = statement.getGeneratedKeys();
-                generatedKeys.next();
-                setId(generatedKeys.getInt(1));
-            } else {
-                statement.executeUpdate(sql);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        //TODO
+//        try (Connection connection = NexusAPI.getApi().getConnection(); Statement statement = connection.createStatement()) {
+//            if (getId() == 0) {
+//                statement.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+//                ResultSet generatedKeys = statement.getGeneratedKeys();
+//                generatedKeys.next();
+//                setId(generatedKeys.getInt(1));
+//            } else {
+//                statement.executeUpdate(sql);
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
     }
     
     @Override

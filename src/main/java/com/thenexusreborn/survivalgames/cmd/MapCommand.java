@@ -14,7 +14,7 @@ import java.util.Map.Entry;
 
 public class MapCommand implements CommandExecutor {
     
-    private SurvivalGames plugin;
+    private final SurvivalGames plugin;
     
     public MapCommand(SurvivalGames plugin) {
         this.plugin = plugin;

@@ -6,8 +6,8 @@ import java.util.*;
 import java.util.Map.Entry;
 
 public class LootChances {
-    private String[] categoryChances;
-    private Map<String, Material[]> materialChances = new HashMap<>();
+    private final String[] categoryChances;
+    private final Map<String, Material[]> materialChances = new HashMap<>();
     
     public LootChances(List<String> categoryChances, Map<String, List<Material>> entryChances) {
         this.categoryChances = categoryChances.toArray(new String[0]);

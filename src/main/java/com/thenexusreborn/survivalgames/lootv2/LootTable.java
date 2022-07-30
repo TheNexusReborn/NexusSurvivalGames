@@ -6,8 +6,8 @@ import org.bukkit.inventory.ItemStack;
 import java.util.*;
 
 public class LootTable {
-    private String name;
-    private List<LootCategory> categories;
+    private final String name;
+    private final List<LootCategory> categories;
     
     public LootTable(String name, List<LootCategory> categories) {
         this.name = name;

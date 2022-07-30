@@ -19,9 +19,9 @@ public class GameMap {
     private String name;
     
     private Position center = new Position(0, 0, 0);
-    private IncrementalMap<Position> spawns = new IncrementalMap<>();
+    private final IncrementalMap<Position> spawns = new IncrementalMap<>();
     private int borderDistance = 0, deathmatchBorderDistance = 0;
-    private Set<String> creators = new HashSet<>();
+    private final Set<String> creators = new HashSet<>();
     private boolean active;
     
     private UUID uniqueId; 

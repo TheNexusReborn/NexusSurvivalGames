@@ -7,7 +7,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class TimerCountdownCheck extends BukkitRunnable {
     
-    private SurvivalGames plugin;
+    private final SurvivalGames plugin;
     
     public TimerCountdownCheck(SurvivalGames plugin) {
         this.plugin = plugin;

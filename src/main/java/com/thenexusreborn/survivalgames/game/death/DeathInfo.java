@@ -10,9 +10,10 @@ import org.bukkit.inventory.ItemStack;
 import java.util.UUID;
 
 public class DeathInfo {
-    protected UUID player;
-    protected DeathType type;
-    protected String deathMessage, teamColor;
+    protected final UUID player;
+    protected final DeathType type;
+    protected String deathMessage;
+    protected final String teamColor;
     
     public DeathInfo(UUID player, DeathType type) {
         this.player = player;

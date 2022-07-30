@@ -8,7 +8,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class GameWorldTask extends BukkitRunnable {
     
-    private SurvivalGames plugin;
+    private final SurvivalGames plugin;
     
     public GameWorldTask(SurvivalGames plugin) {
         this.plugin = plugin;

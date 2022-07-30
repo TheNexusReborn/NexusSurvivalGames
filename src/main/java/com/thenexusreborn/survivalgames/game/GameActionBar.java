@@ -7,7 +7,7 @@ import com.thenexusreborn.survivalgames.SurvivalGames;
 public class GameActionBar extends ActionBar {
     
     private final GamePlayer player;
-    private SurvivalGames plugin;
+    private final SurvivalGames plugin;
     
     public GameActionBar(SurvivalGames plugin, GamePlayer player) {
         this.plugin = plugin;

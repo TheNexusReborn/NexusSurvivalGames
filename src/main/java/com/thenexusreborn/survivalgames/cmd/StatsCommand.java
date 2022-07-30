@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 
 public class StatsCommand implements CommandExecutor {
     
-    private SurvivalGames plugin;
+    private final SurvivalGames plugin;
     
     public StatsCommand(SurvivalGames plugin) {
         this.plugin = plugin;

@@ -28,9 +28,9 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 
 public class Lobby {
-    private SurvivalGames plugin;
-    private Map<UUID, SpigotNexusPlayer> players = new HashMap<>();
-    private List<UUID> spectatingPlayers = new ArrayList<>();
+    private final SurvivalGames plugin;
+    private final Map<UUID, SpigotNexusPlayer> players = new HashMap<>();
+    private final List<UUID> spectatingPlayers = new ArrayList<>();
     private Timer timer;
     private GameSettings gameSettings;
     private LobbySettings lobbySettings;
@@ -38,10 +38,10 @@ public class Lobby {
     private ControlType controlType = ControlType.MANUAL;
     private LobbyState state = LobbyState.WAITING;
     private Location spawnpoint;
-    private Set<UUID> voteStart = new HashSet<>();
-    private Map<Integer, Location> mapSigns = new HashMap<>();
-    private Map<Integer, GameMap> mapOptions = new HashMap<>();
-    private Map<Integer, Set<UUID>> mapVotes = new HashMap<>();
+    private final Set<UUID> voteStart = new HashSet<>();
+    private final Map<Integer, Location> mapSigns = new HashMap<>();
+    private final Map<Integer, GameMap> mapOptions = new HashMap<>();
+    private final Map<Integer, Set<UUID>> mapVotes = new HashMap<>();
     private boolean forceStarted;
     private LootChances lootChances;
     

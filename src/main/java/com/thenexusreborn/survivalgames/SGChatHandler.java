@@ -10,7 +10,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 public class SGChatHandler implements ChatHandler {
     
-    private SurvivalGames plugin;
+    private final SurvivalGames plugin;
     
     private boolean enabled = true;
     

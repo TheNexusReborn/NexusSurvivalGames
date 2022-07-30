@@ -10,7 +10,7 @@ import org.bukkit.util.Vector;
 
 public class SGUtils {
     
-    private static SurvivalGames plugin = SurvivalGames.getPlugin(SurvivalGames.class);
+    private static final SurvivalGames plugin = SurvivalGames.getPlugin(SurvivalGames.class);
     
     public static void sendToHub(Player player) {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();

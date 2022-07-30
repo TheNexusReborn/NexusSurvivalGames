@@ -6,7 +6,7 @@ import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import java.util.UUID;
 
 public class GamePlayer {
-    private SpigotNexusPlayer nexusPlayer;
+    private final SpigotNexusPlayer nexusPlayer;
     private GameTeam team;
     private DeathInfo deathInfo;
     private boolean spectatorByDeath, newPersonalBestNotified = false;

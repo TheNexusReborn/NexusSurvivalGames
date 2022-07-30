@@ -7,7 +7,7 @@ import com.thenexusreborn.survivalgames.*;
 
 public class LobbyActionBar extends ActionBar {
     
-    private SurvivalGames plugin;
+    private final SurvivalGames plugin;
     
     public LobbyActionBar(SurvivalGames plugin) {
         this.plugin = plugin;

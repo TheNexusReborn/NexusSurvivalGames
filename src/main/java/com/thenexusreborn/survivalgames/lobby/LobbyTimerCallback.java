@@ -9,10 +9,10 @@ import java.util.*;
 
 public class LobbyTimerCallback implements ReturnableCallback<TimerSnapshot, Boolean> {
     
-    private static Set<Integer> ANNOUNCE_SECONDS = new HashSet<>(Arrays.asList(60, 45, 30, 15, 10, 3, 2, 1));
+    private static final Set<Integer> ANNOUNCE_SECONDS = new HashSet<>(Arrays.asList(60, 45, 30, 15, 10, 3, 2, 1));
     
-    private Lobby lobby;
-    private Set<Integer> announced = new HashSet<>();
+    private final Lobby lobby;
+    private final Set<Integer> announced = new HashSet<>();
     
     public LobbyTimerCallback(Lobby lobby) {
         this.lobby = lobby;

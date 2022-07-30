@@ -9,6 +9,7 @@ import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.api.tags.Tag;
 import com.thenexusreborn.api.tournament.Tournament;
+import com.thenexusreborn.api.util.Environment;
 import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
@@ -34,24 +35,23 @@ import java.util.Map.Entry;
 
 import static com.thenexusreborn.survivalgames.game.GameState.*;
 
-@SuppressWarnings({"DuplicatedCode"})
 public class Game {
     private static final SurvivalGames plugin = SurvivalGames.getPlugin(SurvivalGames.class);
     private static ControlType controlType = ControlType.MANUAL;
     
-    private GameMap gameMap;
-    private GameSettings settings;
-    private Map<UUID, GamePlayer> players = new HashMap<>();
-    private Map<Integer, UUID> spawns = new HashMap<>();
+    private final GameMap gameMap;
+    private final GameSettings settings;
+    private final Map<UUID, GamePlayer> players = new HashMap<>();
+    private final Map<Integer, UUID> spawns = new HashMap<>();
     private GameState state = UNDEFINED;
     private Timer timer, graceperiodTimer, restockTimer;
-    private List<Location> lootedChests = new ArrayList<>();
-    private GameInfo gameInfo;
+    private final List<Location> lootedChests = new ArrayList<>();
+    private final GameInfo gameInfo;
     private long start, end;
     private GamePlayer firstBlood;
     private LootChances lootChances;
-    private Map<Location, Inventory> enderchestInventories = new HashMap<>();
-    private boolean awardTournamentPoints;
+    private final Map<Location, Inventory> enderchestInventories = new HashMap<>();
+    private final boolean awardTournamentPoints;
     
     public Game(GameMap gameMap, GameSettings settings, Collection<SpigotNexusPlayer> players, List<UUID> spectatingPlayers) {
         this.gameMap = gameMap;

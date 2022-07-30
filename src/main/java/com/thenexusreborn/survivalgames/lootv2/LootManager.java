@@ -7,9 +7,9 @@ import java.util.*;
 
 public class LootManager {
     
-    private List<LootTable> lootTables = new ArrayList<>();
+    private final List<LootTable> lootTables = new ArrayList<>();
     
-    private static LootManager instance = new LootManager();
+    private static final LootManager instance = new LootManager();
     
     public static LootManager getInstance() {
         return instance;

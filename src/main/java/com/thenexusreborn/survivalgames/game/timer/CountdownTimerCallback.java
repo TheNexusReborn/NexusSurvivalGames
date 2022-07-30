@@ -11,10 +11,11 @@ import java.util.*;
 
 public class CountdownTimerCallback implements ReturnableCallback<TimerSnapshot, Boolean> {
     
-    private static Set<Integer> ANNOUNCE_SECONDS = new HashSet<>(Arrays.asList(60, 45, 30, 15, 10, 5, 3, 2, 1));
+    private static final Set<Integer> ANNOUNCE_SECONDS = new HashSet<>(Arrays.asList(60, 45, 30, 15, 10, 5, 3, 2, 1));
     
-    private Game game;
-    private Set<Integer> announced = new HashSet<>(), soundPlayed = new HashSet<>();
+    private final Game game;
+    private final Set<Integer> announced = new HashSet<>();
+    private final Set<Integer> soundPlayed = new HashSet<>();
     private boolean announcedInfo = false, announcedRestart = false;
     
     public CountdownTimerCallback(Game game) {

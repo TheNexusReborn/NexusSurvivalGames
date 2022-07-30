@@ -7,8 +7,8 @@ import java.util.UUID;
 
 public class DeathInfoKilledSuicide extends DeathInfo {
     
-    private UUID killer;
-    private String killerTeamColor;
+    private final UUID killer;
+    private final String killerTeamColor;
     
     public DeathInfoKilledSuicide(UUID player, UUID killer, String killerTeamColor) {
         super(player, DeathType.SUICIDE_KILLED);

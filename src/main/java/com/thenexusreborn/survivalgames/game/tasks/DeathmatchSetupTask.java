@@ -5,7 +5,7 @@ import com.thenexusreborn.survivalgames.game.*;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class DeathmatchSetupTask extends BukkitRunnable {
-    private SurvivalGames plugin;
+    private final SurvivalGames plugin;
     
     public DeathmatchSetupTask(SurvivalGames plugin) {
         this.plugin = plugin;

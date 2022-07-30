@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 
 public class VoteStartCommand implements CommandExecutor {
     
-    private SurvivalGames plugin;
+    private final SurvivalGames plugin;
     
     public VoteStartCommand(SurvivalGames plugin) {
         this.plugin = plugin;

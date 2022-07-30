@@ -10,10 +10,10 @@ import java.util.*;
 
 public class Loot {
     protected int maxAmount;
-    protected Material material;
-    protected String name;
-    protected int weight;
-    protected List<String> lore = new ArrayList<>();
+    protected final Material material;
+    protected final String name;
+    protected final int weight;
+    protected final List<String> lore = new ArrayList<>();
     
     public Loot(Material material, String name, int weight) {
         this.material = material;

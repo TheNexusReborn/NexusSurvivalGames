@@ -1,10 +1,11 @@
 package com.thenexusreborn.survivalgames;
 
-import com.thenexusreborn.api.*;
+import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.registry.StatRegistry;
 import com.thenexusreborn.api.server.ServerInfo;
-import com.thenexusreborn.api.stats.*;
+import com.thenexusreborn.api.stats.StatType;
 import com.thenexusreborn.api.tournament.Tournament;
+import com.thenexusreborn.api.util.Environment;
 import com.thenexusreborn.nexuscore.NexusCore;
 import com.thenexusreborn.nexuscore.api.NexusSpigotPlugin;
 import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
@@ -17,7 +18,6 @@ import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.tasks.*;
 import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.map.MapManager;
-import com.thenexusreborn.survivalgames.settings.Time;
 import com.thenexusreborn.survivalgames.settings.*;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -26,7 +26,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.lang.reflect.Field;
 import java.sql.*;
 import java.util.*;
-import java.util.Map.Entry;
 
 public class SurvivalGames extends NexusSpigotPlugin {
     
@@ -46,8 +45,8 @@ public class SurvivalGames extends NexusSpigotPlugin {
     private SGChatHandler chatHandler;
     private boolean restart = false;
     
-    private Map<String, LobbySettings> lobbySettings = new HashMap<>();
-    private Map<String, GameSettings> gameSettings = new HashMap<>();
+    private final Map<String, LobbySettings> lobbySettings = new HashMap<>();
+    private final Map<String, GameSettings> gameSettings = new HashMap<>();
     
     @Override
     public void onLoad() {
@@ -84,77 +83,78 @@ public class SurvivalGames extends NexusSpigotPlugin {
         getLogger().info("Map Tables successfully created");
         
         getLogger().info("Loading Game and Lobby Settings");
-        try (Connection connection = NexusAPI.getApi().getConnection(); Statement statement = connection.createStatement()) {
-            Map<String, String> lobbySettingsColumns = new HashMap<>(), gameSettingsColumns = new HashMap<>();
-            
-            for (Field field : LobbySettings.class.getDeclaredFields()) {
-                field.setAccessible(true);
-                String name = field.getName();
-                String type;
-                if (field.getType().equals(boolean.class)) {
-                    type = "varchar(5)";
-                } else if (field.getType().equals(int.class)) {
-                    if (field.getName().equalsIgnoreCase("id")) {
-                        type = "int primary key auto_increment";
-                    } else {
-                        type = "int";
-                    }
-                } else if (field.getType().equals(String.class)) {
-                    type = "varchar(100)";
-                } else {
-                    NexusAPI.getApi().getLogger().severe("Found an unhandled lobby setting type, field name: " + name);
-                    continue;
-                }
-                
-                lobbySettingsColumns.put(name, type);
-            }
-            
-            for (Field field : GameSettings.class.getDeclaredFields()) {
-                field.setAccessible(true);
-                String name = field.getName();
-                String type;
-                if (field.getType().equals(boolean.class)) {
-                    type = "varchar(5)";
-                } else if (field.getType().equals(int.class)) {
-                    if (field.getName().equalsIgnoreCase("id")) {
-                        type = "int primary key auto_increment";
-                    } else {
-                        type = "int";
-                    }
-                } else if (Enum.class.isAssignableFrom(field.getType())) {
-                    type = "varchar(100)";
-                } else if (field.getType().equals(String.class)) {
-                    type = "varchar(100)";
-                } else {
-                    NexusAPI.getApi().getLogger().severe("Found an unhandled game setting type, field name: " + name);
-                    continue;
-                }
-                
-                gameSettingsColumns.put(name, type);
-            }
-            
-            StringBuilder sb = new StringBuilder();
-            for (Entry<String, String> entry : lobbySettingsColumns.entrySet()) {
-                sb.append(entry.getKey()).append(" ").append(entry.getValue()).append(", ");
-            }
-            
-            String lobbySettings = sb.substring(0, sb.length() - 2);
-            
-            sb = new StringBuilder();
-            for (Entry<String, String> entry : gameSettingsColumns.entrySet()) {
-                sb.append(entry.getKey()).append(" ").append(entry.getValue()).append(", ");
-            }
-            
-            String gameSettings = sb.substring(0, sb.length() - 2);
-            
-            statement.execute("create table if not exists sglobbysettings(" + lobbySettings + ");");
-            statement.execute("create table if not exists sggamesettings(" + gameSettings + ");");
-        } catch (SQLException e) {
-            getLogger().severe("Error while creating other tables");
-            e.printStackTrace();
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
+        //TODO
+//        try (Connection connection = NexusAPI.getApi().getConnection(); Statement statement = connection.createStatement()) {
+//            Map<String, String> lobbySettingsColumns = new HashMap<>(), gameSettingsColumns = new HashMap<>();
+//            
+//            for (Field field : LobbySettings.class.getDeclaredFields()) {
+//                field.setAccessible(true);
+//                String name = field.getName();
+//                String type;
+//                if (field.getType().equals(boolean.class)) {
+//                    type = "varchar(5)";
+//                } else if (field.getType().equals(int.class)) {
+//                    if (field.getName().equalsIgnoreCase("id")) {
+//                        type = "int primary key auto_increment";
+//                    } else {
+//                        type = "int";
+//                    }
+//                } else if (field.getType().equals(String.class)) {
+//                    type = "varchar(100)";
+//                } else {
+//                    NexusAPI.getApi().getLogger().severe("Found an unhandled lobby setting type, field name: " + name);
+//                    continue;
+//                }
+//                
+//                lobbySettingsColumns.put(name, type);
+//            }
+//            
+//            for (Field field : GameSettings.class.getDeclaredFields()) {
+//                field.setAccessible(true);
+//                String name = field.getName();
+//                String type;
+//                if (field.getType().equals(boolean.class)) {
+//                    type = "varchar(5)";
+//                } else if (field.getType().equals(int.class)) {
+//                    if (field.getName().equalsIgnoreCase("id")) {
+//                        type = "int primary key auto_increment";
+//                    } else {
+//                        type = "int";
+//                    }
+//                } else if (Enum.class.isAssignableFrom(field.getType())) {
+//                    type = "varchar(100)";
+//                } else if (field.getType().equals(String.class)) {
+//                    type = "varchar(100)";
+//                } else {
+//                    NexusAPI.getApi().getLogger().severe("Found an unhandled game setting type, field name: " + name);
+//                    continue;
+//                }
+//                
+//                gameSettingsColumns.put(name, type);
+//            }
+//            
+//            StringBuilder sb = new StringBuilder();
+//            for (Entry<String, String> entry : lobbySettingsColumns.entrySet()) {
+//                sb.append(entry.getKey()).append(" ").append(entry.getValue()).append(", ");
+//            }
+//            
+//            String lobbySettings = sb.substring(0, sb.length() - 2);
+//            
+//            sb = new StringBuilder();
+//            for (Entry<String, String> entry : gameSettingsColumns.entrySet()) {
+//                sb.append(entry.getKey()).append(" ").append(entry.getValue()).append(", ");
+//            }
+//            
+//            String gameSettings = sb.substring(0, sb.length() - 2);
+//            
+//            statement.execute("create table if not exists sglobbysettings(" + lobbySettings + ");");
+//            statement.execute("create table if not exists sggamesettings(" + gameSettings + ");");
+//        } catch (SQLException e) {
+//            getLogger().severe("Error while creating other tables");
+//            e.printStackTrace();
+//            getServer().getPluginManager().disablePlugin(this);
+//            return;
+//        }
         
         Field[] lobbyFields = LobbySettings.class.getDeclaredFields();
         Field[] gameFields = GameSettings.class.getDeclaredFields();
@@ -167,80 +167,81 @@ public class SurvivalGames extends NexusSpigotPlugin {
             gameField.setAccessible(true);
         }
         
-        try (Connection connection = NexusAPI.getApi().getConnection(); Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery("select * from sglobbysettings;");
-            
-            if (resultSet.next()) {
-                do {
-                    LobbySettings settings = new LobbySettings();
-                    for (Field field : lobbyFields) {
-                        Object value;
-                        if (field.getType().equals(int.class)) {
-                            value = resultSet.getInt(field.getName());
-                        } else if (field.getType().equals(boolean.class)) {
-                            value = Boolean.parseBoolean(resultSet.getString(field.getName()));
-                        } else if (field.getType().equals(String.class)) {
-                            value = resultSet.getString(field.getName());
-                        } else {
-                            continue;
-                        }
-        
-                        try {
-                            field.set(settings, value);
-                        } catch (Exception ex) {}
-                    }
-                    getLogger().info("Loaded lobby settings with id " + settings.getId() + " and type " + settings.getType());
-                    this.lobbySettings.put(resultSet.getString("type"), settings);
-                } while (resultSet.next());
-            } else {
-                getLogger().info("There was no existing lobby settings, inserting defaults");
-                LobbySettings settings = new LobbySettings();
-                settings.pushToDatabase();
-                this.lobbySettings.put(settings.getType(), settings);
-                getLogger().info("Defaults have been inserted");
-            }
-            
-            resultSet = statement.executeQuery("select * from sggamesettings;");
-            
-            if (resultSet.next()) {
-                do {
-                    GameSettings settings = new GameSettings();
-                    for (Field field : gameFields) {
-                        Object value;
-                        if (field.getType().equals(int.class)) {
-                            value = resultSet.getInt(field.getName());
-                        } else if (field.getType().equals(boolean.class)) {
-                            value = Boolean.parseBoolean(resultSet.getString(field.getName()));
-                        } else if (field.getType().equals(ColorMode.class)) {
-                            value = ColorMode.valueOf(resultSet.getString(field.getName()));
-                        } else if (field.getType().equals(Weather.class)) {
-                            value = Weather.valueOf(resultSet.getString(field.getName()));
-                        } else if (field.getType().equals(Time.class)) {
-                            value = Time.valueOf(resultSet.getString(field.getName()));
-                        } else if (field.getType().equals(String.class)) {
-                            value = resultSet.getString(field.getName());
-                        } else {
-                            continue;
-                        }
-        
-                        try {
-                            field.set(settings, value);
-                        } catch (Exception ex) {
-                        }
-                    }
-                    getLogger().info("Loaded game settings with id " + settings.getId() + " and type " + settings.getType());
-                    this.gameSettings.put(resultSet.getString("type"), settings);
-                } while (resultSet.next());
-            } else {
-                getLogger().info("There was no existing game settings, inserting defaults");
-                GameSettings settings = new GameSettings();
-                settings.pushToDatabase();
-                this.gameSettings.put(settings.getType(), settings);
-                getLogger().info("Defaults have been inserted");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        //TODO
+//        try (Connection connection = NexusAPI.getApi().getConnection(); Statement statement = connection.createStatement()) {
+//            ResultSet resultSet = statement.executeQuery("select * from sglobbysettings;");
+//            
+//            if (resultSet.next()) {
+//                do {
+//                    LobbySettings settings = new LobbySettings();
+//                    for (Field field : lobbyFields) {
+//                        Object value;
+//                        if (field.getType().equals(int.class)) {
+//                            value = resultSet.getInt(field.getName());
+//                        } else if (field.getType().equals(boolean.class)) {
+//                            value = Boolean.parseBoolean(resultSet.getString(field.getName()));
+//                        } else if (field.getType().equals(String.class)) {
+//                            value = resultSet.getString(field.getName());
+//                        } else {
+//                            continue;
+//                        }
+//        
+//                        try {
+//                            field.set(settings, value);
+//                        } catch (Exception ex) {}
+//                    }
+//                    getLogger().info("Loaded lobby settings with id " + settings.getId() + " and type " + settings.getType());
+//                    this.lobbySettings.put(resultSet.getString("type"), settings);
+//                } while (resultSet.next());
+//            } else {
+//                getLogger().info("There was no existing lobby settings, inserting defaults");
+//                LobbySettings settings = new LobbySettings();
+//                settings.pushToDatabase();
+//                this.lobbySettings.put(settings.getType(), settings);
+//                getLogger().info("Defaults have been inserted");
+//            }
+//            
+//            resultSet = statement.executeQuery("select * from sggamesettings;");
+//            
+//            if (resultSet.next()) {
+//                do {
+//                    GameSettings settings = new GameSettings();
+//                    for (Field field : gameFields) {
+//                        Object value;
+//                        if (field.getType().equals(int.class)) {
+//                            value = resultSet.getInt(field.getName());
+//                        } else if (field.getType().equals(boolean.class)) {
+//                            value = Boolean.parseBoolean(resultSet.getString(field.getName()));
+//                        } else if (field.getType().equals(ColorMode.class)) {
+//                            value = ColorMode.valueOf(resultSet.getString(field.getName()));
+//                        } else if (field.getType().equals(Weather.class)) {
+//                            value = Weather.valueOf(resultSet.getString(field.getName()));
+//                        } else if (field.getType().equals(Time.class)) {
+//                            value = Time.valueOf(resultSet.getString(field.getName()));
+//                        } else if (field.getType().equals(String.class)) {
+//                            value = resultSet.getString(field.getName());
+//                        } else {
+//                            continue;
+//                        }
+//        
+//                        try {
+//                            field.set(settings, value);
+//                        } catch (Exception ex) {
+//                        }
+//                    }
+//                    getLogger().info("Loaded game settings with id " + settings.getId() + " and type " + settings.getType());
+//                    this.gameSettings.put(resultSet.getString("type"), settings);
+//                } while (resultSet.next());
+//            } else {
+//                getLogger().info("There was no existing game settings, inserting defaults");
+//                GameSettings settings = new GameSettings();
+//                settings.pushToDatabase();
+//                this.gameSettings.put(settings.getType(), settings);
+//                getLogger().info("Defaults have been inserted");
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
         
         getLogger().info("Settings Loaded");
         

@@ -8,11 +8,11 @@ import java.util.*;
 import java.util.Map.Entry;
 
 public class MapManager {
-    private SurvivalGames plugin;
+    private final SurvivalGames plugin;
     
     private Config mapsConfig;
     
-    private List<GameMap> gameMaps = new ArrayList<>();
+    private final List<GameMap> gameMaps = new ArrayList<>();
     
     public MapManager(SurvivalGames plugin) {
         this.plugin = plugin;

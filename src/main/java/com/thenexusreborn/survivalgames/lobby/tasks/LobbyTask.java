@@ -14,7 +14,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class LobbyTask extends BukkitRunnable {
     
-    private SurvivalGames plugin;
+    private final SurvivalGames plugin;
     
     public LobbyTask(SurvivalGames plugin) {
         this.plugin = plugin;

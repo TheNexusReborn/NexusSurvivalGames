@@ -10,11 +10,11 @@ import java.util.UUID;
 
 public class DeathInfoTntKill extends DeathInfoPlayerKill {
     
-    protected UUID killer;
+    protected final UUID killer;
     protected ItemStack handItem;
-    protected double killerHealth;
+    protected final double killerHealth;
     protected boolean mutationKill;
-    private String killerTeamColor;
+    private final String killerTeamColor;
     
     public DeathInfoTntKill(UUID player, UUID killer, double killerHealth, String killerTeamColor) {
         super(player, killer, null, killerHealth, killerTeamColor);
