@@ -83,7 +83,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         getLogger().info("Map Tables successfully created");
         
         getLogger().info("Loading Game and Lobby Settings");
-        //TODO
+        //TODO Reimplement this with the new Database System
 //        try (Connection connection = NexusAPI.getApi().getConnection(); Statement statement = connection.createStatement()) {
 //            Map<String, String> lobbySettingsColumns = new HashMap<>(), gameSettingsColumns = new HashMap<>();
 //            
@@ -167,7 +167,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
             gameField.setAccessible(true);
         }
         
-        //TODO
+        //TODO Reimplement with the new database sy stem
 //        try (Connection connection = NexusAPI.getApi().getConnection(); Statement statement = connection.createStatement()) {
 //            ResultSet resultSet = statement.executeQuery("select * from sglobbysettings;");
 //            

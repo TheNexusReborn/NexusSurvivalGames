@@ -20,6 +20,7 @@ public abstract class SGSettings implements Cloneable {
     public abstract void setType(String type);
     
     @SuppressWarnings("SqlResolve")
+    @Deprecated
     public void pushToDatabase() {
         Field[] fields = getClass().getDeclaredFields();
         for (Field field : fields) {
@@ -59,7 +60,7 @@ public abstract class SGSettings implements Cloneable {
             sql = "update " + this.tableName + " set " + sb.substring(0, sb.length() - 1) + " where id='" + getId() + "';";
         }
     
-        //TODO
+        //TODO Move this to using the new database system
 //        try (Connection connection = NexusAPI.getApi().getConnection(); Statement statement = connection.createStatement()) {
 //            if (getId() == 0) {
 //                statement.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);

@@ -97,11 +97,6 @@ public class LobbySettings extends SGSettings {
         return this;
     }
     
-    public static LobbySettings loadFromDatabase(String type) {
-        //TODO
-        return null;
-    }
-    
     @Override
     public String toString() {
         return "LobbySettings{" +

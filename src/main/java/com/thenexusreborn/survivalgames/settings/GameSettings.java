@@ -276,11 +276,6 @@ public class GameSettings extends SGSettings {
         this.allowEnderchests = allowEnderchests;
     }
     
-    public static GameSettings loadFromDatabase(String type) {
-        //TODO
-        return null;
-    }
-    
     @Override
     public String toString() {
         return "GameSettings{" +
