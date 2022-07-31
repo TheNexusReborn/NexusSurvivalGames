@@ -111,17 +111,23 @@ public class Lobby {
                     sign.setLine(3, MCUtils.color("&n" + votes + " Vote(s)"));
                     
                     for (SpigotNexusPlayer player : players.values()) {
-                        if (!player.getPlayer().getWorld().getName().equalsIgnoreCase(spawnpoint.getWorld().getName())) { //TODO Error here
-                            continue;
+                        Player bukkitPlayer = player.getPlayer();
+                        if (bukkitPlayer != null) {
+                            World world = bukkitPlayer.getWorld();
+                            if (world != null) {
+                                if (!world.getName().equalsIgnoreCase(spawnpoint.getWorld().getName())) {
+                                    continue;
+                                }
+                                if (mapVotes.get(entry.getKey()).contains(player.getUniqueId())) {
+                                    sign.setLine(0, MCUtils.color("&n#" + entry.getKey()));
+                                    sign.setLine(2, MCUtils.color("&2&lVOTED!"));
+                                } else {
+                                    sign.setLine(0, MCUtils.color("&nClick to Vote"));
+                                    sign.setLine(2, "");
+                                }
+                                bukkitPlayer.sendSignChange(sign.getLocation(), sign.getLines());
+                            }
                         }
-                        if (mapVotes.get(entry.getKey()).contains(player.getUniqueId())) {
-                            sign.setLine(0, MCUtils.color("&n#" + entry.getKey()));
-                            sign.setLine(2, MCUtils.color("&2&lVOTED!"));
-                        } else {
-                            sign.setLine(0, MCUtils.color("&nClick to Vote"));
-                            sign.setLine(2, "");
-                        }
-                        player.getPlayer().sendSignChange(sign.getLocation(), sign.getLines());
                     }
                 }
             }
