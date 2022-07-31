@@ -1,9 +1,13 @@
 package com.thenexusreborn.survivalgames.map;
 
+import com.thenexusreborn.api.data.annotations.*;
+import com.thenexusreborn.api.data.codec.StringSetCodec;
+import com.thenexusreborn.nexuscore.data.codec.PositionCodec;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.api.collection.IncrementalMap;
 import com.thenexusreborn.api.helper.FileHelper;
+import com.thenexusreborn.survivalgames.data.handler.GameMapObjectHandler;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 
@@ -12,25 +16,35 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.zip.*;
 
+@TableInfo(value = "sgmaps", handler = GameMapObjectHandler.class)
 public class GameMap {
-    public static final int version = 1;
-    private int id;
+    @Primary
+    private long id;
     private String url;
     private String name;
     
+    @ColumnInfo(type = "varchar(100)", codec = PositionCodec.class) 
     private Position center = new Position(0, 0, 0);
-    private final IncrementalMap<Position> spawns = new IncrementalMap<>();
+    @ColumnIgnored
+    private IncrementalMap<MapSpawn> spawns = new IncrementalMap<>();
     private int borderDistance = 0, deathmatchBorderDistance = 0;
-    private final Set<String> creators = new HashSet<>();
+    @ColumnInfo(type = "varchar(1000)", codec = StringSetCodec.class)
+    private Set<String> creators = new HashSet<>();
     private boolean active;
     
-    private UUID uniqueId; 
-    private World world; 
-    private Path downloadedZip; 
-    private Path unzippedFolder; 
-    private Path worldFolder; 
+    @ColumnIgnored
+    private UUID uniqueId;
+    @ColumnIgnored
+    private World world;
+    
+    @ColumnIgnored
+    private Path downloadedZip, unzippedFolder, worldFolder;
+    @ColumnIgnored
     private boolean editing;
+    @ColumnIgnored
     private int votes = 0;
+    
+    private GameMap() {}
     
     public GameMap(String fileName, String name) {
         this.url = fileName;
@@ -90,12 +104,16 @@ public class GameMap {
         this.creators.remove(creator);
     }
     
-    public int addSpawn(Position position) {
-        return this.spawns.add(position);
+    public int addSpawn(MapSpawn spawn) {
+        int index = this.spawns.add(spawn);
+        spawn.setMapId(this.getId());
+        spawn.setIndex(index);
+        return index;
     }
     
-    public void setSpawn(int index, Position position) {
-        this.spawns.put(index, position);
+    public void setSpawn(int index, MapSpawn spawn) {
+        spawn.setIndex(index);
+        this.spawns.put(index, spawn);
     }
     
     public void removeSpawn(int index) {
@@ -126,7 +144,7 @@ public class GameMap {
         this.center = center;
     }
     
-    public SortedMap<Integer, Position> getSpawns() {
+    public SortedMap<Integer, MapSpawn> getSpawns() {
         return spawns;
     }
     
@@ -290,11 +308,11 @@ public class GameMap {
         this.active = active;
     }
     
-    public int getId() {
+    public long getId() {
         return id;
     }
     
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
     

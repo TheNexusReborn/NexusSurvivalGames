@@ -1,10 +1,14 @@
 package com.thenexusreborn.survivalgames.settings;
 
+import com.thenexusreborn.api.data.annotations.*;
+
 import java.lang.reflect.Field;
 
 @SuppressWarnings("DuplicatedCode")
-public class LobbySettings extends SGSettings {
-    private int id;
+@TableInfo("sglobbysettings")
+public class LobbySettings {
+    @Primary
+    private long id;
     private String type = "default";
     private int maxPlayers = 24;
     private int minPlayers = 4;
@@ -14,19 +18,15 @@ public class LobbySettings extends SGSettings {
     private boolean keepPreviousGameSettings = true;
     private boolean sounds = true;
     
-    public LobbySettings() {
-        super("sglobbysettings");
-    }
-    
     public int getMaxPlayers() {
         return maxPlayers;
     }
     
-    public int getId() {
+    public long getId() {
         return id;
     }
     
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
     

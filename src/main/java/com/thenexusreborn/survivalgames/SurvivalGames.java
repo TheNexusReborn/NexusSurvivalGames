@@ -1,7 +1,8 @@
 package com.thenexusreborn.survivalgames;
 
 import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.api.registry.StatRegistry;
+import com.thenexusreborn.api.data.objects.Database;
+import com.thenexusreborn.api.registry.*;
 import com.thenexusreborn.api.server.ServerInfo;
 import com.thenexusreborn.api.stats.StatType;
 import com.thenexusreborn.api.tournament.Tournament;
@@ -17,13 +18,13 @@ import com.thenexusreborn.survivalgames.listener.*;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.tasks.*;
 import com.thenexusreborn.survivalgames.loot.LootManager;
-import com.thenexusreborn.survivalgames.map.MapManager;
+import com.thenexusreborn.survivalgames.map.*;
 import com.thenexusreborn.survivalgames.settings.*;
 import org.bukkit.*;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.lang.reflect.Field;
 import java.sql.*;
 import java.util.*;
 
@@ -47,6 +48,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
     private final Map<String, LobbySettings> lobbySettings = new HashMap<>();
     private final Map<String, GameSettings> gameSettings = new HashMap<>();
+    private Database mapDatabase;
     
     @Override
     public void onLoad() {
@@ -69,180 +71,21 @@ public class SurvivalGames extends NexusSpigotPlugin {
         getLogger().info("Loading NexusSurvivalGames v" + getDescription().getVersion());
         saveDefaultConfig();
         
-        getLogger().info("Creating Map Tables");
-        try (Connection connection = getMapConnection(); Statement statement = connection.createStatement()) {
-            statement.execute("create table if not exists sgmaps(id int primary key not null auto_increment, name varchar(32), url varchar(1000), centerX int, centerY int, centerZ int, borderRadius int, dmBorderRadius int, creators varchar(1000), active varchar(5));");
-            statement.execute("create table if not exists sgmapspawns(id int, mapId int, x int, y int, z int);");
+        getLogger().info("Loading Game and Lobby Settings");
+        try {
+            for (GameSettings gameSettings : NexusAPI.getApi().getPrimaryDatabase().get(GameSettings.class)) {
+                this.gameSettings.put(gameSettings.getType(), gameSettings);
+            }
+    
+            for (LobbySettings lobbySettings : NexusAPI.getApi().getPrimaryDatabase().get(LobbySettings.class)) {
+                this.lobbySettings.put(lobbySettings.getType(), lobbySettings);
+            }
         } catch (SQLException e) {
-            getLogger().severe("Error while creating map tables");
             e.printStackTrace();
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
-        
-        getLogger().info("Map Tables successfully created");
-        
-        getLogger().info("Loading Game and Lobby Settings");
-        //TODO Reimplement this with the new Database System
-//        try (Connection connection = NexusAPI.getApi().getConnection(); Statement statement = connection.createStatement()) {
-//            Map<String, String> lobbySettingsColumns = new HashMap<>(), gameSettingsColumns = new HashMap<>();
-//            
-//            for (Field field : LobbySettings.class.getDeclaredFields()) {
-//                field.setAccessible(true);
-//                String name = field.getName();
-//                String type;
-//                if (field.getType().equals(boolean.class)) {
-//                    type = "varchar(5)";
-//                } else if (field.getType().equals(int.class)) {
-//                    if (field.getName().equalsIgnoreCase("id")) {
-//                        type = "int primary key auto_increment";
-//                    } else {
-//                        type = "int";
-//                    }
-//                } else if (field.getType().equals(String.class)) {
-//                    type = "varchar(100)";
-//                } else {
-//                    NexusAPI.getApi().getLogger().severe("Found an unhandled lobby setting type, field name: " + name);
-//                    continue;
-//                }
-//                
-//                lobbySettingsColumns.put(name, type);
-//            }
-//            
-//            for (Field field : GameSettings.class.getDeclaredFields()) {
-//                field.setAccessible(true);
-//                String name = field.getName();
-//                String type;
-//                if (field.getType().equals(boolean.class)) {
-//                    type = "varchar(5)";
-//                } else if (field.getType().equals(int.class)) {
-//                    if (field.getName().equalsIgnoreCase("id")) {
-//                        type = "int primary key auto_increment";
-//                    } else {
-//                        type = "int";
-//                    }
-//                } else if (Enum.class.isAssignableFrom(field.getType())) {
-//                    type = "varchar(100)";
-//                } else if (field.getType().equals(String.class)) {
-//                    type = "varchar(100)";
-//                } else {
-//                    NexusAPI.getApi().getLogger().severe("Found an unhandled game setting type, field name: " + name);
-//                    continue;
-//                }
-//                
-//                gameSettingsColumns.put(name, type);
-//            }
-//            
-//            StringBuilder sb = new StringBuilder();
-//            for (Entry<String, String> entry : lobbySettingsColumns.entrySet()) {
-//                sb.append(entry.getKey()).append(" ").append(entry.getValue()).append(", ");
-//            }
-//            
-//            String lobbySettings = sb.substring(0, sb.length() - 2);
-//            
-//            sb = new StringBuilder();
-//            for (Entry<String, String> entry : gameSettingsColumns.entrySet()) {
-//                sb.append(entry.getKey()).append(" ").append(entry.getValue()).append(", ");
-//            }
-//            
-//            String gameSettings = sb.substring(0, sb.length() - 2);
-//            
-//            statement.execute("create table if not exists sglobbysettings(" + lobbySettings + ");");
-//            statement.execute("create table if not exists sggamesettings(" + gameSettings + ");");
-//        } catch (SQLException e) {
-//            getLogger().severe("Error while creating other tables");
-//            e.printStackTrace();
-//            getServer().getPluginManager().disablePlugin(this);
-//            return;
-//        }
-        
-        Field[] lobbyFields = LobbySettings.class.getDeclaredFields();
-        Field[] gameFields = GameSettings.class.getDeclaredFields();
-        
-        for (Field lobbyField : lobbyFields) {
-            lobbyField.setAccessible(true);
-        }
-        
-        for (Field gameField : gameFields) {
-            gameField.setAccessible(true);
-        }
-        
-        //TODO Reimplement with the new database sy stem
-//        try (Connection connection = NexusAPI.getApi().getConnection(); Statement statement = connection.createStatement()) {
-//            ResultSet resultSet = statement.executeQuery("select * from sglobbysettings;");
-//            
-//            if (resultSet.next()) {
-//                do {
-//                    LobbySettings settings = new LobbySettings();
-//                    for (Field field : lobbyFields) {
-//                        Object value;
-//                        if (field.getType().equals(int.class)) {
-//                            value = resultSet.getInt(field.getName());
-//                        } else if (field.getType().equals(boolean.class)) {
-//                            value = Boolean.parseBoolean(resultSet.getString(field.getName()));
-//                        } else if (field.getType().equals(String.class)) {
-//                            value = resultSet.getString(field.getName());
-//                        } else {
-//                            continue;
-//                        }
-//        
-//                        try {
-//                            field.set(settings, value);
-//                        } catch (Exception ex) {}
-//                    }
-//                    getLogger().info("Loaded lobby settings with id " + settings.getId() + " and type " + settings.getType());
-//                    this.lobbySettings.put(resultSet.getString("type"), settings);
-//                } while (resultSet.next());
-//            } else {
-//                getLogger().info("There was no existing lobby settings, inserting defaults");
-//                LobbySettings settings = new LobbySettings();
-//                settings.pushToDatabase();
-//                this.lobbySettings.put(settings.getType(), settings);
-//                getLogger().info("Defaults have been inserted");
-//            }
-//            
-//            resultSet = statement.executeQuery("select * from sggamesettings;");
-//            
-//            if (resultSet.next()) {
-//                do {
-//                    GameSettings settings = new GameSettings();
-//                    for (Field field : gameFields) {
-//                        Object value;
-//                        if (field.getType().equals(int.class)) {
-//                            value = resultSet.getInt(field.getName());
-//                        } else if (field.getType().equals(boolean.class)) {
-//                            value = Boolean.parseBoolean(resultSet.getString(field.getName()));
-//                        } else if (field.getType().equals(ColorMode.class)) {
-//                            value = ColorMode.valueOf(resultSet.getString(field.getName()));
-//                        } else if (field.getType().equals(Weather.class)) {
-//                            value = Weather.valueOf(resultSet.getString(field.getName()));
-//                        } else if (field.getType().equals(Time.class)) {
-//                            value = Time.valueOf(resultSet.getString(field.getName()));
-//                        } else if (field.getType().equals(String.class)) {
-//                            value = resultSet.getString(field.getName());
-//                        } else {
-//                            continue;
-//                        }
-//        
-//                        try {
-//                            field.set(settings, value);
-//                        } catch (Exception ex) {
-//                        }
-//                    }
-//                    getLogger().info("Loaded game settings with id " + settings.getId() + " and type " + settings.getType());
-//                    this.gameSettings.put(resultSet.getString("type"), settings);
-//                } while (resultSet.next());
-//            } else {
-//                getLogger().info("There was no existing game settings, inserting defaults");
-//                GameSettings settings = new GameSettings();
-//                settings.pushToDatabase();
-//                this.gameSettings.put(settings.getType(), settings);
-//                getLogger().info("Defaults have been inserted");
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-        
+    
         getLogger().info("Settings Loaded");
         
         mapManager = new MapManager(this);
@@ -262,7 +105,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
                     devLobbySettings = new LobbySettings();
                     devLobbySettings.setType("dev");
                     devLobbySettings.setTimerLength(10);
-                    devLobbySettings.pushToDatabase();
+                    NexusAPI.getApi().getPrimaryDatabase().push(devLobbySettings);
                     addLobbySettings(devLobbySettings);
                 }
                 lobby.setLobbySettings(devLobbySettings);
@@ -272,7 +115,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
                     devGameSettings = new GameSettings();
                     devGameSettings.setType("dev");
                     devGameSettings.setWarmupLength(10);
-                    devGameSettings.pushToDatabase();
+                    NexusAPI.getApi().getPrimaryDatabase().push(devGameSettings);
                     addGameSettings(devGameSettings);
                 }
                 lobby.setGameSettings(devGameSettings);
@@ -364,7 +207,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
     @Override
     public void registerStats(StatRegistry registry) {
-        System.out.println("Registering SG Stats");
         registry.register("sg_score", StatType.INTEGER, 100);
         registry.register("sg_kills", StatType.INTEGER, 0);
         registry.register("sg_highest_kill_streak", StatType.INTEGER, 0);
@@ -460,9 +302,8 @@ public class SurvivalGames extends NexusSpigotPlugin {
         this.restart = restart;
     }
     
-    public Connection getMapConnection() throws SQLException {
-        return nexusCore.getConnection("nexusmaps");
-        //return nexusCore.getConnection();
+    public Database getMapDatabase() {
+        return this.mapDatabase;
     }
     
     public LobbySettings getLobbySettings(String type) {
@@ -487,5 +328,21 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
     public void addGameSettings(GameSettings settings) {
         this.gameSettings.put(settings.getType(), settings);
+    }
+    
+    @Override
+    public void registerDatabases(DatabaseRegistry registry) {
+        for (Database database : registry.getObjects()) {
+            if (database.isPrimary()) {
+                database.registerClass(GameSettings.class);
+                database.registerClass(LobbySettings.class);
+            }
+        }
+    
+        FileConfiguration config = getConfig();
+        mapDatabase = new Database(config.getString("mapdatabase.database"), config.getString("mapdatabase.host"), config.getString("mapdatabase.user"), config.getString("mapdatabase.password"), false);
+        mapDatabase.registerClass(GameMap.class);
+        mapDatabase.registerClass(MapSpawn.class);
+        registry.register(mapDatabase);
     }
 }

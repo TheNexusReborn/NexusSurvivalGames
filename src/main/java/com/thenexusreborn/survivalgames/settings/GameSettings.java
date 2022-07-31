@@ -1,10 +1,14 @@
 package com.thenexusreborn.survivalgames.settings;
 
+import com.thenexusreborn.api.data.annotations.*;
+
 import java.lang.reflect.Field;
 
 @SuppressWarnings("DuplicatedCode")
-public class GameSettings extends SGSettings {
-    private int id;
+@TableInfo("sggamesettings")
+public class GameSettings {
+    @Primary
+    private long id;
     private String type = "default";
     private int maxPlayers = 24;
     private int maxHealth = 20;
@@ -32,10 +36,6 @@ public class GameSettings extends SGSettings {
     private Time time = Time.NOON;
     private Weather weather = Weather.CLEAR;
     
-    public GameSettings() {
-        super("sggamesettings");
-    }
-    
     public GameSettings setTeamingAllowed(boolean value) {
         this.teamingAllowed = value;
         return this;
@@ -45,11 +45,11 @@ public class GameSettings extends SGSettings {
         return teamingAllowed;
     }
     
-    public int getId() {
+    public long getId() {
         return id;
     }
     
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
     
