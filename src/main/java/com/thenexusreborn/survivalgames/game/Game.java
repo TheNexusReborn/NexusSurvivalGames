@@ -18,7 +18,7 @@ import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.death.*;
 import com.thenexusreborn.survivalgames.game.timer.*;
 import com.thenexusreborn.survivalgames.lootv2.LootChances;
-import com.thenexusreborn.survivalgames.map.GameMap;
+import com.thenexusreborn.survivalgames.map.*;
 import com.thenexusreborn.survivalgames.scoreboard.*;
 import com.thenexusreborn.survivalgames.settings.*;
 import com.thenexusreborn.survivalgames.util.SGUtils;
@@ -226,7 +226,7 @@ public class Game {
             if (player != null) {
                 int index = new Random().nextInt(spawns.size());
                 Entry<Integer, UUID> entry = spawns.get(index);
-                Position spawnPosition = this.gameMap.getSpawns().get(entry.getKey());
+                MapSpawn spawnPosition = this.gameMap.getSpawns().get(entry.getKey());
                 Location spawn = spawnPosition.toLocation(gameMap.getWorld());
                 teleportTribute(player, mapSpawn, spawn);
                 this.spawns.put(entry.getKey(), player.getUniqueId());

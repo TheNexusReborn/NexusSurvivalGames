@@ -8,7 +8,7 @@ import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
-import com.thenexusreborn.survivalgames.map.GameMap;
+import com.thenexusreborn.survivalgames.map.*;
 import com.thenexusreborn.survivalgames.settings.*;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.*;
@@ -405,7 +405,7 @@ public class SGCommand implements CommandExecutor {
                 
                 settings.setId(0);
                 settings.setType(args[3].toLowerCase());
-                settings.pushToDatabase();
+                NexusAPI.getApi().getPrimaryDatabase().push(settings);
                 if (settings.getId() > 0) {
                     sender.sendMessage(MCUtils.color(MsgType.INFO + "Successfully saved the settings with the name &b" + settings.getType()));
                     if (type.equalsIgnoreCase("lobby")) {
@@ -614,7 +614,7 @@ public class SGCommand implements CommandExecutor {
                     return true;
                 } else if (mapSubCommand.equals("addspawn") || mapSubCommand.equals("as")) {
                     Location location = player.getLocation();
-                    int position = gameMap.addSpawn(new Position(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+                    int position = gameMap.addSpawn(new MapSpawn(0, 0, location.getBlockX(), location.getBlockY(), location.getBlockZ()));
                     sender.sendMessage(MCUtils.color(MsgType.INFO + "You added a spawn with index &b" + position + " &eto the map &b" + gameMap.getName()));
                 } else if (mapSubCommand.equals("setspawn") || mapSubCommand.equals("sp")) {
                     int argIndex;
@@ -638,7 +638,7 @@ public class SGCommand implements CommandExecutor {
                     }
                     
                     Location location = player.getLocation();
-                    gameMap.setSpawn(position, new Position(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+                    gameMap.setSpawn(position, new MapSpawn(gameMap.getId(), position, location.getBlockX(), location.getBlockY(), location.getBlockZ()));
                     sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the spawn at position &b" + position + " &eto your location in the map &b" + gameMap.getName()));
                 } else if (mapSubCommand.equals("setcenter") || mapSubCommand.equals("sc")) {
                     Location location = player.getPlayer().getLocation();

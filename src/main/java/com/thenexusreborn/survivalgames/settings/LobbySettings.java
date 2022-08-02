@@ -6,10 +6,7 @@ import java.lang.reflect.Field;
 
 @SuppressWarnings("DuplicatedCode")
 @TableInfo("sglobbysettings")
-public class LobbySettings {
-    @Primary
-    private long id;
-    private String type = "default";
+public class LobbySettings extends SGSettings {
     private int maxPlayers = 24;
     private int minPlayers = 4;
     private int maxGames = 10;
@@ -22,25 +19,9 @@ public class LobbySettings {
         return maxPlayers;
     }
     
-    public long getId() {
-        return id;
-    }
-    
-    public void setId(long id) {
-        this.id = id;
-    }
-    
     public LobbySettings setMaxPlayers(int maxPlayers) {
         this.maxPlayers = maxPlayers;
         return this;
-    }
-    
-    public void setType(String type) {
-        this.type = type;
-    }
-    
-    public String getType() {
-        return type;
     }
     
     public int getMinPlayers() {

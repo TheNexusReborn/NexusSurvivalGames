@@ -19,7 +19,7 @@ public class MapSpawn {
     
     private MapSpawn() {}
     
-    public MapSpawn(int mapId, int index, int x, int y, int z) {
+    public MapSpawn(long mapId, int index, int x, int y, int z) {
         this.mapId = mapId;
         this.index = index;
         this.x = x;

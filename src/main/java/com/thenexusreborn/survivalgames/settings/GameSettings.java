@@ -6,10 +6,7 @@ import java.lang.reflect.Field;
 
 @SuppressWarnings("DuplicatedCode")
 @TableInfo("sggamesettings")
-public class GameSettings {
-    @Primary
-    private long id;
-    private String type = "default";
+public class GameSettings extends SGSettings {
     private int maxPlayers = 24;
     private int maxHealth = 20;
     private int gracePeriodLength = 60;
@@ -43,22 +40,6 @@ public class GameSettings {
     
     public boolean isTeamingAllowed() {
         return teamingAllowed;
-    }
-    
-    public long getId() {
-        return id;
-    }
-    
-    public void setId(long id) {
-        this.id = id;
-    }
-    
-    public void setType(String type) {
-        this.type = type;
-    }
-    
-    public String getType() {
-        return type;
     }
     
     public int getMaxPlayers() {
