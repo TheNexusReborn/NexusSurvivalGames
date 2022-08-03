@@ -5,7 +5,6 @@ import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.nexuscore.api.events.*;
-import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
@@ -313,7 +312,7 @@ public class PlayerListener implements Listener {
         String coloredName = e.getNexusPlayer().getRank().getColor() + e.getNexusPlayer().getName();
         Game game = plugin.getGame();
         
-        Collection<SpigotNexusPlayer> players;
+        Collection<NexusPlayer> players;
         if (game == null) {
             players = plugin.getLobby().getPlayers();
         } else {
@@ -344,10 +343,10 @@ public class PlayerListener implements Listener {
                 message = "&a&l>> " + coloredName + " &ejoined.";
             }
         }
-    
+        
         if (!message.equals("")) {
             if (incognito) {
-                for (SpigotNexusPlayer player : players) {
+                for (NexusPlayer player : players) {
                     if (player.getRank().ordinal() <= Rank.HELPER.ordinal() || player.getUniqueId().equals(e.getNexusPlayer().getUniqueId())) {
                         player.sendMessage(message);
                     }
@@ -376,7 +375,9 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onPrepareCraft(PrepareItemCraftEvent e) {
         CraftingInventory inv = e.getInventory();
-        if (inv.getRecipe() == null) return; 
+        if (inv.getRecipe() == null) {
+            return;
+        }
         if (inv.getRecipe().getResult().getType() == Material.FLINT_AND_STEEL) {
             ItemStack itemStack = new ItemStack(Material.FLINT_AND_STEEL);
             itemStack.setDurability((short) (Material.FLINT_AND_STEEL.getMaxDurability() - 4));
@@ -630,7 +631,7 @@ public class PlayerListener implements Listener {
     
     @EventHandler
     public void onNexusPlayerLoad(NexusPlayerLoadEvent e) {
-        SpigotNexusPlayer nexusPlayer = (SpigotNexusPlayer) e.getNexusPlayer();
+        NexusPlayer nexusPlayer = e.getNexusPlayer();
         if (plugin.getGame() == null) {
             if (plugin.getLobby().getPlayingCount() >= plugin.getLobby().getLobbySettings().getMaxPlayers()) {
                 boolean isStaff = nexusPlayer.getRank().ordinal() <= Rank.HELPER.ordinal();
@@ -643,7 +644,7 @@ public class PlayerListener implements Listener {
                             ByteArrayDataOutput out = ByteStreams.newDataOutput();
                             out.writeUTF("Connect");
                             out.writeUTF("H1");
-                            nexusPlayer.getPlayer().sendPluginMessage(plugin.getNexusCore(), "BungeeCord", out.toByteArray());
+                            Bukkit.getPlayer(nexusPlayer.getUniqueId()).sendPluginMessage(plugin.getNexusCore(), "BungeeCord", out.toByteArray());
                         }
                     }.runTaskLater(plugin, 10L);
                     
@@ -679,9 +680,9 @@ public class PlayerListener implements Listener {
         SurvivalGames.PLAYER_QUEUE.remove(e.getPlayer().getUniqueId());
         NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(e.getPlayer().getUniqueId());
         if (plugin.getGame() != null) {
-            plugin.getGame().removePlayer((SpigotNexusPlayer) nexusPlayer);
+            plugin.getGame().removePlayer(nexusPlayer);
         } else {
-            plugin.getLobby().removePlayer((SpigotNexusPlayer) nexusPlayer);
+            plugin.getLobby().removePlayer(nexusPlayer);
         }
         e.setQuitMessage(null);
     }

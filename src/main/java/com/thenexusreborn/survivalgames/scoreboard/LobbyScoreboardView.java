@@ -4,7 +4,6 @@ import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.scoreboard.wrapper.ITeam;
-import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.nexuscore.scoreboard.SpigotScoreboardView;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -66,7 +65,7 @@ public class LobbyScoreboardView extends SpigotScoreboardView {
         }
         
         int waiting = 0;
-        for (SpigotNexusPlayer waitingPlayer : lobby.getPlayers()) {
+        for (NexusPlayer waitingPlayer : lobby.getPlayers()) {
             if (!lobby.getSpectatingPlayers().contains(waitingPlayer.getUniqueId())) {
                 if (!waitingPlayer.getPreferences().get("vanish").getValue()) {
                     waiting++;

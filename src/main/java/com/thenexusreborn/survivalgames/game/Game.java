@@ -10,7 +10,6 @@ import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.api.tags.Tag;
 import com.thenexusreborn.api.tournament.Tournament;
 import com.thenexusreborn.api.util.Environment;
-import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
@@ -53,7 +52,7 @@ public class Game {
     private final Map<Location, Inventory> enderchestInventories = new HashMap<>();
     private final boolean awardTournamentPoints;
     
-    public Game(GameMap gameMap, GameSettings settings, Collection<SpigotNexusPlayer> players, List<UUID> spectatingPlayers) {
+    public Game(GameMap gameMap, GameSettings settings, Collection<NexusPlayer> players, List<UUID> spectatingPlayers) {
         this.gameMap = gameMap;
         this.settings = settings;
         this.gameInfo = new GameInfo();
@@ -61,7 +60,7 @@ public class Game {
         gameInfo.setPlayerCount(players.size() - spectatingPlayers.size());
         gameInfo.setServerName(NexusAPI.getApi().getServerManager().getCurrentServer().getName());
         List<String> playerNames = new ArrayList<>();
-        for (SpigotNexusPlayer player : players) {
+        for (NexusPlayer player : players) {
             GamePlayer gamePlayer = new GamePlayer(player);
             if (spectatingPlayers.contains(player.getUniqueId()) || player.getPreferences().get("vanish").getValue()) {
                 gamePlayer.setTeam(GameTeam.SPECTATORS);
@@ -147,15 +146,16 @@ public class Game {
         return restockTimer;
     }
     
-    public void addPlayer(SpigotNexusPlayer nexusPlayer) {
+    public void addPlayer(NexusPlayer nexusPlayer) {
         GamePlayer gamePlayer = new GamePlayer(nexusPlayer);
         gamePlayer.setTeam(GameTeam.SPECTATORS);
         gamePlayer.sendMessage(GameTeam.SPECTATORS.getJoinMessage());
-        nexusPlayer.getPlayer().getInventory().clear();
-        nexusPlayer.getPlayer().getInventory().setArmorContents(null);
-        giveSpectatorItems(nexusPlayer.getPlayer());
-        nexusPlayer.getPlayer().spigot().setCollidesWithEntities(false);
-        teleportSpectator(nexusPlayer.getPlayer(), this.gameMap.getCenter().toLocation(this.gameMap.getWorld()));
+        Player player = Bukkit.getPlayer(nexusPlayer.getUniqueId());
+        player.getInventory().clear();
+        player.getInventory().setArmorContents(null);
+        giveSpectatorItems(player);
+        player.spigot().setCollidesWithEntities(false);
+        teleportSpectator(player, this.gameMap.getCenter().toLocation(this.gameMap.getWorld()));
         this.players.put(nexusPlayer.getUniqueId(), gamePlayer);
         
         if (nexusPlayer.getPreferences().get("vanish").getValue()) {
@@ -179,7 +179,7 @@ public class Game {
         recalculateVisibiltiy();
     }
     
-    public void removePlayer(SpigotNexusPlayer nexusPlayer) {
+    public void removePlayer(NexusPlayer nexusPlayer) {
         if (!this.players.containsKey(nexusPlayer.getUniqueId())) {
             return;
         }
@@ -299,7 +299,7 @@ public class Game {
             
             List<UUID> tributes = new LinkedList<>(), spectators = new LinkedList<>();
             for (GamePlayer player : this.players.values()) {
-                Player p = player.getNexusPlayer().getPlayer();
+                Player p = Bukkit.getPlayer(player.getUniqueId());
                 p.getInventory().clear();
                 p.getInventory().setArmorContents(null);
                 p.setFlying(false);
@@ -309,7 +309,7 @@ public class Game {
                     tributes.add(player.getUniqueId());
                 } else if (player.getTeam() == GameTeam.SPECTATORS) {
                     spectators.add(player.getUniqueId());
-                    giveSpectatorItems(player.getNexusPlayer().getPlayer());
+                    giveSpectatorItems(Bukkit.getPlayer(player.getUniqueId()));
                 }
                 for (PotionEffect potionEffect : p.getActivePotionEffects()) {
                     p.removePotionEffect(potionEffect.getType());
@@ -516,8 +516,9 @@ public class Game {
     
     public void playSound(Sound sound) {
         for (GamePlayer player : this.players.values()) {
-            if (player.getNexusPlayer().getPlayer() != null) {
-                player.getNexusPlayer().getPlayer().playSound(player.getNexusPlayer().getPlayer().getLocation(), sound, 1, 1);
+            Player p = Bukkit.getPlayer(player.getUniqueId());
+            if (p != null) {
+                p.playSound(p.getLocation(), sound, 1, 1);
             }
         }
     }
@@ -558,7 +559,7 @@ public class Game {
         playSound(Sound.ENDERDRAGON_GROWL);
         for (GamePlayer player : this.players.values()) {
             if (player.getTeam() == GameTeam.TRIBUTES) {
-                player.getNexusPlayer().getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 0));
+                Bukkit.getPlayer(player.getUniqueId()).addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 0));
             }
         }
         
@@ -574,7 +575,7 @@ public class Game {
         
         for (GamePlayer player : this.players.values()) {
             if (player.getTeam() == GameTeam.TRIBUTES) {
-                player.getNexusPlayer().getPlayer().removePotionEffect(PotionEffectType.BLINDNESS);
+                Bukkit.getPlayer(player.getUniqueId()).removePotionEffect(PotionEffectType.BLINDNESS);
             }
         }
         
@@ -776,7 +777,7 @@ public class Game {
             }.runTaskLater(plugin, 100L);
         } else {
             for (GamePlayer player : this.players.values()) {
-                resetPlayer(player.getNexusPlayer().getPlayer());
+                resetPlayer(Bukkit.getPlayer(player.getUniqueId()));
             }
             
             plugin.getLobby().fromGame(this);
@@ -870,13 +871,13 @@ public class Game {
         
         if (deathInfo.getType() != DeathType.LEAVE) {
             gamePlayer.setSpectatorByDeath(true);
-            resetPlayer(gamePlayer.getNexusPlayer().getPlayer());
+            resetPlayer(Bukkit.getPlayer(player.getUniqueId()));
             player.setGameMode(newTeam.getGameMode());
             player.setAllowFlight(true);
             player.setFlying(true);
             player.spigot().setCollidesWithEntities(false);
             gamePlayer.sendMessage(newTeam.getJoinMessage());
-            giveSpectatorItems(gamePlayer.getNexusPlayer().getPlayer());
+            giveSpectatorItems(Bukkit.getPlayer(player.getUniqueId()));
         }
         gamePlayer.setTeam(newTeam);
         

@@ -3,7 +3,6 @@ package com.thenexusreborn.survivalgames.lobby;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.api.tournament.Tournament;
-import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.nexuscore.scoreboard.impl.RankTablistHandler;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
@@ -29,7 +28,7 @@ import java.util.logging.Level;
 
 public class Lobby {
     private final SurvivalGames plugin;
-    private final Map<UUID, SpigotNexusPlayer> players = new HashMap<>();
+    private final Map<UUID, NexusPlayer> players = new HashMap<>();
     private final List<UUID> spectatingPlayers = new ArrayList<>();
     private Timer timer;
     private GameSettings gameSettings;
@@ -110,8 +109,8 @@ public class Lobby {
                     
                     sign.setLine(3, MCUtils.color("&n" + votes + " Vote(s)"));
                     
-                    for (SpigotNexusPlayer player : players.values()) {
-                        Player bukkitPlayer = player.getPlayer();
+                    for (NexusPlayer player : players.values()) {
+                        Player bukkitPlayer = Bukkit.getPlayer(player.getUniqueId());
                         if (bukkitPlayer != null) {
                             World world = bukkitPlayer.getWorld();
                             if (world != null) {
@@ -148,7 +147,7 @@ public class Lobby {
                     return;
                 }
                 
-                for (SpigotNexusPlayer nexusPlayer : players.values()) {
+                for (NexusPlayer nexusPlayer : players.values()) {
                     sendMapOptions(nexusPlayer);
                 }
             }
@@ -224,7 +223,7 @@ public class Lobby {
         this.lootChances = lootChances;
     }
     
-    public void sendMapOptions(SpigotNexusPlayer nexusPlayer) {
+    public void sendMapOptions(NexusPlayer nexusPlayer) {
         nexusPlayer.sendMessage(MsgType.INFO + "&e&lVOTING OPTIONS - &7Click an option to vote!");
         for (Entry<Integer, GameMap> entry : mapOptions.entrySet()) {
             String mapName = entry.getValue().getName();
@@ -248,8 +247,8 @@ public class Lobby {
             TextComponent line = new TextComponent(builder.create());
             line.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/map " + entry.getKey()));
             line.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to vote").create()));
-            
-            nexusPlayer.getPlayer().spigot().sendMessage(line);
+    
+            Bukkit.getPlayer(nexusPlayer.getUniqueId()).spigot().sendMessage(line);
         }
     }
     
@@ -314,7 +313,7 @@ public class Lobby {
     }
     
     public void sendMessage(String message) {
-        for (SpigotNexusPlayer player : this.players.values()) {
+        for (NexusPlayer player : this.players.values()) {
             player.sendMessage(message);
         }
         Bukkit.getConsoleSender().sendMessage(MCUtils.color(message));
@@ -451,7 +450,7 @@ public class Lobby {
         }.runTaskAsynchronously(plugin);
     }
     
-    public Collection<SpigotNexusPlayer> getPlayers() {
+    public Collection<NexusPlayer> getPlayers() {
         return new ArrayList<>(this.players.values());
     }
     
@@ -471,7 +470,7 @@ public class Lobby {
         return gameMap;
     }
     
-    public void addPlayer(SpigotNexusPlayer nexusPlayer) {
+    public void addPlayer(NexusPlayer nexusPlayer) {
         if (nexusPlayer == null) {
             System.out.println("Nexus Player was null");
             return;
@@ -484,7 +483,7 @@ public class Lobby {
         this.players.put(nexusPlayer.getUniqueId(), nexusPlayer);
         
         int totalPlayers = 0;
-        for (SpigotNexusPlayer player : this.players.values()) {
+        for (NexusPlayer player : this.players.values()) {
             if (!this.spectatingPlayers.contains(player.getUniqueId())) {
                 if (!player.getPreferences().get("vanish").getValue()) {
                     totalPlayers++;
@@ -495,12 +494,12 @@ public class Lobby {
         if (totalPlayers > lobbySettings.getMaxPlayers()) {
             nexusPlayer.sendMessage("&eYou will be a spectator in the game as you joined with the player count above the maximum game amount. However, you can be a tribute if those before you leave or become spectators");
         }
+        Player player = Bukkit.getPlayer(nexusPlayer.getUniqueId());
         
         Location spawn = getSpawnpoint().clone();
         spawn.setY(spawn.getY() + 2);
-        nexusPlayer.getPlayer().teleport(spawn);
+        player.teleport(spawn);
         
-        Player player = nexusPlayer.getPlayer();
         for (Player online : Bukkit.getOnlinePlayers()) {
             online.showPlayer(player);
             player.showPlayer(online);
@@ -508,7 +507,7 @@ public class Lobby {
         
         if (nexusPlayer.getPreferences().get("vanish").getValue()) {
             for (Player p : Bukkit.getOnlinePlayers()) {
-                SpigotNexusPlayer psp = this.players.get(p.getUniqueId());
+                NexusPlayer psp = this.players.get(p.getUniqueId());
                 if (psp != null) {
                     if (psp.getRank().ordinal() > Rank.HELPER.ordinal()) {
                         p.hidePlayer(player);
@@ -518,7 +517,7 @@ public class Lobby {
                 }
             }
         } else if (nexusPlayer.getPreferences().get("incognito").getValue()) {
-            for (SpigotNexusPlayer np : this.players.values()) {
+            for (NexusPlayer np : this.players.values()) {
                 if (np != null) {
                     if (np.getRank().ordinal() <= Rank.HELPER.ordinal()) {
                         np.sendMessage("&a&l>> " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined &e&osilently&e.");
@@ -531,10 +530,10 @@ public class Lobby {
         
         boolean joiningPlayerStaff = nexusPlayer.getRank().ordinal() <= Rank.HELPER.ordinal();
         for (Player p : Bukkit.getOnlinePlayers()) {
-            SpigotNexusPlayer psp = this.players.get(p.getUniqueId());
+            NexusPlayer psp = this.players.get(p.getUniqueId());
             if (psp != null) {
                 if (psp.getPreferences().get("vanish").getValue() && !joiningPlayerStaff) {
-                    nexusPlayer.getPlayer().hidePlayer(p);
+                    Bukkit.getPlayer(nexusPlayer.getUniqueId()).hidePlayer(p);
                 }
             }
         }
@@ -554,27 +553,27 @@ public class Lobby {
         sendMapOptions(nexusPlayer);
     }
     
-    public void removePlayer(SpigotNexusPlayer nexusPlayer) {
+    public void removePlayer(NexusPlayer nexusPlayer) {
         if (!this.players.containsKey(nexusPlayer.getUniqueId())) {
             return;
         }
         this.players.remove(nexusPlayer.getUniqueId());
         this.spectatingPlayers.remove(nexusPlayer.getUniqueId());
         int totalPlayers = 0;
-        for (SpigotNexusPlayer player : this.players.values()) {
+        for (NexusPlayer player : this.players.values()) {
             if (!this.spectatingPlayers.contains(player.getUniqueId())) {
                 totalPlayers++;
             }
         }
         
         if (nexusPlayer.getPreferences().get("vanish").getValue()) {
-            for (SpigotNexusPlayer snp : this.players.values()) {
+            for (NexusPlayer snp : this.players.values()) {
                 if (snp.getRank().ordinal() <= Rank.HELPER.ordinal()) {
                     snp.sendMessage("&c&l<< " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft &e&overy silently&e.");
                 }
             }
         } else if (nexusPlayer.getPreferences().get("incognito").getValue()) {
-            for (SpigotNexusPlayer snp : this.players.values()) {
+            for (NexusPlayer snp : this.players.values()) {
                 if (snp.getRank().ordinal() <= Rank.HELPER.ordinal()) {
                     snp.sendMessage("&c&l<< " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft &e&osilently&e.");
                 }
@@ -638,7 +637,7 @@ public class Lobby {
     }
     
     public boolean hasPlayer(UUID uniqueId) {
-        for (SpigotNexusPlayer player : this.players.values()) {
+        for (NexusPlayer player : this.players.values()) {
             if (player.getUniqueId().toString().equalsIgnoreCase(uniqueId.toString())) {
                 return true;
             }
@@ -698,9 +697,10 @@ public class Lobby {
     }
     
     public void playSound(Sound sound) {
-        for (SpigotNexusPlayer player : this.players.values()) {
-            if (player.getPlayer() != null) {
-                player.getPlayer().playSound(player.getPlayer().getLocation(), sound, 1, 1);
+        for (NexusPlayer player : this.players.values()) {
+            Player p = Bukkit.getPlayer(player.getUniqueId());
+            if (p != null) {
+                p.playSound(p.getLocation(), sound, 1, 1);
             }
         }
     }
@@ -779,7 +779,7 @@ public class Lobby {
         this.lobbySettings = settings;
         if (this.timer != null && this.timer.isRunning()) {
             int playerCount = 0;
-            for (SpigotNexusPlayer player : getPlayers()) {
+            for (NexusPlayer player : getPlayers()) {
                 if (!getSpectatingPlayers().contains(player.getUniqueId())) {
                     if (!player.getPreferences().get("vanish").getValue()) {
                         playerCount++;
@@ -800,7 +800,7 @@ public class Lobby {
     
     public int getPlayingCount() {
         int playerCount = 0;
-        for (SpigotNexusPlayer player : getPlayers()) {
+        for (NexusPlayer player : getPlayers()) {
             if (!getSpectatingPlayers().contains(player.getUniqueId())) {
                 if (!player.getPreferences().get("vanish").getValue()) {
                     playerCount++;

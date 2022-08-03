@@ -1,11 +1,11 @@
 package com.thenexusreborn.survivalgames.lobby;
 
 import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.nexuscore.util.ActionBar;
+import com.thenexusreborn.api.player.IActionBar;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.*;
 
-public class LobbyActionBar extends ActionBar {
+public class LobbyActionBar implements IActionBar {
     
     private final SurvivalGames plugin;
     

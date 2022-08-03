@@ -2,6 +2,7 @@ package com.thenexusreborn.survivalgames;
 
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.data.objects.Database;
+import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.registry.*;
 import com.thenexusreborn.api.server.ServerInfo;
 import com.thenexusreborn.api.stats.StatType;
@@ -9,7 +10,6 @@ import com.thenexusreborn.api.tournament.Tournament;
 import com.thenexusreborn.api.util.Environment;
 import com.thenexusreborn.nexuscore.NexusCore;
 import com.thenexusreborn.nexuscore.api.NexusSpigotPlugin;
-import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.survivalgames.cmd.*;
 import com.thenexusreborn.survivalgames.game.*;
@@ -168,12 +168,12 @@ public class SurvivalGames extends NexusSpigotPlugin {
                 if (game != null) {
                     for (GamePlayer player : game.getPlayers().values()) {
                         if (player.getTeam() != GameTeam.TRIBUTES) {
-                            updatePlayerHealthAndFood(player.getNexusPlayer().getPlayer());
+                            updatePlayerHealthAndFood(Bukkit.getPlayer(player.getUniqueId()));
                         }
                     }
                 } else {
-                    for (SpigotNexusPlayer player : lobby.getPlayers()) {
-                        updatePlayerHealthAndFood(player.getPlayer());
+                    for (NexusPlayer player : lobby.getPlayers()) {
+                        updatePlayerHealthAndFood(Bukkit.getPlayer(player.getUniqueId()));
                     }
                 }
             }

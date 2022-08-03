@@ -1,9 +1,8 @@
 package com.thenexusreborn.survivalgames.lobby.tasks;
 
 import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.api.player.Rank;
+import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.api.tournament.Tournament;
-import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.nexuscore.util.ServerProperties;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.*;
@@ -57,7 +56,7 @@ public class LobbyTask extends BukkitRunnable {
                 if (lobby.getLobbySettings().getType().equals("tournament")) {
                     lobby.setLobbySettings(plugin.getLobbySettings("default"));
                 }
-    
+                
                 if (lobby.getGameSettings().getType().equals("tournament")) {
                     lobby.setGameSettings(plugin.getGameSettings("default"));
                 }
@@ -78,22 +77,24 @@ public class LobbyTask extends BukkitRunnable {
             }
         }
         
-        for (SpigotNexusPlayer player : lobby.getPlayers()) {
-            for (SpigotNexusPlayer other : lobby.getPlayers()) {
+        for (NexusPlayer player : lobby.getPlayers()) {
+            Player bukkitPlayer = Bukkit.getPlayer(player.getUniqueId());
+            for (NexusPlayer other : lobby.getPlayers()) {
+                Player otherBukkitPlayer = Bukkit.getPlayer(other.getUniqueId());
                 if (player.getPreferences().get("vanish").getValue()) {
                     if (other.getRank().ordinal() > Rank.HELPER.ordinal()) {
-                        other.getPlayer().hidePlayer(player.getPlayer());
+                        otherBukkitPlayer.hidePlayer(bukkitPlayer);
                     }
                 } else {
-                    other.getPlayer().showPlayer(player.getPlayer());
+                    otherBukkitPlayer.showPlayer(bukkitPlayer);
                 }
                 
                 if (other.getPreferences().get("vanish").getValue()) {
                     if (player.getRank().ordinal() > Rank.HELPER.ordinal()) {
-                        player.getPlayer().hidePlayer(other.getPlayer());
+                        bukkitPlayer.hidePlayer(otherBukkitPlayer);
                     }
                 } else {
-                    player.getPlayer().showPlayer(other.getPlayer());
+                    bukkitPlayer.showPlayer(otherBukkitPlayer);
                 }
             }
         }
