@@ -85,6 +85,34 @@ public class SurvivalGames extends NexusSpigotPlugin {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+        
+        if (!this.lobbySettings.containsKey("default")) {
+            LobbySettings ls = new LobbySettings("default");
+            NexusAPI.getApi().getPrimaryDatabase().push(ls);
+            addLobbySettings(ls);
+        } else if (!this.gameSettings.containsKey("default")) {
+            GameSettings ls = new GameSettings("default");
+            NexusAPI.getApi().getPrimaryDatabase().push(ls);
+            addGameSettings(ls);
+        }
+    
+        if (NexusAPI.getApi().getEnvironment() == Environment.DEVELOPMENT) {
+            LobbySettings devLobbySettings = getLobbySettings("dev");
+            if (devLobbySettings == null) {
+                devLobbySettings = new LobbySettings("dev");
+                devLobbySettings.setTimerLength(10);
+                NexusAPI.getApi().getPrimaryDatabase().push(devLobbySettings);
+                addLobbySettings(devLobbySettings);
+            }
+        
+            GameSettings devGameSettings = getGameSettings("dev");
+            if (devGameSettings == null) {
+                devGameSettings = new GameSettings("dev");
+                devGameSettings.setWarmupLength(10);
+                NexusAPI.getApi().getPrimaryDatabase().push(devGameSettings);
+                addGameSettings(devGameSettings);
+            }
+        }
     
         getLogger().info("Settings Loaded");
         
@@ -99,27 +127,8 @@ public class SurvivalGames extends NexusSpigotPlugin {
         Game.setControlType(ControlType.AUTOMATIC);
         
         if (!(NexusAPI.getApi().getTournament() != null && NexusAPI.getApi().getTournament().isActive())) {
-            if (NexusAPI.getApi().getEnvironment() == Environment.DEVELOPMENT) {
-                LobbySettings devLobbySettings = getLobbySettings("dev");
-                if (devLobbySettings == null) {
-                    devLobbySettings = new LobbySettings();
-                    devLobbySettings.setType("dev");
-                    devLobbySettings.setTimerLength(10);
-                    NexusAPI.getApi().getPrimaryDatabase().push(devLobbySettings);
-                    addLobbySettings(devLobbySettings);
-                }
-                lobby.setLobbySettings(devLobbySettings);
-        
-                GameSettings devGameSettings = getGameSettings("dev");
-                if (devGameSettings == null) {
-                    devGameSettings = new GameSettings();
-                    devGameSettings.setType("dev");
-                    devGameSettings.setWarmupLength(10);
-                    NexusAPI.getApi().getPrimaryDatabase().push(devGameSettings);
-                    addGameSettings(devGameSettings);
-                }
-                lobby.setGameSettings(devGameSettings);
-            }
+            lobby.setLobbySettings(getLobbySettings("dev"));
+            lobby.setGameSettings(getGameSettings("dev"));
         }
         
         if (this.getConfig().contains("spawnpoint")) {

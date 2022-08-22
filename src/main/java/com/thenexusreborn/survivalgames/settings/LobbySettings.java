@@ -15,6 +15,13 @@ public class LobbySettings extends SGSettings {
     private boolean keepPreviousGameSettings = true;
     private boolean sounds = true;
     
+    public LobbySettings() {
+    }
+    
+    public LobbySettings(String type) {
+        super(type);
+    }
+    
     public int getMaxPlayers() {
         return maxPlayers;
     }

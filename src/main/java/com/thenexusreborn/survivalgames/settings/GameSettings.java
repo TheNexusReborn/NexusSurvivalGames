@@ -33,6 +33,13 @@ public class GameSettings extends SGSettings {
     private Time time = Time.NOON;
     private Weather weather = Weather.CLEAR;
     
+    public GameSettings() {
+    }
+    
+    public GameSettings(String type) {
+        super(type);
+    }
+    
     public GameSettings setTeamingAllowed(boolean value) {
         this.teamingAllowed = value;
         return this;

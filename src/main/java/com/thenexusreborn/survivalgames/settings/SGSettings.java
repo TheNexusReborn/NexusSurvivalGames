@@ -7,6 +7,13 @@ public abstract class SGSettings {
     protected long id;
     protected String type;
     
+    public SGSettings() {
+    }
+    
+    public SGSettings(String type) {
+        this.type = type;
+    }
+    
     public long getId() {
         return id;
     }
