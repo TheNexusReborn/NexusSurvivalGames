@@ -1,6 +1,7 @@
 package com.thenexusreborn.survivalgames.settings;
 
 import com.thenexusreborn.api.data.annotations.*;
+import com.thenexusreborn.api.helper.ReflectionHelper;
 
 import java.lang.reflect.Field;
 
@@ -88,15 +89,15 @@ public class LobbySettings extends SGSettings {
     @Override
     public String toString() {
         return "LobbySettings{" +
-                "id=" + id +
-                ", type='" + type + '\'' +
-                ", maxPlayers=" + maxPlayers +
+                "maxPlayers=" + maxPlayers +
                 ", minPlayers=" + minPlayers +
                 ", maxGames=" + maxGames +
                 ", timerLength=" + timerLength +
                 ", voteWeight=" + voteWeight +
                 ", keepPreviousGameSettings=" + keepPreviousGameSettings +
                 ", sounds=" + sounds +
+                ", id=" + id +
+                ", type='" + type + '\'' +
                 '}';
     }
     
@@ -104,7 +105,7 @@ public class LobbySettings extends SGSettings {
     public LobbySettings clone() {
         LobbySettings settings = new LobbySettings();
     
-        for (Field field : getClass().getDeclaredFields()) {
+        for (Field field : ReflectionHelper.getClassFields(getClass())) {
             field.setAccessible(true);
             try {
                 field.set(settings, field.get(this));
@@ -113,7 +114,6 @@ public class LobbySettings extends SGSettings {
             }
         }
         
-        settings.setId(0);
         return settings;
     }
 }

@@ -1,6 +1,7 @@
 package com.thenexusreborn.survivalgames.settings;
 
 import com.thenexusreborn.api.data.annotations.*;
+import com.thenexusreborn.api.helper.ReflectionHelper;
 
 import java.lang.reflect.Field;
 
@@ -267,9 +268,7 @@ public class GameSettings extends SGSettings {
     @Override
     public String toString() {
         return "GameSettings{" +
-                "id=" + id +
-                ", type='" + type + '\'' +
-                ", maxPlayers=" + maxPlayers +
+                "maxPlayers=" + maxPlayers +
                 ", maxHealth=" + maxHealth +
                 ", gracePeriodLength=" + gracePeriodLength +
                 ", gameLength=" + gameLength +
@@ -294,6 +293,8 @@ public class GameSettings extends SGSettings {
                 ", colorMode=" + colorMode +
                 ", time=" + time +
                 ", weather=" + weather +
+                ", id=" + id +
+                ", type='" + type + '\'' +
                 '}';
     }
     
@@ -301,7 +302,7 @@ public class GameSettings extends SGSettings {
     public GameSettings clone() {
         GameSettings settings = new GameSettings();
     
-        for (Field field : getClass().getDeclaredFields()) {
+        for (Field field : ReflectionHelper.getClassFields(getClass())) {
             field.setAccessible(true);
             try {
                 field.set(settings, field.get(this));
@@ -310,7 +311,6 @@ public class GameSettings extends SGSettings {
             }
         }
     
-        settings.setId(0);
         return settings;
     }
 }
