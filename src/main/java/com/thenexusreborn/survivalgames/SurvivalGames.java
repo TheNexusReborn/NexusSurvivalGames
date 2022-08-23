@@ -127,8 +127,10 @@ public class SurvivalGames extends NexusSpigotPlugin {
         Game.setControlType(ControlType.AUTOMATIC);
         
         if (!(NexusAPI.getApi().getTournament() != null && NexusAPI.getApi().getTournament().isActive())) {
-            lobby.setLobbySettings(getLobbySettings("dev"));
-            lobby.setGameSettings(getGameSettings("dev"));
+            if (NexusAPI.getApi().getEnvironment() == Environment.DEVELOPMENT) {
+                lobby.setLobbySettings(getLobbySettings("dev"));
+                lobby.setGameSettings(getGameSettings("dev"));
+            }
         }
         
         if (this.getConfig().contains("spawnpoint")) {
