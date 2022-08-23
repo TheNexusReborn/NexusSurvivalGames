@@ -459,16 +459,10 @@ public class Lobby {
     }
     
     public GameSettings getGameSettings() {
-        if (gameSettings == null) {
-            this.gameSettings = new GameSettings();
-        }
         return gameSettings;
     }
     
     public LobbySettings getLobbySettings() {
-        if (lobbySettings == null) {
-            this.lobbySettings = new LobbySettings();
-        }
         return lobbySettings;
     }
     
