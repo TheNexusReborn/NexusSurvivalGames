@@ -6,11 +6,11 @@ import org.bukkit.*;
 import java.util.Objects;
 
 @TableInfo("sgmapspawns")
-public class MapSpawn {
+public class MapSpawn implements Comparable<MapSpawn> {
     @Primary
     private long id; 
     private long mapId;
-    private int index;
+    private int index = -1;
     private int x, y, z;
     
     public static MapSpawn fromLocation(int mapId, int index, Location location) {
@@ -99,5 +99,13 @@ public class MapSpawn {
     @Override
     public int hashCode() {
         return Objects.hash(mapId, index, x, y, z);
+    }
+    
+    @Override
+    public int compareTo(MapSpawn o) {
+        if (o.mapId != this.mapId) {
+            return -1;
+        }
+        return Integer.compare(this.index, o.index);
     }
 }

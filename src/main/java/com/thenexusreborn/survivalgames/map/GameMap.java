@@ -2,11 +2,10 @@ package com.thenexusreborn.survivalgames.map;
 
 import com.thenexusreborn.api.data.annotations.*;
 import com.thenexusreborn.api.data.codec.StringSetCodec;
-import com.thenexusreborn.nexuscore.data.codec.PositionCodec;
-import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.nexuscore.util.*;
-import com.thenexusreborn.api.collection.IncrementalMap;
 import com.thenexusreborn.api.helper.FileHelper;
+import com.thenexusreborn.nexuscore.data.codec.PositionCodec;
+import com.thenexusreborn.nexuscore.util.Position;
+import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.data.handler.GameMapObjectHandler;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -26,7 +25,7 @@ public class GameMap {
     @ColumnInfo(type = "varchar(100)", codec = PositionCodec.class) 
     private Position center = new Position(0, 0, 0);
     @ColumnIgnored
-    private IncrementalMap<MapSpawn> spawns = new IncrementalMap<>();
+    private List<MapSpawn> spawns = new LinkedList<>();
     private int borderDistance = 0, deathmatchBorderDistance = 0;
     @ColumnInfo(type = "varchar(1000)", codec = StringSetCodec.class)
     private Set<String> creators = new HashSet<>();
@@ -49,6 +48,37 @@ public class GameMap {
     public GameMap(String fileName, String name) {
         this.url = fileName;
         this.name = name;
+    }
+    
+    public void recalculateSpawns() {
+        if (spawns.isEmpty()) {
+            return;
+        }
+        
+        List<MapSpawn> spawns = new LinkedList<>(this.spawns);
+        Collections.sort(spawns);
+        
+        for (int i = 0; i < spawns.size(); i++) {
+            MapSpawn spawn = spawns.get(i);
+            if (spawn != null) {
+                spawn.setIndex(i);
+            }
+        }
+    }
+    
+    public int getNextIndex() {
+        if (this.spawns.isEmpty()) {
+            return 0;
+        }
+        
+        int lastIndex = 0;
+        for (MapSpawn spawn : this.spawns) {
+            if (spawn.getIndex() > lastIndex) {
+                lastIndex = spawn.getIndex();
+            }
+        }
+        
+        return lastIndex + 1;
     }
     
     public void delete(SurvivalGames plugin) {
@@ -104,20 +134,33 @@ public class GameMap {
         this.creators.remove(creator);
     }
     
+    public void setSpawns(Collection<MapSpawn> spawns) {
+        this.spawns.clear();
+        this.spawns.addAll(spawns);
+        this.spawns.forEach(spawn -> spawn.setMapId(this.id));
+    }
+    
     public int addSpawn(MapSpawn spawn) {
-        int index = this.spawns.add(spawn);
+        if (spawn.getIndex() == -1) {
+            int index = getNextIndex();
+            spawn.setIndex(index);
+        } else {
+            this.spawns.add(spawn);
+        }
         spawn.setMapId(this.getId());
-        spawn.setIndex(index);
-        return index;
+        return spawn.getIndex();
     }
     
     public void setSpawn(int index, MapSpawn spawn) {
         spawn.setIndex(index);
-        this.spawns.put(index, spawn);
+        spawn.setMapId(this.getId());
+        this.spawns.removeIf(s -> s.getIndex() == index);
+        this.spawns.add(spawn);
     }
     
     public void removeSpawn(int index) {
-        this.spawns.remove(index);
+        this.spawns.removeIf(spawn -> spawn.getIndex() == index);
+        recalculateSpawns();
     }
     
     public String getUrl() {
@@ -144,7 +187,7 @@ public class GameMap {
         this.center = center;
     }
     
-    public SortedMap<Integer, MapSpawn> getSpawns() {
+    public List<MapSpawn> getSpawns() {
         return spawns;
     }
     
@@ -314,6 +357,7 @@ public class GameMap {
     
     public void setId(long id) {
         this.id = id;
+        this.spawns.forEach(spawn -> spawn.setMapId(id));
     }
     
     @Override

@@ -16,9 +16,8 @@ public class GameMapObjectHandler extends ObjectHandler {
         GameMap gameMap = (GameMap) object;
         try {
             List<MapSpawn> mapSpawns = database.get(MapSpawn.class, "mapId", gameMap.getId());
-            for (MapSpawn mapSpawn : mapSpawns) {
-                gameMap.addSpawn(mapSpawn);
-            }
+            gameMap.setSpawns(mapSpawns);
+            gameMap.recalculateSpawns();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -27,7 +26,14 @@ public class GameMapObjectHandler extends ObjectHandler {
     @Override
     public void afterSave() {
         GameMap gameMap = (GameMap) object;
-        for (MapSpawn mapSpawn : gameMap.getSpawns().values()) {
+    
+        for (MapSpawn spawn : gameMap.getSpawns()) {
+            if (spawn.getMapId() != gameMap.getId()) {
+                spawn.setMapId(gameMap.getId());
+            }
+        }
+        
+        for (MapSpawn mapSpawn : gameMap.getSpawns()) {
             database.push(mapSpawn);
         }
     }
