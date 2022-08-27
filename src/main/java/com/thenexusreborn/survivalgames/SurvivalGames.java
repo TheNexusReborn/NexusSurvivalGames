@@ -223,7 +223,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         registry.register("sg_highest_kill_streak", StatType.INTEGER, 0);
         registry.register("sg_games", StatType.INTEGER, 0);
         registry.register("sg_wins", StatType.INTEGER, 0);
-        registry.register("sg_winstreak", StatType.INTEGER, 0);
+        registry.register("sg_win_streak", StatType.INTEGER, 0);
         registry.register("sg_deaths", StatType.INTEGER, 0);
         registry.register("sg_deathmatches_reached", StatType.INTEGER, 0);
         registry.register("sg_chests_looted", StatType.INTEGER, 0);
