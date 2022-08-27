@@ -76,7 +76,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
             for (GameSettings gameSettings : NexusAPI.getApi().getPrimaryDatabase().get(GameSettings.class)) {
                 this.gameSettings.put(gameSettings.getType(), gameSettings);
             }
-    
+            
             for (LobbySettings lobbySettings : NexusAPI.getApi().getPrimaryDatabase().get(LobbySettings.class)) {
                 this.lobbySettings.put(lobbySettings.getType(), lobbySettings);
             }
@@ -95,7 +95,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
             NexusAPI.getApi().getPrimaryDatabase().push(ls);
             addGameSettings(ls);
         }
-    
+        
         if (NexusAPI.getApi().getEnvironment() == Environment.DEVELOPMENT) {
             LobbySettings devLobbySettings = getLobbySettings("dev");
             if (devLobbySettings == null) {
@@ -104,7 +104,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
                 NexusAPI.getApi().getPrimaryDatabase().push(devLobbySettings);
                 addLobbySettings(devLobbySettings);
             }
-        
+            
             GameSettings devGameSettings = getGameSettings("dev");
             if (devGameSettings == null) {
                 devGameSettings = new GameSettings("dev");
@@ -113,7 +113,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
                 addGameSettings(devGameSettings);
             }
         }
-    
+        
         getLogger().info("Settings Loaded");
         
         mapManager = new MapManager(this);
@@ -228,22 +228,24 @@ public class SurvivalGames extends NexusSpigotPlugin {
         registry.register("sg_deathmatches_reached", StatType.INTEGER, 0);
         registry.register("sg_chests_looted", StatType.INTEGER, 0);
         registry.register("sg_assists", StatType.INTEGER, 0);
-//        registry.register("sg_times_mutated", StatType.INTEGER, 0);
-//        registry.register("sg_mutation_kills", StatType.INTEGER, 0);
-//        registry.register("sg_mutation_deaths", StatType.INTEGER, 0);
-//        registry.register("sg_mutation_passes", StatType.INTEGER, 0);
-//        registry.register("sg_sponsored_others", StatType.INTEGER, 0);
-//        registry.register("sg_sponsors_received", StatType.INTEGER, 0);
+        registry.register("sg_times_mutated", StatType.INTEGER, 0);
+        registry.register("sg_mutation_kills", StatType.INTEGER, 0);
+        registry.register("sg_mutation_deaths", StatType.INTEGER, 0);
+        registry.register("sg_mutation_passes", StatType.INTEGER, 0);
+        registry.register("sg_sponsored_others", StatType.INTEGER, 0);
+        registry.register("sg_sponsors_received", StatType.INTEGER, 0);
         registry.register("sg_tournament_points", StatType.INTEGER, 0);
-//        registry.register("sg_tournament_kills", StatType.INTEGER, 0);
-//        registry.register("sg_tournament_wins", StatType.INTEGER, 0);
-//        registry.register("sg_tournament_survives", StatType.INTEGER, 0);
-//        registry.register("sg_tournament_chests_looted", StatType.INTEGER, 0);
-//        registry.register("sg_tournament_assists", StatType.INTEGER, 0);
+        registry.register("sg_tournament_kills", StatType.INTEGER, 0);
+        registry.register("sg_tournament_wins", StatType.INTEGER, 0);
+        registry.register("sg_tournament_survives", StatType.INTEGER, 0);
+        registry.register("sg_tournament_chests_looted", StatType.INTEGER, 0);
+        registry.register("sg_tournament_assists", StatType.INTEGER, 0);
     }
     
     private void updatePlayerHealthAndFood(Player player) {
-        if (player == null) return;
+        if (player == null) {
+            return;
+        }
         player.setHealth(player.getMaxHealth());
         player.setFoodLevel(20);
         player.setSaturation(2);
@@ -349,7 +351,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
                 database.registerClass(LobbySettings.class);
             }
         }
-    
+        
         FileConfiguration config = getConfig();
         mapDatabase = new Database(config.getString("mapdatabase.database"), config.getString("mapdatabase.host"), config.getString("mapdatabase.user"), config.getString("mapdatabase.password"), false);
         mapDatabase.registerClass(GameMap.class);
