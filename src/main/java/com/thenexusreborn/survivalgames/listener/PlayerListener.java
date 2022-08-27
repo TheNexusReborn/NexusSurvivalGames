@@ -90,11 +90,11 @@ public class PlayerListener implements Listener {
         if (e.isCancelled()) {
             return;
         }
-        
+    
         if (plugin.getLobby().checkMapEditing(e.getPlayer())) {
             return;
         }
-        
+    
         Game game = plugin.getGame();
         if (game != null) {
             GamePlayer gamePlayer = game.getPlayer(e.getPlayer().getUniqueId());
@@ -140,10 +140,9 @@ public class PlayerListener implements Listener {
             if (block != null) {
                 if (block.getType() == Material.NOTE_BLOCK || block.getType() == Material.CHEST) {
                     e.setCancelled(true);
+                    return;
                 }
             }
-            
-            return;
         }
         
         Block block = e.getClickedBlock();
