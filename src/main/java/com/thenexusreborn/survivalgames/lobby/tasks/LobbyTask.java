@@ -100,7 +100,7 @@ public class LobbyTask extends BukkitRunnable {
         }
         
         boolean resetLobby = false;
-        if (lobby.getState() != LobbyState.WAITING) {
+        if (lobby.getState() != LobbyState.WAITING || lobby.getState() != LobbyState.MAP_EDITING) {
             if (lobby.getTimer() == null) {
                 resetLobby = true;
             } else if (lobby.getTimer().getSecondsLeft() <= 0) {
