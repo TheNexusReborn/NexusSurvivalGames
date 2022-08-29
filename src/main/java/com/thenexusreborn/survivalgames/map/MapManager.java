@@ -54,12 +54,12 @@ public class MapManager {
                 
                 ResultSet spawnsSet = statement.executeQuery("select * from sgmapspawns;");
                 while (spawnsSet.next()) {
-                    int id = spawnsSet.getInt("id");
-                    int mapId = spawnsSet.getInt("id");
+                    int index = spawnsSet.getInt("id");
+                    int mapId = spawnsSet.getInt("mapId");
                     int x = spawnsSet.getInt("x");
                     int y = spawnsSet.getInt("y");
                     int z = spawnsSet.getInt("z");
-                    MapSpawn mapSpawn = new MapSpawn(mapId, id, x, y, z);
+                    MapSpawn mapSpawn = new MapSpawn(mapId, index, x, y, z);
                     spawns.add(mapSpawn);
                 }
             } catch (SQLException e) {
@@ -87,6 +87,7 @@ public class MapManager {
     
             for (GameMap map : maps) {
                 plugin.getMapDatabase().push(map);
+                this.gameMaps.add(map);
             }
         }
     }

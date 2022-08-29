@@ -81,7 +81,7 @@ public class LobbyTask extends BukkitRunnable {
             Player bukkitPlayer = Bukkit.getPlayer(player.getUniqueId());
             for (NexusPlayer other : lobby.getPlayers()) {
                 Player otherBukkitPlayer = Bukkit.getPlayer(other.getUniqueId());
-                if (player.getPreferences().get("vanish").getValue()) {
+                if (player.getPreferenceValue("vanish")) {
                     if (other.getRank().ordinal() > Rank.HELPER.ordinal()) {
                         otherBukkitPlayer.hidePlayer(bukkitPlayer);
                     }
@@ -89,7 +89,7 @@ public class LobbyTask extends BukkitRunnable {
                     otherBukkitPlayer.showPlayer(bukkitPlayer);
                 }
                 
-                if (other.getPreferences().get("vanish").getValue()) {
+                if (other.getPreferenceValue("vanish")) {
                     if (player.getRank().ordinal() > Rank.HELPER.ordinal()) {
                         bukkitPlayer.hidePlayer(otherBukkitPlayer);
                     }

@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.game;
 
 import com.google.common.io.*;
-import com.thenexusreborn.api.*;
+import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.gamearchive.*;
 import com.thenexusreborn.api.helper.NumberHelper;
 import com.thenexusreborn.api.multicraft.MulticraftAPI;
@@ -62,7 +62,7 @@ public class Game {
         List<String> playerNames = new ArrayList<>();
         for (NexusPlayer player : players) {
             GamePlayer gamePlayer = new GamePlayer(player);
-            if (spectatingPlayers.contains(player.getUniqueId()) || player.getPreferences().get("vanish").getValue()) {
+            if (spectatingPlayers.contains(player.getUniqueId()) || player.getPreferenceValue("vanish")) {
                 gamePlayer.setTeam(GameTeam.SPECTATORS);
             } else {
                 playerNames.add(player.getName());
@@ -158,13 +158,13 @@ public class Game {
         teleportSpectator(player, this.gameMap.getCenter().toLocation(this.gameMap.getWorld()));
         this.players.put(nexusPlayer.getUniqueId(), gamePlayer);
         
-        if (nexusPlayer.getPreferences().get("vanish").getValue()) {
+        if (nexusPlayer.getPreferenceValue("vanish")) {
             for (GamePlayer gp : this.players.values()) {
                 if (gp.getNexusPlayer().getRank().ordinal() <= Rank.HELPER.ordinal() || gp.getUniqueId().equals(nexusPlayer.getUniqueId())) {
                     gp.sendMessage("&a&l>> " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined &e&overy silently&e.");
                 }
             }
-        } else if (nexusPlayer.getPreferences().get("incognito").getValue()) {
+        } else if (nexusPlayer.getPreferenceValue("incognito")) {
             for (GamePlayer gp : this.players.values()) {
                 if (gp.getNexusPlayer().getRank().ordinal() <= Rank.HELPER.ordinal() || gp.getUniqueId().equals(nexusPlayer.getUniqueId())) {
                     gp.sendMessage("&a&l>> " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined &e&osilently&e.");
@@ -193,13 +193,13 @@ public class Game {
         
         this.players.remove(nexusPlayer.getUniqueId());
         
-        if (nexusPlayer.getPreferences().get("vanish").getValue()) {
+        if (nexusPlayer.getPreferenceValue("vanish")) {
             for (GamePlayer gp : this.players.values()) {
                 if (gp.getNexusPlayer().getRank().ordinal() <= Rank.HELPER.ordinal()) {
                     gp.sendMessage("&c&l<< " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft &e&overy silently&e.");
                 }
             }
-        } else if (nexusPlayer.getPreferences().get("incognito").getValue()) {
+        } else if (nexusPlayer.getPreferenceValue("incognito")) {
             for (GamePlayer gp : this.players.values()) {
                 if (gp.getNexusPlayer().getRank().ordinal() <= Rank.HELPER.ordinal()) {
                     gp.sendMessage("&c&l<< " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft &e&osilently&e.");
@@ -271,7 +271,7 @@ public class Game {
             for (Player other : Bukkit.getOnlinePlayers()) {
                 GamePlayer otherGamePlayer = getPlayer(other.getUniqueId());
                 
-                if (gamePlayer.getNexusPlayer().getPreferences().get("vanish").getValue()) {
+                if (gamePlayer.getNexusPlayer().getPreferenceValue("vanish")) {
                     player.showPlayer(other);
                 } else if (gamePlayer.getTeam() == GameTeam.TRIBUTES && otherGamePlayer.getTeam() == GameTeam.TRIBUTES) {
                     player.showPlayer(other);
@@ -656,7 +656,7 @@ public class Game {
             winner.getNexusPlayer().changeStat("sg_wins", 1, StatOperator.ADD);
             winner.getNexusPlayer().changeStat("sg_win_streak", 1, StatOperator.ADD);
             int winGain = 50;
-            double currentScore = (double) winner.getNexusPlayer().getStatValue("sg_score");
+            int currentScore = (int) winner.getNexusPlayer().getStatValue("sg_score");
             if (currentScore < 100 && currentScore > 50) {
                 winGain *= 1.25;
             } else if (currentScore <= 50 && currentScore > 25) {
@@ -716,25 +716,34 @@ public class Game {
         
         gameInfo.setLength(this.end - this.start);
         
-        NexusAPI.getApi().getDataManager().pushGameInfoAsync(this.gameInfo, gameInfo -> {
+        NexusAPI.getApi().getThreadFactory().runAsync(() -> {
+            NexusAPI.getApi().getPrimaryDatabase().push(gameInfo);
             if (gameInfo.getId() == 0) {
                 sendMessage("&4&l>> &cThere was a database error archiving the game. Please report with date and time.");
             } else {
                 sendMessage("&6&l>> &aThis game has been archived!");
                 sendMessage("&6&l>> &aGame ID: &b" + gameInfo.getId() + " &7&oCustom Website Coming Soon.");
-                
+        
                 if ((gameInfo.getId() % 1000) == 0) {
                     for (String p : gameInfo.getPlayers()) {
                         NexusAPI.getApi().getThreadFactory().runAsync(() -> {
                             NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(p);
                             if (nexusPlayer == null) {
-                                nexusPlayer = NexusAPI.getApi().getDataManager().loadPlayer(p);
+                                for (CachedPlayer cachedPlayer : NexusAPI.getApi().getPlayerManager().getCachedPlayers().values()) {
+                                    if (cachedPlayer.getName().equalsIgnoreCase(p)) {
+                                        try {
+                                            nexusPlayer = NexusAPI.getApi().getPrimaryDatabase().get(NexusPlayer.class, "name", p).get(0);
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                }
                             }
-                            
+                    
                             Tag tag = new Tag(gameInfo.getId() + "th");
                             nexusPlayer.unlockTag(tag.getName());
                             nexusPlayer.sendMessage(MsgType.INFO + "Unlocked the tag " + tag.getDisplayName());
-                            NexusAPI.getApi().getDataManager().pushPlayerAsync(nexusPlayer);
+                            NexusAPI.getApi().getPrimaryDatabase().push(nexusPlayer);
                         });
                     }
                 }

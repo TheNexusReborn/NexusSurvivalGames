@@ -485,7 +485,7 @@ public class Lobby {
         int totalPlayers = 0;
         for (NexusPlayer player : this.players.values()) {
             if (!this.spectatingPlayers.contains(player.getUniqueId())) {
-                if (!player.getPreferences().get("vanish").getValue()) {
+                if (!player.getPreferenceValue("vanish")) {
                     totalPlayers++;
                 }
             }
@@ -505,7 +505,7 @@ public class Lobby {
             player.showPlayer(online);
         }
         
-        if (nexusPlayer.getPreferences().get("vanish").getValue()) {
+        if (nexusPlayer.getPreferenceValue("vanish")) {
             for (Player p : Bukkit.getOnlinePlayers()) {
                 NexusPlayer psp = this.players.get(p.getUniqueId());
                 if (psp != null) {
@@ -516,7 +516,7 @@ public class Lobby {
                     }
                 }
             }
-        } else if (nexusPlayer.getPreferences().get("incognito").getValue()) {
+        } else if (nexusPlayer.getPreferenceValue("incognito")) {
             for (NexusPlayer np : this.players.values()) {
                 if (np != null) {
                     if (np.getRank().ordinal() <= Rank.HELPER.ordinal()) {
@@ -532,7 +532,7 @@ public class Lobby {
         for (Player p : Bukkit.getOnlinePlayers()) {
             NexusPlayer psp = this.players.get(p.getUniqueId());
             if (psp != null) {
-                if (psp.getPreferences().get("vanish").getValue() && !joiningPlayerStaff) {
+                if (psp.getPreferenceValue("vanish") && !joiningPlayerStaff) {
                     Bukkit.getPlayer(nexusPlayer.getUniqueId()).hidePlayer(p);
                 }
             }
@@ -566,13 +566,13 @@ public class Lobby {
             }
         }
         
-        if (nexusPlayer.getPreferences().get("vanish").getValue()) {
+        if (nexusPlayer.getPreferenceValue("vanish")) {
             for (NexusPlayer snp : this.players.values()) {
                 if (snp.getRank().ordinal() <= Rank.HELPER.ordinal()) {
                     snp.sendMessage("&c&l<< " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft &e&overy silently&e.");
                 }
             }
-        } else if (nexusPlayer.getPreferences().get("incognito").getValue()) {
+        } else if (nexusPlayer.getPreferenceValue("incognito")) {
             for (NexusPlayer snp : this.players.values()) {
                 if (snp.getRank().ordinal() <= Rank.HELPER.ordinal()) {
                     snp.sendMessage("&c&l<< " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft &e&osilently&e.");
@@ -781,7 +781,7 @@ public class Lobby {
             int playerCount = 0;
             for (NexusPlayer player : getPlayers()) {
                 if (!getSpectatingPlayers().contains(player.getUniqueId())) {
-                    if (!player.getPreferences().get("vanish").getValue()) {
+                    if (!player.getPreferenceValue("vanish")) {
                         playerCount++;
                     }
                 }
@@ -802,7 +802,7 @@ public class Lobby {
         int playerCount = 0;
         for (NexusPlayer player : getPlayers()) {
             if (!getSpectatingPlayers().contains(player.getUniqueId())) {
-                if (!player.getPreferences().get("vanish").getValue()) {
+                if (!player.getPreferenceValue("vanish")) {
                     playerCount++;
                 }
             }

@@ -32,7 +32,7 @@ public class TimerCountdownCheck extends BukkitRunnable {
         int playerCount = 0;
         for (NexusPlayer player : lobby.getPlayers()) {
             if (!lobby.getSpectatingPlayers().contains(player.getUniqueId())) {
-                if (!player.getPreferences().get("vanish").getValue()) {
+                if (!player.getPreferenceValue("vanish")) {
                     playerCount++;
                 }
             }

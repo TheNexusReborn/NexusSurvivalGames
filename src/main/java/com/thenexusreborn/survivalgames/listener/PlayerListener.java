@@ -269,7 +269,7 @@ public class PlayerListener implements Listener {
                         }.runTaskLater(plugin, 1L);
                     } else if (block.getState() instanceof Sign) {
                         NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(e.getPlayer().getUniqueId());
-                        if (nexusPlayer.getPreferences().get("vanish").getValue()) {
+                        if (nexusPlayer.getPreferenceValue("vanish")) {
                             nexusPlayer.sendMessage(MsgType.WARN + "You cannot vote for a map while in vanish.");
                             return;
                         }
@@ -322,7 +322,7 @@ public class PlayerListener implements Listener {
         }
         
         String message;
-        boolean incognito = e.getNexusPlayer().getPreferences().get("incognito").getValue();
+        boolean incognito = e.getNexusPlayer().getPreferenceValue("incognito");
         if (e.getNewValue()) {
             if (incognito) {
                 message = "";
@@ -634,7 +634,7 @@ public class PlayerListener implements Listener {
         if (plugin.getGame() == null) {
             if (plugin.getLobby().getPlayingCount() >= plugin.getLobby().getLobbySettings().getMaxPlayers()) {
                 boolean isStaff = nexusPlayer.getRank().ordinal() <= Rank.HELPER.ordinal();
-                boolean isInVanish = nexusPlayer.getPreferences().get("vanish").getValue();
+                boolean isInVanish = nexusPlayer.getPreferenceValue("vanish");
                 if (!(isStaff && isInVanish)) {
                     nexusPlayer.sendMessage("&cThe lobby is full.");
                     new BukkitRunnable() {

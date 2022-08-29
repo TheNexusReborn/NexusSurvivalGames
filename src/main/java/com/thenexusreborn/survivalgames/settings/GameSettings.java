@@ -5,7 +5,6 @@ import com.thenexusreborn.api.helper.ReflectionHelper;
 
 import java.lang.reflect.Field;
 
-@SuppressWarnings("DuplicatedCode")
 @TableInfo("sggamesettings")
 public class GameSettings extends SGSettings {
     private int maxPlayers = 24;

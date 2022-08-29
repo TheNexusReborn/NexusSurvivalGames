@@ -5,7 +5,6 @@ import com.thenexusreborn.api.helper.ReflectionHelper;
 
 import java.lang.reflect.Field;
 
-@SuppressWarnings("DuplicatedCode")
 @TableInfo("sglobbysettings")
 public class LobbySettings extends SGSettings {
     private int maxPlayers = 24;
