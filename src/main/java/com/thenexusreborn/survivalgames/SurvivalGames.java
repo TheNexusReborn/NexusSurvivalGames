@@ -87,13 +87,13 @@ public class SurvivalGames extends NexusSpigotPlugin {
         }
         
         if (!this.lobbySettings.containsKey("default")) {
-            LobbySettings ls = new LobbySettings("default");
-            NexusAPI.getApi().getPrimaryDatabase().push(ls);
-            addLobbySettings(ls);
+            LobbySettings lobbySettings = new LobbySettings("default");
+            NexusAPI.getApi().getPrimaryDatabase().push(lobbySettings);
+            addLobbySettings(lobbySettings);
         } else if (!this.gameSettings.containsKey("default")) {
-            GameSettings ls = new GameSettings("default");
-            NexusAPI.getApi().getPrimaryDatabase().push(ls);
-            addGameSettings(ls);
+            GameSettings gameSettings = new GameSettings("default");
+            NexusAPI.getApi().getPrimaryDatabase().push(gameSettings);
+            addGameSettings(gameSettings);
         }
         
         if (NexusAPI.getApi().getEnvironment() == Environment.DEVELOPMENT) {
