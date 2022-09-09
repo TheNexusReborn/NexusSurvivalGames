@@ -1,4 +1,4 @@
-package com.thenexusreborn.survivalgames.lootv2;
+package com.thenexusreborn.survivalgames.loot.v2;
 
 public enum Rarity {
     COMMON(100, 200), 

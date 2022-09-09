@@ -1,4 +1,4 @@
-package com.thenexusreborn.survivalgames.lootv2;
+package com.thenexusreborn.survivalgames.loot.v2;
 
 import com.thenexusreborn.nexuscore.util.MaterialNames;
 import org.bukkit.Material;
@@ -16,8 +16,8 @@ public class LootManager {
     }
     
     public LootManager() {
-        LootTable basic = new LootTable("basic");
-        this.lootTables.add(basic);
+        LootTable tierOne = new LootTable("tierOne");
+        this.lootTables.add(tierOne);
         
         LootCategory food = new LootCategory("food", Rarity.COMMON);
         LootCategory armor = new LootCategory("armor", Rarity.COMMON);
@@ -27,13 +27,13 @@ public class LootManager {
         LootCategory components = new LootCategory("components", Rarity.UNCOMMON);
         LootCategory legendary = new LootCategory("legendary", Rarity.LEGENDARY);
         
-        basic.addCategory(food);
-        basic.addCategory(armor);
-        basic.addCategory(weapons);
-        basic.addCategory(consumables);
-        basic.addCategory(utilities);
-        basic.addCategory(components);
-        basic.addCategory(legendary);
+        tierOne.addCategory(food);
+        tierOne.addCategory(armor);
+        tierOne.addCategory(weapons);
+        tierOne.addCategory(consumables);
+        tierOne.addCategory(utilities);
+        tierOne.addCategory(components);
+        tierOne.addCategory(legendary);
         
         food.addEntry(new LootEntry(Material.GRILLED_PORK, "Porkchop", Rarity.RARE));
         food.addEntry(new LootEntry(Material.COOKED_BEEF, "Steak", Rarity.RARE));

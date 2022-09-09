@@ -1,4 +1,4 @@
-package com.thenexusreborn.survivalgames.lootv2;
+package com.thenexusreborn.survivalgames.loot.v2;
 
 import org.bukkit.Material;
 

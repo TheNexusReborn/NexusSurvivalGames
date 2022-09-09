@@ -1,4 +1,4 @@
-package com.thenexusreborn.survivalgames.loot;
+package com.thenexusreborn.survivalgames.loot.v1;
 
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.api.helper.StringHelper;

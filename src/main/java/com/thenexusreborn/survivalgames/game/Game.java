@@ -16,7 +16,7 @@ import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.death.*;
 import com.thenexusreborn.survivalgames.game.timer.*;
-import com.thenexusreborn.survivalgames.lootv2.LootChances;
+import com.thenexusreborn.survivalgames.loot.v2.LootChances;
 import com.thenexusreborn.survivalgames.map.*;
 import com.thenexusreborn.survivalgames.scoreboard.*;
 import com.thenexusreborn.survivalgames.settings.*;

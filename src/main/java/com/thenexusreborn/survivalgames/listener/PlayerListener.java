@@ -10,8 +10,8 @@ import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.game.death.*;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
-import com.thenexusreborn.survivalgames.loot.Loot;
-import com.thenexusreborn.survivalgames.lootv2.LootManager;
+import com.thenexusreborn.survivalgames.loot.v1.Loot;
+import com.thenexusreborn.survivalgames.loot.v2.LootManager;
 import com.thenexusreborn.survivalgames.menu.TeamMenu;
 import com.thenexusreborn.survivalgames.settings.ColorMode;
 import com.thenexusreborn.survivalgames.util.SGUtils;
@@ -72,16 +72,6 @@ public class PlayerListener implements Listener {
     public void onPlayerFish(PlayerFishEvent e) {
         if (e.getState() == State.CAUGHT_FISH) {
             e.setCancelled(true);
-        }
-    }
-    
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerViolation(PlayerViolationEvent e) {
-        Game game = plugin.getGame();
-        if (game != null) {
-            if (game.getState() == GameState.WARMUP || game.getState() == GameState.DEATHMATCH_WARMUP) {
-                e.setCancelled(true);
-            }
         }
     }
     
@@ -200,7 +190,8 @@ public class PlayerListener implements Listener {
                                 items.add(l.generateItemStack());
                             }
                         } else {
-                            items = LootManager.getInstance().getLootTable("basic").generateLoot(new Random().nextInt(maxAmount) + 2, game.getLootChances());
+                            //items = LootManager.getInstance().getLootTable("tierOne").generateLoot(new Random().nextInt(maxAmount) + 2, game.getLootChances());
+                            items = LootManager.getInstance().getLootTable("tierOne").generateLoot(2, 8);
                         }
                         
                         for (ItemStack item : items) {
@@ -246,7 +237,8 @@ public class PlayerListener implements Listener {
                                     items.add(l.generateItemStack());
                                 }
                             } else {
-                                items = LootManager.getInstance().getLootTable("basic").generateLoot(new Random().nextInt(6) + 2, game.getLootChances());
+                                //items = LootManager.getInstance().getLootTable("tierOne").generateLoot(new Random().nextInt(6) + 2, game.getLootChances());
+                                items = LootManager.getInstance().getLootTable("tierOne").generateLoot(2, 8);
                             }
                             
                             for (ItemStack item : items) {

@@ -8,7 +8,7 @@ import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.*;
-import com.thenexusreborn.survivalgames.lootv2.*;
+import com.thenexusreborn.survivalgames.loot.v2.*;
 import com.thenexusreborn.survivalgames.map.GameMap;
 import com.thenexusreborn.survivalgames.scoreboard.LobbyScoreboardView;
 import com.thenexusreborn.survivalgames.settings.*;
@@ -80,6 +80,9 @@ public class Lobby {
         
         generateMapOptions();
         generateLootChances();
+        for (LootTable lootTable : LootManager.getInstance().getLootTables()) {
+            lootTable.generateNewProbabilities(new Random());
+        }
         
         new BukkitRunnable() {
             @Override
@@ -195,7 +198,7 @@ public class Lobby {
         plugin.getLogger().info("Generating Loot chances");
         List<String> categoryChances = new ArrayList<>();
         Map<String, List<Material>> entryChances = new HashMap<>();
-        for (LootCategory category : LootManager.getInstance().getLootTable("basic").getCategories()) {
+        for (LootCategory category : LootManager.getInstance().getLootTable("tierOne").getCategories()) {
             int amount = new Random().nextInt(category.getRarity().getMax() - category.getRarity().getMin()) + category.getRarity().getMin();
             for (int i = 0; i < amount; i++) {
                 categoryChances.add(category.getName());

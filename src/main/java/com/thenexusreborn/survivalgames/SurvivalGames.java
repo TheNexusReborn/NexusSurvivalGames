@@ -17,7 +17,7 @@ import com.thenexusreborn.survivalgames.game.tasks.*;
 import com.thenexusreborn.survivalgames.listener.*;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.tasks.*;
-import com.thenexusreborn.survivalgames.loot.LootManager;
+import com.thenexusreborn.survivalgames.loot.v1.LootManager;
 import com.thenexusreborn.survivalgames.map.*;
 import com.thenexusreborn.survivalgames.settings.*;
 import org.bukkit.*;
@@ -59,6 +59,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
     @Override
     public void onEnable() {
+        getLogger().info("Loading NexusSurvivalGames v" + getDescription().getVersion());
         try {
             Driver mysqlDriver = new com.mysql.cj.jdbc.Driver();
             DriverManager.registerDriver(mysqlDriver);
@@ -68,7 +69,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
             return;
         }
         
-        getLogger().info("Loading NexusSurvivalGames v" + getDescription().getVersion());
         saveDefaultConfig();
         
         getLogger().info("Loading Game and Lobby Settings");
