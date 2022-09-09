@@ -16,6 +16,8 @@ public class LootItem {
         this.material = material;
         this.name = name;
         this.lore = lore;
+        
+        Items.REGISTRY.add(this);
     }
     
     public LootItem(Material material, String name) {

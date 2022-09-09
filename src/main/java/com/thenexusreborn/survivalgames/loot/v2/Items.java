@@ -5,6 +5,8 @@ import org.bukkit.Material;
 import java.util.*;
 
 public final class Items {
+    public static final List<LootItem> REGISTRY = new ArrayList<>();
+    
     public static final LootItem PORKCHOP = new LootItem(Material.GRILLED_PORK, "Porkchop");
     public static final LootItem STEAK = new LootItem(Material.COOKED_BEEF, "Steak");
     public static final LootItem GRILLED_CHICKEN = new LootItem(Material.COOKED_CHICKEN, "Grilled Chicken");
