@@ -171,6 +171,10 @@ public class SurvivalGames extends NexusSpigotPlugin {
         getServer().getPluginManager().registerEvents(new EntityListener(this), this);
         getServer().getPluginManager().registerEvents(new BlockListener(this), this);
         
+        if (getServer().getPluginManager().getPlugin("Spartan") != null) {
+            getServer().getPluginManager().registerEvents(new AnticheatListener(this), this);
+        }
+        
         getLogger().info("Registered Listeners");
         
         new BukkitRunnable() {
