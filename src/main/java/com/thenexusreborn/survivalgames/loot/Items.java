@@ -1,4 +1,4 @@
-package com.thenexusreborn.survivalgames.loot.v2;
+package com.thenexusreborn.survivalgames.loot;
 
 import org.bukkit.Material;
 
@@ -41,11 +41,16 @@ public final class Items {
     public static final LootItem IRON_CHESTPLATE = new LootItem(Material.IRON_CHESTPLATE);
     public static final LootItem IRON_LEGGINGS = new LootItem(Material.IRON_LEGGINGS);
     public static final LootItem IRON_BOOTS = new LootItem(Material.IRON_BOOTS);
+    public static final LootItem DIAMOND_HELMET = new LootItem(Material.DIAMOND_HELMET);
+    public static final LootItem DIAMOND_CHESTPLATE = new LootItem(Material.DIAMOND_CHESTPLATE);
+    public static final LootItem DIAMOND_LEGGINGS = new LootItem(Material.DIAMOND_LEGGINGS);
+    public static final LootItem DIAMOND_BOOTS = new LootItem(Material.DIAMOND_BOOTS);
     
     public static final LootItem WOOD_AXE = new LootItem(Material.WOOD_AXE);
     public static final LootItem WOOD_SWORD = new LootItem(Material.WOOD_SWORD);
     public static final LootItem STONE_AXE = new LootItem(Material.STONE_AXE);
     public static final LootItem STONE_SWORD = new LootItem(Material.STONE_SWORD);
+    public static final LootItem IRON_SWORD = new LootItem(Material.IRON_SWORD);
     public static final LootItem BOW = new LootItem(Material.BOW);
     
     public static final LootItem ARROW = new LootItem(Material.ARROW);

@@ -1,4 +1,4 @@
-package com.thenexusreborn.survivalgames.loot.v2;
+package com.thenexusreborn.survivalgames.loot;
 
 import com.thenexusreborn.api.helper.NumberHelper;
 import com.thenexusreborn.api.util.Range;
@@ -74,33 +74,6 @@ public class LootTable {
         }
         
         long end = System.currentTimeMillis();
-        return loot;
-    }
-    
-    public List<ItemStack> generateLoot(int maxAmount, LootChances lootChances) {
-        long start = System.currentTimeMillis();
-        List<ItemStack> loot = new ArrayList<>();
-        
-        for (int i = 0; i < maxAmount; i++) {
-            String[] categoryChances = lootChances.getCategoryChances();
-            LootCategory category = getCategory(categoryChances[new Random().nextInt(categoryChances.length)]);
-            Material[] materialChances = lootChances.getMaterialChances(category.getName());
-            Material entryChoice = materialChances[new Random().nextInt(materialChances.length)];
-            LootEntry entry = category.getEntry(entryChoice);
-            if (entry != null) {
-                loot.add(entry.generateItemStack());
-            } else {
-                System.out.println("Had a null choice...");
-            }
-        }
-        
-        long end = System.currentTimeMillis();
-        
-        long time = end - start;
-        if (time > 1) {
-            System.out.println("Loot generation took " + time + "ms.");
-        }
-        
         return loot;
     }
     

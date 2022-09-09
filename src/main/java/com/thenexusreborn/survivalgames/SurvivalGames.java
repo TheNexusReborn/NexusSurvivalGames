@@ -17,7 +17,7 @@ import com.thenexusreborn.survivalgames.game.tasks.*;
 import com.thenexusreborn.survivalgames.listener.*;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.tasks.*;
-import com.thenexusreborn.survivalgames.loot.v1.LootManager;
+import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.map.*;
 import com.thenexusreborn.survivalgames.settings.*;
 import org.bukkit.*;
@@ -120,8 +120,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
         getLogger().info("Loaded Maps");
         lobby = new Lobby(this);
         getLogger().info("Loaded Lobby Settings");
-        lootManager = new LootManager(this);
-        getLogger().info("Loaded Loot");
         
         lobby.setControlType(ControlType.AUTOMATIC);
         Game.setControlType(ControlType.AUTOMATIC);

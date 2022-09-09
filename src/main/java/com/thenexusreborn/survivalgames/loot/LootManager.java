@@ -1,6 +1,6 @@
-package com.thenexusreborn.survivalgames.loot.v2;
+package com.thenexusreborn.survivalgames.loot;
 
-import com.thenexusreborn.survivalgames.loot.v2.tables.TierOneLootTable;
+import com.thenexusreborn.survivalgames.loot.tables.*;
 
 import java.util.*;
 
@@ -15,8 +15,9 @@ public class LootManager {
     }
     
     public LootManager() {
-        LootTable tierOne = new TierOneLootTable();
-        this.lootTables.add(tierOne);
+        this.lootTables.add(new TierOneLootTable());
+        this.lootTables.add(new TierTwoLootTable());
+        this.lootTables.add(new TierThreeLootTable());
     }
     
     public List<LootTable> getLootTables() {

@@ -6,16 +6,15 @@ import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.nexuscore.api.events.*;
 import com.thenexusreborn.nexuscore.util.*;
+import com.thenexusreborn.nexuscore.util.region.Cuboid;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.game.death.*;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
-import com.thenexusreborn.survivalgames.loot.v1.Loot;
-import com.thenexusreborn.survivalgames.loot.v2.LootManager;
+import com.thenexusreborn.survivalgames.loot.*;
 import com.thenexusreborn.survivalgames.menu.TeamMenu;
 import com.thenexusreborn.survivalgames.settings.ColorMode;
 import com.thenexusreborn.survivalgames.util.SGUtils;
-import me.vagdedes.spartan.api.PlayerViolationEvent;
 import org.bukkit.*;
 import org.bukkit.block.*;
 import org.bukkit.entity.*;
@@ -81,13 +80,14 @@ public class PlayerListener implements Listener {
             return;
         }
     
-        if (plugin.getLobby().checkMapEditing(e.getPlayer())) {
+        Player player = e.getPlayer();
+        if (plugin.getLobby().checkMapEditing(player)) {
             return;
         }
-    
+        
         Game game = plugin.getGame();
         if (game != null) {
-            GamePlayer gamePlayer = game.getPlayer(e.getPlayer().getUniqueId());
+            GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
             if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
                 if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
                     if (e.getItem() != null) {
@@ -106,17 +106,17 @@ public class PlayerListener implements Listener {
                                 }
                                 
                                 if (team != null) {
-                                    e.getPlayer().openInventory(new TeamMenu(plugin, team).getInventory());
+                                    player.openInventory(new TeamMenu(plugin, team).getInventory());
                                 }
                             }
                         } else if (item.getType() == Material.ROTTEN_FLESH) {
                             gamePlayer.sendMessage("&6&l>> &cThat is currently not implemented.");
                         } else if (item.getType() == Material.WATCH) {
-                            e.getPlayer().teleport(game.getGameMap().getCenter().toLocation(game.getGameMap().getWorld()));
+                            player.teleport(game.getGameMap().getCenter().toLocation(game.getGameMap().getWorld()));
                             gamePlayer.sendMessage("&6&l>> &eTeleported to the Map Center.");
                         } else if (item.getType() == Material.WOOD_DOOR) {
                             gamePlayer.sendMessage("&6&l>> &eSending you to the hub.");
-                            SGUtils.sendToHub(e.getPlayer());
+                            SGUtils.sendToHub(player);
                         }
                     }
                 }
@@ -149,7 +149,7 @@ public class PlayerListener implements Listener {
                         if (game == null) {
                             return;
                         }
-                        if (game.getPlayer(e.getPlayer().getUniqueId()).getTeam() != GameTeam.TRIBUTES) {
+                        if (game.getPlayer(player.getUniqueId()).getTeam() != GameTeam.TRIBUTES) {
                             e.setCancelled(true);
                             return;
                         }
@@ -157,10 +157,10 @@ public class PlayerListener implements Listener {
                             return;
                         }
                         
-                        game.getPlayer(e.getPlayer().getUniqueId()).getNexusPlayer().changeStat("sg_chests_looted", 1, StatOperator.ADD);
+                        game.getPlayer(player.getUniqueId()).getNexusPlayer().changeStat("sg_chests_looted", 1, StatOperator.ADD);
                         
                         Inventory inv = ((Chest) block.getState()).getBlockInventory();
-                        int maxAmount = 6;
+                        int maxAmount = 8;
                         
                         Block secondHalf = null;
                         Block north = block.getRelative(BlockFace.NORTH);
@@ -183,16 +183,31 @@ public class PlayerListener implements Listener {
                         }
                         
                         inv.clear();
-                        List<ItemStack> items = new ArrayList<>();
-                        if (game.getLootChances() == null || !game.getSettings().isUseNewLoot()) {
-                            List<Loot> loot = plugin.getLootManager().generateLoot(new Random().nextInt(maxAmount) + 2);
-                            for (Loot l : loot) {
-                                items.add(l.generateItemStack());
+    
+                        LootTable lootTable;
+                        Cuboid deathmatchArea = game.getGameMap().getDeathmatchArea();
+                        if (deathmatchArea != null && game.getSettings().isUseNewLoot()) {
+                            boolean inMid = deathmatchArea.contains(player);
+                            if (game.getRestockTimer() == null && game.getState() == GameState.INGAME) {
+                                if (inMid) {
+                                    lootTable = LootManager.getInstance().getLootTable("tierThree");
+                                } else {
+                                    lootTable = LootManager.getInstance().getLootTable("tierTwo");
+                                }
+                            } else {
+                                if (inMid) {
+                                    lootTable = LootManager.getInstance().getLootTable("tierTwo");
+                                } else {
+                                    lootTable = LootManager.getInstance().getLootTable("tierOne");
+                                }
                             }
                         } else {
-                            //items = LootManager.getInstance().getLootTable("tierOne").generateLoot(new Random().nextInt(maxAmount) + 2, game.getLootChances());
-                            items = LootManager.getInstance().getLootTable("tierOne").generateLoot(2, 8);
+                            lootTable = LootManager.getInstance().getLootTable("tierOne");
                         }
+    
+                        player.sendMessage(lootTable.getName());
+    
+                        List<ItemStack> items = lootTable.generateLoot(2, maxAmount);
                         
                         for (ItemStack item : items) {
                             int slot;
@@ -211,13 +226,13 @@ public class PlayerListener implements Listener {
                             return;
                         }
                         
-                        if (game.getPlayer(e.getPlayer().getUniqueId()).getTeam() != GameTeam.TRIBUTES) {
+                        if (game.getPlayer(player.getUniqueId()).getTeam() != GameTeam.TRIBUTES) {
                             e.setCancelled(true);
                             return;
                         }
                         
                         if (!game.getSettings().isAllowEnderchests()) {
-                            e.getPlayer().sendMessage(MCUtils.color(MsgType.WARN + "You cannot open ender chests."));
+                            player.sendMessage(MCUtils.color(MsgType.WARN + "You cannot open ender chests."));
                             e.setCancelled(true);
                             return;
                         }
@@ -229,17 +244,7 @@ public class PlayerListener implements Listener {
                         }
                         
                         if (!game.isLootedChest(block)) {
-                            List<ItemStack> items = new ArrayList<>();
-                            if (!game.getSettings().isUseNewLoot()) {
-                                List<Loot> loot = plugin.getLootManager().generateLoot(new Random().nextInt(6) + 2);
-                                inventory.clear();
-                                for (Loot l : loot) {
-                                    items.add(l.generateItemStack());
-                                }
-                            } else {
-                                //items = LootManager.getInstance().getLootTable("tierOne").generateLoot(new Random().nextInt(6) + 2, game.getLootChances());
-                                items = LootManager.getInstance().getLootTable("tierOne").generateLoot(2, 8);
-                            }
+                            List<ItemStack> items = LootManager.getInstance().getLootTable("tierOne").generateLoot(2, 8);
                             
                             for (ItemStack item : items) {
                                 int slot;
@@ -256,11 +261,11 @@ public class PlayerListener implements Listener {
                         new BukkitRunnable() {
                             @Override
                             public void run() {
-                                e.getPlayer().openInventory(finalInventory);
+                                player.openInventory(finalInventory);
                             }
                         }.runTaskLater(plugin, 1L);
                     } else if (block.getState() instanceof Sign) {
-                        NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(e.getPlayer().getUniqueId());
+                        NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(player.getUniqueId());
                         if (nexusPlayer.getPreferenceValue("vanish")) {
                             nexusPlayer.sendMessage(MsgType.WARN + "You cannot vote for a map while in vanish.");
                             return;

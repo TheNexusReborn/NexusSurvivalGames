@@ -27,7 +27,7 @@ public class GameSettings extends SGSettings {
     private boolean sounds = true;
     private boolean giveCredits = true;
     private boolean giveXp = true;
-    private boolean useNewLoot = true;
+    private boolean useNewLoot = false;
     private boolean allowEnderchests = true;
     private ColorMode colorMode = ColorMode.RANK;
     private Time time = Time.NOON;

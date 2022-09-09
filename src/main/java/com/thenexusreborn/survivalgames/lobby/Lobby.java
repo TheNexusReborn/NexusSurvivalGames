@@ -8,7 +8,7 @@ import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.*;
-import com.thenexusreborn.survivalgames.loot.v2.*;
+import com.thenexusreborn.survivalgames.loot.*;
 import com.thenexusreborn.survivalgames.map.GameMap;
 import com.thenexusreborn.survivalgames.scoreboard.LobbyScoreboardView;
 import com.thenexusreborn.survivalgames.settings.*;
@@ -42,7 +42,6 @@ public class Lobby {
     private final Map<Integer, GameMap> mapOptions = new HashMap<>();
     private final Map<Integer, Set<UUID>> mapVotes = new HashMap<>();
     private boolean forceStarted;
-    private LootChances lootChances;
     
     public Lobby(SurvivalGames plugin) {
         this.plugin = plugin;
@@ -219,11 +218,6 @@ public class Lobby {
         if (categoryChances != null) {
             Collections.shuffle(categoryChances);
         }
-        this.lootChances = new LootChances(categoryChances, entryChances);
-    }
-    
-    public void setLootChances(LootChances lootChances) {
-        this.lootChances = lootChances;
     }
     
     public void sendMapOptions(NexusPlayer nexusPlayer) {
@@ -415,7 +409,6 @@ public class Lobby {
         }
         
         Game game = new Game(gameMap, this.gameSettings, this.players.values(), this.spectatingPlayers);
-        game.setLootChances(lootChances);
         plugin.getChatHandler().disableChat();
         this.voteStart.clear();
         plugin.setGame(game);
@@ -831,7 +824,6 @@ public class Lobby {
                 ", mapOptions=" + mapOptions +
                 ", mapVotes=" + mapVotes +
                 ", forceStarted=" + forceStarted +
-                ", lootChances=" + lootChances +
                 '}';
     }
 }

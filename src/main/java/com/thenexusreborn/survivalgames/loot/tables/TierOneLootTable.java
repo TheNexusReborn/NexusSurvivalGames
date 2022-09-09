@@ -1,6 +1,6 @@
-package com.thenexusreborn.survivalgames.loot.v2.tables;
+package com.thenexusreborn.survivalgames.loot.tables;
 
-import com.thenexusreborn.survivalgames.loot.v2.*;
+import com.thenexusreborn.survivalgames.loot.*;
 
 public class TierOneLootTable extends LootTable {
     public TierOneLootTable() {

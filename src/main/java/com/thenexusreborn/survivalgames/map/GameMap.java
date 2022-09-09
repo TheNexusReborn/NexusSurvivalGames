@@ -5,6 +5,7 @@ import com.thenexusreborn.api.data.codec.StringSetCodec;
 import com.thenexusreborn.api.helper.FileHelper;
 import com.thenexusreborn.nexuscore.data.codec.PositionCodec;
 import com.thenexusreborn.nexuscore.util.Position;
+import com.thenexusreborn.nexuscore.util.region.Cuboid;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.data.handler.GameMapObjectHandler;
 import org.bukkit.*;
@@ -42,6 +43,8 @@ public class GameMap {
     private boolean editing;
     @ColumnIgnored
     private int votes = 0;
+    @ColumnIgnored
+    private Cuboid deathmatchArea;
     
     private GameMap() {}
     
@@ -200,7 +203,7 @@ public class GameMap {
     }
     
     public int getDeathmatchBorderDistance() {
-        return deathmatchBorderDistance;
+        return deathmatchBorderDistance == 0 ? 30 : deathmatchBorderDistance;
     }
     
     public void setDeathmatchBorderDistance(int deathmatchBorderDistance) {
@@ -358,6 +361,14 @@ public class GameMap {
     public void setId(long id) {
         this.id = id;
         this.spawns.forEach(spawn -> spawn.setMapId(id));
+    }
+    
+    public void setDeathmatchArea(Cuboid deathmatchArea) {
+        this.deathmatchArea = deathmatchArea;
+    }
+    
+    public Cuboid getDeathmatchArea() {
+        return deathmatchArea;
     }
     
     @Override

@@ -12,11 +12,11 @@ import com.thenexusreborn.api.tournament.Tournament;
 import com.thenexusreborn.api.util.Environment;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
+import com.thenexusreborn.nexuscore.util.region.Cuboid;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.death.*;
 import com.thenexusreborn.survivalgames.game.timer.*;
-import com.thenexusreborn.survivalgames.loot.v2.LootChances;
 import com.thenexusreborn.survivalgames.map.*;
 import com.thenexusreborn.survivalgames.scoreboard.*;
 import com.thenexusreborn.survivalgames.settings.*;
@@ -48,7 +48,6 @@ public class Game {
     private final GameInfo gameInfo;
     private long start, end;
     private GamePlayer firstBlood;
-    private LootChances lootChances;
     private final Map<Location, Inventory> enderchestInventories = new HashMap<>();
     private final boolean awardTournamentPoints;
     
@@ -82,16 +81,11 @@ public class Game {
         }
         gameInfo.setSettings(sb.substring(0, sb.length() - 1));
         this.awardTournamentPoints = NexusAPI.getApi().getTournament() != null && NexusAPI.getApi().getTournament().isActive();
-        plugin.getLogger().info("Award Tournament Points: " + this.awardTournamentPoints);
     }
     
     protected void setState(GameState state) {
         this.state = state;
         this.gameInfo.getActions().add(new GameAction(System.currentTimeMillis(), "statechange", state.name()));
-    }
-    
-    public LootChances getLootChances() {
-        return lootChances;
     }
     
     public void handleShutdown() {
@@ -410,6 +404,14 @@ public class Game {
                             return;
                         }
                         
+                        int radius = gameMap.getDeathmatchBorderDistance();
+                        Location center = gameMap.getCenter().toLocation(gameMap.getWorld());
+                        Location corner1 = center.clone();
+                        corner1.add(radius, radius, radius);
+                        Location corner2 = center.clone();
+                        corner2.subtract(radius, radius, radius);
+                        gameMap.setDeathmatchArea(new Cuboid(corner1, corner2));
+                        
                         try {
                             for (int i = 0; i < gameMap.getSpawns().size(); i++) {
                                 spawns.put(i, null);
@@ -433,10 +435,6 @@ public class Game {
                 }.runTask(plugin);
             }
         }.runTaskAsynchronously(plugin);
-    }
-    
-    public void setLootChances(LootChances lootChances) {
-        this.lootChances = lootChances;
     }
     
     public void handleError(String message) {
@@ -723,7 +721,7 @@ public class Game {
             } else {
                 sendMessage("&6&l>> &aThis game has been archived!");
                 sendMessage("&6&l>> &aGame ID: &b" + gameInfo.getId() + " &7&oCustom Website Coming Soon.");
-        
+                
                 if ((gameInfo.getId() % 1000) == 0) {
                     for (String p : gameInfo.getPlayers()) {
                         NexusAPI.getApi().getThreadFactory().runAsync(() -> {
@@ -739,7 +737,7 @@ public class Game {
                                     }
                                 }
                             }
-                    
+                            
                             Tag tag = new Tag(gameInfo.getId() + "th");
                             nexusPlayer.unlockTag(tag.getName());
                             nexusPlayer.sendMessage(MsgType.INFO + "Unlocked the tag " + tag.getDisplayName());
