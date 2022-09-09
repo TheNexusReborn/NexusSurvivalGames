@@ -8,6 +8,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 
+@SuppressWarnings("DuplicatedCode")
 public class Loot {
     protected int maxAmount;
     protected final Material material;

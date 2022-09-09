@@ -30,6 +30,14 @@ public class LootCategory {
         this(name, rarity, 2);
     }
     
+    public void addEntries(Rarity rarity, LootItem... items) {
+        if (items != null) {
+            for (LootItem item : items) {
+                this.entries.add(new LootEntry(item, rarity));
+            }
+        }
+    }
+    
     public LootEntry getEntry(String name) {
         for (LootEntry entry : this.entries) {
             if (entry.getName().equalsIgnoreCase(name)) {
@@ -48,6 +56,10 @@ public class LootCategory {
         }
         
         return null;
+    }
+    
+    public void addEntry(LootItem item, Rarity rarity) {
+        this.entries.add(new LootEntry(item, rarity));
     }
     
     public void addEntry(LootEntry lootEntry) {
