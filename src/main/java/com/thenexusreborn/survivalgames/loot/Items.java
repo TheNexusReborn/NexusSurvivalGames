@@ -11,7 +11,7 @@ public final class Items {
     public static final LootItem STEAK = new LootItem(Material.COOKED_BEEF, "Steak");
     public static final LootItem GRILLED_CHICKEN = new LootItem(Material.COOKED_CHICKEN, "Grilled Chicken");
     public static final LootItem RAW_PORKCHOP = new LootItem(Material.PORK, "Raw Porkchop");
-    public static final LootItem RAW_BEEF = new LootItem(Material.PORK);
+    public static final LootItem RAW_BEEF = new LootItem(Material.RAW_BEEF);
     public static final LootItem RAW_CHICKEN = new LootItem(Material.RAW_CHICKEN);
     public static final LootItem CARROT = new LootItem(Material.CARROT_ITEM, "Carrot");
     public static final LootItem POTATO = new LootItem(Material.POTATO_ITEM, "Potato");
