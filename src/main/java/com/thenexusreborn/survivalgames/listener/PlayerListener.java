@@ -205,8 +205,6 @@ public class PlayerListener implements Listener {
                             lootTable = LootManager.getInstance().getLootTable("tierOne");
                         }
     
-                        player.sendMessage(lootTable.getName());
-    
                         List<ItemStack> items = lootTable.generateLoot(2, maxAmount);
                         
                         for (ItemStack item : items) {
