@@ -56,7 +56,7 @@ public class LobbyTask extends BukkitRunnable {
                 if (lobby.getLobbySettings().getType().equals("tournament")) {
                     lobby.setLobbySettings(plugin.getLobbySettings("default"));
                 }
-                
+    
                 if (lobby.getGameSettings().getType().equals("tournament")) {
                     lobby.setGameSettings(plugin.getGameSettings("default"));
                 }

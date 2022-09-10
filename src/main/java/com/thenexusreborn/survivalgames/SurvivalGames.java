@@ -90,7 +90,8 @@ public class SurvivalGames extends NexusSpigotPlugin {
             LobbySettings lobbySettings = new LobbySettings("default");
             NexusAPI.getApi().getPrimaryDatabase().push(lobbySettings);
             addLobbySettings(lobbySettings);
-        } else if (!this.gameSettings.containsKey("default")) {
+        } 
+        if (!this.gameSettings.containsKey("default")) {
             GameSettings gameSettings = new GameSettings("default");
             NexusAPI.getApi().getPrimaryDatabase().push(gameSettings);
             addGameSettings(gameSettings);
@@ -338,11 +339,11 @@ public class SurvivalGames extends NexusSpigotPlugin {
     }
     
     public void addLobbySettings(LobbySettings settings) {
-        this.lobbySettings.put(settings.getType(), settings);
+        this.lobbySettings.put(settings.getType().toLowerCase(), settings);
     }
     
     public void addGameSettings(GameSettings settings) {
-        this.gameSettings.put(settings.getType(), settings);
+        this.gameSettings.put(settings.getType().toLowerCase(), settings);
     }
     
     @Override

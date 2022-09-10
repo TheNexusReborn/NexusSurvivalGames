@@ -76,7 +76,7 @@ public class Lobby {
             this.lobbySettings = plugin.getLobbySettings("default");
             this.gameSettings = plugin.getGameSettings("default");
         }
-        
+    
         generateMapOptions();
         
         for (LootTable lootTable : LootManager.getInstance().getLootTables()) {

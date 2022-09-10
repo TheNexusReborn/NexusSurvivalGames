@@ -293,7 +293,7 @@ public class GameSettings extends SGSettings {
                 ", time=" + time +
                 ", weather=" + weather +
                 ", id=" + id +
-                ", type='" + type + '\'' +
+                ", type='" + type +
                 '}';
     }
     
