@@ -194,6 +194,8 @@ public class PlayerListener implements Listener {
                                 } else {
                                     lootTable = LootManager.getInstance().getLootTable("tierTwo");
                                 }
+                            } else if (game.getState() == GameState.DEATHMATCH)  { 
+                                lootTable = LootManager.getInstance().getLootTable("tierThree");
                             } else {
                                 if (inMid) {
                                     lootTable = LootManager.getInstance().getLootTable("tierTwo");
