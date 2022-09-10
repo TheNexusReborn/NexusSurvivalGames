@@ -6,9 +6,9 @@ public class TierTwoLootTable extends LootTable {
     public TierTwoLootTable() {
         super("tierTwo");
     
-        LootCategory food = new LootCategory("food", Rarity.COMMON);
+        LootCategory food = new LootCategory("food", Rarity.COMMON, 4);
         LootCategory armor = new LootCategory("armor", Rarity.COMMON);
-        LootCategory weapons = new LootCategory("weapons", Rarity.COMMON);
+        LootCategory weapons = new LootCategory("weapons", Rarity.UNCOMMON);
         LootCategory consumables = new LootCategory("consumables", Rarity.UNCOMMON);
         LootCategory utilities = new LootCategory("utilities", Rarity.RARE);
         LootCategory components = new LootCategory("components", Rarity.UNCOMMON);
@@ -31,7 +31,7 @@ public class TierTwoLootTable extends LootTable {
     
         weapons.addEntries(Rarity.COMMON, Items.STONE_AXE, Items.BOW);
         weapons.addEntry(Items.STONE_SWORD, Rarity.UNCOMMON);
-        weapons.addEntry(Items.IRON_SWORD, Rarity.RARE);
+        weapons.addEntry(Items.IRON_SWORD, Rarity.EPIC);
     
         consumables.addEntries(Rarity.COMMON, Items.EGG_OF_DOOM, Items.SLOWBALL, Items.COBWEB);
         consumables.addEntry(new LootEntry(Items.ARROW, 10, Rarity.UNCOMMON));
