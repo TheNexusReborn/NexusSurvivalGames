@@ -55,7 +55,7 @@ public class LootItem {
         for (String line : this.getLore()) {
             lore.add(MCUtils.color(line));
         }
-        itemMeta.setLore(this.getLore());
+        itemMeta.setLore(lore);
         itemStack.setItemMeta(itemMeta);
         return itemStack;
     }
