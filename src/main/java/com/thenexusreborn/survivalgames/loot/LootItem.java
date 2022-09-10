@@ -10,12 +10,12 @@ import java.util.*;
 public class LootItem {
     protected final Material material;
     protected final String name;
-    protected final List<String> lore;
+    protected final List<String> lore = new LinkedList<>();
     
     public LootItem(Material material, String name, List<String> lore) {
         this.material = material;
         this.name = name;
-        this.lore = lore;
+        this.lore.addAll(lore);
         
         Items.REGISTRY.add(this);
     }
@@ -46,8 +46,14 @@ public class LootItem {
         if (!getName().equalsIgnoreCase(getMaterial().name().replace("_", " "))) {
             itemMeta.setDisplayName(MCUtils.color("&f" + this.getName()));
         }
+        
         if (this.getMaterial() == Material.FLINT_AND_STEEL) {
             itemStack.setDurability((short) (getMaterial().getMaxDurability() - 4));
+        }
+        
+        List<String> lore = new LinkedList<>();
+        for (String line : this.getLore()) {
+            lore.add(MCUtils.color(line));
         }
         itemMeta.setLore(this.getLore());
         itemStack.setItemMeta(itemMeta);
