@@ -74,11 +74,11 @@ public class SurvivalGames extends NexusSpigotPlugin {
         getLogger().info("Loading Game and Lobby Settings");
         try {
             for (GameSettings gameSettings : NexusAPI.getApi().getPrimaryDatabase().get(GameSettings.class)) {
-                this.gameSettings.put(gameSettings.getType(), gameSettings);
+                addGameSettings(gameSettings);
             }
             
             for (LobbySettings lobbySettings : NexusAPI.getApi().getPrimaryDatabase().get(LobbySettings.class)) {
-                this.lobbySettings.put(lobbySettings.getType(), lobbySettings);
+                addLobbySettings(lobbySettings);
             }
         } catch (SQLException e) {
             e.printStackTrace();

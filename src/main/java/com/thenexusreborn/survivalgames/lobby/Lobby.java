@@ -78,7 +78,7 @@ public class Lobby {
         }
         
         generateMapOptions();
-        generateLootChances();
+        
         for (LootTable lootTable : LootManager.getInstance().getLootTables()) {
             lootTable.generateNewProbabilities(new Random());
         }
@@ -188,36 +188,8 @@ public class Lobby {
         this.state = LobbyState.WAITING;
         this.voteStart.clear();
         this.generateMapOptions();
-        this.generateLootChances();
         this.forceStarted = false;
         sendMessage(MsgType.SUCCESS + "Lobby Reset from Invalid State complete");
-    }
-    
-    public void generateLootChances() {
-        plugin.getLogger().info("Generating Loot chances");
-        List<String> categoryChances = new ArrayList<>();
-        Map<String, List<Material>> entryChances = new HashMap<>();
-        for (LootCategory category : LootManager.getInstance().getLootTable("tierOne").getCategories()) {
-            int amount = new Random().nextInt(category.getRarity().getMax() - category.getRarity().getMin()) + category.getRarity().getMin();
-            for (int i = 0; i < amount; i++) {
-                categoryChances.add(category.getName());
-                for (LootEntry entry : category.getEntries()) {
-                    int entryAmount = new Random().nextInt(entry.getRarity().getMax() - entry.getRarity().getMin()) + entry.getRarity().getMin();
-                    List<Material> materials = entryChances.computeIfAbsent(category.getName(), k -> new ArrayList<>());
-                    for (int h = 0; h < entryAmount; h++) {
-                        materials.add(entry.getMaterial());
-                    }
-                    
-                    if (materials != null) {
-                        Collections.shuffle(materials);
-                    }
-                }
-            }
-        }
-        
-        if (categoryChances != null) {
-            Collections.shuffle(categoryChances);
-        }
     }
     
     public void sendMapOptions(NexusPlayer nexusPlayer) {
@@ -438,12 +410,6 @@ public class Lobby {
         this.state = LobbyState.WAITING;
         this.forceStarted = false;
         generateMapOptions();
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                generateLootChances();
-            }
-        }.runTaskAsynchronously(plugin);
     }
     
     public Collection<NexusPlayer> getPlayers() {

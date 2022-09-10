@@ -15,7 +15,7 @@ public class LobbySettings extends SGSettings {
     private boolean keepPreviousGameSettings = true;
     private boolean sounds = true;
     
-    public LobbySettings() {
+    private LobbySettings() {
     }
     
     public LobbySettings(String type) {

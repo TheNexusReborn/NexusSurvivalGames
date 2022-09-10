@@ -33,7 +33,7 @@ public class GameSettings extends SGSettings {
     private Time time = Time.NOON;
     private Weather weather = Weather.CLEAR;
     
-    public GameSettings() {
+    private GameSettings() {
     }
     
     public GameSettings(String type) {

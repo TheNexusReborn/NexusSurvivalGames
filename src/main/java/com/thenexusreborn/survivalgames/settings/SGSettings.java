@@ -7,7 +7,7 @@ public abstract class SGSettings {
     protected long id;
     protected String type;
     
-    public SGSettings() {
+    protected SGSettings() {
     }
     
     public SGSettings(String type) {
