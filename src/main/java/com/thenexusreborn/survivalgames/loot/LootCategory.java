@@ -62,6 +62,10 @@ public class LootCategory {
         this.entries.add(new LootEntry(item, rarity));
     }
     
+    public void addEntry(Rarity rarity, LootItem item) {
+        this.entries.add(new LootEntry(item, rarity));
+    }
+    
     public void addEntry(LootEntry lootEntry) {
         this.entries.add(lootEntry);
     }

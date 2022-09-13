@@ -6,13 +6,12 @@ public class TierOneLootTable extends LootTable {
     public TierOneLootTable() {
         super("tierOne");
     
-        LootCategory food = new LootCategory("food", Rarity.COMMON);
-        LootCategory armor = new LootCategory("armor", Rarity.COMMON);
-        LootCategory weapons = new LootCategory("weapons", Rarity.COMMON);
+        LootCategory food = new LootCategory("food", Rarity.COMMON, 4);
+        LootCategory armor = new LootCategory("armor", Rarity.UNCOMMON);
+        LootCategory weapons = new LootCategory("weapons", Rarity.UNCOMMON);
         LootCategory consumables = new LootCategory("consumables", Rarity.UNCOMMON);
         LootCategory utilities = new LootCategory("utilities", Rarity.RARE);
         LootCategory components = new LootCategory("components", Rarity.UNCOMMON);
-        LootCategory legendary = new LootCategory("legendary", Rarity.LEGENDARY);
     
         addCategory(food);
         addCategory(armor);
@@ -20,7 +19,6 @@ public class TierOneLootTable extends LootTable {
         addCategory(consumables);
         addCategory(utilities);
         addCategory(components);
-        addCategory(legendary);
     
         food.addEntries(Rarity.RARE, Items.PORKCHOP, Items.STEAK, Items.GRILLED_CHICKEN, Items.CAKE, Items.PUMPKIN_PIE, Items.VILE_CREATURE);
         food.addEntries(Rarity.COMMON, Items.RAW_PORKCHOP, Items.RAW_BEEF, Items.CARROT, Items.POTATO, Items.RAW_FISH, Items.MELON);

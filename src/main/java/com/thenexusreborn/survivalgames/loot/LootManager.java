@@ -18,6 +18,7 @@ public class LootManager {
         this.lootTables.add(new TierOneLootTable());
         this.lootTables.add(new TierTwoLootTable());
         this.lootTables.add(new TierThreeLootTable());
+        this.lootTables.add(new TierFourLootTable());
     }
     
     public List<LootTable> getLootTables() {

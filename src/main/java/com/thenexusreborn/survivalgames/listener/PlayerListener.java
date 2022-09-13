@@ -6,7 +6,6 @@ import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.nexuscore.api.events.*;
 import com.thenexusreborn.nexuscore.util.*;
-import com.thenexusreborn.nexuscore.util.region.Cuboid;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.game.death.*;
@@ -145,7 +144,8 @@ public class PlayerListener implements Listener {
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
             if (e.getClickedBlock() != null) {
                 if (!(block.getType() == Material.DISPENSER || block.getType() == Material.FURNACE || block.getType() == Material.BURNING_FURNACE || block.getType() == Material.WORKBENCH || block.getType() == Material.ENCHANTMENT_TABLE || block.getType() == Material.ANVIL)) {
-                    if (block.getType() == Material.CHEST || block.getType() == Material.TRAPPED_CHEST) {
+                    LootManager lootManager = LootManager.getInstance();
+                    if (block.getType() == Material.CHEST || block.getType() == Material.TRAPPED_CHEST || block.getType() == Material.ENDER_CHEST) {
                         if (game == null) {
                             return;
                         }
@@ -159,54 +159,78 @@ public class PlayerListener implements Listener {
                         
                         game.getPlayer(player.getUniqueId()).getNexusPlayer().changeStat("sg_chests_looted", 1, StatOperator.ADD);
                         
-                        Inventory inv = ((Chest) block.getState()).getBlockInventory();
+                        Inventory inv;
+                        if (block.getType() == Material.ENDER_CHEST) {
+                            inv = game.getEnderchestInventories().get(block.getLocation());
+                            if (inv == null) {
+                                inv = Bukkit.createInventory(null, 27, "Ender Chest");
+                                game.getEnderchestInventories().put(block.getLocation(), inv);
+                            }
+                        } else {
+                            inv = ((Chest) block.getState()).getBlockInventory();
+                        }
+                        
                         int maxAmount = 8;
                         
                         Block secondHalf = null;
-                        Block north = block.getRelative(BlockFace.NORTH);
-                        Block south = block.getRelative(BlockFace.SOUTH);
-                        Block east = block.getRelative(BlockFace.EAST);
-                        Block west = block.getRelative(BlockFace.WEST);
-                        
-                        if (north != null && north.getType() == Material.CHEST) {
-                            secondHalf = north;
-                        } else if (south != null && south.getType() == Material.CHEST) {
-                            secondHalf = south;
-                        } else if (east != null && east.getType() == Material.CHEST) {
-                            secondHalf = east;
-                        } else if (west != null && west.getType() == Material.CHEST) {
-                            secondHalf = west;
-                        }
-                        
-                        if (secondHalf != null) {
-                            maxAmount += 3;
+                        if (block.getType() != Material.ENDER_CHEST) {
+                            Block north = block.getRelative(BlockFace.NORTH);
+                            Block south = block.getRelative(BlockFace.SOUTH);
+                            Block east = block.getRelative(BlockFace.EAST);
+                            Block west = block.getRelative(BlockFace.WEST);
+                            if (north != null && north.getType() == Material.CHEST) {
+                                secondHalf = north;
+                            } else if (south != null && south.getType() == Material.CHEST) {
+                                secondHalf = south;
+                            } else if (east != null && east.getType() == Material.CHEST) {
+                                secondHalf = east;
+                            } else if (west != null && west.getType() == Material.CHEST) {
+                                secondHalf = west;
+                            }
+    
+                            if (secondHalf != null) {
+                                maxAmount += 3;
+                            }
                         }
                         
                         inv.clear();
     
-                        LootTable lootTable;
-                        Cuboid deathmatchArea = game.getGameMap().getDeathmatchArea();
-                        if (deathmatchArea != null && game.getSettings().isUseNewLoot()) {
-                            boolean inMid = deathmatchArea.contains(player);
-                            if (game.getRestockTimer() == null && game.getState() == GameState.INGAME) {
-                                if (inMid) {
-                                    lootTable = LootManager.getInstance().getLootTable("tierThree");
-                                } else {
-                                    lootTable = LootManager.getInstance().getLootTable("tierTwo");
-                                }
-                            } else if (game.getState() == GameState.DEATHMATCH)  { 
-                                lootTable = LootManager.getInstance().getLootTable("tierThree");
+                        LootTable lootTable = null;
+                        
+                        boolean useTieredLoot = game.getSettings().isUseNewLoot();
+                        if (!useTieredLoot) {
+                            lootTable = lootManager.getLootTable("tierOne");
+                        } else {
+                            if (game.getState() == GameState.DEATHMATCH) {
+                                lootTable = lootManager.getLootTable("tierFour");
                             } else {
-                                if (inMid) {
-                                    lootTable = LootManager.getInstance().getLootTable("tierTwo");
-                                } else {
-                                    lootTable = LootManager.getInstance().getLootTable("tierOne");
+                                boolean withinCenter = game.getGameMap().getDeathmatchArea().contains(player);
+                                if (game.getState() == GameState.INGAME_GRACEPERIOD) {
+                                    lootTable = lootManager.getLootTable("tierOne");
+                                } else if (game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_DEATHMATCH) {
+                                    boolean afterRestock = game.getRestockTimer() == null;
+                                    if (withinCenter) {
+                                        if (afterRestock) {
+                                            lootTable = lootManager.getLootTable("tierThree");
+                                        } else {
+                                            lootTable = lootManager.getLootTable("tierTwo");
+                                        }
+                                    } else {
+                                        if (afterRestock) {
+                                            lootTable = lootManager.getLootTable("tierTwo");
+                                        } else {
+                                            lootTable = lootManager.getLootTable("tierOne");
+                                        }
+                                    }
                                 }
                             }
-                        } else {
-                            lootTable = LootManager.getInstance().getLootTable("tierOne");
                         }
-    
+                        
+                        if (lootTable == null) {
+                            player.sendMessage(MCUtils.color(MsgType.ERROR + "Error while determining the loot table."));
+                            return;
+                        }
+                        
                         List<ItemStack> items = lootTable.generateLoot(2, maxAmount);
                         
                         for (ItemStack item : items) {
@@ -217,53 +241,20 @@ public class PlayerListener implements Listener {
                             inv.setItem(slot, item);
                         }
                         
+                        if (block.getType() == Material.ENDER_CHEST) {
+                            Inventory finalInventory = inv;
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    player.openInventory(finalInventory);
+                                }
+                            }.runTaskLater(plugin, 1L);
+                        }
+                        
                         game.addLootedChest(block.getLocation());
                         if (secondHalf != null) {
                             game.addLootedChest(secondHalf.getLocation());
                         }
-                    } else if (block.getType() == Material.ENDER_CHEST) {
-                        if (game == null) {
-                            return;
-                        }
-                        
-                        if (game.getPlayer(player.getUniqueId()).getTeam() != GameTeam.TRIBUTES) {
-                            e.setCancelled(true);
-                            return;
-                        }
-                        
-                        if (!game.getSettings().isAllowEnderchests()) {
-                            player.sendMessage(MCUtils.color(MsgType.WARN + "You cannot open ender chests."));
-                            e.setCancelled(true);
-                            return;
-                        }
-                        
-                        Inventory inventory = game.getEnderchestInventories().get(block.getLocation());
-                        if (inventory == null) {
-                            inventory = Bukkit.createInventory(null, 27, "Ender Chest");
-                            game.getEnderchestInventories().put(block.getLocation(), inventory);
-                        }
-                        
-                        if (!game.isLootedChest(block)) {
-                            List<ItemStack> items = LootManager.getInstance().getLootTable("tierOne").generateLoot(2, 8);
-                            
-                            for (ItemStack item : items) {
-                                int slot;
-                                do {
-                                    slot = new Random().nextInt(inventory.getSize());
-                                } while (inventory.getItem(slot) != null);
-                                inventory.setItem(slot, item);
-                            }
-                            
-                            game.addLootedChest(block.getLocation());
-                        }
-                        
-                        Inventory finalInventory = inventory;
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                player.openInventory(finalInventory);
-                            }
-                        }.runTaskLater(plugin, 1L);
                     } else if (block.getState() instanceof Sign) {
                         NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(player.getUniqueId());
                         if (nexusPlayer.getPreferenceValue("vanish")) {

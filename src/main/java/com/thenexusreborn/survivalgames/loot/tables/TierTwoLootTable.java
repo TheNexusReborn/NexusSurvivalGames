@@ -20,30 +20,32 @@ public class TierTwoLootTable extends LootTable {
         addCategory(utilities);
         addCategory(components);
     
-        food.addEntries(Rarity.UNCOMMON, Items.PORKCHOP, Items.STEAK, Items.GRILLED_CHICKEN, Items.CAKE, Items.PUMPKIN_PIE, Items.VILE_CREATURE);
-        food.addEntries(Rarity.COMMON, Items.BAKED_POTATO, Items.APPLE);
-        food.addEntry(Items.GOLDEN_CARROT, Rarity.RARE);
-        food.addEntry(Items.GOLDEN_MUNCHIE, Rarity.EPIC);
+        food.addEntries(Rarity.COMMON, Items.RAW_PORKCHOP, Items.RAW_BEEF, Items.RAW_FISH);
+        food.addEntries(Rarity.UNCOMMON, Items.BAKED_POTATO, Items.APPLE);
+        food.addEntries(Rarity.RARE, Items.PORKCHOP, Items.STEAK, Items.GRILLED_CHICKEN, Items.CAKE, Items.PUMPKIN_PIE, Items.VILE_CREATURE);
+        food.addEntry(Items.GOLDEN_CARROT, Rarity.EPIC);
+        food.addEntry(Items.GOLDEN_MUNCHIE, Rarity.LEGENDARY);
     
-        armor.addEntries(Rarity.COMMON, Items.LINGERIE_HELMET, Items.LINGERIE_CHESTPLATE, Items.LINGERIE_LEGGINGS, Items.LINGERIE_BOOTS);
-        armor.addEntries(Rarity.UNCOMMON, Items.IRON_HELMET, Items.IRON_CHESTPLATE, Items.IRON_LEGGINGS, Items.IRON_BOOTS);
-        armor.addEntries(Rarity.LEGENDARY, Items.DIAMOND_HELMET, Items.DIAMOND_BOOTS);
+        armor.addEntries(Rarity.COMMON, Items.THE_CROWN, Items.GOLD_CHESTPLATE, Items.GOLD_LEGGINGS, Items.GOLD_BOOTS);
+        armor.addEntries(Rarity.UNCOMMON, Items.LINGERIE_HELMET, Items.LINGERIE_CHESTPLATE, Items.LINGERIE_LEGGINGS, Items.LINGERIE_BOOTS);
+        armor.addEntries(Rarity.RARE, Items.IRON_HELMET, Items.IRON_CHESTPLATE, Items.IRON_LEGGINGS, Items.IRON_BOOTS);
     
-        weapons.addEntries(Rarity.COMMON, Items.STONE_AXE, Items.BOW);
-        weapons.addEntry(Items.STONE_SWORD, Rarity.UNCOMMON);
+        weapons.addEntry(Items.WOOD_SWORD, Rarity.COMMON);
+        weapons.addEntries(Rarity.UNCOMMON, Items.STONE_AXE, Items.BOW);
+        weapons.addEntry(Items.STONE_SWORD, Rarity.RARE);
         weapons.addEntry(Items.IRON_SWORD, Rarity.EPIC);
     
-        consumables.addEntries(Rarity.COMMON, Items.EGG_OF_DOOM, Items.SLOWBALL, Items.COBWEB);
-        consumables.addEntry(new LootEntry(Items.ARROW, 10, Rarity.UNCOMMON));
-        consumables.addEntries(Rarity.UNCOMMON, Items.TNT, Items.WET_NODDLE);
-        consumables.addEntry(Items.XP_BOTTLE, Rarity.RARE);
-        consumables.addEntry(Items.ENDER_PEARL, Rarity.EPIC);
+        consumables.addEntries(Rarity.UNCOMMON, Items.EGG_OF_DOOM, Items.SLOWBALL, Items.COBWEB);
+        consumables.addEntry(new LootEntry(Items.ARROW, 5, Rarity.RARE));
+        consumables.addEntries(Rarity.RARE, Items.TNT, Items.WET_NODDLE);
+        consumables.addEntry(Items.XP_BOTTLE, Rarity.EPIC);
+        consumables.addEntry(Items.ENDER_PEARL, Rarity.LEGENDARY);
     
-        utilities.addEntries(Rarity.UNCOMMON, Items.PLAYER_TRACKER, Items.FLINT_AND_STEEL, Items.FISHING_ROD);
+        utilities.addEntries(Rarity.COMMON, Items.PLAYER_TRACKER, Items.FLINT_AND_STEEL, Items.FISHING_ROD);
     
-        components.addEntry(Items.IRON_INGOT, Rarity.RARE);
-        components.addEntries(Rarity.UNCOMMON, Items.GOLD_INGOT, Items.STICK);
         components.addEntries(Rarity.COMMON, Items.FEATHER, Items.FLINT);
-        components.addEntry(Items.DIAMOND, Rarity.EPIC);
+        components.addEntries(Rarity.UNCOMMON, Items.GOLD_INGOT, Items.STICK);
+        components.addEntry(Items.IRON_INGOT, Rarity.RARE);
+        components.addEntry(Items.DIAMOND, Rarity.LEGENDARY);
     }
 }
