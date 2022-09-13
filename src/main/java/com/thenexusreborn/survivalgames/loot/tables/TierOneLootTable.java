@@ -26,6 +26,7 @@ public class TierOneLootTable extends LootTable {
         food.addEntries(Rarity.COMMON, Items.RAW_PORKCHOP, Items.RAW_BEEF, Items.CARROT, Items.POTATO, Items.RAW_FISH, Items.MELON);
         food.addEntries(Rarity.UNCOMMON, Items.RAW_CHICKEN, Items.BAKED_POTATO, Items.APPLE);
         food.addEntry(Items.GOLDEN_CARROT, Rarity.EPIC);
+        food.addEntry(Items.GOLDEN_MUNCHIE, Rarity.LEGENDARY);
     
         armor.addEntries(Rarity.COMMON, Items.LEATHER_HELMET, Items.LEATHER_CHESTPLATE, Items.LEATHER_LEGGINGS, Items.LEATHER_BOOTS);
         armor.addEntries(Rarity.UNCOMMON, Items.THE_CROWN, Items.GOLD_CHESTPLATE, Items.GOLD_LEGGINGS, Items.GOLD_BOOTS, Items.LINGERIE_HELMET, Items.LINGERIE_CHESTPLATE, Items.LINGERIE_LEGGINGS, Items.LINGERIE_BOOTS);
@@ -39,14 +40,13 @@ public class TierOneLootTable extends LootTable {
         consumables.addEntry(new LootEntry(Items.ARROW, 5, Rarity.RARE));
         consumables.addEntries(Rarity.RARE, Items.TNT, Items.WET_NODDLE);
         consumables.addEntry(Items.XP_BOTTLE, Rarity.EPIC);
+        consumables.addEntry(Items.ENDER_PEARL, Rarity.LEGENDARY);
     
-        utilities.addEntries(Rarity.UNCOMMON, Items.PLAYER_TRACKER, Items.FLINT_AND_STEEL);
-        utilities.addEntry(Items.FISHING_ROD, Rarity.RARE);
+        utilities.addEntries(Rarity.COMMON, Items.PLAYER_TRACKER, Items.FLINT_AND_STEEL, Items.FISHING_ROD);
     
-        components.addEntry(Items.IRON_INGOT, Rarity.RARE);
-        components.addEntries(Rarity.UNCOMMON, Items.GOLD_INGOT, Items.STICK);
         components.addEntries(Rarity.COMMON, Items.FEATHER, Items.FLINT);
-    
-        legendary.addEntries(Rarity.LEGENDARY, Items.GOLDEN_MUNCHIE, Items.DIAMOND, Items.ENDER_PEARL);
+        components.addEntries(Rarity.UNCOMMON, Items.GOLD_INGOT, Items.STICK);
+        components.addEntry(Items.IRON_INGOT, Rarity.RARE);
+        components.addEntry(Items.DIAMOND, Rarity.LEGENDARY);
     }
 }
