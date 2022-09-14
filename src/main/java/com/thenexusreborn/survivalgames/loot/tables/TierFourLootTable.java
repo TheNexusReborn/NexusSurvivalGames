@@ -6,7 +6,7 @@ public class TierFourLootTable extends LootTable {
     public TierFourLootTable() {
         super("tierFour");
     
-        LootCategory food = new LootCategory("food", Rarity.COMMON, 4);
+        LootCategory food = new LootCategory("food", Rarity.COMMON);
         LootCategory armor = new LootCategory("armor", Rarity.UNCOMMON);
         LootCategory weapons = new LootCategory("weapons", Rarity.UNCOMMON);
         LootCategory consumables = new LootCategory("consumables", Rarity.UNCOMMON);
