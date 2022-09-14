@@ -33,9 +33,10 @@ public class TierThreeLootTable extends LootTable {
         weapons.addEntry(Items.STONE_SWORD, Rarity.UNCOMMON);
         weapons.addEntry(Items.IRON_SWORD, Rarity.RARE);
     
-        consumables.addEntries(Rarity.UNCOMMON, Items.EGG_OF_DOOM, Items.SLOWBALL, Items.COBWEB);
+        consumables.addEntries(Rarity.COMMON, Items.EGG_OF_DOOM, Items.SLOWBALL);
+        consumables.addEntries(Rarity.UNCOMMON, Items.COBWEB, Items.XP_BOTTLE);
         consumables.addEntry(new LootEntry(Items.ARROW, 10, Rarity.RARE));
-        consumables.addEntries(Rarity.RARE, Items.TNT, Items.WET_NODDLE, Items.XP_BOTTLE);
+        consumables.addEntries(Rarity.RARE, Items.TNT, Items.WET_NODDLE);
         consumables.addEntry(Items.ENDER_PEARL, Rarity.EPIC);
     
         utilities.addEntries(Rarity.COMMON, Items.PLAYER_TRACKER, Items.FLINT_AND_STEEL, Items.FISHING_ROD);

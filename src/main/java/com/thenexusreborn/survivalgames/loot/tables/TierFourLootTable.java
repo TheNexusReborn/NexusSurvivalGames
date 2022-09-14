@@ -31,10 +31,10 @@ public class TierFourLootTable extends LootTable {
         weapons.addEntry(Items.STONE_SWORD, Rarity.COMMON);
         weapons.addEntry(Items.IRON_SWORD, Rarity.RARE);
     
-        consumables.addEntries(Rarity.COMMON, Items.EGG_OF_DOOM, Items.SLOWBALL, Items.COBWEB);
-        consumables.addEntry(new LootEntry(Items.ARROW, 15, Rarity.UNCOMMON));
-        consumables.addEntries(Rarity.UNCOMMON, Items.TNT, Items.WET_NODDLE, Items.XP_BOTTLE);
-        consumables.addEntry(Items.ENDER_PEARL, Rarity.RARE);
+        consumables.addEntries(Rarity.COMMON, Items.EGG_OF_DOOM, Items.SLOWBALL);
+        consumables.addEntries(Rarity.UNCOMMON, Items.COBWEB, Items.XP_BOTTLE);
+        consumables.addEntry(new LootEntry(Items.ARROW, 10, Rarity.RARE));
+        consumables.addEntries(Rarity.RARE, Items.TNT, Items.WET_NODDLE, Items.ENDER_PEARL);
     
         utilities.addEntries(Rarity.COMMON, Items.PLAYER_TRACKER, Items.FLINT_AND_STEEL, Items.FISHING_ROD);
     

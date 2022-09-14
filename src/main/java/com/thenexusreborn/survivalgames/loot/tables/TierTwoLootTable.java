@@ -37,8 +37,7 @@ public class TierTwoLootTable extends LootTable {
     
         consumables.addEntries(Rarity.UNCOMMON, Items.EGG_OF_DOOM, Items.SLOWBALL, Items.COBWEB);
         consumables.addEntry(new LootEntry(Items.ARROW, 5, Rarity.RARE));
-        consumables.addEntries(Rarity.RARE, Items.TNT, Items.WET_NODDLE);
-        consumables.addEntry(Items.XP_BOTTLE, Rarity.EPIC);
+        consumables.addEntries(Rarity.RARE, Items.TNT, Items.WET_NODDLE, Items.XP_BOTTLE);
         consumables.addEntry(Items.ENDER_PEARL, Rarity.LEGENDARY);
     
         utilities.addEntries(Rarity.COMMON, Items.PLAYER_TRACKER, Items.FLINT_AND_STEEL, Items.FISHING_ROD);
