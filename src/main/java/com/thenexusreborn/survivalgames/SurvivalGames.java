@@ -3,16 +3,14 @@ package com.thenexusreborn.survivalgames;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.data.objects.Database;
 import com.thenexusreborn.api.registry.*;
-import com.thenexusreborn.api.server.ServerInfo;
 import com.thenexusreborn.api.stats.StatType;
-import com.thenexusreborn.api.tournament.Tournament;
 import com.thenexusreborn.api.util.Environment;
 import com.thenexusreborn.nexuscore.NexusCore;
 import com.thenexusreborn.nexuscore.api.NexusSpigotPlugin;
 import com.thenexusreborn.nexuscore.task.TournamentMsgTask;
-import com.thenexusreborn.nexuscore.util.*;
+import com.thenexusreborn.nexuscore.util.ServerProperties;
 import com.thenexusreborn.survivalgames.cmd.*;
-import com.thenexusreborn.survivalgames.game.*;
+import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.tasks.*;
 import com.thenexusreborn.survivalgames.listener.*;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
@@ -21,10 +19,8 @@ import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.map.*;
 import com.thenexusreborn.survivalgames.settings.*;
 import com.thenexusreborn.survivalgames.tasks.ServerStatusTask;
-import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.*;
 import java.util.*;
@@ -184,28 +180,28 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
     @Override
     public void registerStats(StatRegistry registry) {
-        registry.register("sg_score", StatType.INTEGER, 100);
-        registry.register("sg_kills", StatType.INTEGER, 0);
-        registry.register("sg_highest_kill_streak", StatType.INTEGER, 0);
-        registry.register("sg_games", StatType.INTEGER, 0);
-        registry.register("sg_wins", StatType.INTEGER, 0);
-        registry.register("sg_win_streak", StatType.INTEGER, 0);
-        registry.register("sg_deaths", StatType.INTEGER, 0);
-        registry.register("sg_deathmatches_reached", StatType.INTEGER, 0);
-        registry.register("sg_chests_looted", StatType.INTEGER, 0);
-        registry.register("sg_assists", StatType.INTEGER, 0);
-        registry.register("sg_times_mutated", StatType.INTEGER, 0);
-        registry.register("sg_mutation_kills", StatType.INTEGER, 0);
-        registry.register("sg_mutation_deaths", StatType.INTEGER, 0);
-        registry.register("sg_mutation_passes", StatType.INTEGER, 0);
-        registry.register("sg_sponsored_others", StatType.INTEGER, 0);
-        registry.register("sg_sponsors_received", StatType.INTEGER, 0);
-        registry.register("sg_tournament_points", StatType.INTEGER, 0);
-        registry.register("sg_tournament_kills", StatType.INTEGER, 0);
-        registry.register("sg_tournament_wins", StatType.INTEGER, 0);
-        registry.register("sg_tournament_survives", StatType.INTEGER, 0);
-        registry.register("sg_tournament_chests_looted", StatType.INTEGER, 0);
-        registry.register("sg_tournament_assists", StatType.INTEGER, 0);
+        registry.register("sg_score", "Score", StatType.INTEGER, 100);
+        registry.register("sg_kills", "Kills", StatType.INTEGER, 0);
+        registry.register("sg_highest_kill_streak", "Highest Kill Streak", StatType.INTEGER, 0);
+        registry.register("sg_games", "Total Games", StatType.INTEGER, 0);
+        registry.register("sg_wins", "Total Wins", StatType.INTEGER, 0);
+        registry.register("sg_win_streak", "Winstreak", StatType.INTEGER, 0);
+        registry.register("sg_deaths", "Deaths", StatType.INTEGER, 0);
+        registry.register("sg_deathmatches_reached", "Deathmatches Reached", StatType.INTEGER, 0);
+        registry.register("sg_chests_looted", "Chests Looted", StatType.INTEGER, 0);
+        registry.register("sg_assists", "Kill Assists", StatType.INTEGER, 0);
+        registry.register("sg_times_mutated", "Times Mutated", StatType.INTEGER, 0);
+        registry.register("sg_mutation_kills", "Kills as a Mutation", StatType.INTEGER, 0);
+        registry.register("sg_mutation_deaths", "Deaths as a Mutation", StatType.INTEGER, 0);
+        registry.register("sg_mutation_passes", "Mutation Passes", StatType.INTEGER, 0);
+        registry.register("sg_sponsored_others", "Times Sponsored Others", StatType.INTEGER, 0);
+        registry.register("sg_sponsors_received", "Times Sponsored By Others", StatType.INTEGER, 0);
+        registry.register("sg_tournament_points", "Tournament Points", StatType.INTEGER, 0);
+        registry.register("sg_tournament_kills", "Tournament Kills", StatType.INTEGER, 0);
+        registry.register("sg_tournament_wins", "Tournament Wins", StatType.INTEGER, 0);
+        registry.register("sg_tournament_survives", "Tournament Survives", StatType.INTEGER, 0);
+        registry.register("sg_tournament_chests_looted", "Tournament Chests Looted", StatType.INTEGER, 0);
+        registry.register("sg_tournament_assists", "Tournament Assists", StatType.INTEGER, 0);
     }
     
     public int getGamesPlayed() {
