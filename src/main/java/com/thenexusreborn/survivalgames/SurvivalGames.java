@@ -2,7 +2,6 @@ package com.thenexusreborn.survivalgames;
 
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.data.objects.Database;
-import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.registry.*;
 import com.thenexusreborn.api.server.ServerInfo;
 import com.thenexusreborn.api.stats.StatType;
@@ -10,6 +9,7 @@ import com.thenexusreborn.api.tournament.Tournament;
 import com.thenexusreborn.api.util.Environment;
 import com.thenexusreborn.nexuscore.NexusCore;
 import com.thenexusreborn.nexuscore.api.NexusSpigotPlugin;
+import com.thenexusreborn.nexuscore.task.TournamentMsgTask;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.survivalgames.cmd.*;
 import com.thenexusreborn.survivalgames.game.*;
@@ -20,9 +20,10 @@ import com.thenexusreborn.survivalgames.lobby.tasks.*;
 import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.map.*;
 import com.thenexusreborn.survivalgames.settings.*;
+import com.thenexusreborn.survivalgames.tasks.ServerStatusTask;
+import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.*;
@@ -176,47 +177,9 @@ public class SurvivalGames extends NexusSpigotPlugin {
         
         getLogger().info("Registered Listeners");
         
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (game != null) {
-                    for (GamePlayer player : game.getPlayers().values()) {
-                        if (player.getTeam() != GameTeam.TRIBUTES) {
-                            updatePlayerHealthAndFood(Bukkit.getPlayer(player.getUniqueId()));
-                        }
-                    }
-                } else {
-                    for (NexusPlayer player : lobby.getPlayers()) {
-                        updatePlayerHealthAndFood(Bukkit.getPlayer(player.getUniqueId()));
-                    }
-                }
-            }
-        }.runTaskTimer(this, 1L, 20L);
-        
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                ServerInfo serverInfo = NexusAPI.getApi().getServerManager().getCurrentServer();
-                if (game != null) {
-                    serverInfo.setState("game:" + game.getState().toString());
-                } else {
-                    serverInfo.setState("lobby:" + lobby.getState().toString());
-                }
-            }
-        }.runTaskTimer(this, 20L, 20L);
-        
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                Tournament tournament = NexusAPI.getApi().getTournament();
-                if (tournament != null && tournament.isActive()) {
-                    Bukkit.broadcastMessage(MCUtils.color("&6&l>> &aThere is an active tournament going on right now."));
-                    Bukkit.broadcastMessage(MCUtils.color("&6&l> &aYou will be seeing some additional messages for Points in chat."));
-                    Bukkit.broadcastMessage(MCUtils.color("&6&l> &aYou can use &b/tournament (alias /tt) leaderboard &ato see the current leaderboards"));
-                    Bukkit.broadcastMessage(MCUtils.color("&6&l> &aYou can use &b/tournament score &ato see your score specifically"));
-                }
-            }
-        }.runTaskTimer(this, 20L, 2450L);
+        new SpectatorUpdateTask(this).start();
+        new ServerStatusTask(this).start();
+        new TournamentMsgTask(this).start();
     }
     
     @Override
@@ -243,15 +206,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
         registry.register("sg_tournament_survives", StatType.INTEGER, 0);
         registry.register("sg_tournament_chests_looted", StatType.INTEGER, 0);
         registry.register("sg_tournament_assists", StatType.INTEGER, 0);
-    }
-    
-    private void updatePlayerHealthAndFood(Player player) {
-        if (player == null) {
-            return;
-        }
-        player.setHealth(player.getMaxHealth());
-        player.setFoodLevel(20);
-        player.setSaturation(2);
     }
     
     public int getGamesPlayed() {

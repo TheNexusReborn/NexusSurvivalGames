@@ -7,6 +7,7 @@ import com.thenexusreborn.nexuscore.util.ServerProperties;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.*;
 import com.thenexusreborn.survivalgames.settings.*;
+import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -24,15 +25,20 @@ public class LobbyTask extends BukkitRunnable {
         if (plugin.getGame() != null) {
             return;
         }
+        
         World world = Bukkit.getWorld(ServerProperties.getLevelName());
         for (Entity entity : world.getEntities()) {
             if (!(entity instanceof Player)) {
                 entity.remove();
             }
         }
+    
+        Lobby lobby = plugin.getLobby();
+        for (NexusPlayer player : lobby.getPlayers()) {
+            SGUtils.updatePlayerHealthAndFood(Bukkit.getPlayer(player.getUniqueId()));
+        }
         
         Tournament tournament = NexusAPI.getApi().getTournament();
-        Lobby lobby = plugin.getLobby();
         if (tournament != null && tournament.isActive()) {
             if (lobby.getState() == LobbyState.WAITING || lobby.getState() == LobbyState.COUNTDOWN) {
                 if (!lobby.getLobbySettings().getType().equals("tournament")) {
@@ -62,7 +68,6 @@ public class LobbyTask extends BukkitRunnable {
                 }
             }
         }
-        
         
         world.setThundering(false);
         world.setStorm(false);
