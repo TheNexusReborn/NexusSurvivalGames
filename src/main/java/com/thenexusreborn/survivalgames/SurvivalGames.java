@@ -163,6 +163,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         new MapSignUpdateTask(this).start();
         new MapChatOptionsMsgTask(this).start();
         new VoteStartMsgTask(this).start();
+        new StatSignUpdateTask(this).start();
         
         getLogger().info("Registered Tasks");
         
@@ -183,15 +184,15 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
     @Override
     public void registerStats(StatRegistry registry) {
-        registry.register("sg_score", "Score", StatType.INTEGER, 100);
-        registry.register("sg_kills", "Kills", StatType.INTEGER, 0);
-        registry.register("sg_highest_kill_streak", "Highest Kill Streak", StatType.INTEGER, 0);
-        registry.register("sg_games", "Total Games", StatType.INTEGER, 0);
-        registry.register("sg_wins", "Total Wins", StatType.INTEGER, 0);
-        registry.register("sg_win_streak", "Winstreak", StatType.INTEGER, 0);
-        registry.register("sg_deaths", "Deaths", StatType.INTEGER, 0);
-        registry.register("sg_deathmatches_reached", "Deathmatches Reached", StatType.INTEGER, 0);
-        registry.register("sg_chests_looted", "Chests Looted", StatType.INTEGER, 0);
+        registry.register("sg_score", "Score", StatType.INTEGER, 100);//
+        registry.register("sg_kills", "Kills", StatType.INTEGER, 0); //
+        registry.register("sg_highest_kill_streak", "Highest Kill Streak", StatType.INTEGER, 0);//
+        registry.register("sg_games", "Total Games", StatType.INTEGER, 0);//
+        registry.register("sg_wins", "Total Wins", StatType.INTEGER, 0); //
+        registry.register("sg_win_streak", "Winstreak", StatType.INTEGER, 0);//
+        registry.register("sg_deaths", "Deaths", StatType.INTEGER, 0); //
+        registry.register("sg_deathmatches_reached", "Deathmatches Reached", StatType.INTEGER, 0);//
+        registry.register("sg_chests_looted", "Chests Looted", StatType.INTEGER, 0); //
         registry.register("sg_assists", "Kill Assists", StatType.INTEGER, 0);
         registry.register("sg_times_mutated", "Times Mutated", StatType.INTEGER, 0);
         registry.register("sg_mutation_kills", "Kills as a Mutation", StatType.INTEGER, 0);

@@ -2,12 +2,13 @@ package com.thenexusreborn.survivalgames.cmd;
 
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.Rank;
+import com.thenexusreborn.api.stats.*;
 import com.thenexusreborn.api.util.Operator;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.*;
-import com.thenexusreborn.survivalgames.lobby.LobbyState;
+import com.thenexusreborn.survivalgames.lobby.*;
 import com.thenexusreborn.survivalgames.map.*;
 import com.thenexusreborn.survivalgames.settings.*;
 import com.thenexusreborn.survivalgames.util.SGUtils;
@@ -348,6 +349,79 @@ public class SGCommand implements CommandExecutor {
                     plugin.getLobby().getMapSigns().put(position, targetBlock.getLocation());
                     player.sendMessage(MCUtils.color(MsgType.INFO + "You set the sign you are looking at as a map sign in position &b" + position));
                     plugin.getLobby().generateMapOptions();
+                }
+            } else if (lobbySubCommand.equals("statsigns") || lobbySubCommand.equals("sts")) {
+                if (game != null) {
+                    sender.sendMessage(MCUtils.color(MsgType.WARN + "The server has a game in progress."));
+                    return true;
+                }
+    
+                if (!(args.length > 2)) {
+                    sender.sendMessage("&cYou must provide a sub command.");
+                    return true;
+                }
+    
+                if (!(sender instanceof Player)) {
+                    sender.sendMessage(MCUtils.color(MsgType.WARN + "Only players can use that command."));
+                    return true;
+                }
+                Player player = (Player) sender;
+    
+                Block targetBlock = player.getTargetBlock((Set<Material>) null, 10);
+                if (targetBlock == null) {
+                    player.sendMessage("&cYou are not looking at a block.");
+                    return true;
+                }
+    
+                if (!(targetBlock.getType() == Material.SIGN || targetBlock.getType() == Material.WALL_SIGN)) {
+                    player.sendMessage("&cYou are not looking at a sign.");
+                    return true;
+                }
+    
+                if (args[2].equalsIgnoreCase("remove")) {
+                    Iterator<StatSign> iterator = plugin.getLobby().getStatSigns().iterator();
+                    while (iterator.hasNext()) {
+                        StatSign entry = iterator.next();
+                        if (entry.getLocation().equals(targetBlock.getLocation())) {
+                            iterator.remove();
+                            player.sendMessage(MCUtils.color(MsgType.WARN + "You removed that stat sign"));
+                            break;
+                        }
+                    }
+                } else if (args[2].equalsIgnoreCase("add")) {
+                    if (!(args.length > 4)) {
+                        player.sendMessage(MCUtils.color(MsgType.WARN + "Usage: /survivalgames lobby statsigns add <stat> <displayName>"));
+                        return true;
+                    }
+        
+                    String stat = args[3];
+                    Stat.Info info = StatHelper.getInfo(stat);
+                    if (info == null) {
+                        player.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid stat name."));
+                        return true;
+                    }
+    
+                    for (StatSign statSign : plugin.getLobby().getStatSigns()) {
+                        if (statSign.getStat().equalsIgnoreCase(stat)) {
+                            player.sendMessage(MCUtils.color(MsgType.WARN + "A stat sign with that stat already exists. You can only have one per stat."));
+                            return true;
+                        }
+                    }
+                    
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 4; i < args.length; i++) {
+                        sb.append(args[i]).append(" ");
+                    }
+                    
+                    String displayName = ChatColor.stripColor(MCUtils.color(sb.toString().trim()));
+                    if (displayName.length() > 14) {
+                        player.sendMessage(MCUtils.color(MsgType.WARN + "The display name cannot be larger than 14 characters"));
+                        return true;
+                    }
+                    
+                    StatSign statSign = new StatSign(targetBlock.getLocation(), stat, displayName);
+                    plugin.getLobby().getStatSigns().add(statSign);
+                    player.sendMessage(MCUtils.color(MsgType.INFO + "You added a stat sign for &b" + stat + " &ewith the display name &b" + displayName));
                 }
             } else if (lobbySubCommand.equals("preparegame") || lobbySubCommand.equals("pg")) {
                 if (game != null) {

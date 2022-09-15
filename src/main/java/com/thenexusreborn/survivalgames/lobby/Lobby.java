@@ -16,8 +16,8 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
 import net.md_5.bungee.api.chat.ClickEvent.Action;
 import org.bukkit.*;
-import org.bukkit.block.*;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 
@@ -41,6 +41,7 @@ public class Lobby {
     private final Map<Integer, GameMap> mapOptions = new HashMap<>();
     private final Map<Integer, Set<UUID>> mapVotes = new HashMap<>();
     private boolean forceStarted;
+    private final List<StatSign> statSigns = new ArrayList<>();
     
     public Lobby(SurvivalGames plugin) {
         this.plugin = plugin;
@@ -59,6 +60,20 @@ public class Lobby {
                 this.mapSigns.put(position, location);
             }
             plugin.getLogger().info("Map Signs Loaded");
+        }
+        
+        if (plugin.getConfig().contains("statsigns")) {
+            plugin.getLogger().info("Loading Stat Signs");
+            ConfigurationSection signsSection = plugin.getConfig().getConfigurationSection("statsigns");
+            for (String key : signsSection.getKeys(false)) {
+                World world = Bukkit.getWorld(signsSection.getString(key + ".world"));
+                int x = signsSection.getInt(key + ".x");
+                int y = signsSection.getInt(key + ".y");
+                int z = signsSection.getInt(key + ".z");
+                Location location = new Location(world, x, y, z);
+                String displayName = signsSection.getString(key + ".displayName");
+                this.statSigns.add(new StatSign(location, key, displayName));
+            }
         }
         
         if (NexusAPI.getApi().getTournament() != null && NexusAPI.getApi().getTournament().isActive()) {
@@ -141,12 +156,22 @@ public class Lobby {
         if (gameMap != null) {
             gameMap.delete(plugin);
         }
-        
+    
+        FileConfiguration config = plugin.getConfig();
         this.mapSigns.forEach((position, location) -> {
-            plugin.getConfig().set("mapsigns." + position + ".world", location.getWorld().getName());
-            plugin.getConfig().set("mapsigns." + position + ".x", location.getBlockX());
-            plugin.getConfig().set("mapsigns." + position + ".y", location.getBlockY());
-            plugin.getConfig().set("mapsigns." + position + ".z", location.getBlockZ());
+            config.set("mapsigns." + position + ".world", location.getWorld().getName());
+            config.set("mapsigns." + position + ".x", location.getBlockX());
+            config.set("mapsigns." + position + ".y", location.getBlockY());
+            config.set("mapsigns." + position + ".z", location.getBlockZ());
+        });
+        
+        this.statSigns.forEach(statSign -> {
+            Location location = statSign.getLocation();
+            config.set("statsigns." + statSign.getStat() + ".world", location.getWorld().getName());
+            config.set("statsigns." + statSign.getStat() + ".x", location.getBlockX());
+            config.set("statsigns." + statSign.getStat() + ".y", location.getBlockY());
+            config.set("statsigns." + statSign.getStat() + ".z", location.getBlockZ());
+            config.set("statsigns." + statSign.getStat() + ".displayName", statSign.getDisplayName());
         });
     }
     
@@ -676,6 +701,14 @@ public class Lobby {
             }
         }
         return playerCount;
+    }
+    
+    public List<StatSign> getStatSigns() {
+        return statSigns;
+    }
+    
+    public Map<Integer, Set<UUID>> getMapVotes() {
+        return this.mapVotes;
     }
     
     @Override
