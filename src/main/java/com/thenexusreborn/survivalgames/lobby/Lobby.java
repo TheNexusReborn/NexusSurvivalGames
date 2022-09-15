@@ -20,7 +20,6 @@ import org.bukkit.block.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -82,99 +81,6 @@ public class Lobby {
         for (LootTable lootTable : LootManager.getInstance().getLootTables()) {
             lootTable.generateNewProbabilities(new Random());
         }
-        
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (getState() == LobbyState.MAP_EDITING) {
-                    return;
-                }
-                
-                if (mapOptions.size() < 1) {
-                    return;
-                }
-                for (Entry<Integer, Location> entry : mapSigns.entrySet()) {
-                    GameMap map = mapOptions.get(entry.getKey());
-                    BlockState state = entry.getValue().getBlock().getState();
-                    if (!(state instanceof Sign)) {
-                        continue;
-                    }
-                    Sign sign = (Sign) state;
-                    String mapName;
-                    if (map.getName().length() > 16) {
-                        mapName = map.getName().substring(0, 16);
-                    } else {
-                        mapName = map.getName();
-                    }
-                    sign.setLine(1, mapName);
-                    int votes = getTotalMapVotes(entry.getKey());
-                    
-                    sign.setLine(3, MCUtils.color("&n" + votes + " Vote(s)"));
-                    
-                    for (NexusPlayer player : players.values()) {
-                        Player bukkitPlayer = Bukkit.getPlayer(player.getUniqueId());
-                        if (bukkitPlayer != null) {
-                            World world = bukkitPlayer.getWorld();
-                            if (world != null) {
-                                if (!world.getName().equalsIgnoreCase(spawnpoint.getWorld().getName())) {
-                                    continue;
-                                }
-                                if (mapVotes.get(entry.getKey()).contains(player.getUniqueId())) {
-                                    sign.setLine(0, MCUtils.color("&n#" + entry.getKey()));
-                                    sign.setLine(2, MCUtils.color("&2&lVOTED!"));
-                                } else {
-                                    sign.setLine(0, MCUtils.color("&nClick to Vote"));
-                                    sign.setLine(2, "");
-                                }
-                                bukkitPlayer.sendSignChange(sign.getLocation(), sign.getLines());
-                            }
-                        }
-                    }
-                }
-            }
-        }.runTaskTimer(plugin, 20L, 20L);
-        
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (plugin.getGame() != null) {
-                    return;
-                }
-                
-                if (players.size() == 0) {
-                    return;
-                }
-                
-                if (!(getState() == LobbyState.WAITING || getState() == LobbyState.COUNTDOWN)) {
-                    return;
-                }
-                
-                for (NexusPlayer nexusPlayer : players.values()) {
-                    sendMapOptions(nexusPlayer);
-                }
-            }
-        }.runTaskTimer(plugin, 60L, 2400);
-        
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (plugin.getGame() != null) {
-                    return;
-                }
-                
-                if (players.size() == 0) {
-                    return;
-                }
-                
-                if (getState() != LobbyState.WAITING) {
-                    return;
-                }
-                
-                if (players.size() < lobbySettings.getMinPlayers()) {
-                    sendMessage("&6&l>> &e&lDid you know that you can use &f&l/votestart &e&lto start a game early?");
-                }
-            }
-        }.runTaskTimerAsynchronously(plugin, 20L, 2400L);
     }
     
     public void resetInvalidState() {
@@ -333,7 +239,7 @@ public class Lobby {
         }
     }
     
-    private int getTotalMapVotes(int position) {
+    public int getTotalMapVotes(int position) {
         int votes = 0;
         Set<UUID> playerVotes = mapVotes.get(position);
         for (UUID vote : playerVotes) {

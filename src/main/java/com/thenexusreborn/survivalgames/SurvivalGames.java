@@ -160,6 +160,9 @@ public class SurvivalGames extends NexusSpigotPlugin {
         new GameWorldTask(this).runTaskTimer(this, 1L, 20L);
         new LobbyTask(this).runTaskTimer(this, 1L, 20L);
         new PlayerTrackerTask().start();
+        new MapSignUpdateTask(this).start();
+        new MapChatOptionsMsgTask(this).start();
+        new VoteStartMsgTask(this).start();
         
         getLogger().info("Registered Tasks");
         
