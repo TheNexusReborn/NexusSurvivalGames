@@ -164,6 +164,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         new MapChatOptionsMsgTask(this).start();
         new VoteStartMsgTask(this).start();
         new StatSignUpdateTask(this).start();
+        new TributeSignUpdateTask(this).start();
         
         getLogger().info("Registered Tasks");
         

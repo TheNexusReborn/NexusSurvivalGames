@@ -42,6 +42,7 @@ public class Lobby {
     private final Map<Integer, Set<UUID>> mapVotes = new HashMap<>();
     private boolean forceStarted;
     private final List<StatSign> statSigns = new ArrayList<>();
+    private final List<TributeSign> tributeSigns = new ArrayList<>();
     
     public Lobby(SurvivalGames plugin) {
         this.plugin = plugin;
@@ -73,6 +74,28 @@ public class Lobby {
                 Location location = new Location(world, x, y, z);
                 String displayName = signsSection.getString(key + ".displayName");
                 this.statSigns.add(new StatSign(location, key, displayName));
+            }
+        }
+        
+        if (plugin.getConfig().contains("tributesigns")) {
+            plugin.getLogger().info("Loading Tribute Signs");
+            ConfigurationSection signsSection = plugin.getConfig().getConfigurationSection("tributesigns");
+            for (String key : signsSection.getKeys(false)) {
+                int index = Integer.parseInt(key);
+                World world = Bukkit.getWorld(signsSection.getString(key + ".world"));
+                int signX = signsSection.getInt(key + ".sign.x");
+                int signY = signsSection.getInt(key + ".sign.y");
+                int signZ = signsSection.getInt(key + ".sign.z");
+    
+                int headX = signsSection.getInt(key + ".head.x");
+                int headY = signsSection.getInt(key + ".head.y");
+                int headZ = signsSection.getInt(key + ".head.z");
+                
+                Location signLocation = new Location(world, signX, signY, signZ);
+                Location headLocation = new Location(world, headX, headY, headZ);
+                
+                TributeSign tributeSign = new TributeSign(index, signLocation, headLocation);
+                this.tributeSigns.add(tributeSign);
             }
         }
         
@@ -172,6 +195,19 @@ public class Lobby {
             config.set("statsigns." + statSign.getStat() + ".y", location.getBlockY());
             config.set("statsigns." + statSign.getStat() + ".z", location.getBlockZ());
             config.set("statsigns." + statSign.getStat() + ".displayName", statSign.getDisplayName());
+        });
+        
+        this.tributeSigns.forEach(tributeSign -> {
+            Location sl = tributeSign.getSignLocation();
+            Location hl = tributeSign.getHeadLocation();
+            
+            config.set("tributesigns." + tributeSign.getIndex() + ".world", sl.getWorld().getName());
+            config.set("tributesigns." + tributeSign.getIndex() + ".sign.x", sl.getBlockX());
+            config.set("tributesigns." + tributeSign.getIndex() + ".sign.y", sl.getBlockY());
+            config.set("tributesigns." + tributeSign.getIndex() + ".sign.z", sl.getBlockZ());
+            config.set("tributesigns." + tributeSign.getIndex() + ".head.x", hl.getBlockX());
+            config.set("tributesigns." + tributeSign.getIndex() + ".head.y", hl.getBlockY());
+            config.set("tributesigns." + tributeSign.getIndex() + ".head.z", hl.getBlockZ());
         });
     }
     
@@ -343,7 +379,7 @@ public class Lobby {
         generateMapOptions();
     }
     
-    public Collection<NexusPlayer> getPlayers() {
+    public List<NexusPlayer> getPlayers() {
         return new ArrayList<>(this.players.values());
     }
     
@@ -709,6 +745,10 @@ public class Lobby {
     
     public Map<Integer, Set<UUID>> getMapVotes() {
         return this.mapVotes;
+    }
+    
+    public List<TributeSign> getTributeSigns() {
+        return tributeSigns;
     }
     
     @Override
