@@ -55,8 +55,7 @@ public class StatsCommand implements CommandExecutor {
                     continue;
                 }
                 
-                name = name.toLowerCase().replaceAll("sg_", "");
-                name = StringHelper.capitalizeEveryWord(name);
+                name = stat.getDisplayName();
                 sender.sendMessage(MCUtils.color("&6&l> &e" + name + "&7: &b" + new DecimalFormat(format).format(nexusPlayer.getStatValue(stat.getName()))));
             }
         };
