@@ -1,0 +1,5 @@
+mapdatabase:
+  host: localhost
+  user: maps
+  password: maps
+  database: maps

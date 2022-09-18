@@ -1,8 +1,8 @@
 package com.thenexusreborn.survivalgames.scoreboard;
 
+import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.scoreboard.wrapper.*;
-import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.nexuscore.scoreboard.SpigotScoreboardView;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
@@ -18,7 +18,7 @@ import java.util.*;
 @SuppressWarnings("DuplicatedCode")
 public class DebugLobbyBoard extends SpigotScoreboardView {
     
-    private SurvivalGames plugin;
+    private final SurvivalGames plugin;
     
     private final String modeLabelName = "modeLabel", modeValueName = "modeValue", blank1Name = "blank1", stateLabelName = "stateLabel", stateValueName = "stateValue", 
             blank2Name = "blank2", timeLabelName = "timeLabel", timeValueName = "timeValue", blank3Name = "blank3", playersLabelName = "playersLabel", 
@@ -116,7 +116,7 @@ public class DebugLobbyBoard extends SpigotScoreboardView {
             secondsValue.setPrefix(MCUtils.color("&f0s"));
         }
         int playing = 0, max = lobby.getLobbySettings().getMaxPlayers(), spectating = 0;
-        for (SpigotNexusPlayer player : new ArrayList<>(lobby.getPlayers())) {
+        for (NexusPlayer player : new ArrayList<>(lobby.getPlayers())) {
             if (player.getPlayer() != null) {
                 if (!lobby.getSpectatingPlayers().contains(player.getUniqueId())) {
                     playing++;

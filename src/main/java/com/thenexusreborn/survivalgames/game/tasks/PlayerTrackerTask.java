@@ -12,7 +12,7 @@ import java.util.*;
 
 public class PlayerTrackerTask extends BukkitRunnable {
     
-    private SurvivalGames plugin = SurvivalGames.getPlugin(SurvivalGames.class);
+    private final SurvivalGames plugin = SurvivalGames.getPlugin(SurvivalGames.class);
     
     public void run() {
         Game game = plugin.getGame();

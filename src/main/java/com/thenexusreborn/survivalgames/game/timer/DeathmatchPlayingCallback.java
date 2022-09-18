@@ -13,8 +13,8 @@ public class DeathmatchPlayingCallback implements ReturnableCallback<TimerSnapsh
     
     private static final Set<Integer> ANNOUNCE = new HashSet<>(Arrays.asList(60, 45, 30, 15, 10, 5, 4, 3, 2, 1, 0));
     
-    private Game game;
-    private Set<Integer> announced = new HashSet<>();
+    private final Game game;
+    private final Set<Integer> announced = new HashSet<>();
     
     public DeathmatchPlayingCallback(Game game) {
         this.game = game;

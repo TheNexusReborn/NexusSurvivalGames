@@ -3,20 +3,17 @@ package com.thenexusreborn.survivalgames.listener;
 import com.google.common.io.*;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.*;
-import com.thenexusreborn.api.util.Operator;
+import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.nexuscore.api.events.*;
-import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.game.death.*;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
-import com.thenexusreborn.survivalgames.loot.Loot;
-import com.thenexusreborn.survivalgames.lootv2.LootManager;
+import com.thenexusreborn.survivalgames.loot.*;
 import com.thenexusreborn.survivalgames.menu.TeamMenu;
 import com.thenexusreborn.survivalgames.settings.ColorMode;
 import com.thenexusreborn.survivalgames.util.SGUtils;
-import me.vagdedes.spartan.api.PlayerViolationEvent;
 import org.bukkit.*;
 import org.bukkit.block.*;
 import org.bukkit.entity.*;
@@ -37,7 +34,7 @@ import java.util.*;
 
 @SuppressWarnings("DuplicatedCode")
 public class PlayerListener implements Listener {
-    private SurvivalGames plugin;
+    private final SurvivalGames plugin;
     
     public PlayerListener(SurvivalGames plugin) {
         this.plugin = plugin;
@@ -76,25 +73,20 @@ public class PlayerListener implements Listener {
         }
     }
     
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerViolation(PlayerViolationEvent e) {
-        Game game = plugin.getGame();
-        if (game != null) {
-            if (game.getState() == GameState.WARMUP || game.getState() == GameState.DEATHMATCH_WARMUP) {
-                e.setCancelled(true);
-            }
-        }
-    }
-    
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent e) {
-        if (plugin.getLobby().checkMapEditing(e.getPlayer())) {
+        if (e.isCancelled()) {
+            return;
+        }
+    
+        Player player = e.getPlayer();
+        if (plugin.getLobby().checkMapEditing(player)) {
             return;
         }
         
         Game game = plugin.getGame();
         if (game != null) {
-            GamePlayer gamePlayer = game.getPlayer(e.getPlayer().getUniqueId());
+            GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
             if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
                 if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
                     if (e.getItem() != null) {
@@ -113,17 +105,17 @@ public class PlayerListener implements Listener {
                                 }
                                 
                                 if (team != null) {
-                                    e.getPlayer().openInventory(new TeamMenu(plugin, team).getInventory());
+                                    player.openInventory(new TeamMenu(plugin, team).getInventory());
                                 }
                             }
                         } else if (item.getType() == Material.ROTTEN_FLESH) {
                             gamePlayer.sendMessage("&6&l>> &cThat is currently not implemented.");
                         } else if (item.getType() == Material.WATCH) {
-                            e.getPlayer().teleport(game.getGameMap().getCenter().toLocation(game.getGameMap().getWorld()));
+                            player.teleport(game.getGameMap().getCenter().toLocation(game.getGameMap().getWorld()));
                             gamePlayer.sendMessage("&6&l>> &eTeleported to the Map Center.");
                         } else if (item.getType() == Material.WOOD_DOOR) {
                             gamePlayer.sendMessage("&6&l>> &eSending you to the hub.");
-                            SGUtils.sendToHub(e.getPlayer());
+                            SGUtils.sendToHub(player);
                         }
                     }
                 }
@@ -152,11 +144,12 @@ public class PlayerListener implements Listener {
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
             if (e.getClickedBlock() != null) {
                 if (!(block.getType() == Material.DISPENSER || block.getType() == Material.FURNACE || block.getType() == Material.BURNING_FURNACE || block.getType() == Material.WORKBENCH || block.getType() == Material.ENCHANTMENT_TABLE || block.getType() == Material.ANVIL)) {
-                    if (block.getType() == Material.CHEST || block.getType() == Material.TRAPPED_CHEST) {
+                    LootManager lootManager = LootManager.getInstance();
+                    if (block.getType() == Material.CHEST || block.getType() == Material.TRAPPED_CHEST || block.getType() == Material.ENDER_CHEST) {
                         if (game == null) {
                             return;
                         }
-                        if (game.getPlayer(e.getPlayer().getUniqueId()).getTeam() != GameTeam.TRIBUTES) {
+                        if (game.getPlayer(player.getUniqueId()).getTeam() != GameTeam.TRIBUTES) {
                             e.setCancelled(true);
                             return;
                         }
@@ -164,41 +157,81 @@ public class PlayerListener implements Listener {
                             return;
                         }
                         
-                        game.getPlayer(e.getPlayer().getUniqueId()).getNexusPlayer().changeStat("sg_chests_looted", 1, Operator.ADD);
+                        game.getPlayer(player.getUniqueId()).getNexusPlayer().changeStat("sg_chests_looted", 1, StatOperator.ADD);
                         
-                        Inventory inv = ((Chest) block.getState()).getBlockInventory();
-                        int maxAmount = 6;
-                        
-                        Block secondHalf = null;
-                        Block north = block.getRelative(BlockFace.NORTH);
-                        Block south = block.getRelative(BlockFace.SOUTH);
-                        Block east = block.getRelative(BlockFace.EAST);
-                        Block west = block.getRelative(BlockFace.WEST);
-                        
-                        if (north != null && north.getType() == Material.CHEST) {
-                            secondHalf = north;
-                        } else if (south != null && south.getType() == Material.CHEST) {
-                            secondHalf = south;
-                        } else if (east != null && east.getType() == Material.CHEST) {
-                            secondHalf = east;
-                        } else if (west != null && west.getType() == Material.CHEST) {
-                            secondHalf = west;
+                        Inventory inv;
+                        if (block.getType() == Material.ENDER_CHEST) {
+                            inv = game.getEnderchestInventories().get(block.getLocation());
+                            if (inv == null) {
+                                inv = Bukkit.createInventory(null, 27, "Ender Chest");
+                                game.getEnderchestInventories().put(block.getLocation(), inv);
+                            }
+                        } else {
+                            inv = ((Chest) block.getState()).getBlockInventory();
                         }
                         
-                        if (secondHalf != null) {
-                            maxAmount += 3;
+                        int maxAmount = 8;
+                        
+                        Block secondHalf = null;
+                        if (block.getType() != Material.ENDER_CHEST) {
+                            Block north = block.getRelative(BlockFace.NORTH);
+                            Block south = block.getRelative(BlockFace.SOUTH);
+                            Block east = block.getRelative(BlockFace.EAST);
+                            Block west = block.getRelative(BlockFace.WEST);
+                            if (north != null && north.getType() == Material.CHEST) {
+                                secondHalf = north;
+                            } else if (south != null && south.getType() == Material.CHEST) {
+                                secondHalf = south;
+                            } else if (east != null && east.getType() == Material.CHEST) {
+                                secondHalf = east;
+                            } else if (west != null && west.getType() == Material.CHEST) {
+                                secondHalf = west;
+                            }
+    
+                            if (secondHalf != null) {
+                                maxAmount += 3;
+                            }
                         }
                         
                         inv.clear();
-                        List<ItemStack> items = new ArrayList<>();
-                        if (game.getLootChances() == null || !game.getSettings().isUseNewLoot()) {
-                            List<Loot> loot = plugin.getLootManager().generateLoot(new Random().nextInt(maxAmount) + 2);
-                            for (Loot l : loot) {
-                                items.add(l.generateItemStack());
-                            }
+    
+                        LootTable lootTable = null;
+                        
+                        boolean useTieredLoot = game.getSettings().isUseNewLoot();
+                        if (!useTieredLoot) {
+                            lootTable = lootManager.getLootTable("tierOne");
                         } else {
-                            items = LootManager.getInstance().getLootTable("basic").generateLoot(new Random().nextInt(maxAmount) + 2, game.getLootChances());
+                            if (game.getState() == GameState.DEATHMATCH) {
+                                lootTable = lootManager.getLootTable("tierFour");
+                            } else {
+                                boolean withinCenter = game.getGameMap().getDeathmatchArea().contains(player);
+                                if (game.getState() == GameState.INGAME_GRACEPERIOD) {
+                                    lootTable = lootManager.getLootTable("tierOne");
+                                } else if (game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_DEATHMATCH) {
+                                    boolean afterRestock = game.getRestockTimer() == null;
+                                    if (withinCenter) {
+                                        if (afterRestock) {
+                                            lootTable = lootManager.getLootTable("tierThree");
+                                        } else {
+                                            lootTable = lootManager.getLootTable("tierTwo");
+                                        }
+                                    } else {
+                                        if (afterRestock) {
+                                            lootTable = lootManager.getLootTable("tierTwo");
+                                        } else {
+                                            lootTable = lootManager.getLootTable("tierOne");
+                                        }
+                                    }
+                                }
+                            }
                         }
+                        
+                        if (lootTable == null) {
+                            player.sendMessage(MCUtils.color(MsgType.ERROR + "Error while determining the loot table."));
+                            return;
+                        }
+                        
+                        List<ItemStack> items = lootTable.generateLoot(2, maxAmount);
                         
                         for (ItemStack item : items) {
                             int slot;
@@ -208,65 +241,23 @@ public class PlayerListener implements Listener {
                             inv.setItem(slot, item);
                         }
                         
+                        if (block.getType() == Material.ENDER_CHEST) {
+                            Inventory finalInventory = inv;
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    player.openInventory(finalInventory);
+                                }
+                            }.runTaskLater(plugin, 1L);
+                        }
+                        
                         game.addLootedChest(block.getLocation());
                         if (secondHalf != null) {
                             game.addLootedChest(secondHalf.getLocation());
                         }
-                    } else if (block.getType() == Material.ENDER_CHEST) {
-                        if (game == null) {
-                            return;
-                        }
-                        
-                        if (game.getPlayer(e.getPlayer().getUniqueId()).getTeam() != GameTeam.TRIBUTES) {
-                            e.setCancelled(true);
-                            return;
-                        }
-                        
-                        if (!game.getSettings().isAllowEnderchests()) {
-                            e.getPlayer().sendMessage(MCUtils.color(MsgType.WARN + "You cannot open ender chests."));
-                            e.setCancelled(true);
-                            return;
-                        }
-                        
-                        Inventory inventory = game.getEnderchestInventories().get(block.getLocation());
-                        if (inventory == null) {
-                            inventory = Bukkit.createInventory(null, 27, "Ender Chest");
-                            game.getEnderchestInventories().put(block.getLocation(), inventory);
-                        }
-                        
-                        if (!game.isLootedChest(block)) {
-                            List<ItemStack> items = new ArrayList<>();
-                            if (!game.getSettings().isUseNewLoot()) {
-                                List<Loot> loot = plugin.getLootManager().generateLoot(new Random().nextInt(6) + 2);
-                                inventory.clear();
-                                for (Loot l : loot) {
-                                    items.add(l.generateItemStack());
-                                }
-                            } else {
-                                items = LootManager.getInstance().getLootTable("basic").generateLoot(new Random().nextInt(6) + 2, game.getLootChances());
-                            }
-                            
-                            for (ItemStack item : items) {
-                                int slot;
-                                do {
-                                    slot = new Random().nextInt(inventory.getSize());
-                                } while (inventory.getItem(slot) != null);
-                                inventory.setItem(slot, item);
-                            }
-                            
-                            game.addLootedChest(block.getLocation());
-                        }
-                        
-                        Inventory finalInventory = inventory;
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                e.getPlayer().openInventory(finalInventory);
-                            }
-                        }.runTaskLater(plugin, 1L);
                     } else if (block.getState() instanceof Sign) {
-                        NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(e.getPlayer().getUniqueId());
-                        if (nexusPlayer.getPreferences().get("vanish").getValue()) {
+                        NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(player.getUniqueId());
+                        if (nexusPlayer.getPreferenceValue("vanish")) {
                             nexusPlayer.sendMessage(MsgType.WARN + "You cannot vote for a map while in vanish.");
                             return;
                         }
@@ -308,7 +299,7 @@ public class PlayerListener implements Listener {
         String coloredName = e.getNexusPlayer().getRank().getColor() + e.getNexusPlayer().getName();
         Game game = plugin.getGame();
         
-        Collection<SpigotNexusPlayer> players;
+        Collection<NexusPlayer> players;
         if (game == null) {
             players = plugin.getLobby().getPlayers();
         } else {
@@ -319,7 +310,7 @@ public class PlayerListener implements Listener {
         }
         
         String message;
-        boolean incognito = e.getNexusPlayer().getPreferences().get("incognito").getValue();
+        boolean incognito = e.getNexusPlayer().getPreferenceValue("incognito");
         if (e.getNewValue()) {
             if (incognito) {
                 message = "";
@@ -339,10 +330,10 @@ public class PlayerListener implements Listener {
                 message = "&a&l>> " + coloredName + " &ejoined.";
             }
         }
-    
+        
         if (!message.equals("")) {
             if (incognito) {
-                for (SpigotNexusPlayer player : players) {
+                for (NexusPlayer player : players) {
                     if (player.getRank().ordinal() <= Rank.HELPER.ordinal() || player.getUniqueId().equals(e.getNexusPlayer().getUniqueId())) {
                         player.sendMessage(message);
                     }
@@ -371,7 +362,9 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onPrepareCraft(PrepareItemCraftEvent e) {
         CraftingInventory inv = e.getInventory();
-        if (inv.getRecipe() == null) return; 
+        if (inv.getRecipe() == null) {
+            return;
+        }
         if (inv.getRecipe().getResult().getType() == Material.FLINT_AND_STEEL) {
             ItemStack itemStack = new ItemStack(Material.FLINT_AND_STEEL);
             itemStack.setDurability((short) (Material.FLINT_AND_STEEL.getMaxDurability() - 4));
@@ -625,11 +618,11 @@ public class PlayerListener implements Listener {
     
     @EventHandler
     public void onNexusPlayerLoad(NexusPlayerLoadEvent e) {
-        SpigotNexusPlayer nexusPlayer = (SpigotNexusPlayer) e.getNexusPlayer();
+        NexusPlayer nexusPlayer = e.getNexusPlayer();
         if (plugin.getGame() == null) {
             if (plugin.getLobby().getPlayingCount() >= plugin.getLobby().getLobbySettings().getMaxPlayers()) {
                 boolean isStaff = nexusPlayer.getRank().ordinal() <= Rank.HELPER.ordinal();
-                boolean isInVanish = nexusPlayer.getPreferences().get("vanish").getValue();
+                boolean isInVanish = nexusPlayer.getPreferenceValue("vanish");
                 if (!(isStaff && isInVanish)) {
                     nexusPlayer.sendMessage("&cThe lobby is full.");
                     new BukkitRunnable() {
@@ -638,7 +631,7 @@ public class PlayerListener implements Listener {
                             ByteArrayDataOutput out = ByteStreams.newDataOutput();
                             out.writeUTF("Connect");
                             out.writeUTF("H1");
-                            nexusPlayer.getPlayer().sendPluginMessage(plugin.getNexusCore(), "BungeeCord", out.toByteArray());
+                            Bukkit.getPlayer(nexusPlayer.getUniqueId()).sendPluginMessage(plugin.getNexusCore(), "BungeeCord", out.toByteArray());
                         }
                     }.runTaskLater(plugin, 10L);
                     
@@ -674,9 +667,9 @@ public class PlayerListener implements Listener {
         SurvivalGames.PLAYER_QUEUE.remove(e.getPlayer().getUniqueId());
         NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(e.getPlayer().getUniqueId());
         if (plugin.getGame() != null) {
-            plugin.getGame().removePlayer((SpigotNexusPlayer) nexusPlayer);
+            plugin.getGame().removePlayer(nexusPlayer);
         } else {
-            plugin.getLobby().removePlayer((SpigotNexusPlayer) nexusPlayer);
+            plugin.getLobby().removePlayer(nexusPlayer);
         }
         e.setQuitMessage(null);
     }

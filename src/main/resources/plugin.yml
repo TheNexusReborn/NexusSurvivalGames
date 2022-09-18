@@ -3,6 +3,7 @@ version: ${project.version}
 name: SurvivalGames
 description: The Survival Games plugin for The Nexus Reborn
 depend: [NexusCore]
+softdepend: [Spartan]
 author: Firestar311
 commands:
   votestart:

@@ -5,14 +5,13 @@ import com.thenexusreborn.survivalgames.SurvivalGames;
 
 import java.sql.*;
 import java.util.*;
-import java.util.Map.Entry;
 
 public class MapManager {
-    private SurvivalGames plugin;
+    private final SurvivalGames plugin;
     
     private Config mapsConfig;
     
-    private List<GameMap> gameMaps = new ArrayList<>();
+    private final List<GameMap> gameMaps = new ArrayList<>();
     
     public MapManager(SurvivalGames plugin) {
         this.plugin = plugin;
@@ -21,43 +20,75 @@ public class MapManager {
     
     public void load() {
         plugin.getLogger().info("Loading the Maps...");
-        try (Connection connection = plugin.getMapConnection(); Statement mapStatement = connection.createStatement(); Statement spawnsStatement = connection.createStatement()) {
-            ResultSet resultSet = mapStatement.executeQuery("select * from sgmaps;");
-            while (resultSet.next()) {
-                int id = resultSet.getInt("id");
-                String name = resultSet.getString("name").replace("''", "'");
-                String url = resultSet.getString("url");
-                int centerX = resultSet.getInt("centerX");
-                int centerY = resultSet.getInt("centerY");
-                int centerZ = resultSet.getInt("centerZ");
-                int borderRadius = resultSet.getInt("borderRadius");
-                int dmBorderRadius = resultSet.getInt("dmBorderRadius");
-                String rawCreators = resultSet.getString("creators");
-                boolean active = Boolean.parseBoolean(resultSet.getString("active"));
-                
-                GameMap gameMap = new GameMap(url, name);
-                gameMap.setId(id);
-                gameMap.setCenter(new Position(centerX, centerY, centerZ));
-                gameMap.setBorderDistance(borderRadius);
-                gameMap.setDeathmatchBorderDistance(dmBorderRadius);
-                gameMap.setActive(active);
-                for (String creator : rawCreators.split(",")) {
-                    gameMap.addCreator(creator);
-                }
-                
-                ResultSet spawnResultSet = spawnsStatement.executeQuery("select * from sgmapspawns where mapId='" + gameMap.getId() + "';");
-                while (spawnResultSet.next()) {
-                    int spawnId = spawnResultSet.getInt("id");
-                    int x = spawnResultSet.getInt("x");
-                    int y = spawnResultSet.getInt("y");
-                    int z = spawnResultSet.getInt("z");
-                    Position spawn = new Position(x, y, z);
-                    gameMap.setSpawn(spawnId, spawn);
-                }
-                this.gameMaps.add(gameMap);
-            }
+        try {
+            gameMaps.addAll(plugin.getMapDatabase().get(GameMap.class));
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+        
+        if (gameMaps.size() == 0) {
+            List<GameMap> maps = new ArrayList<>(); 
+            List<MapSpawn> spawns = new ArrayList<>();
+            try (Connection connection = plugin.getNexusCore().getConnection("nexusmaps"); Statement statement = connection.createStatement()) {
+                ResultSet mapSet = statement.executeQuery("select * from sgmaps;");
+                while (mapSet.next()) {
+                    int id = mapSet.getInt("id");
+                    String name = mapSet.getString("name");
+                    String url = mapSet.getString("url");
+                    int centerX = mapSet.getInt("centerX");
+                    int centerY = mapSet.getInt("centerY");
+                    int centerZ = mapSet.getInt("centerZ");
+                    int borderRadius = mapSet.getInt("borderRadius");
+                    int dmBorderRadius = mapSet.getInt("dmBorderRadius");
+                    String creators = mapSet.getString("creators");
+                    boolean active = Boolean.parseBoolean(mapSet.getString("active"));
+                    GameMap gameMap = new GameMap(url, name);
+                    gameMap.setId(id);
+                    gameMap.setCenter(new Position(centerX, centerY, centerZ));
+                    gameMap.setBorderDistance(borderRadius);
+                    gameMap.setDeathmatchBorderDistance(dmBorderRadius);
+                    gameMap.getCreators().addAll(Arrays.asList(creators.split(",")));
+                    gameMap.setActive(active);
+                    maps.add(gameMap);
+                }
+                
+                ResultSet spawnsSet = statement.executeQuery("select * from sgmapspawns;");
+                while (spawnsSet.next()) {
+                    int index = spawnsSet.getInt("id");
+                    int mapId = spawnsSet.getInt("mapId");
+                    int x = spawnsSet.getInt("x");
+                    int y = spawnsSet.getInt("y");
+                    int z = spawnsSet.getInt("z");
+                    MapSpawn mapSpawn = new MapSpawn(mapId, index, x, y, z);
+                    spawns.add(mapSpawn);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+    
+            Iterator<MapSpawn> spawnIterator = spawns.iterator();
+            while (spawnIterator.hasNext()) {
+                MapSpawn spawn = spawnIterator.next();
+                for (GameMap map : maps) {
+                    if (map.getId() == spawn.getMapId()) {
+                        map.getSpawns().add(spawn);
+                        spawnIterator.remove();
+                    }
+                }
+            }
+            
+            if (spawns.size() > 0) {
+                plugin.getLogger().warning("There was a total of " + spawns.size() + " spawns that didn't have a map.");
+            }
+    
+            for (GameMap map : maps) {
+                map.setId(0);
+            }
+    
+            for (GameMap map : maps) {
+                plugin.getMapDatabase().push(map);
+                this.gameMaps.add(map);
+            }
         }
     }
     
@@ -79,70 +110,7 @@ public class MapManager {
     }
     
     public void saveToDatabase(GameMap gameMap) {
-        try (Connection connection = plugin.getMapConnection()) {
-            String mapSql;
-            
-            if (gameMap.getId() > 0) {
-                //language=MySQL
-                mapSql = "update sgmaps set name=?, url=?, centerX=?, centerY=?, centerZ=?, borderRadius=?, dmBorderRadius=?, creators=?, active=? where id='" + gameMap.getId() + "';";
-            } else {
-                //language=MySQL
-                mapSql = "insert into sgmaps(name, url, centerX, centerY, centerZ, borderRadius, dmBorderRadius, creators, active) values(?, ?, ?, ?, ?, ?, ?, ?, ?);";
-            }
-            
-            try (PreparedStatement mapStatement = connection.prepareStatement(mapSql, Statement.RETURN_GENERATED_KEYS); PreparedStatement spawnUpdateStatement = connection.prepareStatement("update sgmapspawns set x=?, y=?, z=? where id=? and mapId=?;"); PreparedStatement spawnInsertStatement = connection.prepareStatement("insert into sgmapspawns(id, mapId, x, y, z) values(?, ?, ?, ?, ?);")) {
-                mapStatement.setString(1, gameMap.getName().replace("'", "''"));
-                mapStatement.setString(2, gameMap.getUrl());
-                mapStatement.setInt(3, gameMap.getCenter().getX());
-                mapStatement.setInt(4, gameMap.getCenter().getY());
-                mapStatement.setInt(5, gameMap.getCenter().getZ());
-                mapStatement.setInt(6, gameMap.getBorderDistance());
-                mapStatement.setInt(7, gameMap.getDeathmatchBorderDistance());
-                StringBuilder creators = new StringBuilder();
-                for (String creator : gameMap.getCreators()) {
-                    if (creator != null && !creator.equals("") && !creator.equals(" ")) {
-                        creators.append(creator).append(",");
-                    }
-                }
-                if (creators.length() == 0) {
-                    creators.append(" ");
-                }
-                mapStatement.setString(8, creators.substring(0, creators.length() - 1));
-                mapStatement.setString(9, gameMap.isActive() + "");
-                mapStatement.executeUpdate();
-                if (mapSql.contains("insert into")) {
-                    ResultSet generatedKeys = mapStatement.getGeneratedKeys();
-                    if (generatedKeys.next()) {
-                        gameMap.setId(generatedKeys.getInt(1));
-                    }
-                }
-                
-                for (Entry<Integer, Position> entry : gameMap.getSpawns().entrySet()) {
-                    try (Statement spawnQuery = connection.createStatement()) {
-                        ResultSet resultSet = spawnQuery.executeQuery("select * from nexusmaps.sgmapspawns where id='" + entry.getKey() + "' and mapId='" + gameMap.getId() + "';");
-                        if (resultSet.next()) {
-                            spawnUpdateStatement.setInt(1, entry.getValue().getX());
-                            spawnUpdateStatement.setInt(2, entry.getValue().getY());
-                            spawnUpdateStatement.setInt(3, entry.getValue().getZ());
-                            spawnUpdateStatement.setInt(4, entry.getKey());
-                            spawnUpdateStatement.setInt(5, gameMap.getId());
-                            spawnUpdateStatement.addBatch();
-                        } else {
-                            spawnInsertStatement.setInt(1, entry.getKey());
-                            spawnInsertStatement.setInt(2, gameMap.getId());
-                            spawnInsertStatement.setInt(3, entry.getValue().getX());
-                            spawnInsertStatement.setInt(4, entry.getValue().getY());
-                            spawnInsertStatement.setInt(5, entry.getValue().getZ());
-                            spawnInsertStatement.addBatch();
-                        }
-                    }
-                }
-                spawnUpdateStatement.executeBatch();
-                spawnInsertStatement.executeBatch();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        plugin.getMapDatabase().push(gameMap);
     }
     
     public void addMap(GameMap gameMap) {

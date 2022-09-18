@@ -17,7 +17,7 @@ import java.util.*;
 @SuppressWarnings("DuplicatedCode")
 public class DebugGameBoard extends SpigotScoreboardView {
     
-    private SurvivalGames plugin;
+    private final SurvivalGames plugin;
     
     private final String modeLabelName = "modeLabel", modeValueName = "modeValue", blank1Name = "blank1", stateLabelName = "stateLabel", stateValueName = "stateValue", 
             blank2Name = "blank2", timeLabelName = "timeLabel", timeValueName = "timeValue", blank3Name = "blank3", playersLabelName = "playersLabel", 

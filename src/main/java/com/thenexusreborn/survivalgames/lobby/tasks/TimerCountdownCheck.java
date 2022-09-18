@@ -1,13 +1,12 @@
 package com.thenexusreborn.survivalgames.lobby.tasks;
 
-import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
 import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.lobby.*;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class TimerCountdownCheck extends BukkitRunnable {
     
-    private SurvivalGames plugin;
+    private final SurvivalGames plugin;
     
     public TimerCountdownCheck(SurvivalGames plugin) {
         this.plugin = plugin;
@@ -29,14 +28,7 @@ public class TimerCountdownCheck extends BukkitRunnable {
             return;
         }
         
-        int playerCount = 0;
-        for (SpigotNexusPlayer player : lobby.getPlayers()) {
-            if (!lobby.getSpectatingPlayers().contains(player.getUniqueId())) {
-                if (!player.getPreferences().get("vanish").getValue()) {
-                    playerCount++;
-                }
-            }
-        }
+        int playerCount = lobby.getPlayingCount();
         
         if (playerCount >= lobby.getLobbySettings().getMinPlayers()) {
             lobby.startTimer();

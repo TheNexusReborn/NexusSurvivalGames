@@ -10,7 +10,16 @@ import org.bukkit.util.Vector;
 
 public class SGUtils {
     
-    private static SurvivalGames plugin = SurvivalGames.getPlugin(SurvivalGames.class);
+    private static final SurvivalGames plugin = SurvivalGames.getPlugin(SurvivalGames.class);
+    
+    public static void updatePlayerHealthAndFood(Player player) {
+        if (player == null) {
+            return;
+        }
+        player.setHealth(player.getMaxHealth());
+        player.setFoodLevel(20);
+        player.setSaturation(2);
+    }
     
     public static void sendToHub(Player player) {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();

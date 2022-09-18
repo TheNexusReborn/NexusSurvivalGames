@@ -1,13 +1,13 @@
 package com.thenexusreborn.survivalgames.game;
 
-import com.thenexusreborn.nexuscore.util.ActionBar;
+import com.thenexusreborn.api.player.IActionBar;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 
-public class GameActionBar extends ActionBar {
+public class GameActionBar implements IActionBar {
     
     private final GamePlayer player;
-    private SurvivalGames plugin;
+    private final SurvivalGames plugin;
     
     public GameActionBar(SurvivalGames plugin, GamePlayer player) {
         this.plugin = plugin;

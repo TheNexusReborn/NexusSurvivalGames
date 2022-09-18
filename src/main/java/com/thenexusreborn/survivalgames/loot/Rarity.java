@@ -1,11 +1,11 @@
-package com.thenexusreborn.survivalgames.lootv2;
+package com.thenexusreborn.survivalgames.loot;
 
 public enum Rarity {
-    COMMON(100, 200), 
-    UNCOMMON(50, 75), 
-    RARE(15, 25),
-    EPIC(5, 10), 
-    LEGENDARY(0, 3);
+    COMMON(30, 60), 
+    UNCOMMON(12, 23), 
+    RARE(6, 11),
+    EPIC(2, 5), 
+    LEGENDARY(0, 1);
     
     private final int min, max;
     

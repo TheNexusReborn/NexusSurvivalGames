@@ -1,23 +1,23 @@
 package com.thenexusreborn.survivalgames.game;
 
 import com.google.common.io.*;
-import com.thenexusreborn.api.*;
+import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.gamearchive.*;
 import com.thenexusreborn.api.helper.NumberHelper;
 import com.thenexusreborn.api.multicraft.MulticraftAPI;
 import com.thenexusreborn.api.player.*;
+import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.api.tags.Tag;
 import com.thenexusreborn.api.tournament.Tournament;
-import com.thenexusreborn.api.util.Operator;
-import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
+import com.thenexusreborn.api.util.Environment;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
+import com.thenexusreborn.nexuscore.util.region.Cuboid;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.death.*;
 import com.thenexusreborn.survivalgames.game.timer.*;
-import com.thenexusreborn.survivalgames.lootv2.LootChances;
-import com.thenexusreborn.survivalgames.map.GameMap;
+import com.thenexusreborn.survivalgames.map.*;
 import com.thenexusreborn.survivalgames.scoreboard.*;
 import com.thenexusreborn.survivalgames.settings.*;
 import com.thenexusreborn.survivalgames.util.SGUtils;
@@ -34,26 +34,24 @@ import java.util.Map.Entry;
 
 import static com.thenexusreborn.survivalgames.game.GameState.*;
 
-@SuppressWarnings({"DuplicatedCode"})
 public class Game {
     private static final SurvivalGames plugin = SurvivalGames.getPlugin(SurvivalGames.class);
     private static ControlType controlType = ControlType.MANUAL;
     
-    private GameMap gameMap;
-    private GameSettings settings;
-    private Map<UUID, GamePlayer> players = new HashMap<>();
-    private Map<Integer, UUID> spawns = new HashMap<>();
+    private final GameMap gameMap;
+    private final GameSettings settings;
+    private final Map<UUID, GamePlayer> players = new HashMap<>();
+    private final Map<Integer, UUID> spawns = new HashMap<>();
     private GameState state = UNDEFINED;
     private Timer timer, graceperiodTimer, restockTimer;
-    private List<Location> lootedChests = new ArrayList<>();
-    private GameInfo gameInfo;
+    private final List<Location> lootedChests = new ArrayList<>();
+    private final GameInfo gameInfo;
     private long start, end;
     private GamePlayer firstBlood;
-    private LootChances lootChances;
-    private Map<Location, Inventory> enderchestInventories = new HashMap<>();
-    private boolean awardTournamentPoints;
+    private final Map<Location, Inventory> enderchestInventories = new HashMap<>();
+    private final boolean awardTournamentPoints;
     
-    public Game(GameMap gameMap, GameSettings settings, Collection<SpigotNexusPlayer> players, List<UUID> spectatingPlayers) {
+    public Game(GameMap gameMap, GameSettings settings, Collection<NexusPlayer> players, List<UUID> spectatingPlayers) {
         this.gameMap = gameMap;
         this.settings = settings;
         this.gameInfo = new GameInfo();
@@ -61,9 +59,9 @@ public class Game {
         gameInfo.setPlayerCount(players.size() - spectatingPlayers.size());
         gameInfo.setServerName(NexusAPI.getApi().getServerManager().getCurrentServer().getName());
         List<String> playerNames = new ArrayList<>();
-        for (SpigotNexusPlayer player : players) {
+        for (NexusPlayer player : players) {
             GamePlayer gamePlayer = new GamePlayer(player);
-            if (spectatingPlayers.contains(player.getUniqueId()) || player.getPreferences().get("vanish").getValue()) {
+            if (spectatingPlayers.contains(player.getUniqueId()) || player.getPreferenceValue("vanish")) {
                 gamePlayer.setTeam(GameTeam.SPECTATORS);
             } else {
                 playerNames.add(player.getName());
@@ -83,16 +81,11 @@ public class Game {
         }
         gameInfo.setSettings(sb.substring(0, sb.length() - 1));
         this.awardTournamentPoints = NexusAPI.getApi().getTournament() != null && NexusAPI.getApi().getTournament().isActive();
-        plugin.getLogger().info("Award Tournament Points: " + this.awardTournamentPoints);
     }
     
     protected void setState(GameState state) {
         this.state = state;
         this.gameInfo.getActions().add(new GameAction(System.currentTimeMillis(), "statechange", state.name()));
-    }
-    
-    public LootChances getLootChances() {
-        return lootChances;
     }
     
     public void handleShutdown() {
@@ -147,24 +140,25 @@ public class Game {
         return restockTimer;
     }
     
-    public void addPlayer(SpigotNexusPlayer nexusPlayer) {
+    public void addPlayer(NexusPlayer nexusPlayer) {
         GamePlayer gamePlayer = new GamePlayer(nexusPlayer);
         gamePlayer.setTeam(GameTeam.SPECTATORS);
         gamePlayer.sendMessage(GameTeam.SPECTATORS.getJoinMessage());
-        nexusPlayer.getPlayer().getInventory().clear();
-        nexusPlayer.getPlayer().getInventory().setArmorContents(null);
-        giveSpectatorItems(nexusPlayer.getPlayer());
-        nexusPlayer.getPlayer().spigot().setCollidesWithEntities(false);
-        teleportSpectator(nexusPlayer.getPlayer(), this.gameMap.getCenter().toLocation(this.gameMap.getWorld()));
+        Player player = Bukkit.getPlayer(nexusPlayer.getUniqueId());
+        player.getInventory().clear();
+        player.getInventory().setArmorContents(null);
+        giveSpectatorItems(player);
+        player.spigot().setCollidesWithEntities(false);
+        teleportSpectator(player, this.gameMap.getCenter().toLocation(this.gameMap.getWorld()));
         this.players.put(nexusPlayer.getUniqueId(), gamePlayer);
         
-        if (nexusPlayer.getPreferences().get("vanish").getValue()) {
+        if (nexusPlayer.getPreferenceValue("vanish")) {
             for (GamePlayer gp : this.players.values()) {
                 if (gp.getNexusPlayer().getRank().ordinal() <= Rank.HELPER.ordinal() || gp.getUniqueId().equals(nexusPlayer.getUniqueId())) {
                     gp.sendMessage("&a&l>> " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined &e&overy silently&e.");
                 }
             }
-        } else if (nexusPlayer.getPreferences().get("incognito").getValue()) {
+        } else if (nexusPlayer.getPreferenceValue("incognito")) {
             for (GamePlayer gp : this.players.values()) {
                 if (gp.getNexusPlayer().getRank().ordinal() <= Rank.HELPER.ordinal() || gp.getUniqueId().equals(nexusPlayer.getUniqueId())) {
                     gp.sendMessage("&a&l>> " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined &e&osilently&e.");
@@ -179,7 +173,7 @@ public class Game {
         recalculateVisibiltiy();
     }
     
-    public void removePlayer(SpigotNexusPlayer nexusPlayer) {
+    public void removePlayer(NexusPlayer nexusPlayer) {
         if (!this.players.containsKey(nexusPlayer.getUniqueId())) {
             return;
         }
@@ -193,13 +187,13 @@ public class Game {
         
         this.players.remove(nexusPlayer.getUniqueId());
         
-        if (nexusPlayer.getPreferences().get("vanish").getValue()) {
+        if (nexusPlayer.getPreferenceValue("vanish")) {
             for (GamePlayer gp : this.players.values()) {
                 if (gp.getNexusPlayer().getRank().ordinal() <= Rank.HELPER.ordinal()) {
                     gp.sendMessage("&c&l<< " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft &e&overy silently&e.");
                 }
             }
-        } else if (nexusPlayer.getPreferences().get("incognito").getValue()) {
+        } else if (nexusPlayer.getPreferenceValue("incognito")) {
             for (GamePlayer gp : this.players.values()) {
                 if (gp.getNexusPlayer().getRank().ordinal() <= Rank.HELPER.ordinal()) {
                     gp.sendMessage("&c&l<< " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft &e&osilently&e.");
@@ -226,7 +220,7 @@ public class Game {
             if (player != null) {
                 int index = new Random().nextInt(spawns.size());
                 Entry<Integer, UUID> entry = spawns.get(index);
-                Position spawnPosition = this.gameMap.getSpawns().get(entry.getKey());
+                MapSpawn spawnPosition = this.gameMap.getSpawns().get(entry.getKey());
                 Location spawn = spawnPosition.toLocation(gameMap.getWorld());
                 teleportTribute(player, mapSpawn, spawn);
                 this.spawns.put(entry.getKey(), player.getUniqueId());
@@ -271,7 +265,7 @@ public class Game {
             for (Player other : Bukkit.getOnlinePlayers()) {
                 GamePlayer otherGamePlayer = getPlayer(other.getUniqueId());
                 
-                if (gamePlayer.getNexusPlayer().getPreferences().get("vanish").getValue()) {
+                if (gamePlayer.getNexusPlayer().getPreferenceValue("vanish")) {
                     player.showPlayer(other);
                 } else if (gamePlayer.getTeam() == GameTeam.TRIBUTES && otherGamePlayer.getTeam() == GameTeam.TRIBUTES) {
                     player.showPlayer(other);
@@ -299,7 +293,7 @@ public class Game {
             
             List<UUID> tributes = new LinkedList<>(), spectators = new LinkedList<>();
             for (GamePlayer player : this.players.values()) {
-                Player p = player.getNexusPlayer().getPlayer();
+                Player p = Bukkit.getPlayer(player.getUniqueId());
                 p.getInventory().clear();
                 p.getInventory().setArmorContents(null);
                 p.setFlying(false);
@@ -309,7 +303,7 @@ public class Game {
                     tributes.add(player.getUniqueId());
                 } else if (player.getTeam() == GameTeam.SPECTATORS) {
                     spectators.add(player.getUniqueId());
-                    giveSpectatorItems(player.getNexusPlayer().getPlayer());
+                    giveSpectatorItems(Bukkit.getPlayer(player.getUniqueId()));
                 }
                 for (PotionEffect potionEffect : p.getActivePotionEffects()) {
                     p.removePotionEffect(potionEffect.getType());
@@ -410,6 +404,14 @@ public class Game {
                             return;
                         }
                         
+                        int radius = gameMap.getDeathmatchBorderDistance();
+                        Location center = gameMap.getCenter().toLocation(gameMap.getWorld());
+                        Location corner1 = center.clone();
+                        corner1.add(radius, radius, radius);
+                        Location corner2 = center.clone();
+                        corner2.subtract(radius, radius, radius);
+                        gameMap.setDeathmatchArea(new Cuboid(corner1, corner2));
+                        
                         try {
                             for (int i = 0; i < gameMap.getSpawns().size(); i++) {
                                 spawns.put(i, null);
@@ -433,10 +435,6 @@ public class Game {
                 }.runTask(plugin);
             }
         }.runTaskAsynchronously(plugin);
-    }
-    
-    public void setLootChances(LootChances lootChances) {
-        this.lootChances = lootChances;
     }
     
     public void handleError(String message) {
@@ -516,8 +514,9 @@ public class Game {
     
     public void playSound(Sound sound) {
         for (GamePlayer player : this.players.values()) {
-            if (player.getNexusPlayer().getPlayer() != null) {
-                player.getNexusPlayer().getPlayer().playSound(player.getNexusPlayer().getPlayer().getLocation(), sound, 1, 1);
+            Player p = Bukkit.getPlayer(player.getUniqueId());
+            if (p != null) {
+                p.playSound(p.getLocation(), sound, 1, 1);
             }
         }
     }
@@ -530,7 +529,7 @@ public class Game {
             for (GamePlayer player : this.players.values()) {
                 if (player.getTeam() == GameTeam.TRIBUTES) {
                     tributes.add(player.getUniqueId());
-                    player.getNexusPlayer().changeStat("sg_deathmatches_reached", 1, Operator.ADD);
+                    player.getNexusPlayer().changeStat("sg_deathmatches_reached", 1, StatOperator.ADD);
                 } else {
                     spectators.add(player.getUniqueId());
                 }
@@ -558,7 +557,7 @@ public class Game {
         playSound(Sound.ENDERDRAGON_GROWL);
         for (GamePlayer player : this.players.values()) {
             if (player.getTeam() == GameTeam.TRIBUTES) {
-                player.getNexusPlayer().getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 0));
+                Bukkit.getPlayer(player.getUniqueId()).addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 0));
             }
         }
         
@@ -574,7 +573,7 @@ public class Game {
         
         for (GamePlayer player : this.players.values()) {
             if (player.getTeam() == GameTeam.TRIBUTES) {
-                player.getNexusPlayer().getPlayer().removePotionEffect(PotionEffectType.BLINDNESS);
+                Bukkit.getPlayer(player.getUniqueId()).removePotionEffect(PotionEffectType.BLINDNESS);
             }
         }
         
@@ -627,7 +626,7 @@ public class Game {
         GamePlayer winner = null;
         for (GamePlayer player : this.players.values()) {
             if (player.getTeam() == GameTeam.TRIBUTES) {
-                player.getNexusPlayer().changeStat("sg_games", 1, Operator.ADD);
+                player.getNexusPlayer().changeStat("sg_games", 1, StatOperator.ADD);
                 if (winner == null) {
                     winner = player;
                 } else {
@@ -642,7 +641,7 @@ public class Game {
             winnerName = winner.getNexusPlayer().getDisplayName();
             if (awardTournamentPoints) {
                 Tournament tournament = NexusAPI.getApi().getTournament();
-                winner.getNexusPlayer().changeStat("sg_tournament_points", tournament.getPointsPerWin(), Operator.ADD);
+                winner.getNexusPlayer().changeStat("sg_tournament_points", tournament.getPointsPerWin(), StatOperator.ADD);
                 winner.sendMessage("&2&l>> &a+" + tournament.getPointsPerWin() + " Points!");
             }
         } else {
@@ -652,10 +651,10 @@ public class Game {
         sendMessage("&6&l>> " + winnerName + " &a&lhas won Survival Games!");
         
         if (winner != null) {
-            winner.getNexusPlayer().changeStat("sg_wins", 1, Operator.ADD);
-            winner.getNexusPlayer().changeStat("sg_win_streak", 1, Operator.ADD);
+            winner.getNexusPlayer().changeStat("sg_wins", 1, StatOperator.ADD);
+            winner.getNexusPlayer().changeStat("sg_win_streak", 1, StatOperator.ADD);
             int winGain = 50;
-            double currentScore = winner.getNexusPlayer().getStatValue("sg_score");
+            int currentScore = (int) winner.getNexusPlayer().getStatValue("sg_score");
             if (currentScore < 100 && currentScore > 50) {
                 winGain *= 1.25;
             } else if (currentScore <= 50 && currentScore > 25) {
@@ -669,7 +668,7 @@ public class Game {
             } else if (currentScore >= 1000) {
                 winGain *= .5;
             }
-            winner.getNexusPlayer().changeStat("sg_score", winGain, Operator.ADD);
+            winner.getNexusPlayer().changeStat("sg_score", winGain, StatOperator.ADD);
             winner.sendMessage("&2&l>> &a+" + winGain + " Score!");
             double multiplier = winner.getNexusPlayer().getRank().getMultiplier();
             Rank rank = winner.getNexusPlayer().getRank();
@@ -677,7 +676,7 @@ public class Game {
             if (settings.isGiveXp()) {
                 double xp = 10;
                 xp *= multiplier;
-                winner.getNexusPlayer().changeStat("xp", xp, Operator.ADD);
+                winner.getNexusPlayer().changeStat("xp", xp, StatOperator.ADD);
                 String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(xp) + " &2&lXP&a&l!";
                 if (multiplier > 1) {
                     winner.sendMessage(baseMessage + multiplierMessage);
@@ -689,7 +688,7 @@ public class Game {
             if (settings.isGiveCredits()) {
                 double credits = 10;
                 credits *= multiplier;
-                winner.getNexusPlayer().changeStat("credits", credits, Operator.ADD);
+                winner.getNexusPlayer().changeStat("credits", credits, StatOperator.ADD);
                 String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(credits) + " &3&lCREDITS&a&l!";
                 if (multiplier > 1) {
                     winner.sendMessage(baseMessage + multiplierMessage);
@@ -715,7 +714,8 @@ public class Game {
         
         gameInfo.setLength(this.end - this.start);
         
-        NexusAPI.getApi().getDataManager().pushGameInfoAsync(this.gameInfo, gameInfo -> {
+        NexusAPI.getApi().getThreadFactory().runAsync(() -> {
+            NexusAPI.getApi().getPrimaryDatabase().push(gameInfo);
             if (gameInfo.getId() == 0) {
                 sendMessage("&4&l>> &cThere was a database error archiving the game. Please report with date and time.");
             } else {
@@ -727,13 +727,21 @@ public class Game {
                         NexusAPI.getApi().getThreadFactory().runAsync(() -> {
                             NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(p);
                             if (nexusPlayer == null) {
-                                nexusPlayer = NexusAPI.getApi().getDataManager().loadPlayer(p);
+                                for (CachedPlayer cachedPlayer : NexusAPI.getApi().getPlayerManager().getCachedPlayers().values()) {
+                                    if (cachedPlayer.getName().equalsIgnoreCase(p)) {
+                                        try {
+                                            nexusPlayer = NexusAPI.getApi().getPrimaryDatabase().get(NexusPlayer.class, "name", p).get(0);
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                }
                             }
                             
                             Tag tag = new Tag(gameInfo.getId() + "th");
-                            nexusPlayer.unlockTag(tag);
+                            nexusPlayer.unlockTag(tag.getName());
                             nexusPlayer.sendMessage(MsgType.INFO + "Unlocked the tag " + tag.getDisplayName());
-                            NexusAPI.getApi().getDataManager().pushPlayerAsync(nexusPlayer);
+                            NexusAPI.getApi().getPrimaryDatabase().push(nexusPlayer);
                         });
                     }
                 }
@@ -776,7 +784,7 @@ public class Game {
             }.runTaskLater(plugin, 100L);
         } else {
             for (GamePlayer player : this.players.values()) {
-                resetPlayer(player.getNexusPlayer().getPlayer());
+                resetPlayer(Bukkit.getPlayer(player.getUniqueId()));
             }
             
             plugin.getLobby().fromGame(this);
@@ -805,11 +813,11 @@ public class Game {
         int lost = (int) Math.ceil(score / 10D);
         
         if (!vanished) {
-            gamePlayer.getNexusPlayer().changeStat("sg_score", lost, Operator.SUBTRACT);
+            gamePlayer.getNexusPlayer().changeStat("sg_score", lost, StatOperator.SUBTRACT);
             gamePlayer.sendMessage("&4&l>> &cYou lost " + lost + " Score for dying.");
-            gamePlayer.getNexusPlayer().changeStat("sg_games", 1, Operator.ADD);
-            gamePlayer.getNexusPlayer().changeStat("sg_win_streak", 0, Operator.MULTIPLY);
-            gamePlayer.getNexusPlayer().changeStat("sg_deaths", 1, Operator.ADD);
+            gamePlayer.getNexusPlayer().changeStat("sg_games", 1, StatOperator.ADD);
+            gamePlayer.getNexusPlayer().changeStat("sg_win_streak", 0, StatOperator.SET);
+            gamePlayer.getNexusPlayer().changeStat("sg_deaths", 1, StatOperator.ADD);
         }
         
         gamePlayer.sendMessage(GameTeam.TRIBUTES.getLeaveMessage());
@@ -870,13 +878,13 @@ public class Game {
         
         if (deathInfo.getType() != DeathType.LEAVE) {
             gamePlayer.setSpectatorByDeath(true);
-            resetPlayer(gamePlayer.getNexusPlayer().getPlayer());
+            resetPlayer(Bukkit.getPlayer(player.getUniqueId()));
             player.setGameMode(newTeam.getGameMode());
             player.setAllowFlight(true);
             player.setFlying(true);
             player.spigot().setCollidesWithEntities(false);
             gamePlayer.sendMessage(newTeam.getJoinMessage());
-            giveSpectatorItems(gamePlayer.getNexusPlayer().getPlayer());
+            giveSpectatorItems(Bukkit.getPlayer(player.getUniqueId()));
         }
         gamePlayer.setTeam(newTeam);
         
@@ -888,11 +896,11 @@ public class Game {
         
         if (killer != null) {
             killer.setKills(killer.getKills() + 1);
-            killer.getNexusPlayer().changeStat("sg_kills", 1, Operator.ADD);
+            killer.getNexusPlayer().changeStat("sg_kills", 1, StatOperator.ADD);
             killer.setKillStreak(killer.getKillStreak() + 1);
             int highestKillStreak = (int) killer.getNexusPlayer().getStatValue("sg_highest_kill_streak");
             if (highestKillStreak < killer.getKillStreak()) {
-                killer.getNexusPlayer().changeStat("sg_highest_kill_streak", killer.getKillStreak() - highestKillStreak, Operator.ADD);
+                killer.getNexusPlayer().changeStat("sg_highest_kill_streak", killer.getKillStreak() - highestKillStreak, StatOperator.ADD);
                 if (!killer.isNewPersonalBestNotified()) {
                     killer.sendMessage("&6&l>> &a&lNEW PERSONAL BEST!");
                     killer.setNewPersonalBestNotified(true);
@@ -904,7 +912,7 @@ public class Game {
             killerName += killer.getNexusPlayer().getName();
             gamePlayer.sendMessage("&4&l>> &cYour killer &8(" + killerName + "&8) &chad &4" + NumberHelper.formatNumber(killerHealth) + " HP &cremaining!");
             if (!killer.getUniqueId().equals(player.getUniqueId())) {
-                killer.getNexusPlayer().changeStat("sg_score", lost, Operator.ADD);
+                killer.getNexusPlayer().changeStat("sg_score", lost, StatOperator.ADD);
                 killer.sendMessage("&2&l>> &a+" + lost + " Score!");
             } else {
                 killer.sendMessage("&2&l>> &cYou killed yourself. No score for you.");
@@ -916,7 +924,7 @@ public class Game {
                 double xp = 2;
                 xp *= multiplier;
                 if (!killer.getUniqueId().equals(player.getUniqueId())) {
-                    killer.getNexusPlayer().changeStat("xp", xp, Operator.ADD);
+                    killer.getNexusPlayer().changeStat("xp", xp, StatOperator.ADD);
                     String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(xp) + " &2&lXP&a&l!";
                     if (multiplier > 1) {
                         killer.sendMessage(baseMessage + multiplierMessage);
@@ -932,7 +940,7 @@ public class Game {
                 double credits = 2;
                 credits *= multiplier;
                 if (!(killer.getUniqueId().equals(player.getUniqueId()))) {
-                    killer.getNexusPlayer().changeStat("credits", credits, Operator.ADD);
+                    killer.getNexusPlayer().changeStat("credits", credits, StatOperator.ADD);
                     String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(credits) + " &3&lCREDITS&a&l!";
                     if (multiplier > 1) {
                         killer.sendMessage(baseMessage + multiplierMessage);
@@ -984,12 +992,12 @@ public class Game {
             Tournament tournament = NexusAPI.getApi().getTournament();
             if (killer != null) {
                 if (awardTournamentPoints) {
-                    killer.getNexusPlayer().changeStat("sg_tournament_points", tournament.getPointsPerKill(), Operator.ADD);
+                    killer.getNexusPlayer().changeStat("sg_tournament_points", tournament.getPointsPerKill(), StatOperator.ADD);
                     killer.sendMessage("&2&l>> &a+" + tournament.getPointsPerKill() + " Points!");
                     
                     for (GamePlayer p : this.players.values()) {
                         if (p.getTeam() == GameTeam.TRIBUTES) {
-                            killer.getNexusPlayer().changeStat("sg_tournament_points", tournament.getPointsPerSurvival(), Operator.ADD);
+                            killer.getNexusPlayer().changeStat("sg_tournament_points", tournament.getPointsPerSurvival(), StatOperator.ADD);
                             p.sendMessage("&2&l>> &a+" + tournament.getPointsPerSurvival() + " Points!");
                         }
                     }

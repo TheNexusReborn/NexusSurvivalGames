@@ -1,11 +1,12 @@
 package com.thenexusreborn.survivalgames.settings;
 
+import com.thenexusreborn.api.data.annotations.*;
+import com.thenexusreborn.api.helper.ReflectionHelper;
+
 import java.lang.reflect.Field;
 
-@SuppressWarnings("DuplicatedCode")
+@TableInfo("sggamesettings")
 public class GameSettings extends SGSettings {
-    private int id;
-    private String type = "default";
     private int maxPlayers = 24;
     private int maxHealth = 20;
     private int gracePeriodLength = 60;
@@ -26,14 +27,17 @@ public class GameSettings extends SGSettings {
     private boolean sounds = true;
     private boolean giveCredits = true;
     private boolean giveXp = true;
-    private boolean useNewLoot = true;
+    private boolean useNewLoot = false;
     private boolean allowEnderchests = true;
     private ColorMode colorMode = ColorMode.RANK;
     private Time time = Time.NOON;
     private Weather weather = Weather.CLEAR;
     
-    public GameSettings() {
-        super("sggamesettings");
+    private GameSettings() {
+    }
+    
+    public GameSettings(String type) {
+        super(type);
     }
     
     public GameSettings setTeamingAllowed(boolean value) {
@@ -43,22 +47,6 @@ public class GameSettings extends SGSettings {
     
     public boolean isTeamingAllowed() {
         return teamingAllowed;
-    }
-    
-    public int getId() {
-        return id;
-    }
-    
-    public void setId(int id) {
-        this.id = id;
-    }
-    
-    public void setType(String type) {
-        this.type = type;
-    }
-    
-    public String getType() {
-        return type;
     }
     
     public int getMaxPlayers() {
@@ -276,16 +264,44 @@ public class GameSettings extends SGSettings {
         this.allowEnderchests = allowEnderchests;
     }
     
-    public static GameSettings loadFromDatabase(String type) {
-        //TODO
-        return null;
+    @Override
+    public String toString() {
+        return "GameSettings{" +
+                "maxPlayers=" + maxPlayers +
+                ", maxHealth=" + maxHealth +
+                ", gracePeriodLength=" + gracePeriodLength +
+                ", gameLength=" + gameLength +
+                ", deathmatchLength=" + deathmatchLength +
+                ", warmupLength=" + warmupLength +
+                ", deathmatchThreshold=" + deathmatchThreshold +
+                ", nextGameStart=" + nextGameStart +
+                ", deathmatchTimerLength=" + deathmatchTimerLength +
+                ", teamingAllowed=" + teamingAllowed +
+                ", mutations=" + mutations +
+                ", regeneration=" + regeneration +
+                ", gracePeriod=" + gracePeriod +
+                ", unlimitedPasses=" + unlimitedPasses +
+                ", timeProgression=" + timeProgression +
+                ", weatherProgression=" + weatherProgression +
+                ", multiplier=" + multiplier +
+                ", sounds=" + sounds +
+                ", giveCredits=" + giveCredits +
+                ", giveXp=" + giveXp +
+                ", useNewLoot=" + useNewLoot +
+                ", allowEnderchests=" + allowEnderchests +
+                ", colorMode=" + colorMode +
+                ", time=" + time +
+                ", weather=" + weather +
+                ", id=" + id +
+                ", type='" + type +
+                '}';
     }
     
     @Override
     public GameSettings clone() {
         GameSettings settings = new GameSettings();
     
-        for (Field field : getClass().getDeclaredFields()) {
+        for (Field field : ReflectionHelper.getClassFields(getClass())) {
             field.setAccessible(true);
             try {
                 field.set(settings, field.get(this));
@@ -294,7 +310,6 @@ public class GameSettings extends SGSettings {
             }
         }
     
-        settings.setId(0);
         return settings;
     }
 }

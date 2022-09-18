@@ -1,25 +1,29 @@
-package com.thenexusreborn.survivalgames.lootv2;
+package com.thenexusreborn.survivalgames.loot;
 
-import com.thenexusreborn.nexuscore.util.*;
+import com.thenexusreborn.nexuscore.util.MaterialNames;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 
+@SuppressWarnings("DuplicatedCode")
 public class LootEntry {
-    protected int maxAmount;
-    protected Material material;
-    protected String name;
-    protected Rarity rarity;
-    protected List<String> lore;
+    protected final int maxAmount;
+    protected final Rarity rarity;
+    protected final LootItem item;
+    
+    public LootEntry(LootItem item, int maxAmount, Rarity rarity) {
+        this.item = item;
+        this.maxAmount = maxAmount;
+        this.rarity = rarity;
+    }
+    
+    public LootEntry(LootItem item, Rarity rarity) {
+        this(item, 1, rarity);
+    }
     
     public LootEntry(Material material, String name, Rarity rarity, int maxAmount, List<String> lore) {
-        this.material = material;
-        this.name = name;
-        this.rarity = rarity;
-        this.maxAmount = maxAmount;
-        this.lore = lore;
+        this(new LootItem(material, name, lore), maxAmount, rarity);
     }
     
     public LootEntry(Material material, String name, Rarity rarity) {
@@ -35,11 +39,11 @@ public class LootEntry {
     }
     
     public Material getMaterial() {
-        return material;
+        return item.getMaterial();
     }
     
     public String getName() {
-        return name;
+        return item.getName();
     }
     
     public Rarity getRarity() {
@@ -47,26 +51,18 @@ public class LootEntry {
     }
     
     public List<String> getLore() {
-        return lore;
+        return item.getLore();
     }
     
     public ItemStack generateItemStack() {
+        ItemStack itemStack = item.getItemStack();
         int amount;
         if (this.maxAmount > 1) {
             amount = new Random().nextInt(maxAmount - 1) + 1;
         } else {
             amount = 1;
         }
-        ItemStack itemStack = new ItemStack(this.material, amount);
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        if (!name.equalsIgnoreCase(material.name().replace("_", " "))) {
-            itemMeta.setDisplayName(MCUtils.color("&f" + this.name));
-        }
-        if (this.material == Material.FLINT_AND_STEEL) {
-            itemStack.setDurability((short) (material.getMaxDurability() - 4));
-        }
-        itemMeta.setLore(this.lore);
-        itemStack.setItemMeta(itemMeta);
+        itemStack.setAmount(amount);
         return itemStack;
     }
 }

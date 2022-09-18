@@ -14,9 +14,10 @@ public class GameEndTimerCallback implements ReturnableCallback<TimerSnapshot, B
     private static final Set<Integer> SECONDS_ANNOUNCE = new HashSet<>(Arrays.asList(45, 30, 15, 10, 5, 4, 3, 2, 1, 0));
     private static final Set<Integer> MINUTES_ANNOUCNE = new HashSet<>(Arrays.asList(60, 45, 30, 15, 10, 5, 4, 3, 2, 1));
     
-    private Set<Integer> announcedSeconds = new HashSet<>(), announcedMinutes = new HashSet<>();
+    private final Set<Integer> announcedSeconds = new HashSet<>();
+    private final Set<Integer> announcedMinutes = new HashSet<>();
     
-    private Game game;
+    private final Game game;
     
     public GameEndTimerCallback(Game game) {
         this.game = game;

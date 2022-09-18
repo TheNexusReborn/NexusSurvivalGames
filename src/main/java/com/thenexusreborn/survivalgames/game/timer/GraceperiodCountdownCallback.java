@@ -11,10 +11,10 @@ import java.util.*;
 
 public class GraceperiodCountdownCallback implements ReturnableCallback<TimerSnapshot, Boolean> {
     
-    private static Set<Integer> ANNOUNCE_SECONDS = new HashSet<>(Arrays.asList(60, 45, 30, 15, 10, 3, 2, 1));
+    private static final Set<Integer> ANNOUNCE_SECONDS = new HashSet<>(Arrays.asList(60, 45, 30, 15, 10, 3, 2, 1));
     
-    private Game game;
-    private Set<Integer> announced = new HashSet<>();
+    private final Game game;
+    private final Set<Integer> announced = new HashSet<>();
     
     public GraceperiodCountdownCallback(Game game) {
         this.game = game;

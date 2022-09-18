@@ -2,17 +2,18 @@ package com.thenexusreborn.survivalgames.cmd;
 
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.Rank;
+import com.thenexusreborn.api.stats.*;
 import com.thenexusreborn.api.util.Operator;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.*;
-import com.thenexusreborn.survivalgames.lobby.LobbyState;
-import com.thenexusreborn.survivalgames.map.GameMap;
+import com.thenexusreborn.survivalgames.lobby.*;
+import com.thenexusreborn.survivalgames.map.*;
 import com.thenexusreborn.survivalgames.settings.*;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.*;
-import org.bukkit.block.Block;
+import org.bukkit.block.*;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -23,7 +24,7 @@ import java.util.Map.Entry;
 
 public class SGCommand implements CommandExecutor {
     
-    private SurvivalGames plugin;
+    private final SurvivalGames plugin;
     
     public SGCommand(SurvivalGames plugin) {
         this.plugin = plugin;
@@ -349,6 +350,172 @@ public class SGCommand implements CommandExecutor {
                     player.sendMessage(MCUtils.color(MsgType.INFO + "You set the sign you are looking at as a map sign in position &b" + position));
                     plugin.getLobby().generateMapOptions();
                 }
+            } else if (lobbySubCommand.equals("statsigns") || lobbySubCommand.equals("sts")) {
+                if (game != null) {
+                    sender.sendMessage(MCUtils.color(MsgType.WARN + "The server has a game in progress."));
+                    return true;
+                }
+    
+                if (!(args.length > 2)) {
+                    sender.sendMessage("&cYou must provide a sub command.");
+                    return true;
+                }
+    
+                if (!(sender instanceof Player)) {
+                    sender.sendMessage(MCUtils.color(MsgType.WARN + "Only players can use that command."));
+                    return true;
+                }
+                Player player = (Player) sender;
+    
+                Block targetBlock = player.getTargetBlock((Set<Material>) null, 10);
+                if (targetBlock == null) {
+                    player.sendMessage("&cYou are not looking at a block.");
+                    return true;
+                }
+    
+                if (!(targetBlock.getType() == Material.SIGN || targetBlock.getType() == Material.WALL_SIGN)) {
+                    player.sendMessage("&cYou are not looking at a sign.");
+                    return true;
+                }
+    
+                if (args[2].equalsIgnoreCase("remove")) {
+                    Iterator<StatSign> iterator = plugin.getLobby().getStatSigns().iterator();
+                    while (iterator.hasNext()) {
+                        StatSign entry = iterator.next();
+                        if (entry.getLocation().equals(targetBlock.getLocation())) {
+                            iterator.remove();
+                            player.sendMessage(MCUtils.color(MsgType.WARN + "You removed that stat sign"));
+                            break;
+                        }
+                    }
+                } else if (args[2].equalsIgnoreCase("add")) {
+                    if (!(args.length > 4)) {
+                        player.sendMessage(MCUtils.color(MsgType.WARN + "Usage: /survivalgames lobby statsigns add <stat> <displayName>"));
+                        return true;
+                    }
+        
+                    String stat = args[3];
+                    Stat.Info info = StatHelper.getInfo(stat);
+                    if (info == null) {
+                        player.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid stat name."));
+                        return true;
+                    }
+    
+                    for (StatSign statSign : plugin.getLobby().getStatSigns()) {
+                        if (statSign.getStat().equalsIgnoreCase(stat)) {
+                            player.sendMessage(MCUtils.color(MsgType.WARN + "A stat sign with that stat already exists. You can only have one per stat."));
+                            return true;
+                        }
+                    }
+                    
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 4; i < args.length; i++) {
+                        sb.append(args[i]).append(" ");
+                    }
+                    
+                    String displayName = ChatColor.stripColor(MCUtils.color(sb.toString().trim()));
+                    if (displayName.length() > 14) {
+                        player.sendMessage(MCUtils.color(MsgType.WARN + "The display name cannot be larger than 14 characters"));
+                        return true;
+                    }
+                    
+                    StatSign statSign = new StatSign(targetBlock.getLocation(), stat, displayName);
+                    plugin.getLobby().getStatSigns().add(statSign);
+                    player.sendMessage(MCUtils.color(MsgType.INFO + "You added a stat sign for &b" + stat + " &ewith the display name &b" + displayName));
+                }
+            } else if (lobbySubCommand.equals("tributesigns") || lobbySubCommand.equals("ts")) {
+                if (game != null) {
+                    sender.sendMessage(MCUtils.color(MsgType.WARN + "The server has a game in progress."));
+                    return true;
+                }
+    
+                if (!(args.length > 2)) {
+                    sender.sendMessage("&cYou must provide a sub command.");
+                    return true;
+                }
+    
+                if (!(sender instanceof Player)) {
+                    sender.sendMessage(MCUtils.color(MsgType.WARN + "Only players can use that command."));
+                    return true;
+                }
+                Player player = (Player) sender;
+    
+                Block targetBlock = player.getTargetBlock((Set<Material>) null, 10);
+                if (targetBlock == null) {
+                    player.sendMessage("&cYou are not looking at a block.");
+                    return true;
+                }
+    
+                if (!(targetBlock.getType() == Material.SIGN || targetBlock.getType() == Material.WALL_SIGN || targetBlock.getType() == Material.SKULL)) {
+                    player.sendMessage("&cYou are not looking at a sign or a head.");
+                    return true;
+                }
+    
+                if (args[2].equalsIgnoreCase("remove")) {
+                    Iterator<TributeSign> iterator = plugin.getLobby().getTributeSigns().iterator();
+                    while (iterator.hasNext()) {
+                        TributeSign sign = iterator.next();
+                        if (sign.getSignLocation().equals(targetBlock.getLocation()) || sign.getHeadLocation().equals(targetBlock.getLocation())) {
+                            iterator.remove();
+                            player.sendMessage(MCUtils.color(MsgType.INFO + "You removed the tribute sign with index " + sign.getIndex()));
+                        }
+                    }
+                } else if (args[2].equalsIgnoreCase("set")) {
+                    if (!(args.length > 3)) {
+                        player.sendMessage(MCUtils.color(MsgType.WARN + "You must provide an index number."));
+                        return true;
+                    }
+        
+                    int index;
+                    try {
+                        index = Integer.parseInt(args[3]);
+                    } catch (NumberFormatException e) {
+                        player.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid number."));
+                        return true;
+                    }
+        
+                    Location signLocation = null, headLocation = null;
+                    if (targetBlock.getType() == Material.SIGN || targetBlock.getType() == Material.WALL_SIGN) {
+                        signLocation = targetBlock.getLocation();
+                    } else if (targetBlock.getType() == Material.SKULL) {
+                        headLocation = targetBlock.getLocation();
+                    }
+    
+                    TributeSign tributeSign = null;
+                    for (TributeSign sign : plugin.getLobby().getTributeSigns()) {
+                        if (sign.getIndex() == index) {
+                            tributeSign = sign;
+                            break;
+                        }
+                    }
+                    
+                    if (tributeSign == null) {
+                        tributeSign = new TributeSign(index, signLocation, headLocation);
+                        String msg = "You created a new tribute sign with index &b" + index;
+                        if (signLocation == null) {
+                            msg += "&e, however you still need to add a sign to it. Just use the same command while looking at a sign.";
+                        } else if (headLocation == null) {
+                            msg += "&e, however you still need to add a head to it. Just use the same command while looking at a head.";
+                        } else {
+                            player.sendMessage(MCUtils.color(MsgType.WARN + "Unknown error occured. Please report as a bug."));
+                            return true;
+                        }
+                        plugin.getLobby().getTributeSigns().add(tributeSign);
+                        player.sendMessage(MCUtils.color(MsgType.INFO + msg));
+                        return true;
+                    }
+                    
+                    if (signLocation != null) {
+                        tributeSign.setSignLocation(signLocation);
+                        player.sendMessage(MCUtils.color(MsgType.INFO + "You set the sign location of the tribute sign at index &b" + index));
+                    } else if (headLocation != null) {
+                        tributeSign.setHeadLocation(headLocation);
+                        player.sendMessage(MCUtils.color(MsgType.INFO + "You set the head location of the tribute sign at index &b" + index));
+                    } else {
+                        player.sendMessage(MCUtils.color(MsgType.WARN + "Unknown error occured. Please report as a bug."));
+                        return true;
+                    }
+                }
             } else if (lobbySubCommand.equals("preparegame") || lobbySubCommand.equals("pg")) {
                 if (game != null) {
                     sender.sendMessage(MCUtils.color(MsgType.WARN + "The server has a game in progress."));
@@ -405,7 +572,7 @@ public class SGCommand implements CommandExecutor {
                 
                 settings.setId(0);
                 settings.setType(args[3].toLowerCase());
-                settings.pushToDatabase();
+                NexusAPI.getApi().getPrimaryDatabase().push(settings);
                 if (settings.getId() > 0) {
                     sender.sendMessage(MCUtils.color(MsgType.INFO + "Successfully saved the settings with the name &b" + settings.getType()));
                     if (type.equalsIgnoreCase("lobby")) {
@@ -614,7 +781,7 @@ public class SGCommand implements CommandExecutor {
                     return true;
                 } else if (mapSubCommand.equals("addspawn") || mapSubCommand.equals("as")) {
                     Location location = player.getLocation();
-                    int position = gameMap.addSpawn(new Position(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+                    int position = gameMap.addSpawn(new MapSpawn(0, 0, location.getBlockX(), location.getBlockY(), location.getBlockZ()));
                     sender.sendMessage(MCUtils.color(MsgType.INFO + "You added a spawn with index &b" + position + " &eto the map &b" + gameMap.getName()));
                 } else if (mapSubCommand.equals("setspawn") || mapSubCommand.equals("sp")) {
                     int argIndex;
@@ -638,7 +805,7 @@ public class SGCommand implements CommandExecutor {
                     }
                     
                     Location location = player.getLocation();
-                    gameMap.setSpawn(position, new Position(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+                    gameMap.setSpawn(position, new MapSpawn(gameMap.getId(), position, location.getBlockX(), location.getBlockY(), location.getBlockZ()));
                     sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the spawn at position &b" + position + " &eto your location in the map &b" + gameMap.getName()));
                 } else if (mapSubCommand.equals("setcenter") || mapSubCommand.equals("sc")) {
                     Location location = player.getPlayer().getLocation();
@@ -847,6 +1014,11 @@ public class SGCommand implements CommandExecutor {
                     sender.sendMessage(MCUtils.color(MsgType.INFO + "You modified the " + timerType + " timer."));
                 }
             }
+        } else if (args[0].equalsIgnoreCase("skull")) {
+            Player player = (Player) sender;
+            Block targetBlock = player.getTargetBlock((Set<Material>) null, 10);
+            Skull skull = (Skull) targetBlock.getState();
+            player.sendMessage(skull.getOwner());
         }
         
         return true;

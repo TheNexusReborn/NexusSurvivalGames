@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.game.death;
 
-import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
+import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.settings.ColorMode;
 import org.bukkit.Bukkit;
@@ -10,11 +10,11 @@ import java.util.UUID;
 
 public class DeathInfoPlayerKill extends DeathInfo {
     
-    protected UUID killer;
+    protected final UUID killer;
     protected ItemStack handItem;
-    protected double killerHealth;
+    protected final double killerHealth;
     protected boolean mutationKill;
-    private String killerTeamColor;
+    private final String killerTeamColor;
     
     public DeathInfoPlayerKill(UUID player, UUID killer, ItemStack handItem, double killerHealth, String killerTeamColor) {
         super(player, DeathType.PLAYER);
@@ -31,7 +31,7 @@ public class DeathInfoPlayerKill extends DeathInfo {
         if (game.getSettings().getColorMode() == ColorMode.GAME_TEAM) {
             killerName = killerTeamColor + Bukkit.getPlayer(killer).getName();
         } else {
-            SpigotNexusPlayer nexusPlayer = game.getPlayer(this.killer).getNexusPlayer();
+            NexusPlayer nexusPlayer = game.getPlayer(this.killer).getNexusPlayer();
             killerName = nexusPlayer.getRank().getColor() + nexusPlayer.getName();
         }
         

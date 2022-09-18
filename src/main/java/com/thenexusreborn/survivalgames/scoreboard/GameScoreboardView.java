@@ -15,7 +15,7 @@ import java.util.*;
 @SuppressWarnings("DuplicatedCode")
 public class GameScoreboardView extends SpigotScoreboardView {
     
-    private SurvivalGames plugin;
+    private final SurvivalGames plugin;
     
     private final String mapLabelName = "mapLabel", mapValueName = "mapValue", blank1Name = "blank1", 
             playersLabelName = "playersLabel", tributesValueName = "tributesValue", watchingValueName = "watchingValue", 
@@ -76,7 +76,7 @@ public class GameScoreboardView extends SpigotScoreboardView {
                 if (gamePlayer.getTeam() == GameTeam.TRIBUTES) {
                     tributes++;
                 } else if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
-                    if (!gamePlayer.getNexusPlayer().getPreferences().get("vanish").getValue()) {
+                    if (!gamePlayer.getNexusPlayer().getPreferenceValue("vanish")) {
                         watching++;
                     }
                 }
@@ -84,7 +84,7 @@ public class GameScoreboardView extends SpigotScoreboardView {
             
             scoreboard.getScoreboard().getTeam(tributesValueName).setSuffix(MCUtils.color("&a" + tributes));
             scoreboard.getScoreboard().getTeam(watchingValueName).setSuffix(MCUtils.color("&c" + watching));
-            scoreboard.getScoreboard().getTeam(scoreValueName).setSuffix(MCUtils.color("&e" + MCUtils.formatNumber(this.scoreboard.getPlayer().getStatValue("sg_score"))));
+            scoreboard.getScoreboard().getTeam(scoreValueName).setSuffix(MCUtils.color("&e" + MCUtils.formatNumber((int) this.scoreboard.getPlayer().getStatValue("sg_score"))));
             GamePlayer player = game.getPlayer(this.scoreboard.getPlayer().getUniqueId());
             int kills = player.getKills();
             int hks = (int) player.getNexusPlayer().getStatValue("sg_highest_kill_streak");

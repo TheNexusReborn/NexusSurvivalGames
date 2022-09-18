@@ -1,11 +1,12 @@
 package com.thenexusreborn.survivalgames.settings;
 
+import com.thenexusreborn.api.data.annotations.*;
+import com.thenexusreborn.api.helper.ReflectionHelper;
+
 import java.lang.reflect.Field;
 
-@SuppressWarnings("DuplicatedCode")
+@TableInfo("sglobbysettings")
 public class LobbySettings extends SGSettings {
-    private int id;
-    private String type = "default";
     private int maxPlayers = 24;
     private int minPlayers = 4;
     private int maxGames = 10;
@@ -14,33 +15,20 @@ public class LobbySettings extends SGSettings {
     private boolean keepPreviousGameSettings = true;
     private boolean sounds = true;
     
-    public LobbySettings() {
-        super("sglobbysettings");
+    private LobbySettings() {
+    }
+    
+    public LobbySettings(String type) {
+        super(type);
     }
     
     public int getMaxPlayers() {
         return maxPlayers;
     }
     
-    public int getId() {
-        return id;
-    }
-    
-    public void setId(int id) {
-        this.id = id;
-    }
-    
     public LobbySettings setMaxPlayers(int maxPlayers) {
         this.maxPlayers = maxPlayers;
         return this;
-    }
-    
-    public void setType(String type) {
-        this.type = type;
-    }
-    
-    public String getType() {
-        return type;
     }
     
     public int getMinPlayers() {
@@ -97,16 +85,26 @@ public class LobbySettings extends SGSettings {
         return this;
     }
     
-    public static LobbySettings loadFromDatabase(String type) {
-        //TODO
-        return null;
+    @Override
+    public String toString() {
+        return "LobbySettings{" +
+                "maxPlayers=" + maxPlayers +
+                ", minPlayers=" + minPlayers +
+                ", maxGames=" + maxGames +
+                ", timerLength=" + timerLength +
+                ", voteWeight=" + voteWeight +
+                ", keepPreviousGameSettings=" + keepPreviousGameSettings +
+                ", sounds=" + sounds +
+                ", id=" + id +
+                ", type='" + type + '\'' +
+                '}';
     }
     
     @Override
     public LobbySettings clone() {
         LobbySettings settings = new LobbySettings();
     
-        for (Field field : getClass().getDeclaredFields()) {
+        for (Field field : ReflectionHelper.getClassFields(getClass())) {
             field.setAccessible(true);
             try {
                 field.set(settings, field.get(this));
@@ -115,7 +113,6 @@ public class LobbySettings extends SGSettings {
             }
         }
         
-        settings.setId(0);
         return settings;
     }
 }

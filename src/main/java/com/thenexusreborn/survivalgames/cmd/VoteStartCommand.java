@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 
 public class VoteStartCommand implements CommandExecutor {
     
-    private SurvivalGames plugin;
+    private final SurvivalGames plugin;
     
     public VoteStartCommand(SurvivalGames plugin) {
         this.plugin = plugin;
@@ -40,7 +40,7 @@ public class VoteStartCommand implements CommandExecutor {
         NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(senderPlayer.getUniqueId());
         Lobby lobby = plugin.getLobby();
         
-        if (nexusPlayer.getPreferences().get("vanish").getValue()) {
+        if (nexusPlayer.getPreferenceValue("vanish")) {
             nexusPlayer.sendMessage(MsgType.WARN + "You cannot vote to start while in vanish mode.");
             return true;
         }

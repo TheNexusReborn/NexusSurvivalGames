@@ -6,7 +6,7 @@ import org.bukkit.entity.EntityType;
 import java.util.UUID;
 
 public class DeathInfoEntity extends DeathInfo {
-    protected EntityType killer;
+    protected final EntityType killer;
 
     public DeathInfoEntity(UUID player, EntityType killer) {
         super(player, DeathType.ENTITY);

@@ -14,9 +14,11 @@ public class GameTimerCallback implements ReturnableCallback<TimerSnapshot, Bool
     private static final Set<Integer> DEATHMATCH_START_COUNTDOWN_ANNOUNCE = new HashSet<>(Arrays.asList(60, 45, 30, 15, 10, 5, 4, 3, 2, 1, 0));
     private static final Set<Integer> GAME_ANNOUNCE_MINUTES = new HashSet<>(Arrays.asList(60, 45, 30, 15, 10, 5, 4, 3, 2)); //1 is handled by the other announce above
     
-    private Set<Integer> announcedSeconds = new HashSet<>(), announcedMinutes = new HashSet<>(), chestsRestocked = new HashSet<>();
+    private final Set<Integer> announcedSeconds = new HashSet<>();
+    private final Set<Integer> announcedMinutes = new HashSet<>();
+    private Set<Integer> chestsRestocked = new HashSet<>();
     
-    private Game game;
+    private final Game game;
     
     public GameTimerCallback(Game game) {
         this.game = game;

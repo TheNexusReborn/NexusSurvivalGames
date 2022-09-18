@@ -10,10 +10,9 @@ import org.bukkit.potion.*;
 
 import java.util.*;
 
-@SuppressWarnings("DuplicatedCode")
 public class EntityListener implements Listener {
     
-    private SurvivalGames plugin;
+    private final SurvivalGames plugin;
     
     private static final Set<DamageCause> GRACE_DAMAGE_STOP = new HashSet<>(Arrays.asList(DamageCause.BLOCK_EXPLOSION, DamageCause.ENTITY_EXPLOSION, DamageCause.FIRE, DamageCause.FIRE_TICK));
     

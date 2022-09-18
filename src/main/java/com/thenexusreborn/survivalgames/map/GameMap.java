@@ -1,9 +1,13 @@
 package com.thenexusreborn.survivalgames.map;
 
-import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.nexuscore.util.*;
-import com.thenexusreborn.api.collection.IncrementalMap;
+import com.thenexusreborn.api.data.annotations.*;
+import com.thenexusreborn.api.data.codec.StringSetCodec;
 import com.thenexusreborn.api.helper.FileHelper;
+import com.thenexusreborn.nexuscore.data.codec.PositionCodec;
+import com.thenexusreborn.nexuscore.util.Position;
+import com.thenexusreborn.nexuscore.util.region.Cuboid;
+import com.thenexusreborn.survivalgames.SurvivalGames;
+import com.thenexusreborn.survivalgames.data.handler.GameMapObjectHandler;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 
@@ -12,29 +16,72 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.zip.*;
 
+@TableInfo(value = "sgmaps", handler = GameMapObjectHandler.class)
 public class GameMap {
-    public static final int version = 1;
-    private int id;
+    @Primary
+    private long id;
     private String url;
     private String name;
     
+    @ColumnInfo(type = "varchar(100)", codec = PositionCodec.class) 
     private Position center = new Position(0, 0, 0);
-    private IncrementalMap<Position> spawns = new IncrementalMap<>();
+    @ColumnIgnored
+    private List<MapSpawn> spawns = new LinkedList<>();
     private int borderDistance = 0, deathmatchBorderDistance = 0;
+    @ColumnInfo(type = "varchar(1000)", codec = StringSetCodec.class)
     private Set<String> creators = new HashSet<>();
     private boolean active;
     
-    private UUID uniqueId; 
-    private World world; 
-    private Path downloadedZip; 
-    private Path unzippedFolder; 
-    private Path worldFolder; 
+    @ColumnIgnored
+    private UUID uniqueId;
+    @ColumnIgnored
+    private World world;
+    
+    @ColumnIgnored
+    private Path downloadedZip, unzippedFolder, worldFolder;
+    @ColumnIgnored
     private boolean editing;
+    @ColumnIgnored
     private int votes = 0;
+    @ColumnIgnored
+    private Cuboid deathmatchArea;
+    
+    private GameMap() {}
     
     public GameMap(String fileName, String name) {
         this.url = fileName;
         this.name = name;
+    }
+    
+    public void recalculateSpawns() {
+        if (spawns.isEmpty()) {
+            return;
+        }
+        
+        List<MapSpawn> spawns = new LinkedList<>(this.spawns);
+        Collections.sort(spawns);
+        
+        for (int i = 0; i < spawns.size(); i++) {
+            MapSpawn spawn = spawns.get(i);
+            if (spawn != null) {
+                spawn.setIndex(i);
+            }
+        }
+    }
+    
+    public int getNextIndex() {
+        if (this.spawns.isEmpty()) {
+            return 0;
+        }
+        
+        int lastIndex = 0;
+        for (MapSpawn spawn : this.spawns) {
+            if (spawn.getIndex() > lastIndex) {
+                lastIndex = spawn.getIndex();
+            }
+        }
+        
+        return lastIndex + 1;
     }
     
     public void delete(SurvivalGames plugin) {
@@ -90,16 +137,33 @@ public class GameMap {
         this.creators.remove(creator);
     }
     
-    public int addSpawn(Position position) {
-        return this.spawns.add(position);
+    public void setSpawns(Collection<MapSpawn> spawns) {
+        this.spawns.clear();
+        this.spawns.addAll(spawns);
+        this.spawns.forEach(spawn -> spawn.setMapId(this.id));
     }
     
-    public void setSpawn(int index, Position position) {
-        this.spawns.put(index, position);
+    public int addSpawn(MapSpawn spawn) {
+        if (spawn.getIndex() == -1) {
+            int index = getNextIndex();
+            spawn.setIndex(index);
+        } else {
+            this.spawns.add(spawn);
+        }
+        spawn.setMapId(this.getId());
+        return spawn.getIndex();
+    }
+    
+    public void setSpawn(int index, MapSpawn spawn) {
+        spawn.setIndex(index);
+        spawn.setMapId(this.getId());
+        this.spawns.removeIf(s -> s.getIndex() == index);
+        this.spawns.add(spawn);
     }
     
     public void removeSpawn(int index) {
-        this.spawns.remove(index);
+        this.spawns.removeIf(spawn -> spawn.getIndex() == index);
+        recalculateSpawns();
     }
     
     public String getUrl() {
@@ -126,7 +190,7 @@ public class GameMap {
         this.center = center;
     }
     
-    public SortedMap<Integer, Position> getSpawns() {
+    public List<MapSpawn> getSpawns() {
         return spawns;
     }
     
@@ -139,7 +203,7 @@ public class GameMap {
     }
     
     public int getDeathmatchBorderDistance() {
-        return deathmatchBorderDistance;
+        return deathmatchBorderDistance == 0 ? 30 : deathmatchBorderDistance;
     }
     
     public void setDeathmatchBorderDistance(int deathmatchBorderDistance) {
@@ -290,11 +354,42 @@ public class GameMap {
         this.active = active;
     }
     
-    public int getId() {
+    public long getId() {
         return id;
     }
     
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
+        this.spawns.forEach(spawn -> spawn.setMapId(id));
+    }
+    
+    public void setDeathmatchArea(Cuboid deathmatchArea) {
+        this.deathmatchArea = deathmatchArea;
+    }
+    
+    public Cuboid getDeathmatchArea() {
+        return deathmatchArea;
+    }
+    
+    @Override
+    public String toString() {
+        return "GameMap{" +
+                "id=" + id +
+                ", url='" + url + '\'' +
+                ", name='" + name + '\'' +
+                ", center=" + center +
+                ", spawns=" + spawns +
+                ", borderDistance=" + borderDistance +
+                ", deathmatchBorderDistance=" + deathmatchBorderDistance +
+                ", creators=" + creators +
+                ", active=" + active +
+                ", uniqueId=" + uniqueId +
+                ", world=" + world +
+                ", downloadedZip=" + downloadedZip +
+                ", unzippedFolder=" + unzippedFolder +
+                ", worldFolder=" + worldFolder +
+                ", editing=" + editing +
+                ", votes=" + votes +
+                '}';
     }
 }

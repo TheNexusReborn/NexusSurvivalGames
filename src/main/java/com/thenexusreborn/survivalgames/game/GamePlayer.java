@@ -1,23 +1,23 @@
 package com.thenexusreborn.survivalgames.game;
 
-import com.thenexusreborn.nexuscore.player.SpigotNexusPlayer;
+import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 
 import java.util.UUID;
 
 public class GamePlayer {
-    private SpigotNexusPlayer nexusPlayer;
+    private final NexusPlayer nexusPlayer;
     private GameTeam team;
     private DeathInfo deathInfo;
     private boolean spectatorByDeath, newPersonalBestNotified = false;
     private TrackerInfo trackerInfo;
     private int kills, killStreak;
     
-    public GamePlayer(SpigotNexusPlayer nexusPlayer) {
+    public GamePlayer(NexusPlayer nexusPlayer) {
         this.nexusPlayer = nexusPlayer;
     }
     
-    public SpigotNexusPlayer getNexusPlayer() {
+    public NexusPlayer getNexusPlayer() {
         return nexusPlayer;
     }
     

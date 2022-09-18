@@ -13,7 +13,7 @@ import java.util.*;
 
 public class SpectateCommand implements CommandExecutor {
     
-    private SurvivalGames plugin;
+    private final SurvivalGames plugin;
     
     private static final Set<GameState> INVALID_GAME_STATES = new HashSet<>(Arrays.asList(GameState.ASSIGN_TEAMS, GameState.ENDED, GameState.ENDING, 
             GameState.ERROR, GameState.TELEPORT_START, GameState.SETTING_UP, GameState.SETUP_COMPLETE, GameState.UNDEFINED));

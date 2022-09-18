@@ -11,10 +11,10 @@ import java.util.*;
 
 public class DeathmatchCountdownCallback implements ReturnableCallback<TimerSnapshot, Boolean> {
     
-    private static Set<Integer> ANNOUNCE_SECONDS = new HashSet<>(Arrays.asList(10, 9, 8, 7, 6, 5, 4, 3, 2, 1));
+    private static final Set<Integer> ANNOUNCE_SECONDS = new HashSet<>(Arrays.asList(10, 9, 8, 7, 6, 5, 4, 3, 2, 1));
     
-    private Game game;
-    private Set<Integer> announced = new HashSet<>();
+    private final Game game;
+    private final Set<Integer> announced = new HashSet<>();
     
     public DeathmatchCountdownCallback(Game game) {
         this.game = game;
