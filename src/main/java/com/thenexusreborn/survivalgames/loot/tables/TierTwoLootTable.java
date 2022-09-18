@@ -33,7 +33,6 @@ public class TierTwoLootTable extends LootTable {
         weapons.addEntry(Items.WOOD_SWORD, Rarity.COMMON);
         weapons.addEntries(Rarity.UNCOMMON, Items.STONE_AXE, Items.BOW);
         weapons.addEntry(Items.STONE_SWORD, Rarity.RARE);
-        weapons.addEntry(Items.IRON_SWORD, Rarity.EPIC);
     
         consumables.addEntries(Rarity.UNCOMMON, Items.EGG_OF_DOOM, Items.SLOWBALL, Items.COBWEB);
         consumables.addEntry(new LootEntry(Items.ARROW, 5, Rarity.RARE));
