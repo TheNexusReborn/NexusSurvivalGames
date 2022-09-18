@@ -801,8 +801,10 @@ public class Game {
         this.gameInfo.getActions().add(new GameAction(System.currentTimeMillis(), "death", strippedDeathMessage.substring(3)));
         
         Player player = Bukkit.getPlayer(gamePlayer.getUniqueId());
-        player.getInventory().clear();
-        player.getInventory().setArmorContents(null);
+        if (player != null) {
+            player.getInventory().clear();
+            player.getInventory().setArmorContents(null);
+        }
         gamePlayer.setDeathInfo(deathInfo);
         gamePlayer.setTrackerInfo(null);
         GameTeam oldTeam = gamePlayer.getTeam();
@@ -1011,7 +1013,7 @@ public class Game {
                     cancel();
                     return;
                 }
-                if (state == INGAME || state == INGAME_GRACEPERIOD || state == DEATHMATCH || state == INGAME_DEATHMATCH) {
+                if (state == INGAME || state == INGAME_GRACEPERIOD || state == DEATHMATCH || state == INGAME_DEATHMATCH || state == WARMUP) {
                     checkGameEnd();
                 }
             }
