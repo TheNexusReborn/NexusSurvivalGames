@@ -476,6 +476,11 @@ public class Lobby {
                 player.removePotionEffect(pe.getType());
             }
         }
+        
+        if (nexusPlayer.getRank().ordinal() <= Rank.DIAMOND.ordinal()) {
+            player.setAllowFlight(nexusPlayer.getPreferenceValue("fly"));
+        }
+        
         nexusPlayer.getScoreboard().setView(new LobbyScoreboardView(nexusPlayer.getScoreboard(), plugin));
         nexusPlayer.getScoreboard().setTablistHandler(new RankTablistHandler(nexusPlayer.getScoreboard()));
         nexusPlayer.setActionBar(new LobbyActionBar(plugin));

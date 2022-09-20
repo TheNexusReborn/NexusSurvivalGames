@@ -147,6 +147,7 @@ public class Game {
         Player player = Bukkit.getPlayer(nexusPlayer.getUniqueId());
         player.getInventory().clear();
         player.getInventory().setArmorContents(null);
+        player.setAllowFlight(false);
         giveSpectatorItems(player);
         player.spigot().setCollidesWithEntities(false);
         teleportSpectator(player, this.gameMap.getCenter().toLocation(this.gameMap.getWorld()));
@@ -236,6 +237,8 @@ public class Game {
         spawn.setPitch(0);
         spawn.setYaw(SGUtils.getAngle(spawn.toVector(), mapSpawn.toVector()));
         tribute.teleport(spawn);
+        tribute.setAllowFlight(false);
+        tribute.setFlying(false);
         new BukkitRunnable() {
             @Override
             public void run() {
