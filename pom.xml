@@ -73,7 +73,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.28</version>
+            <version>8.0.30</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -85,7 +85,7 @@
         <dependency>
             <groupId>com.thenexusreborn</groupId>
             <artifactId>NexusCore</artifactId>
-            <version>1.5-ALPHA</version>
+            <version>1.6-ALPHA</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
