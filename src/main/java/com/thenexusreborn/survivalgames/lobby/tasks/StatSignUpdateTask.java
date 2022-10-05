@@ -41,7 +41,7 @@ public class StatSignUpdateTask extends BukkitRunnable {
                     continue;
                 }
                 
-                String[] lines = new String[] {MCUtils.color("&n" + statSign.getDisplayName()), "", nexusPlayer.getStatValue(statSign.getStat()).toString(), ""};
+                String[] lines = new String[] {MCUtils.color("&n" + statSign.getDisplayName()), "", nexusPlayer.getStats().getValue(statSign.getStat()).toString(), ""};
                 player.sendSignChange(statSign.getLocation(), lines);
             }
         }

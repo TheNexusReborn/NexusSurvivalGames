@@ -78,9 +78,9 @@ public class TributeSignUpdateTask extends BukkitRunnable {
             } else {
                 name = nexusPlayer.getName();
             }
-            int score = (int) nexusPlayer.getStatValue("sg_score");
-            int kills = (int) nexusPlayer.getStatValue("sg_kills");
-            int wins = (int) nexusPlayer.getStatValue("sg_wins");
+            int score = (int) nexusPlayer.getStats().getValue("sg_score");
+            int kills = (int) nexusPlayer.getStats().getValue("sg_kills");
+            int wins = (int) nexusPlayer.getStats().getValue("sg_wins");
             skull.setOwner(player.getName());
             skull.update();
     

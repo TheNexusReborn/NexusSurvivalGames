@@ -157,7 +157,7 @@ public class PlayerListener implements Listener {
                             return;
                         }
                         
-                        game.getPlayer(player.getUniqueId()).getNexusPlayer().changeStat("sg_chests_looted", 1, StatOperator.ADD);
+                        game.getPlayer(player.getUniqueId()).getNexusPlayer().getStats().change("sg_chests_looted", 1, StatOperator.ADD);
                         
                         Inventory inv;
                         if (block.getType() == Material.ENDER_CHEST) {

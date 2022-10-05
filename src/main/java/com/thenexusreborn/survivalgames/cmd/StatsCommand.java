@@ -67,7 +67,7 @@ public class StatsCommand implements CommandExecutor {
                 }
 
                 sender.sendMessage(MCUtils.color("&6&l>> &aSurvival Games Stats for " + nexusPlayer.getRank().getColor() + nexusPlayer.getName()));
-                for (Stat stat : nexusPlayer.getStats().values()) {
+                for (Stat stat : nexusPlayer.getStats().findAll()) {
                     String name = stat.getName();
                     if (!name.startsWith("sg_")) {
                         continue;
@@ -78,7 +78,7 @@ public class StatsCommand implements CommandExecutor {
                     }
 
                     name = stat.getDisplayName();
-                    sender.sendMessage(MCUtils.color("&6&l> &e" + name + "&7: &b" + new DecimalFormat(format).format(nexusPlayer.getStatValue(stat.getName()))));
+                    sender.sendMessage(MCUtils.color("&6&l> &e" + name + "&7: &b" + new DecimalFormat(format).format(nexusPlayer.getStats().getValue(stat.getName()))));
                 }
             }
         }.runTaskAsynchronously(plugin);
