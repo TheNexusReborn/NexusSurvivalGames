@@ -2,7 +2,6 @@ package com.thenexusreborn.survivalgames.lobby;
 
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.*;
-import com.thenexusreborn.api.tournament.Tournament;
 import com.thenexusreborn.nexuscore.scoreboard.impl.RankTablistHandler;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
@@ -86,7 +85,7 @@ public class Lobby {
                 int signX = signsSection.getInt(key + ".sign.x");
                 int signY = signsSection.getInt(key + ".sign.y");
                 int signZ = signsSection.getInt(key + ".sign.z");
-    
+                
                 int headX = signsSection.getInt(key + ".head.x");
                 int headY = signsSection.getInt(key + ".head.y");
                 int headZ = signsSection.getInt(key + ".head.z");
@@ -99,21 +98,9 @@ public class Lobby {
             }
         }
         
-        if (NexusAPI.getApi().getTournament() != null && NexusAPI.getApi().getTournament().isActive()) {
-            this.lobbySettings = plugin.getLobbySettings("tournament");
-            if (lobbySettings == null) {
-                this.lobbySettings = plugin.getLobbySettings("default");
-            }
-    
-            this.gameSettings = plugin.getGameSettings("tournament");
-            if (gameSettings == null) {
-                this.gameSettings = plugin.getGameSettings("default");
-            }
-        } else {
-            this.lobbySettings = plugin.getLobbySettings("default");
-            this.gameSettings = plugin.getGameSettings("default");
-        }
-    
+        this.lobbySettings = plugin.getLobbySettings("default");
+        this.gameSettings = plugin.getGameSettings("default");
+        
         generateMapOptions();
         
         for (LootTable lootTable : LootManager.getInstance().getLootTables()) {
@@ -160,7 +147,7 @@ public class Lobby {
             TextComponent line = new TextComponent(builder.create());
             line.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/map " + entry.getKey()));
             line.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to vote").create()));
-    
+            
             Bukkit.getPlayer(nexusPlayer.getUniqueId()).spigot().sendMessage(line);
         }
     }
@@ -179,7 +166,7 @@ public class Lobby {
         if (gameMap != null) {
             gameMap.delete(plugin);
         }
-    
+        
         FileConfiguration config = plugin.getConfig();
         this.mapSigns.forEach((position, location) -> {
             config.set("mapsigns." + position + ".world", location.getWorld().getName());
@@ -584,27 +571,11 @@ public class Lobby {
     }
     
     public void fromGame(Game game) {
-        Tournament tournament = NexusAPI.getApi().getTournament();
-        if (tournament != null && tournament.isActive()) {
-            this.lobbySettings = plugin.getLobbySettings("tournament");
-            if (lobbySettings == null) {
-                this.lobbySettings = plugin.getLobbySettings("default");
-            }
-        
-            this.gameSettings = plugin.getGameSettings("tournament");
-            if (gameSettings == null) {
-                this.gameSettings = plugin.getGameSettings("default");
-            }
+        if (this.lobbySettings.isKeepPreviousGameSettings()) {
+            this.gameSettings = game.getSettings();
         } else {
-            if (this.lobbySettings.isKeepPreviousGameSettings()) {
-                this.gameSettings = game.getSettings();
-                if (this.gameSettings.getType().equals("tournament")) {
-                    this.gameSettings = plugin.getGameSettings("default");
-                }
-            } else {
-                this.gameSettings = plugin.getGameSettings("default");
-            }
-        }        
+            this.gameSettings = plugin.getGameSettings("default");
+        }
         
         for (GamePlayer player : game.getPlayers().values()) {
             if (player.getNexusPlayer().getPlayer() != null) {

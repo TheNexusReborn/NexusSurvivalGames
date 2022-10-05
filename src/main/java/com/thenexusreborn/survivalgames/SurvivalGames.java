@@ -7,7 +7,6 @@ import com.thenexusreborn.api.server.Environment;
 import com.thenexusreborn.api.stats.StatType;
 import com.thenexusreborn.nexuscore.NexusCore;
 import com.thenexusreborn.nexuscore.api.NexusSpigotPlugin;
-import com.thenexusreborn.nexuscore.task.TournamentMsgTask;
 import com.thenexusreborn.nexuscore.util.ServerProperties;
 import com.thenexusreborn.survivalgames.cmd.*;
 import com.thenexusreborn.survivalgames.game.Game;
@@ -87,7 +86,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
             LobbySettings lobbySettings = new LobbySettings("default");
             NexusAPI.getApi().getPrimaryDatabase().push(lobbySettings);
             addLobbySettings(lobbySettings);
-        } 
+        }
         if (!this.gameSettings.containsKey("default")) {
             GameSettings gameSettings = new GameSettings("default");
             NexusAPI.getApi().getPrimaryDatabase().push(gameSettings);
@@ -122,11 +121,9 @@ public class SurvivalGames extends NexusSpigotPlugin {
         lobby.setControlType(ControlType.AUTOMATIC);
         Game.setControlType(ControlType.AUTOMATIC);
         
-        if (!(NexusAPI.getApi().getTournament() != null && NexusAPI.getApi().getTournament().isActive())) {
-            if (NexusAPI.getApi().getEnvironment() == Environment.DEVELOPMENT) {
-                lobby.setLobbySettings(getLobbySettings("dev"));
-                lobby.setGameSettings(getGameSettings("dev"));
-            }
+        if (NexusAPI.getApi().getEnvironment() == Environment.DEVELOPMENT) {
+            lobby.setLobbySettings(getLobbySettings("dev"));
+            lobby.setGameSettings(getGameSettings("dev"));
         }
         
         if (this.getConfig().contains("spawnpoint")) {
@@ -180,7 +177,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
         
         new SpectatorUpdateTask(this).start();
         new ServerStatusTask(this).start();
-        new TournamentMsgTask(this).start();
     }
     
     @Override
@@ -201,12 +197,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
         registry.register("sg_mutation_passes", "Mutation Passes", StatType.INTEGER, 0);
         registry.register("sg_sponsored_others", "Times Sponsored Others", StatType.INTEGER, 0);
         registry.register("sg_sponsors_received", "Times Sponsored By Others", StatType.INTEGER, 0);
-        registry.register("sg_tournament_points", "Tournament Points", StatType.INTEGER, 0);
-        registry.register("sg_tournament_kills", "Tournament Kills", StatType.INTEGER, 0);
-        registry.register("sg_tournament_wins", "Tournament Wins", StatType.INTEGER, 0);
-        registry.register("sg_tournament_survives", "Tournament Survives", StatType.INTEGER, 0);
-        registry.register("sg_tournament_chests_looted", "Tournament Chests Looted", StatType.INTEGER, 0);
-        registry.register("sg_tournament_assists", "Tournament Assists", StatType.INTEGER, 0);
     }
     
     public int getGamesPlayed() {

@@ -13,7 +13,6 @@ import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.server.Environment;
 import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.api.tags.Tag;
-import com.thenexusreborn.api.tournament.Tournament;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
@@ -63,7 +62,6 @@ public class Game {
     private long start, end;
     private GamePlayer firstBlood;
     private final Map<Location, Inventory> enderchestInventories = new HashMap<>();
-    private final boolean awardTournamentPoints;
     
     public Game(GameMap gameMap, GameSettings settings, Collection<NexusPlayer> players, List<UUID> spectatingPlayers) {
         this.gameMap = gameMap;
@@ -94,7 +92,6 @@ public class Game {
             }
         }
         gameInfo.setSettings(sb.substring(0, sb.length() - 1));
-        this.awardTournamentPoints = NexusAPI.getApi().getTournament() != null && NexusAPI.getApi().getTournament().isActive();
     }
     
     protected void setState(GameState state) {
@@ -656,11 +653,6 @@ public class Game {
         String winnerName;
         if (winner != null) {
             winnerName = winner.getNexusPlayer().getDisplayName();
-            if (awardTournamentPoints) {
-                Tournament tournament = NexusAPI.getApi().getTournament();
-                winner.getNexusPlayer().changeStat("sg_tournament_points", tournament.getPointsPerWin(), StatOperator.ADD);
-                winner.sendMessage("&2&l>> &a+" + tournament.getPointsPerWin() + " Points!");
-            }
         } else {
             winnerName = "&f&lNo one";
         }
@@ -1005,23 +997,6 @@ public class Game {
         
         if (sendDeathMessage) {
             this.sendMessage(deathInfo.getDeathMessage(this));
-        }
-        
-        if (oldTeam == GameTeam.TRIBUTES) {
-            Tournament tournament = NexusAPI.getApi().getTournament();
-            if (killer != null) {
-                if (awardTournamentPoints) {
-                    killer.getNexusPlayer().changeStat("sg_tournament_points", tournament.getPointsPerKill(), StatOperator.ADD);
-                    killer.sendMessage("&2&l>> &a+" + tournament.getPointsPerKill() + " Points!");
-                    
-                    for (GamePlayer p : this.players.values()) {
-                        if (p.getTeam() == GameTeam.TRIBUTES) {
-                            killer.getNexusPlayer().changeStat("sg_tournament_points", tournament.getPointsPerSurvival(), StatOperator.ADD);
-                            p.sendMessage("&2&l>> &a+" + tournament.getPointsPerSurvival() + " Points!");
-                        }
-                    }
-                }
-            }
         }
         
         new BukkitRunnable() {

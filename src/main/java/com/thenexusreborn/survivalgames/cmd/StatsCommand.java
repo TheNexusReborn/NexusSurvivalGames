@@ -73,7 +73,7 @@ public class StatsCommand implements CommandExecutor {
                         continue;
                     }
 
-                    if (name.contains("tournament") || name.contains("mutat") || name.contains("sponsor")) {
+                    if (name.contains("mutat") || name.contains("sponsor")) {
                         continue;
                     }
 

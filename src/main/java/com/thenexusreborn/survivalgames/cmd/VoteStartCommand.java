@@ -2,7 +2,6 @@ package com.thenexusreborn.survivalgames.cmd;
 
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
-import com.thenexusreborn.api.tournament.Tournament;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
@@ -28,12 +27,6 @@ public class VoteStartCommand implements CommandExecutor {
         
         if (plugin.getGame() != null) {
             senderPlayer.sendMessage(MCUtils.color("&cThere is already a game running. You cannot use that command."));
-            return true;
-        }
-    
-        Tournament tournament = NexusAPI.getApi().getTournament();
-        if (tournament != null && tournament.isActive()) {
-            senderPlayer.sendMessage(MCUtils.color(MsgType.WARN + "You cannot vote to start a lobby with an active tournament."));
             return true;
         }
     
