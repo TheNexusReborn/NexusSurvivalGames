@@ -52,16 +52,16 @@ public class LobbyTask extends BukkitRunnable {
             Player bukkitPlayer = Bukkit.getPlayer(player.getUniqueId());
             for (NexusPlayer other : lobby.getPlayers()) {
                 Player otherBukkitPlayer = Bukkit.getPlayer(other.getUniqueId());
-                if (player.getPreferenceValue("vanish")) {
-                    if (other.getRank().ordinal() > Rank.HELPER.ordinal()) {
+                if (player.getToggles().getValue("vanish")) {
+                    if (other.getRanks().get().ordinal() > Rank.HELPER.ordinal()) {
                         otherBukkitPlayer.hidePlayer(bukkitPlayer);
                     }
                 } else {
                     otherBukkitPlayer.showPlayer(bukkitPlayer);
                 }
                 
-                if (other.getPreferenceValue("vanish")) {
-                    if (player.getRank().ordinal() > Rank.HELPER.ordinal()) {
+                if (other.getToggles().getValue("vanish")) {
+                    if (player.getRanks().get().ordinal() > Rank.HELPER.ordinal()) {
                         bukkitPlayer.hidePlayer(otherBukkitPlayer);
                     }
                 } else {

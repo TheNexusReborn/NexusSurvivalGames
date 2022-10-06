@@ -33,7 +33,7 @@ public class VoteStartCommand implements CommandExecutor {
         NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(senderPlayer.getUniqueId());
         Lobby lobby = plugin.getLobby();
         
-        if (nexusPlayer.getPreferenceValue("vanish")) {
+        if (nexusPlayer.getToggles().getValue("vanish")) {
             nexusPlayer.sendMessage(MsgType.WARN + "You cannot vote to start while in vanish mode.");
             return true;
         }

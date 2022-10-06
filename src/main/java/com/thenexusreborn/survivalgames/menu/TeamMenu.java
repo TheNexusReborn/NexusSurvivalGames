@@ -15,7 +15,7 @@ public class TeamMenu extends Menu {
         
         if (plugin.getGame() != null) {
             for (GamePlayer player : plugin.getGame().getPlayers().values()) {
-                if (!player.getNexusPlayer().getPreferenceValue("vanish")) {
+                if (!player.getNexusPlayer().getToggles().getValue("vanish")) {
                     if (player.getTeam() == team) {
                         ItemStack skull = SpigotUtils.getPlayerSkull(Bukkit.getPlayer(player.getUniqueId()));
                         ItemMeta meta = skull.getItemMeta();

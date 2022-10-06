@@ -281,7 +281,7 @@ public class Lobby {
         }
         
         if (lobbySettings.isVoteWeight()) {
-            return (int) nexusPlayer.getRank().getMultiplier();
+            return (int) nexusPlayer.getRanks().get().getMultiplier();
         } else {
             return 1;
         }
@@ -297,7 +297,7 @@ public class Lobby {
             }
             
             if (lobbySettings.isVoteWeight()) {
-                votes += nexusPlayer.getRank().getMultiplier();
+                votes += nexusPlayer.getRanks().get().getMultiplier();
             } else {
                 votes++;
             }
@@ -401,7 +401,7 @@ public class Lobby {
         int totalPlayers = 0;
         for (NexusPlayer player : this.players.values()) {
             if (!this.spectatingPlayers.contains(player.getUniqueId())) {
-                if (!player.getPreferenceValue("vanish")) {
+                if (!player.getToggles().getValue("vanish")) {
                     totalPlayers++;
                 }
             }
@@ -421,34 +421,34 @@ public class Lobby {
             player.showPlayer(online);
         }
         
-        if (nexusPlayer.getPreferenceValue("vanish")) {
+        if (nexusPlayer.getToggles().getValue("vanish")) {
             for (Player p : Bukkit.getOnlinePlayers()) {
                 NexusPlayer psp = this.players.get(p.getUniqueId());
                 if (psp != null) {
-                    if (psp.getRank().ordinal() > Rank.HELPER.ordinal()) {
+                    if (psp.getRanks().get().ordinal() > Rank.HELPER.ordinal()) {
                         p.hidePlayer(player);
                     } else {
-                        psp.sendMessage("&a&l>> " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined &e&overy silently&e.");
+                        psp.sendMessage("&a&l>> " + nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName() + " &ejoined &e&overy silently&e.");
                     }
                 }
             }
-        } else if (nexusPlayer.getPreferenceValue("incognito")) {
+        } else if (nexusPlayer.getToggles().getValue("incognito")) {
             for (NexusPlayer np : this.players.values()) {
                 if (np != null) {
-                    if (np.getRank().ordinal() <= Rank.HELPER.ordinal()) {
-                        np.sendMessage("&a&l>> " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined &e&osilently&e.");
+                    if (np.getRanks().get().ordinal() <= Rank.HELPER.ordinal()) {
+                        np.sendMessage("&a&l>> " + nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName() + " &ejoined &e&osilently&e.");
                     }
                 }
             }
         } else {
-            sendMessage("&a&l>> " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined.");
+            sendMessage("&a&l>> " + nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName() + " &ejoined.");
         }
         
-        boolean joiningPlayerStaff = nexusPlayer.getRank().ordinal() <= Rank.HELPER.ordinal();
+        boolean joiningPlayerStaff = nexusPlayer.getRanks().get().ordinal() <= Rank.HELPER.ordinal();
         for (Player p : Bukkit.getOnlinePlayers()) {
             NexusPlayer psp = this.players.get(p.getUniqueId());
             if (psp != null) {
-                if (psp.getPreferenceValue("vanish") && !joiningPlayerStaff) {
+                if (psp.getToggles().getValue("vanish") && !joiningPlayerStaff) {
                     Bukkit.getPlayer(nexusPlayer.getUniqueId()).hidePlayer(p);
                 }
             }
@@ -464,8 +464,8 @@ public class Lobby {
             }
         }
         
-        if (nexusPlayer.getRank().ordinal() <= Rank.DIAMOND.ordinal()) {
-            player.setAllowFlight(nexusPlayer.getPreferenceValue("fly"));
+        if (nexusPlayer.getRanks().get().ordinal() <= Rank.DIAMOND.ordinal()) {
+            player.setAllowFlight(nexusPlayer.getToggles().getValue("fly"));
         }
         
         nexusPlayer.getScoreboard().setView(new LobbyScoreboardView(nexusPlayer.getScoreboard(), plugin));
@@ -487,20 +487,20 @@ public class Lobby {
             }
         }
         
-        if (nexusPlayer.getPreferenceValue("vanish")) {
+        if (nexusPlayer.getToggles().getValue("vanish")) {
             for (NexusPlayer snp : this.players.values()) {
-                if (snp.getRank().ordinal() <= Rank.HELPER.ordinal()) {
-                    snp.sendMessage("&c&l<< " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft &e&overy silently&e.");
+                if (snp.getRanks().get().ordinal() <= Rank.HELPER.ordinal()) {
+                    snp.sendMessage("&c&l<< " + nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName() + " &eleft &e&overy silently&e.");
                 }
             }
-        } else if (nexusPlayer.getPreferenceValue("incognito")) {
+        } else if (nexusPlayer.getToggles().getValue("incognito")) {
             for (NexusPlayer snp : this.players.values()) {
-                if (snp.getRank().ordinal() <= Rank.HELPER.ordinal()) {
-                    snp.sendMessage("&c&l<< " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft &e&osilently&e.");
+                if (snp.getRanks().get().ordinal() <= Rank.HELPER.ordinal()) {
+                    snp.sendMessage("&c&l<< " + nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName() + " &eleft &e&osilently&e.");
                 }
             }
         } else {
-            sendMessage("&c&l<< " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft.");
+            sendMessage("&c&l<< " + nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName() + " &eleft.");
         }
         
         if (this.voteStart.contains(nexusPlayer.getUniqueId())) {
@@ -620,7 +620,7 @@ public class Lobby {
     
     public void addStartVote(NexusPlayer player) {
         this.voteStart.add(player.getUniqueId());
-        sendMessage("&6&l>> " + player.getRank().getColor() + player.getName() + " &ehas voted to start the lobby.");
+        sendMessage("&6&l>> " + player.getRanks().get().getColor() + player.getName() + " &ehas voted to start the lobby.");
         if (this.state == LobbyState.WAITING) {
             if (this.voteStart.size() >= 2) {
                 this.startTimer();
@@ -686,7 +686,7 @@ public class Lobby {
             int playerCount = 0;
             for (NexusPlayer player : getPlayers()) {
                 if (!getSpectatingPlayers().contains(player.getUniqueId())) {
-                    if (!player.getPreferenceValue("vanish")) {
+                    if (!player.getToggles().getValue("vanish")) {
                         playerCount++;
                     }
                 }
@@ -707,7 +707,7 @@ public class Lobby {
         int playerCount = 0;
         for (NexusPlayer player : getPlayers()) {
             if (!getSpectatingPlayers().contains(player.getUniqueId())) {
-                if (!player.getPreferenceValue("vanish")) {
+                if (!player.getToggles().getValue("vanish")) {
                     playerCount++;
                 }
             }

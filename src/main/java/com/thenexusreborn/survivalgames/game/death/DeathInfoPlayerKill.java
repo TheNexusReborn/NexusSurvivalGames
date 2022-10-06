@@ -32,7 +32,7 @@ public class DeathInfoPlayerKill extends DeathInfo {
             killerName = killerTeamColor + Bukkit.getPlayer(killer).getName();
         } else {
             NexusPlayer nexusPlayer = game.getPlayer(this.killer).getNexusPlayer();
-            killerName = nexusPlayer.getRank().getColor() + nexusPlayer.getName();
+            killerName = nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName();
         }
         
         String itemName = getHandItem(handItem);

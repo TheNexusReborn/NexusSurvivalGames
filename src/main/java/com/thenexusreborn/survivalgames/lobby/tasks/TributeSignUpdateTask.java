@@ -74,7 +74,7 @@ public class TributeSignUpdateTask extends BukkitRunnable {
             Player player = Bukkit.getPlayer(nexusPlayer.getUniqueId());
             String name;
             if (nexusPlayer.getName().length() <= 14) {
-                name = MCUtils.color(nexusPlayer.getRank().getColor() + nexusPlayer.getName());
+                name = MCUtils.color(nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName());
             } else {
                 name = nexusPlayer.getName();
             }

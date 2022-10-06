@@ -257,7 +257,7 @@ public class PlayerListener implements Listener {
                         }
                     } else if (block.getState() instanceof Sign) {
                         NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(player.getUniqueId());
-                        if (nexusPlayer.getPreferenceValue("vanish")) {
+                        if (nexusPlayer.getToggles().getValue("vanish")) {
                             nexusPlayer.sendMessage(MsgType.WARN + "You cannot vote for a map while in vanish.");
                             return;
                         }
@@ -296,7 +296,7 @@ public class PlayerListener implements Listener {
     
     @EventHandler
     public void onVanishToggle(VanishToggleEvent e) {
-        String coloredName = e.getNexusPlayer().getRank().getColor() + e.getNexusPlayer().getName();
+        String coloredName = e.getNexusPlayer().getRanks().get().getColor() + e.getNexusPlayer().getName();
         Game game = plugin.getGame();
         
         Collection<NexusPlayer> players;
@@ -310,7 +310,7 @@ public class PlayerListener implements Listener {
         }
         
         String message;
-        boolean incognito = e.getNexusPlayer().getPreferenceValue("incognito");
+        boolean incognito = e.getNexusPlayer().getToggles().getValue("incognito");
         if (e.getNewValue()) {
             if (incognito) {
                 message = "";
@@ -334,7 +334,7 @@ public class PlayerListener implements Listener {
         if (!message.equals("")) {
             if (incognito) {
                 for (NexusPlayer player : players) {
-                    if (player.getRank().ordinal() <= Rank.HELPER.ordinal() || player.getUniqueId().equals(e.getNexusPlayer().getUniqueId())) {
+                    if (player.getRanks().get().ordinal() <= Rank.HELPER.ordinal() || player.getUniqueId().equals(e.getNexusPlayer().getUniqueId())) {
                         player.sendMessage(message);
                     }
                 }
@@ -525,7 +525,7 @@ public class PlayerListener implements Listener {
                                 if (game.getSettings().getColorMode() == ColorMode.GAME_TEAM) {
                                     color = game.getPlayer(entity.getUniqueId()).getTeam().getColor();
                                 } else {
-                                    color = game.getPlayer(entity.getUniqueId()).getNexusPlayer().getRank().getColor();
+                                    color = game.getPlayer(entity.getUniqueId()).getNexusPlayer().getRanks().get().getColor();
                                 }
                             }
                             deathInfo = new DeathInfoProjectile(player.getUniqueId(), ((Entity) projectile.getShooter()), player.getLocation().distance(entity.getLocation()), color, ((LivingEntity) projectile.getShooter()).getHealth());
@@ -621,8 +621,8 @@ public class PlayerListener implements Listener {
         NexusPlayer nexusPlayer = e.getNexusPlayer();
         if (plugin.getGame() == null) {
             if (plugin.getLobby().getPlayingCount() >= plugin.getLobby().getLobbySettings().getMaxPlayers()) {
-                boolean isStaff = nexusPlayer.getRank().ordinal() <= Rank.HELPER.ordinal();
-                boolean isInVanish = nexusPlayer.getPreferenceValue("vanish");
+                boolean isStaff = nexusPlayer.getRanks().get().ordinal() <= Rank.HELPER.ordinal();
+                boolean isInVanish = nexusPlayer.getToggles().getValue("vanish");
                 if (!(isStaff && isInVanish)) {
                     nexusPlayer.sendMessage("&cThe lobby is full.");
                     new BukkitRunnable() {

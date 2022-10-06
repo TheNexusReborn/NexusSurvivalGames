@@ -28,7 +28,7 @@ public class DeathInfoKilledSuicide extends DeathInfo {
     public String getDeathMessage(Game game) {
         //String killerName = killerTeamColor + Bukkit.getPlayer(killer).getName();
         NexusPlayer nexusPlayer = game.getPlayer(this.killer).getNexusPlayer();
-        String killerName = nexusPlayer.getRank().getColor() + nexusPlayer.getName();
+        String killerName = nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName();
         this.deathMessage = "&4&l>> %playername% &7was killed by " + killerName + "&7's suicide.";
         return super.getDeathMessage(game);
     }

@@ -31,9 +31,9 @@ public class DeathInfoTntKill extends DeathInfoPlayerKill {
             targetName = teamColor + Bukkit.getPlayer(player).getName();
         } else {
             NexusPlayer nexusPlayer = game.getPlayer(this.killer).getNexusPlayer();
-            killerName = nexusPlayer.getRank().getColor() + nexusPlayer.getName();
+            killerName = nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName();
             NexusPlayer targetPlayer = game.getPlayer(this.player).getNexusPlayer();
-            targetName = targetPlayer.getRank().getColor() + targetPlayer.getName();
+            targetName = targetPlayer.getRanks().get().getColor() + targetPlayer.getName();
         }
         this.deathMessage = "&4&l>> %playername% &7was blown up by " + killerName;
         return this.deathMessage.replace("%playername%", targetName);
