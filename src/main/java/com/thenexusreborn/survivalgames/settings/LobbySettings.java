@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.settings;
 
-import com.thenexusreborn.api.data.annotations.*;
+import com.thenexusreborn.api.storage.annotations.*;
 import com.thenexusreborn.api.helper.ReflectionHelper;
 
 import java.lang.reflect.Field;

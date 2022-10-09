@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames;
 
 import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.api.data.objects.Database;
+import com.thenexusreborn.api.storage.objects.Database;
 import com.thenexusreborn.api.registry.*;
 import com.thenexusreborn.api.server.Environment;
 import com.thenexusreborn.api.stats.StatType;

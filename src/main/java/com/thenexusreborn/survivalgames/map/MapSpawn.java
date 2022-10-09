@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.map;
 
-import com.thenexusreborn.api.data.annotations.*;
+import com.thenexusreborn.api.storage.annotations.*;
 import org.bukkit.*;
 
 import java.util.Objects;

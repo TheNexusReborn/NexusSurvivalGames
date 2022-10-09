@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.settings;
 
-import com.thenexusreborn.api.data.annotations.Primary;
+import com.thenexusreborn.api.storage.annotations.Primary;
 
 public abstract class SGSettings {
     @Primary
