@@ -1,10 +1,11 @@
 package com.thenexusreborn.survivalgames;
 
 import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.api.storage.objects.Database;
+import com.thenexusreborn.api.maven.MavenLibrary;
 import com.thenexusreborn.api.registry.*;
 import com.thenexusreborn.api.server.Environment;
 import com.thenexusreborn.api.stats.StatType;
+import com.thenexusreborn.api.storage.objects.Database;
 import com.thenexusreborn.nexuscore.NexusCore;
 import com.thenexusreborn.nexuscore.api.NexusSpigotPlugin;
 import com.thenexusreborn.nexuscore.util.ServerProperties;
@@ -24,6 +25,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import java.sql.*;
 import java.util.*;
 
+@MavenLibrary(groupId = "mysql", artifactId = "mysql-connector-java", version = "8.0.30")
 public class SurvivalGames extends NexusSpigotPlugin {
     
     public static final String MAP_URL = "https://starmediadev.com/files/nexusreborn/sgmaps/";
@@ -56,6 +58,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
     @Override
     public void onEnable() {
         getLogger().info("Loading NexusSurvivalGames v" + getDescription().getVersion());
+        //LibraryLoader.loadAll(SurvivalGames.class, (URLClassLoader) getClassLoader());
         try {
             Driver mysqlDriver = new com.mysql.cj.jdbc.Driver();
             DriverManager.registerDriver(mysqlDriver);
