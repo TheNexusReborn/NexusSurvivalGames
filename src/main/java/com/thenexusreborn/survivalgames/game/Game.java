@@ -663,7 +663,7 @@ public class Game {
             winner.getNexusPlayer().getStats().change("sg_wins", 1, StatOperator.ADD);
             winner.getNexusPlayer().getStats().change("sg_win_streak", 1, StatOperator.ADD);
             int winGain = 50;
-            int currentScore = (int) winner.getNexusPlayer().getStats().getValue("sg_score");
+            int currentScore = winner.getNexusPlayer().getStats().getValue("sg_score").getAsInt();
             if (currentScore < 100 && currentScore > 50) {
                 winGain *= 1.25;
             } else if (currentScore <= 50 && currentScore > 25) {
@@ -820,7 +820,7 @@ public class Game {
         
         boolean vanished = deathInfo.getType() == DeathType.VANISH;
         
-        int score = (int) gamePlayer.getNexusPlayer().getStats().getValue("sg_score");
+        int score = gamePlayer.getNexusPlayer().getStats().getValue("sg_score").getAsInt();
         int lost = (int) Math.ceil(score / 10D);
         
         if (!vanished) {
@@ -909,7 +909,7 @@ public class Game {
             killer.setKills(killer.getKills() + 1);
             killer.getNexusPlayer().getStats().change("sg_kills", 1, StatOperator.ADD);
             killer.setKillStreak(killer.getKillStreak() + 1);
-            int highestKillStreak = (int) killer.getNexusPlayer().getStats().getValue("sg_highest_kill_streak");
+            int highestKillStreak = killer.getNexusPlayer().getStats().getValue("sg_highest_kill_streak").getAsInt();
             if (highestKillStreak < killer.getKillStreak()) {
                 killer.getNexusPlayer().getStats().change("sg_highest_kill_streak", killer.getKillStreak() - highestKillStreak, StatOperator.ADD);
                 if (!killer.isNewPersonalBestNotified()) {

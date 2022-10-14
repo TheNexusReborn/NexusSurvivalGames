@@ -84,10 +84,10 @@ public class GameScoreboardView extends SpigotScoreboardView {
             
             scoreboard.getScoreboard().getTeam(tributesValueName).setSuffix(MCUtils.color("&a" + tributes));
             scoreboard.getScoreboard().getTeam(watchingValueName).setSuffix(MCUtils.color("&c" + watching));
-            scoreboard.getScoreboard().getTeam(scoreValueName).setSuffix(MCUtils.color("&e" + MCUtils.formatNumber((int) this.scoreboard.getPlayer().getStats().getValue("sg_score"))));
+            scoreboard.getScoreboard().getTeam(scoreValueName).setSuffix(MCUtils.color("&e" + MCUtils.formatNumber(this.scoreboard.getPlayer().getStats().getValue("sg_score").getAsInt())));
             GamePlayer player = game.getPlayer(this.scoreboard.getPlayer().getUniqueId());
             int kills = player.getKills();
-            int hks = (int) player.getNexusPlayer().getStats().getValue("sg_highest_kill_streak");
+            int hks = player.getNexusPlayer().getStats().getValue("sg_highest_kill_streak").getAsInt();
             scoreboard.getScoreboard().getTeam(killStreakValueName).setSuffix(MCUtils.color("&e" + kills + "/" + hks));
         } catch (Exception e) {
             e.printStackTrace();
