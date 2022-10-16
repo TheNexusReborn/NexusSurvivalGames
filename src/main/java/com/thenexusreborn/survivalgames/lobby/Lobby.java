@@ -747,4 +747,21 @@ public class Lobby {
                 ", forceStarted=" + forceStarted +
                 '}';
     }
+    
+    public void recaculateVisibility() {
+        for (NexusPlayer player : this.getPlayers()) {
+            Player bukkitPlayer = Bukkit.getPlayer(player.getUniqueId());
+            boolean vanish = player.getToggles().getValue("vanish");
+            for (NexusPlayer other : this.getPlayers()) {
+                Player otherBukkit = Bukkit.getPlayer(other.getUniqueId());
+                if (!vanish) {
+                    otherBukkit.showPlayer(bukkitPlayer);
+                } else {
+                    if (other.getRanks().get().ordinal() > Rank.HELPER.ordinal()) {
+                        otherBukkit.hidePlayer(bukkitPlayer);
+                    }
+                }
+            }
+        }
+    }
 }

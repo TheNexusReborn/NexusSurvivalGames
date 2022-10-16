@@ -182,7 +182,7 @@ public class Game {
         nexusPlayer.getScoreboard().setView(new GameScoreboardView(nexusPlayer.getScoreboard(), plugin));
         nexusPlayer.getScoreboard().setTablistHandler(new GameTablistHandler(nexusPlayer.getScoreboard(), plugin));
         nexusPlayer.setActionBar(new GameActionBar(plugin, gamePlayer));
-        recalculateVisibiltiy();
+        recalculateVisibility();
     }
     
     public void removePlayer(NexusPlayer nexusPlayer) {
@@ -273,7 +273,7 @@ public class Game {
         }
     }
     
-    public void recalculateVisibiltiy() {
+    public void recalculateVisibility() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             GamePlayer gamePlayer = getPlayer(player.getUniqueId());
             for (Player other : Bukkit.getOnlinePlayers()) {
@@ -333,7 +333,7 @@ public class Game {
                 }
             }
             
-            recalculateVisibiltiy();
+            recalculateVisibility();
             
             setState(TELEPORT_START_DONE);
         } catch (Exception e) {
@@ -553,7 +553,7 @@ public class Game {
             teleportTributes(tributes, mapSpawn);
             teleportSpectators(spectators, mapSpawn);
             
-            recalculateVisibiltiy();
+            recalculateVisibility();
             setState(TELEPORT_DEATHMATCH_DONE);
         } catch (Exception e) {
             e.printStackTrace();
@@ -903,7 +903,7 @@ public class Game {
             playSound(Sound.WITHER_SPAWN);
         }
         
-        recalculateVisibiltiy();
+        recalculateVisibility();
         
         if (killer != null) {
             killer.setKills(killer.getKills() + 1);
