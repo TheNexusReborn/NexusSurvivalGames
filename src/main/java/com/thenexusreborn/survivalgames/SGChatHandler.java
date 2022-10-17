@@ -28,7 +28,7 @@ public class SGChatHandler implements ChatHandler {
         String format = "{score} {level} &r{displayName}&8: {message}";
         String nameColor; 
         String score = "&8<&3" + MCUtils.formatNumber(player.getStats().getValue("sg_score").getAsInt()) + "&8>";
-        String level = "&8(&2&l" + player.getStats().getValue("level") + "&8)";
+        String level = "&8(&2&l" + player.getStats().getValue("level").getAsInt() + "&8)";
         String spectators = "&8[&cSpectators&8]";
         String tag = "";
         if (player.getTag() != null && !player.getTag().getName().equalsIgnoreCase("null")) {
