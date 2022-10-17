@@ -6,7 +6,7 @@
 
     <groupId>com.thenexusreborn</groupId>
     <artifactId>NexusSurvivalGames</artifactId>
-    <version>1.7.2-ALPHA</version>
+    <version>1.8-ALPHA</version>
 
     <properties>
         <java.version>1.8</java.version>
@@ -35,12 +35,6 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <relocations>
-                                <relocation>
-                                    <pattern>com.mysql</pattern>
-                                    <shadedPattern>com.thenexusreborn.mysql</shadedPattern>
-                                </relocation>
-                            </relocations>
                         </configuration>
                     </execution>
                 </executions>
@@ -73,7 +67,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.28</version>
+            <version>8.0.30</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -85,7 +79,7 @@
         <dependency>
             <groupId>com.thenexusreborn</groupId>
             <artifactId>NexusCore</artifactId>
-            <version>1.5-ALPHA</version>
+            <version>1.6-ALPHA</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

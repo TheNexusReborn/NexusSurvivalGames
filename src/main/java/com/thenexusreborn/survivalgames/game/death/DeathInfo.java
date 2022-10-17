@@ -42,7 +42,7 @@ public class DeathInfo {
                 message = message.replace("%playername%", teamColor + Bukkit.getPlayer(player).getName());
             } else {
                 NexusPlayer nexusPlayer = game.getPlayer(this.player).getNexusPlayer();
-                message = message.replace("%playername%", nexusPlayer.getRank().getColor() + nexusPlayer.getName());
+                message = message.replace("%playername%", nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName());
             }
         }
         return message;

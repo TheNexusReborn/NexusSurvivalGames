@@ -74,13 +74,13 @@ public class TributeSignUpdateTask extends BukkitRunnable {
             Player player = Bukkit.getPlayer(nexusPlayer.getUniqueId());
             String name;
             if (nexusPlayer.getName().length() <= 14) {
-                name = MCUtils.color(nexusPlayer.getRank().getColor() + nexusPlayer.getName());
+                name = MCUtils.color(nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName());
             } else {
                 name = nexusPlayer.getName();
             }
-            int score = (int) nexusPlayer.getStatValue("sg_score");
-            int kills = (int) nexusPlayer.getStatValue("sg_kills");
-            int wins = (int) nexusPlayer.getStatValue("sg_wins");
+            int score = nexusPlayer.getStats().getValue("sg_score").getAsInt();
+            int kills = nexusPlayer.getStats().getValue("sg_kills").getAsInt();
+            int wins = nexusPlayer.getStats().getValue("sg_wins").getAsInt();
             skull.setOwner(player.getName());
             skull.update();
     

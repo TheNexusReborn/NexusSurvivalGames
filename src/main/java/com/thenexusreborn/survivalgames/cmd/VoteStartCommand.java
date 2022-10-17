@@ -2,7 +2,6 @@ package com.thenexusreborn.survivalgames.cmd;
 
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
-import com.thenexusreborn.api.tournament.Tournament;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
@@ -31,16 +30,10 @@ public class VoteStartCommand implements CommandExecutor {
             return true;
         }
     
-        Tournament tournament = NexusAPI.getApi().getTournament();
-        if (tournament != null && tournament.isActive()) {
-            senderPlayer.sendMessage(MCUtils.color(MsgType.WARN + "You cannot vote to start a lobby with an active tournament."));
-            return true;
-        }
-    
         NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(senderPlayer.getUniqueId());
         Lobby lobby = plugin.getLobby();
         
-        if (nexusPlayer.getPreferenceValue("vanish")) {
+        if (nexusPlayer.getToggles().getValue("vanish")) {
             nexusPlayer.sendMessage(MsgType.WARN + "You cannot vote to start while in vanish mode.");
             return true;
         }

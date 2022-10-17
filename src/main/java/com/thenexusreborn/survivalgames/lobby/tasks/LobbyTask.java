@@ -1,12 +1,9 @@
 package com.thenexusreborn.survivalgames.lobby.tasks;
 
-import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.*;
-import com.thenexusreborn.api.tournament.Tournament;
 import com.thenexusreborn.nexuscore.util.ServerProperties;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.*;
-import com.thenexusreborn.survivalgames.settings.*;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.*;
 import org.bukkit.entity.*;
@@ -38,37 +35,6 @@ public class LobbyTask extends BukkitRunnable {
             SGUtils.updatePlayerHealthAndFood(Bukkit.getPlayer(player.getUniqueId()));
         }
         
-        Tournament tournament = NexusAPI.getApi().getTournament();
-        if (tournament != null && tournament.isActive()) {
-            if (lobby.getState() == LobbyState.WAITING || lobby.getState() == LobbyState.COUNTDOWN) {
-                if (!lobby.getLobbySettings().getType().equals("tournament")) {
-                    LobbySettings settings = plugin.getLobbySettings("tournament");
-                    if (settings == null) {
-                        settings = plugin.getLobbySettings("default");
-                    }
-                    lobby.setLobbySettings(settings);
-                }
-                
-                if (!lobby.getGameSettings().getType().equals("tournament")) {
-                    GameSettings settings = plugin.getGameSettings("tournament");
-                    if (settings == null) {
-                        settings = plugin.getGameSettings("default");
-                    }
-                    lobby.setGameSettings(settings);
-                }
-            }
-        } else {
-            if (lobby.getState() == LobbyState.WAITING || lobby.getState() == LobbyState.COUNTDOWN) {
-                if (lobby.getLobbySettings().getType().equals("tournament")) {
-                    lobby.setLobbySettings(plugin.getLobbySettings("default"));
-                }
-    
-                if (lobby.getGameSettings().getType().equals("tournament")) {
-                    lobby.setGameSettings(plugin.getGameSettings("default"));
-                }
-            }
-        }
-        
         world.setThundering(false);
         world.setStorm(false);
         
@@ -86,16 +52,16 @@ public class LobbyTask extends BukkitRunnable {
             Player bukkitPlayer = Bukkit.getPlayer(player.getUniqueId());
             for (NexusPlayer other : lobby.getPlayers()) {
                 Player otherBukkitPlayer = Bukkit.getPlayer(other.getUniqueId());
-                if (player.getPreferenceValue("vanish")) {
-                    if (other.getRank().ordinal() > Rank.HELPER.ordinal()) {
+                if (player.getToggles().getValue("vanish")) {
+                    if (other.getRanks().get().ordinal() > Rank.HELPER.ordinal()) {
                         otherBukkitPlayer.hidePlayer(bukkitPlayer);
                     }
                 } else {
                     otherBukkitPlayer.showPlayer(bukkitPlayer);
                 }
                 
-                if (other.getPreferenceValue("vanish")) {
-                    if (player.getRank().ordinal() > Rank.HELPER.ordinal()) {
+                if (other.getToggles().getValue("vanish")) {
+                    if (player.getRanks().get().ordinal() > Rank.HELPER.ordinal()) {
                         bukkitPlayer.hidePlayer(otherBukkitPlayer);
                     }
                 } else {

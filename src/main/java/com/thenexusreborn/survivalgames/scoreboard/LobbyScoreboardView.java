@@ -67,7 +67,7 @@ public class LobbyScoreboardView extends SpigotScoreboardView {
         int waiting = 0;
         for (NexusPlayer waitingPlayer : lobby.getPlayers()) {
             if (!lobby.getSpectatingPlayers().contains(waitingPlayer.getUniqueId())) {
-                if (!waitingPlayer.getPreferenceValue("vanish")) {
+                if (!waitingPlayer.getToggles().getValue("vanish")) {
                     waiting++;
                 }
             }

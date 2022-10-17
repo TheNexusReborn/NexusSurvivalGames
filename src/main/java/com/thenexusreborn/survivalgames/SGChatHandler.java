@@ -27,8 +27,8 @@ public class SGChatHandler implements ChatHandler {
         
         String format = "{score} {level} &r{displayName}&8: {message}";
         String nameColor; 
-        String score = "&8<&3" + MCUtils.formatNumber((int) player.getStatValue("sg_score")) + "&8>";
-        String level = "&8(&2&l" + player.getLevel() + "&8)";
+        String score = "&8<&3" + MCUtils.formatNumber(player.getStats().getValue("sg_score").getAsInt()) + "&8>";
+        String level = "&8(&2&l" + player.getStats().getValue("level").getAsInt() + "&8)";
         String spectators = "&8[&cSpectators&8]";
         String tag = "";
         if (player.getTag() != null && !player.getTag().getName().equalsIgnoreCase("null")) {
@@ -40,12 +40,12 @@ public class SGChatHandler implements ChatHandler {
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
             if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
                 format = "{score} &8[&cSpectators&8] {level} &r{displayName}&8: {message}";
-                nameColor = player.getRank().getColor();
+                nameColor = player.getRanks().get().getColor();
             } else {
                 nameColor = gamePlayer.getTeam().getColor();
             }
         } else {
-            if (player.getRank() != Rank.MEMBER) {
+            if (player.getRanks().get() != Rank.MEMBER) {
                 nameColor = "&f";   
             } else {
                 nameColor = Rank.MEMBER.getColor();
@@ -53,8 +53,8 @@ public class SGChatHandler implements ChatHandler {
         }
         
         String prefix = "";
-        if (player.getRank().ordinal() < Rank.MEMBER.ordinal()) {
-            prefix = player.getRank().getPrefix() + " ";
+        if (player.getRanks().get().ordinal() < Rank.MEMBER.ordinal()) {
+            prefix = player.getRanks().get().getPrefix() + " ";
         }
         
         String displayName = prefix + nameColor + player.getName() + tag;

@@ -44,7 +44,7 @@ public class MapCommand implements CommandExecutor {
     
         NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(((Player) sender).getUniqueId());
         
-        if (nexusPlayer.getPreferenceValue("vanish")) {
+        if (nexusPlayer.getToggles().getValue("vanish")) {
             nexusPlayer.sendMessage(MsgType.WARN + "You cannot vote for a map while in vanish.");
             return true;
         }

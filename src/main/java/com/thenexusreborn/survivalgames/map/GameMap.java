@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.map;
 
-import com.thenexusreborn.api.data.annotations.*;
-import com.thenexusreborn.api.data.codec.StringSetCodec;
+import com.thenexusreborn.api.storage.annotations.*;
+import com.thenexusreborn.api.storage.codec.StringSetCodec;
 import com.thenexusreborn.api.helper.FileHelper;
 import com.thenexusreborn.nexuscore.data.codec.PositionCodec;
 import com.thenexusreborn.nexuscore.util.Position;

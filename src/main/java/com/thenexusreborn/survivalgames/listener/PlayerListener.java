@@ -9,7 +9,7 @@ import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.game.death.*;
-import com.thenexusreborn.survivalgames.lobby.LobbyState;
+import com.thenexusreborn.survivalgames.lobby.*;
 import com.thenexusreborn.survivalgames.loot.*;
 import com.thenexusreborn.survivalgames.menu.TeamMenu;
 import com.thenexusreborn.survivalgames.settings.ColorMode;
@@ -157,7 +157,7 @@ public class PlayerListener implements Listener {
                             return;
                         }
                         
-                        game.getPlayer(player.getUniqueId()).getNexusPlayer().changeStat("sg_chests_looted", 1, StatOperator.ADD);
+                        game.getPlayer(player.getUniqueId()).getNexusPlayer().getStats().change("sg_chests_looted", 1, StatOperator.ADD);
                         
                         Inventory inv;
                         if (block.getType() == Material.ENDER_CHEST) {
@@ -257,7 +257,7 @@ public class PlayerListener implements Listener {
                         }
                     } else if (block.getState() instanceof Sign) {
                         NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(player.getUniqueId());
-                        if (nexusPlayer.getPreferenceValue("vanish")) {
+                        if (nexusPlayer.getToggles().getValue("vanish")) {
                             nexusPlayer.sendMessage(MsgType.WARN + "You cannot vote for a map while in vanish.");
                             return;
                         }
@@ -295,56 +295,58 @@ public class PlayerListener implements Listener {
     }
     
     @EventHandler
-    public void onVanishToggle(VanishToggleEvent e) {
-        String coloredName = e.getNexusPlayer().getRank().getColor() + e.getNexusPlayer().getName();
+    public void onToggleChange(ToggleChangeEvent e) {
+        NexusPlayer nexusPlayer = e.getNexusPlayer();
+        boolean incognito = nexusPlayer.getToggles().getValue("incognito");
+        Player player = Bukkit.getPlayer(nexusPlayer.getUniqueId());
+        Toggle toggle = e.getToggle();
         Game game = plugin.getGame();
+        Lobby lobby = plugin.getLobby();
+    
+        if (toggle.getInfo().getName().equalsIgnoreCase("fly")) {
+            if (game != null) {
+                e.setCancelled(true);
+                e.setCancelReason("You cannot toggle fly during a game.");
+            } else {
+                player.setAllowFlight(e.newValue());
+            }
         
-        Collection<NexusPlayer> players;
+            return;
+        }
+        
+        if (!toggle.getInfo().getName().equalsIgnoreCase("vanish")) {
+            return;
+        }
+    
+        Collection<NexusPlayer> players = new ArrayList<>();
         if (game == null) {
-            players = plugin.getLobby().getPlayers();
+            players.addAll(plugin.getLobby().getPlayers());
         } else {
-            players = new ArrayList<>();
             for (GamePlayer value : game.getPlayers().values()) {
                 players.add(value.getNexusPlayer());
             }
         }
         
-        String message;
-        boolean incognito = e.getNexusPlayer().getPreferenceValue("incognito");
-        if (e.getNewValue()) {
-            if (incognito) {
-                message = "";
-            } else {
-                message = "&c&l<< " + coloredName + " &eleft.";
-                if (game != null) {
-                    GamePlayer gamePlayer = game.getPlayers().get(e.getNexusPlayer().getUniqueId());
-                    if (gamePlayer.getTeam() == GameTeam.TRIBUTES || gamePlayer.getTeam() == GameTeam.MUTATIONS) {
-                        game.killPlayer(gamePlayer.getUniqueId(), new DeathInfoVanish(gamePlayer.getUniqueId()));
-                    }
+        String symbolColor = e.newValue() ? "a" : "c";
+        String symbol = e.newValue() ? ">>" : "<<";
+        String action = e.newValue() ? "joined" : "left";
+        String silent = incognito ? " &e&osilently" : "";
+        
+        String message = "&" + symbolColor + "&l" + symbol + " " + nexusPlayer.getColoredName() + " &e" + action + silent + "&e.";
+        
+        if (incognito) {
+            for (NexusPlayer p : players) {
+                if (p.getRanks().get().ordinal() <= Rank.HELPER.ordinal() || p.getUniqueId().equals(e.getNexusPlayer().getUniqueId())) {
+                    p.sendMessage(message);
                 }
             }
         } else {
-            if (incognito) {
-                message = "&a&l>> " + coloredName + " &ejoined &e&osilently&e.";
+            if (game == null) {
+                lobby.recaculateVisibility();
+                lobby.sendMessage(message);
             } else {
-                message = "&a&l>> " + coloredName + " &ejoined.";
-            }
-        }
-        
-        if (!message.equals("")) {
-            if (incognito) {
-                for (NexusPlayer player : players) {
-                    if (player.getRank().ordinal() <= Rank.HELPER.ordinal() || player.getUniqueId().equals(e.getNexusPlayer().getUniqueId())) {
-                        player.sendMessage(message);
-                    }
-                }
-            } else {
-                if (game == null) {
-                    plugin.getLobby().sendMessage(message);
-                } else {
-                    game.recalculateVisibiltiy();
-                    game.sendMessage(message);
-                }
+                game.recalculateVisibility();
+                game.sendMessage(message);
             }
         }
     }
@@ -525,7 +527,7 @@ public class PlayerListener implements Listener {
                                 if (game.getSettings().getColorMode() == ColorMode.GAME_TEAM) {
                                     color = game.getPlayer(entity.getUniqueId()).getTeam().getColor();
                                 } else {
-                                    color = game.getPlayer(entity.getUniqueId()).getNexusPlayer().getRank().getColor();
+                                    color = game.getPlayer(entity.getUniqueId()).getNexusPlayer().getRanks().get().getColor();
                                 }
                             }
                             deathInfo = new DeathInfoProjectile(player.getUniqueId(), ((Entity) projectile.getShooter()), player.getLocation().distance(entity.getLocation()), color, ((LivingEntity) projectile.getShooter()).getHealth());
@@ -621,8 +623,8 @@ public class PlayerListener implements Listener {
         NexusPlayer nexusPlayer = e.getNexusPlayer();
         if (plugin.getGame() == null) {
             if (plugin.getLobby().getPlayingCount() >= plugin.getLobby().getLobbySettings().getMaxPlayers()) {
-                boolean isStaff = nexusPlayer.getRank().ordinal() <= Rank.HELPER.ordinal();
-                boolean isInVanish = nexusPlayer.getPreferenceValue("vanish");
+                boolean isStaff = nexusPlayer.getRanks().get().ordinal() <= Rank.HELPER.ordinal();
+                boolean isInVanish = nexusPlayer.getToggles().getValue("vanish");
                 if (!(isStaff && isInVanish)) {
                     nexusPlayer.sendMessage("&cThe lobby is full.");
                     new BukkitRunnable() {

@@ -30,7 +30,7 @@ public class DeathInfoProjectile extends DeathInfo {
             Player playerShooter = (Player) shooter;
             //killerName = killerTeamColor + playerShooter.getName();
             NexusPlayer nexusPlayer = game.getPlayer(playerShooter.getUniqueId()).getNexusPlayer();
-            killerName = nexusPlayer.getRank().getColor() + nexusPlayer.getName();
+            killerName = nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName();
         } else {
             killerName = "&f" + EntityNames.getInstance().getName(shooter.getType());
         }

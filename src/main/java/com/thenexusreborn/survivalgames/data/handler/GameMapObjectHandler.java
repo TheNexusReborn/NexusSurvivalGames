@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.data.handler;
 
-import com.thenexusreborn.api.data.objects.*;
+import com.thenexusreborn.api.storage.objects.*;
 import com.thenexusreborn.survivalgames.map.*;
 
 import java.sql.SQLException;

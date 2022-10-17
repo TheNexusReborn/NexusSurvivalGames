@@ -1,31 +1,44 @@
 package com.thenexusreborn.survivalgames.game;
 
-import com.google.common.io.*;
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.api.gamearchive.*;
+import com.thenexusreborn.api.gamearchive.GameAction;
+import com.thenexusreborn.api.gamearchive.GameInfo;
 import com.thenexusreborn.api.helper.NumberHelper;
 import com.thenexusreborn.api.multicraft.MulticraftAPI;
-import com.thenexusreborn.api.player.*;
+import com.thenexusreborn.api.player.CachedPlayer;
+import com.thenexusreborn.api.player.NexusPlayer;
+import com.thenexusreborn.api.player.Rank;
+import com.thenexusreborn.api.server.Environment;
 import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.api.tags.Tag;
-import com.thenexusreborn.api.tournament.Tournament;
-import com.thenexusreborn.api.util.Environment;
-import com.thenexusreborn.nexuscore.util.*;
+import com.thenexusreborn.nexuscore.util.MCUtils;
+import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.nexuscore.util.region.Cuboid;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
-import com.thenexusreborn.survivalgames.*;
+import com.thenexusreborn.survivalgames.ControlType;
+import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.death.*;
 import com.thenexusreborn.survivalgames.game.timer.*;
-import com.thenexusreborn.survivalgames.map.*;
-import com.thenexusreborn.survivalgames.scoreboard.*;
-import com.thenexusreborn.survivalgames.settings.*;
+import com.thenexusreborn.survivalgames.map.GameMap;
+import com.thenexusreborn.survivalgames.map.MapSpawn;
+import com.thenexusreborn.survivalgames.scoreboard.GameScoreboardView;
+import com.thenexusreborn.survivalgames.scoreboard.GameTablistHandler;
+import com.thenexusreborn.survivalgames.settings.ColorMode;
+import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.entity.*;
-import org.bukkit.inventory.*;
-import org.bukkit.potion.*;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Monster;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.lang.reflect.Field;
@@ -49,7 +62,6 @@ public class Game {
     private long start, end;
     private GamePlayer firstBlood;
     private final Map<Location, Inventory> enderchestInventories = new HashMap<>();
-    private final boolean awardTournamentPoints;
     
     public Game(GameMap gameMap, GameSettings settings, Collection<NexusPlayer> players, List<UUID> spectatingPlayers) {
         this.gameMap = gameMap;
@@ -61,7 +73,7 @@ public class Game {
         List<String> playerNames = new ArrayList<>();
         for (NexusPlayer player : players) {
             GamePlayer gamePlayer = new GamePlayer(player);
-            if (spectatingPlayers.contains(player.getUniqueId()) || player.getPreferenceValue("vanish")) {
+            if (spectatingPlayers.contains(player.getUniqueId()) || player.getToggles().getValue("vanish")) {
                 gamePlayer.setTeam(GameTeam.SPECTATORS);
             } else {
                 playerNames.add(player.getName());
@@ -80,7 +92,6 @@ public class Game {
             }
         }
         gameInfo.setSettings(sb.substring(0, sb.length() - 1));
-        this.awardTournamentPoints = NexusAPI.getApi().getTournament() != null && NexusAPI.getApi().getTournament().isActive();
     }
     
     protected void setState(GameState state) {
@@ -147,30 +158,31 @@ public class Game {
         Player player = Bukkit.getPlayer(nexusPlayer.getUniqueId());
         player.getInventory().clear();
         player.getInventory().setArmorContents(null);
+        player.setAllowFlight(false);
         giveSpectatorItems(player);
         player.spigot().setCollidesWithEntities(false);
         teleportSpectator(player, this.gameMap.getCenter().toLocation(this.gameMap.getWorld()));
         this.players.put(nexusPlayer.getUniqueId(), gamePlayer);
         
-        if (nexusPlayer.getPreferenceValue("vanish")) {
+        if (nexusPlayer.getToggles().getValue("vanish")) {
             for (GamePlayer gp : this.players.values()) {
-                if (gp.getNexusPlayer().getRank().ordinal() <= Rank.HELPER.ordinal() || gp.getUniqueId().equals(nexusPlayer.getUniqueId())) {
-                    gp.sendMessage("&a&l>> " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined &e&overy silently&e.");
+                if (gp.getNexusPlayer().getRanks().get().ordinal() <= Rank.HELPER.ordinal() || gp.getUniqueId().equals(nexusPlayer.getUniqueId())) {
+                    gp.sendMessage("&a&l>> " + nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName() + " &ejoined &e&overy silently&e.");
                 }
             }
-        } else if (nexusPlayer.getPreferenceValue("incognito")) {
+        } else if (nexusPlayer.getToggles().getValue("incognito")) {
             for (GamePlayer gp : this.players.values()) {
-                if (gp.getNexusPlayer().getRank().ordinal() <= Rank.HELPER.ordinal() || gp.getUniqueId().equals(nexusPlayer.getUniqueId())) {
-                    gp.sendMessage("&a&l>> " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined &e&osilently&e.");
+                if (gp.getNexusPlayer().getRanks().get().ordinal() <= Rank.HELPER.ordinal() || gp.getUniqueId().equals(nexusPlayer.getUniqueId())) {
+                    gp.sendMessage("&a&l>> " + nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName() + " &ejoined &e&osilently&e.");
                 }
             }
         } else {
-            sendMessage("&a&l>> &b" + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined.");
+            sendMessage("&a&l>> &b" + nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName() + " &ejoined.");
         }
         nexusPlayer.getScoreboard().setView(new GameScoreboardView(nexusPlayer.getScoreboard(), plugin));
         nexusPlayer.getScoreboard().setTablistHandler(new GameTablistHandler(nexusPlayer.getScoreboard(), plugin));
         nexusPlayer.setActionBar(new GameActionBar(plugin, gamePlayer));
-        recalculateVisibiltiy();
+        recalculateVisibility();
     }
     
     public void removePlayer(NexusPlayer nexusPlayer) {
@@ -187,20 +199,20 @@ public class Game {
         
         this.players.remove(nexusPlayer.getUniqueId());
         
-        if (nexusPlayer.getPreferenceValue("vanish")) {
+        if (nexusPlayer.getToggles().getValue("vanish")) {
             for (GamePlayer gp : this.players.values()) {
-                if (gp.getNexusPlayer().getRank().ordinal() <= Rank.HELPER.ordinal()) {
-                    gp.sendMessage("&c&l<< " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft &e&overy silently&e.");
+                if (gp.getNexusPlayer().getRanks().get().ordinal() <= Rank.HELPER.ordinal()) {
+                    gp.sendMessage("&c&l<< " + nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName() + " &eleft &e&overy silently&e.");
                 }
             }
-        } else if (nexusPlayer.getPreferenceValue("incognito")) {
+        } else if (nexusPlayer.getToggles().getValue("incognito")) {
             for (GamePlayer gp : this.players.values()) {
-                if (gp.getNexusPlayer().getRank().ordinal() <= Rank.HELPER.ordinal()) {
-                    gp.sendMessage("&c&l<< " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft &e&osilently&e.");
+                if (gp.getNexusPlayer().getRanks().get().ordinal() <= Rank.HELPER.ordinal()) {
+                    gp.sendMessage("&c&l<< " + nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName() + " &eleft &e&osilently&e.");
                 }
             }
         } else {
-            sendMessage("&c&l<< &b" + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft.");
+            sendMessage("&c&l<< &b" + nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName() + " &eleft.");
         }
     }
     
@@ -236,6 +248,8 @@ public class Game {
         spawn.setPitch(0);
         spawn.setYaw(SGUtils.getAngle(spawn.toVector(), mapSpawn.toVector()));
         tribute.teleport(spawn);
+        tribute.setAllowFlight(false);
+        tribute.setFlying(false);
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -259,13 +273,13 @@ public class Game {
         }
     }
     
-    public void recalculateVisibiltiy() {
+    public void recalculateVisibility() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             GamePlayer gamePlayer = getPlayer(player.getUniqueId());
             for (Player other : Bukkit.getOnlinePlayers()) {
                 GamePlayer otherGamePlayer = getPlayer(other.getUniqueId());
                 
-                if (gamePlayer.getNexusPlayer().getPreferenceValue("vanish")) {
+                if (gamePlayer.getNexusPlayer().getToggles().getValue("vanish")) {
                     player.showPlayer(other);
                 } else if (gamePlayer.getTeam() == GameTeam.TRIBUTES && otherGamePlayer.getTeam() == GameTeam.TRIBUTES) {
                     player.showPlayer(other);
@@ -319,7 +333,7 @@ public class Game {
                 }
             }
             
-            recalculateVisibiltiy();
+            recalculateVisibility();
             
             setState(TELEPORT_START_DONE);
         } catch (Exception e) {
@@ -529,7 +543,7 @@ public class Game {
             for (GamePlayer player : this.players.values()) {
                 if (player.getTeam() == GameTeam.TRIBUTES) {
                     tributes.add(player.getUniqueId());
-                    player.getNexusPlayer().changeStat("sg_deathmatches_reached", 1, StatOperator.ADD);
+                    player.getNexusPlayer().getStats().change("sg_deathmatches_reached", 1, StatOperator.ADD);
                 } else {
                     spectators.add(player.getUniqueId());
                 }
@@ -539,7 +553,7 @@ public class Game {
             teleportTributes(tributes, mapSpawn);
             teleportSpectators(spectators, mapSpawn);
             
-            recalculateVisibiltiy();
+            recalculateVisibility();
             setState(TELEPORT_DEATHMATCH_DONE);
         } catch (Exception e) {
             e.printStackTrace();
@@ -626,7 +640,7 @@ public class Game {
         GamePlayer winner = null;
         for (GamePlayer player : this.players.values()) {
             if (player.getTeam() == GameTeam.TRIBUTES) {
-                player.getNexusPlayer().changeStat("sg_games", 1, StatOperator.ADD);
+                player.getNexusPlayer().getStats().change("sg_games", 1, StatOperator.ADD);
                 if (winner == null) {
                     winner = player;
                 } else {
@@ -639,11 +653,6 @@ public class Game {
         String winnerName;
         if (winner != null) {
             winnerName = winner.getNexusPlayer().getDisplayName();
-            if (awardTournamentPoints) {
-                Tournament tournament = NexusAPI.getApi().getTournament();
-                winner.getNexusPlayer().changeStat("sg_tournament_points", tournament.getPointsPerWin(), StatOperator.ADD);
-                winner.sendMessage("&2&l>> &a+" + tournament.getPointsPerWin() + " Points!");
-            }
         } else {
             winnerName = "&f&lNo one";
         }
@@ -651,10 +660,10 @@ public class Game {
         sendMessage("&6&l>> " + winnerName + " &a&lhas won Survival Games!");
         
         if (winner != null) {
-            winner.getNexusPlayer().changeStat("sg_wins", 1, StatOperator.ADD);
-            winner.getNexusPlayer().changeStat("sg_win_streak", 1, StatOperator.ADD);
+            winner.getNexusPlayer().getStats().change("sg_wins", 1, StatOperator.ADD);
+            winner.getNexusPlayer().getStats().change("sg_win_streak", 1, StatOperator.ADD);
             int winGain = 50;
-            int currentScore = (int) winner.getNexusPlayer().getStatValue("sg_score");
+            int currentScore = winner.getNexusPlayer().getStats().getValue("sg_score").getAsInt();
             if (currentScore < 100 && currentScore > 50) {
                 winGain *= 1.25;
             } else if (currentScore <= 50 && currentScore > 25) {
@@ -668,15 +677,15 @@ public class Game {
             } else if (currentScore >= 1000) {
                 winGain *= .5;
             }
-            winner.getNexusPlayer().changeStat("sg_score", winGain, StatOperator.ADD);
+            winner.getNexusPlayer().getStats().change("sg_score", winGain, StatOperator.ADD);
             winner.sendMessage("&2&l>> &a+" + winGain + " Score!");
-            double multiplier = winner.getNexusPlayer().getRank().getMultiplier();
-            Rank rank = winner.getNexusPlayer().getRank();
+            double multiplier = winner.getNexusPlayer().getRanks().get().getMultiplier();
+            Rank rank = winner.getNexusPlayer().getRanks().get();
             String multiplierMessage = rank.getColor() + "&l * x" + MCUtils.formatNumber(multiplier) + " " + rank.getPrefix() + " Bonus";
             if (settings.isGiveXp()) {
                 double xp = 10;
                 xp *= multiplier;
-                winner.getNexusPlayer().changeStat("xp", xp, StatOperator.ADD);
+                winner.getNexusPlayer().getStats().change("xp", xp, StatOperator.ADD);
                 String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(xp) + " &2&lXP&a&l!";
                 if (multiplier > 1) {
                     winner.sendMessage(baseMessage + multiplierMessage);
@@ -688,7 +697,7 @@ public class Game {
             if (settings.isGiveCredits()) {
                 double credits = 10;
                 credits *= multiplier;
-                winner.getNexusPlayer().changeStat("credits", credits, StatOperator.ADD);
+                winner.getNexusPlayer().getStats().change("credits", credits, StatOperator.ADD);
                 String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(credits) + " &3&lCREDITS&a&l!";
                 if (multiplier > 1) {
                     winner.sendMessage(baseMessage + multiplierMessage);
@@ -811,15 +820,15 @@ public class Game {
         
         boolean vanished = deathInfo.getType() == DeathType.VANISH;
         
-        int score = (int) gamePlayer.getNexusPlayer().getStatValue("sg_score");
+        int score = gamePlayer.getNexusPlayer().getStats().getValue("sg_score").getAsInt();
         int lost = (int) Math.ceil(score / 10D);
         
         if (!vanished) {
-            gamePlayer.getNexusPlayer().changeStat("sg_score", lost, StatOperator.SUBTRACT);
+            gamePlayer.getNexusPlayer().getStats().change("sg_score", lost, StatOperator.SUBTRACT);
             gamePlayer.sendMessage("&4&l>> &cYou lost " + lost + " Score for dying.");
-            gamePlayer.getNexusPlayer().changeStat("sg_games", 1, StatOperator.ADD);
-            gamePlayer.getNexusPlayer().changeStat("sg_win_streak", 0, StatOperator.SET);
-            gamePlayer.getNexusPlayer().changeStat("sg_deaths", 1, StatOperator.ADD);
+            gamePlayer.getNexusPlayer().getStats().change("sg_games", 1, StatOperator.ADD);
+            gamePlayer.getNexusPlayer().getStats().change("sg_win_streak", 0, StatOperator.SET);
+            gamePlayer.getNexusPlayer().getStats().change("sg_deaths", 1, StatOperator.ADD);
         }
         
         gamePlayer.sendMessage(GameTeam.TRIBUTES.getLeaveMessage());
@@ -841,7 +850,7 @@ public class Game {
                     killerName += "&c";
                 }
             } else {
-                killerName = getPlayer(playerDeath.getKiller()).getNexusPlayer().getRank().getColor();
+                killerName = getPlayer(playerDeath.getKiller()).getNexusPlayer().getRanks().get().getColor();
             }
             killer = getPlayer(playerDeath.getKiller());
             killerHealth = playerDeath.getKillerHealth();
@@ -854,7 +863,7 @@ public class Game {
                     killerName += "&d";
                 }
             } else {
-                killerName = getPlayer(death.getKiller()).getNexusPlayer().getRank().getColor();
+                killerName = getPlayer(death.getKiller()).getNexusPlayer().getRanks().get().getColor();
             }
             killer = getPlayer(death.getKiller());
             Player killerPlayer = Bukkit.getPlayer(killer.getUniqueId());
@@ -870,7 +879,7 @@ public class Game {
                         killerName += "&d";
                     }
                 } else {
-                    killerName = getPlayer(death.getShooter().getUniqueId()).getNexusPlayer().getRank().getColor();
+                    killerName = getPlayer(death.getShooter().getUniqueId()).getNexusPlayer().getRanks().get().getColor();
                 }
                 killer = getPlayer(death.getShooter().getUniqueId());
                 newTeam = GameTeam.SPECTATORS;
@@ -894,15 +903,15 @@ public class Game {
             playSound(Sound.WITHER_SPAWN);
         }
         
-        recalculateVisibiltiy();
+        recalculateVisibility();
         
         if (killer != null) {
             killer.setKills(killer.getKills() + 1);
-            killer.getNexusPlayer().changeStat("sg_kills", 1, StatOperator.ADD);
+            killer.getNexusPlayer().getStats().change("sg_kills", 1, StatOperator.ADD);
             killer.setKillStreak(killer.getKillStreak() + 1);
-            int highestKillStreak = (int) killer.getNexusPlayer().getStatValue("sg_highest_kill_streak");
+            int highestKillStreak = killer.getNexusPlayer().getStats().getValue("sg_highest_kill_streak").getAsInt();
             if (highestKillStreak < killer.getKillStreak()) {
-                killer.getNexusPlayer().changeStat("sg_highest_kill_streak", killer.getKillStreak() - highestKillStreak, StatOperator.ADD);
+                killer.getNexusPlayer().getStats().change("sg_highest_kill_streak", killer.getKillStreak() - highestKillStreak, StatOperator.ADD);
                 if (!killer.isNewPersonalBestNotified()) {
                     killer.sendMessage("&6&l>> &a&lNEW PERSONAL BEST!");
                     killer.setNewPersonalBestNotified(true);
@@ -914,19 +923,19 @@ public class Game {
             killerName += killer.getNexusPlayer().getName();
             gamePlayer.sendMessage("&4&l>> &cYour killer &8(" + killerName + "&8) &chad &4" + NumberHelper.formatNumber(killerHealth) + " HP &cremaining!");
             if (!killer.getUniqueId().equals(player.getUniqueId())) {
-                killer.getNexusPlayer().changeStat("sg_score", lost, StatOperator.ADD);
+                killer.getNexusPlayer().getStats().change("sg_score", lost, StatOperator.ADD);
                 killer.sendMessage("&2&l>> &a+" + lost + " Score!");
             } else {
                 killer.sendMessage("&2&l>> &cYou killed yourself. No score for you.");
             }
-            double multiplier = killer.getNexusPlayer().getRank().getMultiplier();
-            Rank rank = killer.getNexusPlayer().getRank();
+            double multiplier = killer.getNexusPlayer().getRanks().get().getMultiplier();
+            Rank rank = killer.getNexusPlayer().getRanks().get();
             String multiplierMessage = rank.getColor() + "&l * x" + MCUtils.formatNumber(multiplier) + " " + rank.getPrefix() + " Bonus";
             if (settings.isGiveXp()) {
                 double xp = 2;
                 xp *= multiplier;
                 if (!killer.getUniqueId().equals(player.getUniqueId())) {
-                    killer.getNexusPlayer().changeStat("xp", xp, StatOperator.ADD);
+                    killer.getNexusPlayer().getStats().change("xp", xp, StatOperator.ADD);
                     String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(xp) + " &2&lXP&a&l!";
                     if (multiplier > 1) {
                         killer.sendMessage(baseMessage + multiplierMessage);
@@ -942,7 +951,7 @@ public class Game {
                 double credits = 2;
                 credits *= multiplier;
                 if (!(killer.getUniqueId().equals(player.getUniqueId()))) {
-                    killer.getNexusPlayer().changeStat("credits", credits, StatOperator.ADD);
+                    killer.getNexusPlayer().getStats().change("credits", credits, StatOperator.ADD);
                     String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(credits) + " &3&lCREDITS&a&l!";
                     if (multiplier > 1) {
                         killer.sendMessage(baseMessage + multiplierMessage);
@@ -988,23 +997,6 @@ public class Game {
         
         if (sendDeathMessage) {
             this.sendMessage(deathInfo.getDeathMessage(this));
-        }
-        
-        if (oldTeam == GameTeam.TRIBUTES) {
-            Tournament tournament = NexusAPI.getApi().getTournament();
-            if (killer != null) {
-                if (awardTournamentPoints) {
-                    killer.getNexusPlayer().changeStat("sg_tournament_points", tournament.getPointsPerKill(), StatOperator.ADD);
-                    killer.sendMessage("&2&l>> &a+" + tournament.getPointsPerKill() + " Points!");
-                    
-                    for (GamePlayer p : this.players.values()) {
-                        if (p.getTeam() == GameTeam.TRIBUTES) {
-                            killer.getNexusPlayer().changeStat("sg_tournament_points", tournament.getPointsPerSurvival(), StatOperator.ADD);
-                            p.sendMessage("&2&l>> &a+" + tournament.getPointsPerSurvival() + " Points!");
-                        }
-                    }
-                }
-            }
         }
         
         new BukkitRunnable() {
