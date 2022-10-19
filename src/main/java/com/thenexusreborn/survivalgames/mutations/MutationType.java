@@ -33,21 +33,19 @@ public class MutationType {
     private ItemStack weapon;
     private DisguiseType disguiseType;
     private int unlockCost;
-    private int perUseCost;
     private int health;
     private boolean healthRegen;
     private List<DamageCause> damageImmunities;
     private List<MutationEffect> effects;
     private List<MutationItem> items;
     
-    MutationType(String id, String displayName, ArmorType armorType, ItemStack weapon, DisguiseType disguiseType, int unlockCost, int perUseCost, int health, boolean healthRegen, List<DamageCause> damageImmunities, List<MutationEffect> effects, List<MutationItem> items) {
+    MutationType(String id, String displayName, ArmorType armorType, ItemStack weapon, DisguiseType disguiseType, int unlockCost, int health, boolean healthRegen, List<DamageCause> damageImmunities, List<MutationEffect> effects, List<MutationItem> items) {
         this.id = id;
         this.displayName = displayName;
         this.armorType = armorType;
         this.weapon = weapon;
         this.disguiseType = disguiseType;
         this.unlockCost = unlockCost;
-        this.perUseCost = perUseCost;
         this.health = health;
         this.healthRegen = healthRegen;
         this.damageImmunities = damageImmunities;
@@ -77,10 +75,6 @@ public class MutationType {
     
     public int getUnlockCost() {
         return unlockCost;
-    }
-    
-    public int getPerUseCost() {
-        return perUseCost;
     }
     
     public int getHealth() {
@@ -123,7 +117,6 @@ public class MutationType {
         private ItemStack weapon;
         private DisguiseType disguiseType;
         private int unlockCost;
-        private int perUseCost;
         private int health;
         private boolean healthRegen = true;
         private List<DamageCause> damageImmunities = new ArrayList<>();
@@ -149,11 +142,6 @@ public class MutationType {
         
         public Builder unlockCost(int unlockCost) {
             this.unlockCost = unlockCost;
-            return this;
-        }
-        
-        public Builder perUseCost(int perUseCost) {
-            this.perUseCost = perUseCost;
             return this;
         }
         
@@ -190,7 +178,7 @@ public class MutationType {
                 health = 20;
             }
             
-            return new MutationType(id, displayName, armorType, weapon, disguiseType, unlockCost, perUseCost, health, healthRegen, damageImmunities, effects, items);
+            return new MutationType(id, displayName, armorType, weapon, disguiseType, unlockCost, health, healthRegen, damageImmunities, effects, items);
         }
     }
 }
