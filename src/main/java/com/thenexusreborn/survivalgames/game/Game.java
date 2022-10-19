@@ -24,6 +24,7 @@ import com.thenexusreborn.survivalgames.game.death.*;
 import com.thenexusreborn.survivalgames.game.timer.*;
 import com.thenexusreborn.survivalgames.map.GameMap;
 import com.thenexusreborn.survivalgames.map.MapSpawn;
+import com.thenexusreborn.survivalgames.mutations.Mutation;
 import com.thenexusreborn.survivalgames.scoreboard.GameScoreboardView;
 import com.thenexusreborn.survivalgames.scoreboard.GameTablistHandler;
 import com.thenexusreborn.survivalgames.settings.ColorMode;
@@ -1097,5 +1098,13 @@ public class Game {
     
     public GameInfo getGameInfo() {
         return gameInfo;
+    }
+    
+    public void addMutation(Mutation mutation) {
+        GamePlayer gamePlayer = getPlayer(mutation.getPlayer());
+        NexusPlayer nexusPlayer = gamePlayer.getNexusPlayer();
+        sendMessage("&6&l>> " + nexusPlayer.getColoredName() + " &6has &lMUTATED &6as a(n) &l" + mutation.getType().getDisplayName() + " &6and seeks revenge on &a" + Bukkit.getPlayer(mutation.getTarget()).getName() + "&6!");
+        
+        //TODO logic of mutations
     }
 }
