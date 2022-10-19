@@ -18,7 +18,7 @@ import static org.bukkit.potion.PotionEffectType.*;
 public class MutationType {
     private static final ItemBuilder UNBREAKABLE_GOLD_SWORD = ItemBuilder.start(Material.GOLD_SWORD).unbreakable(true);
     
-    public static final MutationType PIG_ZOMBIE = new Builder("pig_zombie", ArmorType.LEATHER, UNBREAKABLE_GOLD_SWORD.build(), DisguiseType.PIG_ZOMBIE).addDamageImmunity(FIRE).addDamageImmunity(FIRE_TICK).addEffect(SPEED, 1).create();
+    public static final MutationType PIG_ZOMBIE = new Builder("pig_zombie", ArmorType.LEATHER, UNBREAKABLE_GOLD_SWORD.build(), DisguiseType.PIG_ZOMBIE).addDamageImmunity(FIRE).addDamageImmunity(FIRE_TICK).addEffect(SPEED, 1).healthRegen(false).create();
     public static final MutationType ZOMBIE = new Builder("zombie", ArmorType.IRON, UNBREAKABLE_GOLD_SWORD.build(), DisguiseType.ZOMBIE).unlockCost(3000).addEffect(SLOW, 0).create();
     public static final MutationType ENDERMAN = new Builder("enderman", ArmorType.LEATHER, UNBREAKABLE_GOLD_SWORD.build(), DisguiseType.ENDERMAN).unlockCost(5000).addItem(1, new ItemStack(Material.ENDER_PEARL, 32)).create();
     public static final MutationType SKELETON = new Builder("skeleton", ArmorType.LEATHER, new ItemStack(Material.WOOD_SWORD), DisguiseType.SKELETON).unlockCost(3000).addItem(1, ItemBuilder.start(Material.BOW).addEnchantment(Enchantment.ARROW_INFINITE, 1).unbreakable(true).build()).addItem(2, new ItemStack(Material.ARROW)).addEffect(SPEED, 0).create();
