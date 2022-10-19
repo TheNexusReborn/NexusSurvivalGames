@@ -83,6 +83,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.thenexusreborn</groupId>
+            <artifactId>NexusDisguises</artifactId>
+            <version>1.0-ALPHA</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>me.vagdedes</groupId>
             <artifactId>Spartan</artifactId>
             <scope>system</scope>
