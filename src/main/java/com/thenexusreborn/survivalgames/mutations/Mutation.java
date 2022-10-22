@@ -7,6 +7,7 @@ import com.thenexusreborn.survivalgames.mutations.timer.MutationCountdownCallbac
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.*;
 import java.util.UUID;
 
 public abstract class Mutation {
@@ -18,7 +19,29 @@ public abstract class Mutation {
     protected final UUID target;
     protected Timer countdownTimer;
     
-    public Mutation(MutationType type, UUID player, UUID target) {
+    public static Mutation createInstance(MutationType type, UUID player, UUID target) {
+        Class<? extends Mutation> clazz = type.getClazz();
+        Constructor<? extends Mutation> constructor;
+        try {
+            constructor = clazz.getDeclaredConstructor(UUID.class, UUID.class);
+        } catch (NoSuchMethodException e) {
+            plugin.getLogger().severe("Mutation Class " + clazz.getName() + " does not have the constructor (UUID player, UUID target)");
+            return null;
+        }
+        
+        constructor.setAccessible(true);
+    
+        try {
+            return constructor.newInstance(player, target);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            plugin.getLogger().severe("Could not create an instance of the Mutation Class: " + clazz.getName());
+            plugin.getLogger().severe("Error Message: " + e.getClass().getName() + ": " + e.getMessage());
+        }
+        
+        return null;
+    }
+    
+    protected Mutation(MutationType type, UUID player, UUID target) {
         this.type = type;
         this.player = player;
         this.target = target;
