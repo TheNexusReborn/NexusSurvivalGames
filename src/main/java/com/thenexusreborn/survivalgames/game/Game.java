@@ -747,9 +747,9 @@ public class Game {
                                     }
                                 }
                             }
-                            
-                            Tag tag = new Tag(gameInfo.getId() + "th");
-                            nexusPlayer.unlockTag(tag.getName());
+
+                            Tag tag = new Tag(nexusPlayer.getUniqueId(), gameInfo.getId() + "th", System.currentTimeMillis());
+                            nexusPlayer.getTags().add(tag);
                             nexusPlayer.sendMessage(MsgType.INFO + "Unlocked the tag " + tag.getDisplayName());
                             NexusAPI.getApi().getPrimaryDatabase().push(nexusPlayer);
                         });
