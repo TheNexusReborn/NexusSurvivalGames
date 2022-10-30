@@ -1,33 +1,44 @@
 package com.thenexusreborn.survivalgames.menu;
 
+import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
-import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.nexuscore.menu.element.Element;
 import com.thenexusreborn.nexuscore.menu.element.button.Button;
 import com.thenexusreborn.nexuscore.menu.gui.Menu;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.*;
-import com.thenexusreborn.survivalgames.game.death.*;
-import com.thenexusreborn.survivalgames.mutations.*;
+import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.GamePlayer;
+import com.thenexusreborn.survivalgames.game.GameTeam;
+import com.thenexusreborn.survivalgames.game.death.DeathInfo;
+import com.thenexusreborn.survivalgames.game.death.DeathInfoPlayerKill;
+import com.thenexusreborn.survivalgames.game.death.DeathType;
+import com.thenexusreborn.survivalgames.mutations.Mutation;
+import com.thenexusreborn.survivalgames.mutations.MutationType;
+import com.thenexusreborn.survivalgames.mutations.PlayerMutations;
+import com.thenexusreborn.survivalgames.mutations.UnlockedMutation;
 import org.bukkit.Material;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class MutateGui extends Menu {
     public MutateGui(SurvivalGames plugin, NexusPlayer player) {
         super(plugin, "mutateas", "&lMutate as...", 3);
-    
-        Set<String> unlockedMutations = player.getStats().getValue("sg_unlocked_mutations").getAsStringSet();
-        if (unlockedMutations.isEmpty() || !unlockedMutations.contains("pig_zombie")) {
-            unlockedMutations.add("pig_zombie");
+
+        PlayerMutations unlockedMutations = plugin.getUnlockedMutations(player.getUniqueId());
+
+        if (!unlockedMutations.isUnlocked("pig_zombie")) {
+            unlockedMutations.add(new UnlockedMutation(player.getUniqueId(), "pig_zombie", player.getStats().getValue("firstjoined").getAsLong()));
         }
+
         double credits = player.getStats().getValue("credits").getAsDouble();
     
         List<String> purchased = new ArrayList<>(), available = new ArrayList<>(), locked = new ArrayList<>();
         for (MutationType type : MutationType.TYPES) {
-            if (unlockedMutations.contains(type.getId().toLowerCase())) {
+            if (unlockedMutations.isUnlocked(type.getId().toLowerCase())) {
                 purchased.add(type.getId());
             } else if (type.getUnlockCost()<= credits) {
                 available.add(type.getId());
@@ -107,7 +118,10 @@ public class MutateGui extends Menu {
             Button button = new Button(ItemBuilder.start(type.getIcon()).displayName("&e&l" + type.getDisplayName()).lore("&eCost: &f" + type.getUnlockCost() + " &3Credits", "&6&lLeft Click &fto purchase.").build());
             button.setLeftClickAction((p, menu, click) -> {
                 player.removeCredits(type.getUnlockCost());
-                player.getStats().change("sg_unlocked_mutations", type.getId(), StatOperator.ADD);
+                UnlockedMutation unlockedMutation = new UnlockedMutation(player.getUniqueId(), type.getId(), System.currentTimeMillis());
+                NexusAPI.getApi().getThreadFactory().runAsync(() -> NexusAPI.getApi().getPrimaryDatabase().push(unlockedMutation));
+                NexusAPI.getApi().getNetworkManager().send("unlockmutation", player.getUniqueId().toString(), unlockedMutation.getType(), unlockedMutation.getTimestamp() + "");
+                unlockedMutations.add(unlockedMutation);
                 player.sendMessage(MsgType.INFO + "You bought the mutation &b" + type.getDisplayName() + " &efor &b" + type.getUnlockCost() + " &ecredits.");
                 p.closeInventory();
             });

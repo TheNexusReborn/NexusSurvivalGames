@@ -2,6 +2,7 @@ package com.thenexusreborn.survivalgames;
 
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.maven.MavenLibrary;
+import com.thenexusreborn.api.network.cmd.NetworkCommand;
 import com.thenexusreborn.api.registry.*;
 import com.thenexusreborn.api.server.Environment;
 import com.thenexusreborn.api.stats.StatType;
@@ -17,6 +18,8 @@ import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.tasks.*;
 import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.map.*;
+import com.thenexusreborn.survivalgames.mutations.PlayerMutations;
+import com.thenexusreborn.survivalgames.mutations.UnlockedMutation;
 import com.thenexusreborn.survivalgames.settings.*;
 import com.thenexusreborn.survivalgames.tasks.ServerStatusTask;
 import org.bukkit.*;
@@ -48,6 +51,8 @@ public class SurvivalGames extends NexusSpigotPlugin {
     private final Map<String, GameSettings> gameSettings = new HashMap<>();
     private Database mapDatabase;
     
+    private final Map<UUID, PlayerMutations> playerUnlockedMutations = new HashMap<>();
+
     @Override
     public void onLoad() {
         nexusCore = (NexusCore) Bukkit.getPluginManager().getPlugin("NexusCore");
@@ -142,7 +147,24 @@ public class SurvivalGames extends NexusSpigotPlugin {
         } else {
             lobby.setSpawnpoint(Bukkit.getWorld(ServerProperties.getLevelName()).getSpawnLocation());
         }
-        
+
+        getLogger().info("Loading all unlocked mutations");
+        try {
+            List<UnlockedMutation> unlockedMutations = NexusAPI.getApi().getPrimaryDatabase().get(UnlockedMutation.class);
+            for (UnlockedMutation unlockedMutation : unlockedMutations) {
+                if (this.playerUnlockedMutations.containsKey(unlockedMutation.getUuid())) {
+                    this.playerUnlockedMutations.get(unlockedMutation.getUuid()).add(unlockedMutation);
+                } else {
+                    PlayerMutations value = new PlayerMutations(unlockedMutation.getUuid());
+                    value.add(unlockedMutation);
+                    this.playerUnlockedMutations.put(unlockedMutation.getUuid(), value);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        getLogger().info("Unlocked mutations loaded.");
+
         this.chatHandler = new SGChatHandler(this);
         nexusCore.getChatManager().setHandler(chatHandler);
         
@@ -199,7 +221,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
         registry.register("sg_mutation_kills", "Kills as a Mutation", StatType.INTEGER, 0);
         registry.register("sg_mutation_deaths", "Deaths as a Mutation", StatType.INTEGER, 0);
         registry.register("sg_mutation_passes", "Mutation Passes", StatType.INTEGER, 0);
-        registry.register("sg_unlocked_mutations", "Unlocked Mutations", StatType.STRING_SET, new HashSet<>());
         registry.register("sg_sponsored_others", "Times Sponsored Others", StatType.INTEGER, 0);
         registry.register("sg_sponsors_received", "Times Sponsored By Others", StatType.INTEGER, 0);
     }
@@ -295,13 +316,24 @@ public class SurvivalGames extends NexusSpigotPlugin {
     public void addGameSettings(GameSettings settings) {
         this.gameSettings.put(settings.getType().toLowerCase(), settings);
     }
-    
+
+    @Override
+    public void registerNetworkCommands(NetworkCommandRegistry registry) {
+        registry.register(new NetworkCommand("unlockmutation", (cmd, origin, args) -> {
+            UUID uuid = UUID.fromString(args[0]);
+            String type = args[1];
+            long timestamp = Long.parseLong(args[2]);
+            getUnlockedMutations(uuid).add(new UnlockedMutation(uuid, type, timestamp));
+        }));
+    }
+
     @Override
     public void registerDatabases(DatabaseRegistry registry) {
         for (Database database : registry.getObjects()) {
             if (database.isPrimary()) {
                 database.registerClass(GameSettings.class);
                 database.registerClass(LobbySettings.class);
+                database.registerClass(UnlockedMutation.class);
             }
         }
         
@@ -310,5 +342,15 @@ public class SurvivalGames extends NexusSpigotPlugin {
         mapDatabase.registerClass(GameMap.class);
         mapDatabase.registerClass(MapSpawn.class);
         registry.register(mapDatabase);
+    }
+
+    public PlayerMutations getUnlockedMutations(UUID uniqueId) {
+        PlayerMutations playerMutations = this.playerUnlockedMutations.get(uniqueId);
+        if (playerMutations == null) {
+            playerMutations = new PlayerMutations(uniqueId);
+            this.playerUnlockedMutations.put(uniqueId, playerMutations);
+        }
+
+        return playerMutations;
     }
 }
