@@ -3,6 +3,7 @@ package com.thenexusreborn.survivalgames.game;
 import com.thenexusreborn.api.player.IActionBar;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
+import com.thenexusreborn.survivalgames.mutations.Mutation;
 
 public class GameActionBar implements IActionBar {
     
@@ -21,6 +22,12 @@ public class GameActionBar implements IActionBar {
             return "";
         }
         
+        if (player.getTeam() == GameTeam.MUTATIONS) {
+            Mutation mutation = player.getMutation();
+            GamePlayer target = game.getPlayer(mutation.getTarget());
+            return "&c&lSEEKING REVENGE ON &a" + target.getNexusPlayer().getName();
+        }
+
         if (game.getState() == GameState.SETTING_UP) {
             return "&aSetting up the map...";
         }

@@ -223,4 +223,8 @@ public class MutationType {
             return new MutationType(id, displayName, clazz, icon, armorType, weapon, disguiseType, unlockCost, health, healthRegen, damageImmunities, effects, items);
         }
     }
+
+    public boolean healthRegen() {
+        return healthRegen;
+    }
 }

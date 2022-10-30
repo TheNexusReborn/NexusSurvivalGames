@@ -11,7 +11,9 @@ import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.game.death.*;
 import com.thenexusreborn.survivalgames.lobby.*;
 import com.thenexusreborn.survivalgames.loot.*;
+import com.thenexusreborn.survivalgames.menu.MutateGui;
 import com.thenexusreborn.survivalgames.menu.TeamMenu;
+import com.thenexusreborn.survivalgames.mutations.MutationType;
 import com.thenexusreborn.survivalgames.settings.ColorMode;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.*;
@@ -40,6 +42,48 @@ public class PlayerListener implements Listener {
         this.plugin = plugin;
     }
     
+    @EventHandler
+    public void onEntityDamage(EntityDamageEvent e) {
+        if (!(e.getEntity() instanceof Player)) {
+            return;
+        }
+
+        if (plugin.getGame() == null) {
+            return;
+        }
+
+        GamePlayer player = plugin.getGame().getPlayer(e.getEntity().getUniqueId());
+        if (player.getTeam() != GameTeam.MUTATIONS) {
+            return;
+        }
+
+        MutationType mutationType = player.getMutation().getType();
+        if (mutationType.getDamageImmunities().contains(e.getCause())) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onHealthRegen(EntityRegainHealthEvent e) {
+        if (!(e.getEntity() instanceof Player)) {
+            return;
+        }
+
+        if (plugin.getGame() == null) {
+            return;
+        }
+
+        GamePlayer player = plugin.getGame().getPlayer(e.getEntity().getUniqueId());
+        if (player.getTeam() != GameTeam.MUTATIONS) {
+            return;
+        }
+
+        MutationType mutationType = player.getMutation().getType();
+        if (!mutationType.healthRegen()) {
+            e.setCancelled(true);
+        }
+    }
+
     @EventHandler
     public void onItemDrop(PlayerDropItemEvent e) {
         if (plugin.getLobby().checkMapEditing(e.getPlayer())) {
@@ -75,10 +119,6 @@ public class PlayerListener implements Listener {
     
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent e) {
-        if (e.isCancelled()) {
-            return;
-        }
-    
         Player player = e.getPlayer();
         if (plugin.getLobby().checkMapEditing(player)) {
             return;
@@ -109,7 +149,7 @@ public class PlayerListener implements Listener {
                                 }
                             }
                         } else if (item.getType() == Material.ROTTEN_FLESH) {
-                            gamePlayer.sendMessage("&6&l>> &cThat is currently not implemented.");
+                            player.openInventory(new MutateGui(plugin, gamePlayer.getNexusPlayer()).getInventory());
                         } else if (item.getType() == Material.WATCH) {
                             player.teleport(game.getGameMap().getCenter().toLocation(game.getGameMap().getWorld()));
                             gamePlayer.sendMessage("&6&l>> &eTeleported to the Map Center.");
@@ -119,7 +159,6 @@ public class PlayerListener implements Listener {
                         }
                     }
                 }
-                
                 
                 e.setCancelled(true);
                 return;

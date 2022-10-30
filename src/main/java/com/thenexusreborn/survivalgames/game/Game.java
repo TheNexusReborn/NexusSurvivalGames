@@ -13,6 +13,9 @@ import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.server.Environment;
 import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.api.tags.Tag;
+import com.thenexusreborn.disguise.DisguiseAPI;
+import com.thenexusreborn.disguise.disguisetypes.MobDisguise;
+import com.thenexusreborn.nexuscore.util.ArmorType;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
@@ -22,9 +25,13 @@ import com.thenexusreborn.survivalgames.ControlType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.death.*;
 import com.thenexusreborn.survivalgames.game.timer.*;
+import com.thenexusreborn.survivalgames.loot.Items;
 import com.thenexusreborn.survivalgames.map.GameMap;
 import com.thenexusreborn.survivalgames.map.MapSpawn;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
+import com.thenexusreborn.survivalgames.mutations.MutationEffect;
+import com.thenexusreborn.survivalgames.mutations.MutationItem;
+import com.thenexusreborn.survivalgames.mutations.MutationType;
 import com.thenexusreborn.survivalgames.scoreboard.GameScoreboardView;
 import com.thenexusreborn.survivalgames.scoreboard.GameTablistHandler;
 import com.thenexusreborn.survivalgames.settings.ColorMode;
@@ -94,7 +101,7 @@ public class Game {
         }
         gameInfo.setSettings(sb.substring(0, sb.length() - 1));
     }
-    
+
     protected void setState(GameState state) {
         this.state = state;
         this.gameInfo.getActions().add(new GameAction(System.currentTimeMillis(), "statechange", state.name()));
@@ -242,23 +249,31 @@ public class Game {
         }
     }
     
-    public void teleportTribute(Player tribute, Location mapSpawn, Location spawn) {
+    private void teleportToGameSpawn(Player player, Location mapSpawn, Location spawn, GameTeam gameTeam) {
         spawn.setX(spawn.getX() + 0.5);
         spawn.setY(spawn.getY() + 2.0);
         spawn.setZ(spawn.getZ() + 0.5);
         spawn.setPitch(0);
         spawn.setYaw(SGUtils.getAngle(spawn.toVector(), mapSpawn.toVector()));
-        tribute.teleport(spawn);
-        tribute.setAllowFlight(false);
-        tribute.setFlying(false);
+        player.teleport(spawn);
+        player.setAllowFlight(false);
+        player.setFlying(false);
         new BukkitRunnable() {
             @Override
             public void run() {
-                tribute.setGameMode(GameTeam.TRIBUTES.getGameMode());
+                player.setGameMode(gameTeam.getGameMode());
             }
         }.runTaskLater(plugin, 1L);
     }
-    
+
+    public void teleportTribute(Player tribute, Location mapSpawn, Location spawn) {
+        teleportToGameSpawn(tribute, mapSpawn, spawn, GameTeam.TRIBUTES);
+    }
+
+    public void teleportMutation(Player mutation, Location mapSpawn, Location spawn) {
+        teleportToGameSpawn(mutation, mapSpawn, spawn, GameTeam.MUTATIONS);
+    }
+
     public void teleportSpectator(Player spectator, Location mapSpawn) {
         try {
             spectator.teleport(mapSpawn);
@@ -282,10 +297,10 @@ public class Game {
                 
                 if (gamePlayer.getNexusPlayer().getToggles().getValue("vanish")) {
                     player.showPlayer(other);
-                } else if (gamePlayer.getTeam() == GameTeam.TRIBUTES && otherGamePlayer.getTeam() == GameTeam.TRIBUTES) {
+                } else if (gamePlayer.getTeam() != GameTeam.SPECTATORS && otherGamePlayer.getTeam() != GameTeam.SPECTATORS) {
                     player.showPlayer(other);
                     other.showPlayer(player);
-                } else if (gamePlayer.getTeam() == GameTeam.SPECTATORS && otherGamePlayer.getTeam() == GameTeam.TRIBUTES) {
+                } else if (gamePlayer.getTeam() == GameTeam.SPECTATORS && otherGamePlayer.getTeam() != GameTeam.SPECTATORS) {
                     player.showPlayer(other);
                     other.hidePlayer(player);
                 } else {
@@ -346,7 +361,6 @@ public class Game {
     public void assignStartingTeams() {
         try {
             setState(ASSIGN_TEAMS);
-            int totalTributes = 0;
             UUID uuid;
             Queue<UUID> tributes = new LinkedList<>(), spectators = new LinkedList<>();
             while ((uuid = SurvivalGames.PLAYER_QUEUE.poll()) != null) {
@@ -1014,10 +1028,23 @@ public class Game {
     }
     
     public void giveSpectatorItems(Player p) {
+        GamePlayer gamePlayer = getPlayer(p.getUniqueId());
         ItemStack tributesBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&a&lTributes &7&o(Right Click)").build();
         ItemStack mutationsBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&d&lMutations &c(WIP)").build();
         ItemStack spectatorsBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&c&lSpectators &7&o(Right Click)").build();
-        ItemStack mutateItem = ItemBuilder.start(Material.ROTTEN_FLESH).displayName("&cWIP").build();
+        String mutateName = "";
+        if (gamePlayer.hasMutated()) {
+            mutateName = "&cCan't mutate again.";
+        } else {
+            if (!(gamePlayer.getDeathInfo() instanceof DeathInfoPlayerKill)) {
+                mutateName = "&cCannot mutate.";
+            } else {
+                DeathInfoPlayerKill playerKill = (DeathInfoPlayerKill) gamePlayer.getDeathInfo();
+                GamePlayer killer = getPlayer(playerKill.getKiller());
+                mutateName = "&c&lTAKE REVENGE   &eTarget: " + killer.getNexusPlayer().getColoredName() + "   &ePasses: &b" + gamePlayer.getNexusPlayer().getStats().getValue("sg_mutation_passes").getAsInt();
+            }
+        }
+        ItemStack mutateItem = ItemBuilder.start(Material.ROTTEN_FLESH).displayName(mutateName).build();
         ItemStack compass = ItemBuilder.start(Material.COMPASS).displayName("&fPlayer Tracker").build();
         ItemStack tpCenter = ItemBuilder.start(Material.WATCH).displayName("&e&lTeleport to Map Center &7&o(Right Click)").build();
         ItemStack hubItem = ItemBuilder.start(Material.WOOD_DOOR).displayName("&e&lReturn to Hub &7(Right Click)").build();
@@ -1104,7 +1131,37 @@ public class Game {
         GamePlayer gamePlayer = getPlayer(mutation.getPlayer());
         NexusPlayer nexusPlayer = gamePlayer.getNexusPlayer();
         sendMessage("&6&l>> " + nexusPlayer.getColoredName() + " &6has &lMUTATED &6as a(n) &l" + mutation.getType().getDisplayName() + " &6and seeks revenge on &a" + Bukkit.getPlayer(mutation.getTarget()).getName() + "&6!");
+
+        MapSpawn spawn = gameMap.getSpawns().get(new Random().nextInt(gameMap.getSpawns().size()));
+        Location location = spawn.toLocation(this.gameMap.getWorld());
+        Player player = Bukkit.getPlayer(nexusPlayer.getUniqueId());
         
-        //TODO logic of mutations
+        gamePlayer.sendMessage(gamePlayer.getTeam().getLeaveMessage());
+        gamePlayer.setTeam(GameTeam.MUTATIONS);
+        gamePlayer.sendMessage(gamePlayer.getTeam().getJoinMessage());
+        DisguiseAPI.disguiseEntity(player, new MobDisguise(mutation.getType().getDisguiseType()));
+
+        gamePlayer.setMutated(true);
+        teleportMutation(player, this.gameMap.getCenter().toLocation(gameMap.getWorld()), location);
+        recalculateVisibility();
+        player.getInventory().clear();
+        player.getInventory().setArmorContents(null);
+
+        MutationType type = mutation.getType();
+        PlayerInventory inv = player.getInventory();
+        inv.setItem(0, type.getWeapon());
+        inv.setItem(1, Items.PLAYER_TRACKER.getItemStack());
+        for (MutationItem item : type.getItems()) {
+            inv.setItem(1 + item.getSlotOffset(), item.getItemStack());
+        }
+        ArmorType armorType = type.getArmorType();
+        inv.setHelmet(new ItemStack(armorType.getHelmet()));
+        inv.setChestplate(new ItemStack(armorType.getChestplate()));
+        inv.setLeggings(new ItemStack(armorType.getLeggings()));
+        inv.setBoots(new ItemStack(armorType.getBoots()));
+        player.setMaxHealth(type.getHealth());
+        for (MutationEffect effect : type.getEffects()) {
+            player.addPotionEffect(new PotionEffect(effect.getPotionType(), Integer.MAX_VALUE, effect.getAmplifier(), false, false));
+        }
     }
 }

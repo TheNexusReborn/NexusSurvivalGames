@@ -60,8 +60,8 @@ public class MutationCountdownCallback implements ReturnableCallback<TimerSnapsh
         }
         
         if (secondsLeft <= 0) {
-            NexusPlayer targetNexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(mutation.getTarget());
-            t.sendMessage(MCUtils.color("&6&l>> " + targetNexusPlayer.getColoredName().toUpperCase() + " &c&lIS AFTER YOU! RUN!"));
+            NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(p.getUniqueId());
+            t.sendMessage(MCUtils.color("&6&l>> " + nexusPlayer.getColoredName().toUpperCase() + " &c&lIS AFTER YOU! RUN!"));
             
             game.addMutation(mutation);
             return false;
