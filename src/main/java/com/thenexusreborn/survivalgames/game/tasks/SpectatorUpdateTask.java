@@ -18,7 +18,7 @@ public class SpectatorUpdateTask extends BukkitRunnable {
         Game game = plugin.getGame();
         if (game != null) {
             for (GamePlayer player : game.getPlayers().values()) {
-                if (player.getTeam() != GameTeam.TRIBUTES) {
+                if (player.getTeam() == GameTeam.SPECTATORS) {
                     SGUtils.updatePlayerHealthAndFood(Bukkit.getPlayer(player.getUniqueId()));
                 }
             }
