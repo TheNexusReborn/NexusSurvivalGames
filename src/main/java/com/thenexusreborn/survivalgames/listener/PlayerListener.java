@@ -13,7 +13,7 @@ import com.thenexusreborn.survivalgames.lobby.*;
 import com.thenexusreborn.survivalgames.loot.*;
 import com.thenexusreborn.survivalgames.menu.*;
 import com.thenexusreborn.survivalgames.mutations.*;
-import com.thenexusreborn.survivalgames.mutations.impl.CreeperMutation;
+import com.thenexusreborn.survivalgames.mutations.impl.*;
 import com.thenexusreborn.survivalgames.settings.ColorMode;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import net.minecraft.server.v1_8_R3.EntityTNTPrimed;
@@ -45,48 +45,6 @@ public class PlayerListener implements Listener {
     
     public PlayerListener(SurvivalGames plugin) {
         this.plugin = plugin;
-    }
-    
-    @EventHandler
-    public void onEntityDamage(EntityDamageEvent e) {
-        if (!(e.getEntity() instanceof Player)) {
-            return;
-        }
-
-        if (plugin.getGame() == null) {
-            return;
-        }
-
-        GamePlayer player = plugin.getGame().getPlayer(e.getEntity().getUniqueId());
-        if (player.getTeam() != GameTeam.MUTATIONS) {
-            return;
-        }
-
-        MutationType mutationType = player.getMutation().getType();
-        if (mutationType.getDamageImmunities().contains(e.getCause())) {
-            e.setCancelled(true);
-        }
-    }
-
-    @EventHandler
-    public void onHealthRegen(EntityRegainHealthEvent e) {
-        if (!(e.getEntity() instanceof Player)) {
-            return;
-        }
-
-        if (plugin.getGame() == null) {
-            return;
-        }
-
-        GamePlayer player = plugin.getGame().getPlayer(e.getEntity().getUniqueId());
-        if (player.getTeam() != GameTeam.MUTATIONS) {
-            return;
-        }
-
-        MutationType mutationType = player.getMutation().getType();
-        if (!mutationType.healthRegen()) {
-            e.setCancelled(true);
-        }
     }
 
     @EventHandler
@@ -196,6 +154,8 @@ public class PlayerListener implements Listener {
                             }
                         }, 10L);
                     }
+                } else if (mutation instanceof ChickenMutation) {
+                    ChickenMutation chickenMutation = (ChickenMutation) mutation;
                 }
             }
         } else {
@@ -474,7 +434,6 @@ public class PlayerListener implements Listener {
                 enchantingInventory.setSecondary(new ItemStack(Material.INK_SACK, 64, (short) 4));
             }
         }
-        //TODO custom guis when implemented
     }
     
     @EventHandler

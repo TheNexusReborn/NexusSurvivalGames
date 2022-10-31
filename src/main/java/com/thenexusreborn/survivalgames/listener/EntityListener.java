@@ -2,6 +2,8 @@ package com.thenexusreborn.survivalgames.listener;
 
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
+import com.thenexusreborn.survivalgames.mutations.MutationType;
+import com.thenexusreborn.survivalgames.mutations.impl.SkeletonMutation;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.bukkit.event.entity.*;
@@ -40,6 +42,11 @@ public class EntityListener implements Listener {
                 e.setCancelled(true);
                 e.getEntity().setFireTicks(0);
                 return;
+            } else if (gamePlayer.getTeam() == GameTeam.MUTATIONS) {
+                MutationType mutationType = gamePlayer.getMutation().getType();
+                if (mutationType.getDamageImmunities().contains(e.getCause())) {
+                    e.setCancelled(true);
+                }
             }
             
             if (game.getState() == GameState.INGAME_GRACEPERIOD) {
@@ -108,9 +115,7 @@ public class EntityListener implements Listener {
                     }
                 }
             } else if (e.getDamager() instanceof TNTPrimed) {
-                System.out.println("Damage by tnt");
                 if (e.getEntity() instanceof Player) {
-                    System.out.println("Target is a player");
                     if (game.getSuicideLocations().containsKey(e.getDamager().getLocation())) {
                         UUID source = game.getSuicideLocations().get(e.getDamager().getLocation());
                         GamePlayer sourcePlayer = game.getPlayer(source);
@@ -122,9 +127,7 @@ public class EntityListener implements Listener {
                     }
                     
                     TNTPrimed tntPrimed = (TNTPrimed) e.getDamager();
-                    System.out.println(tntPrimed.getSource());
                     if (tntPrimed.getSource() instanceof Player) {
-                        System.out.println("Source is a player");
                         GamePlayer sourcePlayer = game.getPlayer(tntPrimed.getSource().getUniqueId());
                         if (sourcePlayer.getTeam() == GameTeam.MUTATIONS) {
                             if (!sourcePlayer.getMutation().getTarget().equals(e.getEntity().getUniqueId())) {
@@ -150,7 +153,7 @@ public class EntityListener implements Listener {
                 e.setCancelled(true);
                 damagerPlayer.sendMessage("&4&l>> &cYou can only damage mutations that are after you.");
             } else {
-                if (targetPlayer.getMutation().getType().getId().equalsIgnoreCase("skeleton")) {
+                if (targetPlayer.getMutation() instanceof SkeletonMutation) {
                     e.setDamage(e.getDamage() * 1.5);
                 }
             }
@@ -163,8 +166,16 @@ public class EntityListener implements Listener {
             Game game = plugin.getGame();
             if (e.getEntity() instanceof Player) {
                 Player player = ((Player) e.getEntity());
+                GamePlayer gamePlayer = game.getPlayer(e.getEntity().getUniqueId());
                 if (!game.getSettings().isRegeneration()) {
-                    if (game.getPlayer(e.getEntity().getUniqueId()).getTeam() == GameTeam.TRIBUTES) {
+                    if (gamePlayer.getTeam() == GameTeam.TRIBUTES) {
+                        e.setCancelled(true);
+                    }
+                }
+                
+                if (gamePlayer.getTeam() == GameTeam.MUTATIONS) {
+                    MutationType mutationType = gamePlayer.getMutation().getType();
+                    if (!mutationType.healthRegen()) {
                         e.setCancelled(true);
                     }
                 }
