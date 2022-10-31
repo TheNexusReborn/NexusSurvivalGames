@@ -7,6 +7,7 @@ import org.bukkit.event.*;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.*;
+import org.bukkit.projectiles.ProjectileSource;
 
 import java.util.*;
 
@@ -82,7 +83,7 @@ public class EntityListener implements Listener {
                     e.setCancelled(true);
                 }
                 
-                //TODO mutations
+                checkMutationDamage(damagerPlayer, targetPlayer, e);
             } else if (e.getEntity() instanceof ItemFrame || e.getEntity() instanceof ArmorStand) {
                 e.setCancelled(true);
             } else if (e.getDamager() instanceof Projectile) {
@@ -100,10 +101,33 @@ public class EntityListener implements Listener {
                     if (game.getState() == GameState.INGAME_GRACEPERIOD) {
                         e.setCancelled(true);
                     }
+    
+                    ProjectileSource shooter = ((Arrow) e.getDamager()).getShooter();
+                    if (shooter instanceof Player && e.getEntity() instanceof Player) {
+                        checkMutationDamage(game.getPlayer(((Player) shooter).getUniqueId()), game.getPlayer(e.getEntity().getUniqueId()), e);
+                    }
                 }
             }
         } else {
             e.setCancelled(true);
+        }
+    }
+    
+    private void checkMutationDamage(GamePlayer damagerPlayer, GamePlayer targetPlayer, EntityDamageByEntityEvent e) {
+        if (damagerPlayer.getTeam() == GameTeam.MUTATIONS) {
+            if (!damagerPlayer.getMutation().getTarget().equals(targetPlayer.getUniqueId())) {
+                e.setCancelled(true);
+                damagerPlayer.sendMessage("&4&l>> &cYou can only damage your target.");
+            }
+        } else if (targetPlayer.getTeam() == GameTeam.MUTATIONS) {
+            if (!targetPlayer.getMutation().getTarget().equals(damagerPlayer.getUniqueId())) {
+                e.setCancelled(true);
+                damagerPlayer.sendMessage("&4&l>> &cYou can only damage mutations that are after you.");
+            } else {
+                if (targetPlayer.getMutation().getType().getId().equalsIgnoreCase("skeleton")) {
+                    e.setDamage(e.getDamage() * 1.5);
+                }
+            }
         }
     }
     

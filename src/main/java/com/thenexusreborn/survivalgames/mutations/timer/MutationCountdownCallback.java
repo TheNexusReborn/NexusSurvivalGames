@@ -51,7 +51,7 @@ public class MutationCountdownCallback implements ReturnableCallback<TimerSnapsh
         
         if (secondsLeft == 15 || secondsLeft == 10 || (secondsLeft <= 5 && secondsLeft > 0)) {
             if (!announcedTarget.contains(secondsLeft)) {
-                t.sendMessage(MCUtils.color("&4&l>> &c" + p.getName() + "is &lMUTATING! &cThey spawn in &c&l" + secondsLeft + "s..."));
+                t.sendMessage(MCUtils.color("&4&l>> &c" + p.getName() + " is &lMUTATING! &cThey spawn in &c&l" + secondsLeft + "s..."));
                 announcedTarget.add(secondsLeft );
             }
         }

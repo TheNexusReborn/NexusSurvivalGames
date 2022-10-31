@@ -561,7 +561,8 @@ public class Game {
                     gp.setTeam(GameTeam.SPECTATORS);
                     gp.sendMessage(gp.getTeam().getJoinMessage());
                     giveSpectatorItems(Bukkit.getPlayer(gp.getUniqueId()));
-                    gp.sendMessage("&6&l>> You were made a spectator because deathmatch started.");
+                    recalculateVisibility();
+                    gp.sendMessage("&6&l>> &cYou were made a spectator because deathmatch started.");
                 }
             }
             
@@ -904,7 +905,7 @@ public class Game {
             if (death.getShooter() instanceof Player) {
                 killer = getPlayer(death.getShooter().getUniqueId());
     
-                mutationKill = killer.getTeam() == GameTeam.MUTATIONS && killer.getMutation().getTarget() == killer.getUniqueId();
+                mutationKill = killer.getTeam() == GameTeam.MUTATIONS && killer.getMutation().getTarget() == gamePlayer.getUniqueId();
                 
                 if (settings.getColorMode() == ColorMode.GAME_TEAM) {
                     if (killer.getTeam() == GameTeam.TRIBUTES) {

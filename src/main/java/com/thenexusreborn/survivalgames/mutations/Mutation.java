@@ -71,7 +71,7 @@ public abstract class Mutation {
         p.sendMessage(MCUtils.color("&6&l>> &eYou will mutate as a(n) " + getType().getDisplayName() + "!"));
         p.sendMessage(MCUtils.color("&6&l>> &eYou will be mutated in &l" + this.countdownTimer.getSecondsLeft() + " Seconds&e."));
         Player t = Bukkit.getPlayer(this.target);
-        t.sendMessage(MCUtils.color("&4&l>> &c" + p.getName() + "is &lMUTATING! &cThey spawn in &c&l" + this.countdownTimer.getSecondsLeft() + "s..."));
+        t.sendMessage(MCUtils.color("&4&l>> &c" + p.getName() + " is &lMUTATING! &cThey spawn in &c&l" + this.countdownTimer.getSecondsLeft() + "s..."));
         this.countdownTimer.run();
     }
     
