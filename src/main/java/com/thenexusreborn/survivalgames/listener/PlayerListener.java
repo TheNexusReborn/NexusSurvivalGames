@@ -34,6 +34,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
+import static com.thenexusreborn.survivalgames.game.GameState.*;
+
 @SuppressWarnings("DuplicatedCode")
 public class PlayerListener implements Listener {
     private final SurvivalGames plugin;
@@ -149,7 +151,7 @@ public class PlayerListener implements Listener {
                                 }
                             }
                         } else if (item.getType() == Material.ROTTEN_FLESH) {
-                            if (!(gamePlayer.deathByMutation() || gamePlayer.hasMutated())) {
+                            if (!(gamePlayer.deathByMutation() || gamePlayer.hasMutated()) && (game.getState() == INGAME || game.getState() == INGAME_DEATHMATCH)) {
                                 player.openInventory(new MutateGui(plugin, gamePlayer.getNexusPlayer()).getInventory());
                             }
                         } else if (item.getType() == Material.WATCH) {

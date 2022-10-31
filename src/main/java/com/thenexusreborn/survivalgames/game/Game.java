@@ -553,6 +553,18 @@ public class Game {
     public void teleportDeathmatch() {
         try {
             setState(TELEPORT_DEATHMATCH);
+    
+            for (GamePlayer gp : this.players.values()) {
+                if (gp.getTeam() == GameTeam.MUTATIONS) {
+                    removeMutation(gp.getMutation());
+                    gp.sendMessage(gp.getTeam().getLeaveMessage());
+                    gp.setTeam(GameTeam.SPECTATORS);
+                    gp.sendMessage(gp.getTeam().getJoinMessage());
+                    giveSpectatorItems(Bukkit.getPlayer(gp.getUniqueId()));
+                    gp.sendMessage("&6&l>> You were made a spectator because deathmatch started.");
+                }
+            }
+            
             sendMessage("&6&l>> &e&LPREPARE FOR DEATHMATCH...");
             List<UUID> tributes = new LinkedList<>(), spectators = new LinkedList<>();
             for (GamePlayer player : this.players.values()) {
@@ -1089,7 +1101,9 @@ public class Game {
         ItemStack mutationsBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&d&lMutations &7&o(Right Click)").build();
         ItemStack spectatorsBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&c&lSpectators &7&o(Right Click)").build();
         String mutateName;
-        if (gamePlayer.hasMutated()) {
+        if (!(getState() == INGAME || getState() == INGAME_DEATHMATCH)) {
+            mutateName = "&cCannot mutate.";
+        } else if (gamePlayer.hasMutated()) {
             mutateName = "&cCan't mutate again.";
         } else {
             if (!(gamePlayer.getDeathInfo() instanceof DeathInfoPlayerKill) || gamePlayer.deathByMutation()) {
