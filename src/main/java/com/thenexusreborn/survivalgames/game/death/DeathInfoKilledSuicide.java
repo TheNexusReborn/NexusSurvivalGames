@@ -9,11 +9,13 @@ public class DeathInfoKilledSuicide extends DeathInfo {
     
     private final UUID killer;
     private final String killerTeamColor;
+    protected final double killerHealth;
     
-    public DeathInfoKilledSuicide(UUID player, UUID killer, String killerTeamColor) {
+    public DeathInfoKilledSuicide(UUID player, UUID killer, double killerHealth, String killerTeamColor) {
         super(player, DeathType.SUICIDE_KILLED);
         this.killer = killer;
         this.killerTeamColor = killerTeamColor;
+        this.killerHealth = killerHealth;
     }
     
     public UUID getKiller() {
@@ -22,6 +24,10 @@ public class DeathInfoKilledSuicide extends DeathInfo {
     
     public String getKillerTeamColor() {
         return killerTeamColor;
+    }
+    
+    public double getKillerHealth() {
+        return killerHealth;
     }
     
     @Override

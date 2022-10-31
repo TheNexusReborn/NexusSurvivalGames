@@ -70,6 +70,7 @@ public class Game {
     private long start, end;
     private GamePlayer firstBlood;
     private final Map<Location, Inventory> enderchestInventories = new HashMap<>();
+    private final Map<Location, UUID> suicideLocations = new HashMap<>();
     
     public Game(GameMap gameMap, GameSettings settings, Collection<NexusPlayer> players, List<UUID> spectatingPlayers) {
         this.gameMap = gameMap;
@@ -899,7 +900,8 @@ public class Game {
             killer = getPlayer(death.getKiller());
             Player killerPlayer = Bukkit.getPlayer(killer.getUniqueId());
             killerPlayer.setMaxHealth(settings.getMaxHealth());
-            killerHealth = 20; //TODO Add better tracking of this for this type of death
+            killerHealth = death.getKillerHealth();
+            mutationKill = true;
         } else if (deathInfo instanceof DeathInfoProjectile) {
             DeathInfoProjectile death = (DeathInfoProjectile) deathInfo;
             if (death.getShooter() instanceof Player) {
@@ -1252,5 +1254,9 @@ public class Game {
         for (PotionEffect effect : player.getActivePotionEffects()) {
             player.removePotionEffect(effect.getType());
         }
+    }
+    
+    public Map<Location, UUID> getSuicideLocations() {
+        return suicideLocations;
     }
 }

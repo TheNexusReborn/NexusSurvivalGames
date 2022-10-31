@@ -107,6 +107,32 @@ public class EntityListener implements Listener {
                         checkMutationDamage(game.getPlayer(((Player) shooter).getUniqueId()), game.getPlayer(e.getEntity().getUniqueId()), e);
                     }
                 }
+            } else if (e.getDamager() instanceof TNTPrimed) {
+                System.out.println("Damage by tnt");
+                if (e.getEntity() instanceof Player) {
+                    System.out.println("Target is a player");
+                    if (game.getSuicideLocations().containsKey(e.getDamager().getLocation())) {
+                        UUID source = game.getSuicideLocations().get(e.getDamager().getLocation());
+                        GamePlayer sourcePlayer = game.getPlayer(source);
+                        if (sourcePlayer.getTeam() == GameTeam.MUTATIONS) {
+                            if (!sourcePlayer.getMutation().getTarget().equals(e.getEntity().getUniqueId())) {
+                                e.setCancelled(true);
+                            }
+                        }
+                    }
+                    
+                    TNTPrimed tntPrimed = (TNTPrimed) e.getDamager();
+                    System.out.println(tntPrimed.getSource());
+                    if (tntPrimed.getSource() instanceof Player) {
+                        System.out.println("Source is a player");
+                        GamePlayer sourcePlayer = game.getPlayer(tntPrimed.getSource().getUniqueId());
+                        if (sourcePlayer.getTeam() == GameTeam.MUTATIONS) {
+                            if (!sourcePlayer.getMutation().getTarget().equals(e.getEntity().getUniqueId())) {
+                                e.setCancelled(true);
+                            }
+                        }
+                    }
+                }
             }
         } else {
             e.setCancelled(true);

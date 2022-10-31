@@ -62,7 +62,9 @@ public class BlockListener implements Listener {
                         Field source = nmsTnt.getClass().getDeclaredField("source");
                         source.setAccessible(true);
                         source.set(nmsTnt, ((CraftPlayer) e.getPlayer()).getHandle());
-                    } catch (Exception ex) {}
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
                     new BukkitRunnable() {
                         public void run() {
                             e.getBlock().setType(AIR);

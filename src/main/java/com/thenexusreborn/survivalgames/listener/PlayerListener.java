@@ -11,13 +11,15 @@ import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.game.death.*;
 import com.thenexusreborn.survivalgames.lobby.*;
 import com.thenexusreborn.survivalgames.loot.*;
-import com.thenexusreborn.survivalgames.menu.MutateGui;
-import com.thenexusreborn.survivalgames.menu.TeamMenu;
-import com.thenexusreborn.survivalgames.mutations.MutationType;
+import com.thenexusreborn.survivalgames.menu.*;
+import com.thenexusreborn.survivalgames.mutations.*;
+import com.thenexusreborn.survivalgames.mutations.impl.CreeperMutation;
 import com.thenexusreborn.survivalgames.settings.ColorMode;
 import com.thenexusreborn.survivalgames.util.SGUtils;
+import net.minecraft.server.v1_8_R3.EntityTNTPrimed;
 import org.bukkit.*;
 import org.bukkit.block.*;
+import org.bukkit.craftbukkit.v1_8_R3.entity.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.bukkit.event.block.Action;
@@ -32,6 +34,7 @@ import org.bukkit.material.Openable;
 import org.bukkit.potion.*;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.lang.reflect.Field;
 import java.util.*;
 
 import static com.thenexusreborn.survivalgames.game.GameState.*;
@@ -166,6 +169,34 @@ public class PlayerListener implements Listener {
                 
                 e.setCancelled(true);
                 return;
+            } else if (gamePlayer.getTeam() == GameTeam.MUTATIONS) {
+                Mutation mutation = gamePlayer.getMutation();
+                ItemStack item = player.getItemInHand();
+                if (item == null) {
+                    return;
+                }
+                if (mutation instanceof CreeperMutation) {
+                    if (item.getType() == Material.SULPHUR) {
+                        Location loc = player.getLocation();
+                        game.getSuicideLocations().put(loc, player.getUniqueId());
+                        TNTPrimed tnt = (TNTPrimed) player.getWorld().spawnEntity(loc.clone().add(0.5, 0, 0.5), EntityType.PRIMED_TNT);
+                        tnt.setFuseTicks(1);
+                        tnt.setYield(4F);
+                        EntityTNTPrimed nmsTnt = ((CraftTNTPrimed) tnt).getHandle();
+                        try {
+                            Field source = nmsTnt.getClass().getDeclaredField("source");
+                            source.setAccessible(true);
+                            source.set(nmsTnt, ((CraftPlayer) e.getPlayer()).getHandle());
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                            if (gamePlayer.getTeam() == GameTeam.MUTATIONS) {
+                                e.getPlayer().setHealth(0);
+                            }
+                        }, 10L);
+                    }
+                }
             }
         } else {
             Block block = e.getClickedBlock();
@@ -596,13 +627,14 @@ public class PlayerListener implements Listener {
                     EntityDamageByEntityEvent edbe = ((EntityDamageByEntityEvent) player.getLastDamageCause());
                     Location dLoc = edbe.getDamager().getLocation().clone();
                     Location loc = new Location(dLoc.getWorld(), dLoc.getBlockX(), dLoc.getBlockY(), dLoc.getBlockZ());
-//                    if (game.getSuicideLocations().containsKey(loc)) {
-//                        UUID cause = game.getSuicideLocations().get(loc);
-//                        deathInfo = new DeathInfoKilledSuicide(player.getUniqueId(), cause, game.getGameTeam(cause).getColor());
-//                    } else {
-                    //}
+                    if (game.getSuicideLocations().containsKey(loc)) {
+                        UUID cause = game.getSuicideLocations().get(loc);
+                        double health = Bukkit.getPlayer(cause).getHealth();
+                        deathInfo = new DeathInfoKilledSuicide(player.getUniqueId(), cause, health, game.getPlayer(cause).getTeam().getColor());
+                    }
+                } else {
+                    deathInfo = new DeathInfo(player.getUniqueId(), DeathType.EXPLOSION, "&4&l>> %playername% &7exploded.", teamColor);
                 }
-                deathInfo = new DeathInfo(player.getUniqueId(), DeathType.EXPLOSION, "&4&l>> %playername% &7exploded.", teamColor);
             } else if (damageCause == DamageCause.VOID) {
                 deathInfo = new DeathInfo(player.getUniqueId(), DeathType.VOID, "&4&l>> %playername% &7fell in the void.", teamColor);
             } else if (damageCause == DamageCause.LIGHTNING) {
