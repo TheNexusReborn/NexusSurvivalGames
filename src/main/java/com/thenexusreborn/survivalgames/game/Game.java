@@ -832,12 +832,12 @@ public class Game {
         gamePlayer.setDeathInfo(deathInfo);
         gamePlayer.setTrackerInfo(null);
         GameTeam oldTeam = gamePlayer.getTeam();
-        
+    
         boolean vanished = deathInfo.getType() == DeathType.VANISH;
-        
+    
         int score = gamePlayer.getNexusPlayer().getStats().getValue("sg_score").getAsInt();
         int lost = (int) Math.ceil(score / 10D);
-        
+    
         if (!vanished) {
             gamePlayer.getNexusPlayer().getStats().change("sg_score", lost, StatOperator.SUBTRACT);
             gamePlayer.sendMessage("&4&l>> &cYou lost " + lost + " Score for dying.");
@@ -846,7 +846,7 @@ public class Game {
             gamePlayer.getNexusPlayer().getStats().change("sg_deaths", 1, StatOperator.ADD);
         }
         
-        gamePlayer.sendMessage(GameTeam.TRIBUTES.getLeaveMessage());
+        gamePlayer.sendMessage(oldTeam.getLeaveMessage());
         GamePlayer killer = null;
         String killerName = null;
         boolean mutationKill = false;
@@ -855,8 +855,12 @@ public class Game {
         GameTeam newTeam = GameTeam.SPECTATORS;
         if (deathInfo instanceof DeathInfoPlayerKill) {
             DeathInfoPlayerKill playerDeath = (DeathInfoPlayerKill) deathInfo;
+            killer = getPlayer(playerDeath.getKiller());
+    
+            mutationKill = killer.getTeam() == GameTeam.MUTATIONS && killer.getMutation().getTarget() == gamePlayer.getUniqueId();
+            
             if (settings.getColorMode() == ColorMode.GAME_TEAM) {
-                GameTeam killerTeam = getPlayer(playerDeath.getKiller()).getTeam();
+                GameTeam killerTeam = killer.getTeam();
                 if (killerTeam == GameTeam.TRIBUTES) {
                     killerName += "&a";
                 } else if (killerTeam == GameTeam.MUTATIONS) {
@@ -865,9 +869,8 @@ public class Game {
                     killerName += "&c";
                 }
             } else {
-                killerName = getPlayer(playerDeath.getKiller()).getNexusPlayer().getRanks().get().getColor();
+                killerName = killer.getNexusPlayer().getRanks().get().getColor();
             }
-            killer = getPlayer(playerDeath.getKiller());
             killerHealth = playerDeath.getKillerHealth();
         } else if (deathInfo instanceof DeathInfoKilledSuicide) {
             DeathInfoKilledSuicide death = (DeathInfoKilledSuicide) deathInfo;
@@ -887,22 +890,40 @@ public class Game {
         } else if (deathInfo instanceof DeathInfoProjectile) {
             DeathInfoProjectile death = (DeathInfoProjectile) deathInfo;
             if (death.getShooter() instanceof Player) {
+                killer = getPlayer(death.getShooter().getUniqueId());
+    
+                mutationKill = killer.getTeam() == GameTeam.MUTATIONS && killer.getMutation().getTarget() == killer.getUniqueId();
+                
                 if (settings.getColorMode() == ColorMode.GAME_TEAM) {
-                    if (getPlayer(death.getShooter().getUniqueId()).getTeam() == GameTeam.TRIBUTES) {
+                    if (killer.getTeam() == GameTeam.TRIBUTES) {
                         killerName += "&a";
                     } else {
                         killerName += "&d";
                     }
                 } else {
-                    killerName = getPlayer(death.getShooter().getUniqueId()).getNexusPlayer().getRanks().get().getColor();
+                    killerName = killer.getNexusPlayer().getRanks().get().getColor();
                 }
-                killer = getPlayer(death.getShooter().getUniqueId());
+                
                 newTeam = GameTeam.SPECTATORS;
                 killerHealth = death.getKillerHealth();
             }
         }
+    
+        if (mutationKill) {
+            gamePlayer.setDeathByMutation(true);
+            removeMutation(killer.getMutation());
+            sendMessage("&6&l>> " + killer.getNexusPlayer().getColoredName() + " &ahas taken revenge and is back in the game!");
+            killer.sendMessage(killer.getTeam().getLeaveMessage());
+            killer.setTeam(GameTeam.TRIBUTES);
+            Player killerPlayer = Bukkit.getPlayer(killer.getUniqueId());
+            killerPlayer.setGameMode(killer.getTeam().getGameMode());
+            killer.sendMessage(killer.getTeam().getJoinMessage());
+        }
         
         if (deathInfo.getType() != DeathType.LEAVE) {
+            if (oldTeam == GameTeam.MUTATIONS) {
+                removeMutation(gamePlayer.getMutation());
+            }
             gamePlayer.setSpectatorByDeath(true);
             resetPlayer(Bukkit.getPlayer(player.getUniqueId()));
             player.setGameMode(newTeam.getGameMode());
@@ -915,7 +936,11 @@ public class Game {
         gamePlayer.setTeam(newTeam);
         
         if (settings.isSounds()) {
-            playSound(Sound.WITHER_SPAWN);
+            if (oldTeam == GameTeam.TRIBUTES) {
+                playSound(Sound.WITHER_SPAWN);
+            } else if (oldTeam == GameTeam.MUTATIONS) {
+                playSound(Sound.ZOMBIE_PIG_DEATH);
+            }
         }
         
         recalculateVisibility();
@@ -979,8 +1004,8 @@ public class Game {
             }
         }
         
-        int totalTributes = 0;
         if (oldTeam == GameTeam.TRIBUTES) {
+            int totalTributes = 0;
             for (GamePlayer gp : this.players.values()) {
                 if (gp.getTeam() == GameTeam.TRIBUTES) {
                     totalTributes++;
@@ -1008,6 +1033,15 @@ public class Game {
                     }
                 }
             }
+        } else if (oldTeam == GameTeam.MUTATIONS) {
+            int totalMutations = 0;
+            for (GamePlayer gp : this.players.values()) {
+                if (gp.getTeam() == GameTeam.MUTATIONS) {
+                    totalMutations++;
+                }
+            }
+    
+            sendMessage("&6&l>> &d&l" + totalMutations + " mutations remain.");
         }
         
         if (sendDeathMessage) {
@@ -1030,13 +1064,13 @@ public class Game {
     public void giveSpectatorItems(Player p) {
         GamePlayer gamePlayer = getPlayer(p.getUniqueId());
         ItemStack tributesBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&a&lTributes &7&o(Right Click)").build();
-        ItemStack mutationsBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&d&lMutations &c(WIP)").build();
+        ItemStack mutationsBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&d&lMutations &7&o(Right Click)").build();
         ItemStack spectatorsBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&c&lSpectators &7&o(Right Click)").build();
-        String mutateName = "";
+        String mutateName;
         if (gamePlayer.hasMutated()) {
             mutateName = "&cCan't mutate again.";
         } else {
-            if (!(gamePlayer.getDeathInfo() instanceof DeathInfoPlayerKill)) {
+            if (!(gamePlayer.getDeathInfo() instanceof DeathInfoPlayerKill) || gamePlayer.deathByMutation()) {
                 mutateName = "&cCannot mutate.";
             } else {
                 DeathInfoPlayerKill playerKill = (DeathInfoPlayerKill) gamePlayer.getDeathInfo();
@@ -1146,6 +1180,9 @@ public class Game {
         recalculateVisibility();
         player.getInventory().clear();
         player.getInventory().setArmorContents(null);
+        player.setAllowFlight(false);
+        player.setFlying(false);
+        player.setSaturation(20);
 
         MutationType type = mutation.getType();
         PlayerInventory inv = player.getInventory();
@@ -1162,6 +1199,21 @@ public class Game {
         player.setMaxHealth(type.getHealth());
         for (MutationEffect effect : type.getEffects()) {
             player.addPotionEffect(new PotionEffect(effect.getPotionType(), Integer.MAX_VALUE, effect.getAmplifier(), false, false));
+        }
+    }
+    
+    public void removeMutation(Mutation mutation) {
+        Player player = Bukkit.getPlayer(mutation.getPlayer());
+        DisguiseAPI.undisguiseToAll(player);
+        player.getInventory().clear();
+        player.getInventory().setArmorContents(null);
+        player.setMaxHealth(20);
+        player.setHealth(20);
+        player.setExp(0);
+        player.setLevel(0);
+        player.spigot().setCollidesWithEntities(true);
+        for (PotionEffect effect : player.getActivePotionEffects()) {
+            player.removePotionEffect(effect.getType());
         }
     }
 }

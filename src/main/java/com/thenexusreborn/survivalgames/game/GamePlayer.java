@@ -15,6 +15,7 @@ public class GamePlayer {
     private int kills, killStreak;
     private boolean mutated;
     private Mutation mutation;
+    private boolean deathByMutation;
     
     public GamePlayer(NexusPlayer nexusPlayer) {
         this.nexusPlayer = nexusPlayer;
@@ -102,5 +103,13 @@ public class GamePlayer {
     
     public Mutation getMutation() {
         return mutation;
+    }
+    
+    public void setDeathByMutation(boolean value) {
+        this.deathByMutation = value;
+    }
+    
+    public boolean deathByMutation() {
+        return deathByMutation;
     }
 }

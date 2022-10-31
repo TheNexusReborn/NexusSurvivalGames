@@ -139,7 +139,7 @@ public class PlayerListener implements Listener {
                                 if (displayName.toLowerCase().contains("tributes")) {
                                     team = GameTeam.TRIBUTES;
                                 } else if (displayName.toLowerCase().contains("mutations")) {
-                                    gamePlayer.sendMessage("&6&l>> &cThat feature is not implemented yet.");
+                                    team = GameTeam.MUTATIONS;
                                 } else if (displayName.toLowerCase().contains("spectators")) {
                                     team = GameTeam.SPECTATORS;
                                 }
@@ -149,7 +149,9 @@ public class PlayerListener implements Listener {
                                 }
                             }
                         } else if (item.getType() == Material.ROTTEN_FLESH) {
-                            player.openInventory(new MutateGui(plugin, gamePlayer.getNexusPlayer()).getInventory());
+                            if (!(gamePlayer.deathByMutation() || !gamePlayer.hasMutated())) {
+                                player.openInventory(new MutateGui(plugin, gamePlayer.getNexusPlayer()).getInventory());
+                            }
                         } else if (item.getType() == Material.WATCH) {
                             player.teleport(game.getGameMap().getCenter().toLocation(game.getGameMap().getWorld()));
                             gamePlayer.sendMessage("&6&l>> &eTeleported to the Map Center.");
@@ -533,6 +535,10 @@ public class PlayerListener implements Listener {
         GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
         if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
             return;
+        }
+        
+        if (gamePlayer.getTeam() == GameTeam.MUTATIONS) {
+            e.getDrops().clear();
         }
         
         DeathInfo deathInfo = null;
