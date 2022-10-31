@@ -1002,6 +1002,28 @@ public class Game {
                     killer.sendMessage("&2&l>> &cYou killed yourself. No Credits for you.");
                 }
             }
+    
+            for (GamePlayer gp : new ArrayList<>(this.players.values())) {
+                if (gp.getTeam() == GameTeam.MUTATIONS) {
+                    if (gp.getMutation().getTarget().equals(gamePlayer.getUniqueId())) {
+                        gp.getMutation().setTarget(killer.getUniqueId());
+                        gp.sendMessage("&6&l>> &cYour previous target died, your new target is &a" + killer.getNexusPlayer().getName());
+                    }
+                }
+            }
+        } else {
+            for (GamePlayer gp : new ArrayList<>(this.players.values())) {
+                if (gp.getTeam() == GameTeam.MUTATIONS) {
+                    if (gp.getMutation().getTarget().equals(gamePlayer.getUniqueId())) {
+                        gp.sendMessage("&6&l>> &cYour target died without a killer, you have been set back as a spectator.");
+                        removeMutation(gp.getMutation());
+                        gp.sendMessage(gp.getTeam().getLeaveMessage());
+                        gp.setTeam(GameTeam.SPECTATORS);
+                        giveSpectatorItems(Bukkit.getPlayer(gp.getUniqueId()));
+                        gp.sendMessage(gp.getTeam().getJoinMessage());
+                    }
+                }
+            }
         }
         
         if (oldTeam == GameTeam.TRIBUTES) {

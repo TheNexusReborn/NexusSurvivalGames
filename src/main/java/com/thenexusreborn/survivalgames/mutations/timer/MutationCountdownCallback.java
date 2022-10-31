@@ -28,20 +28,17 @@ public class MutationCountdownCallback implements ReturnableCallback<TimerSnapsh
         Player p = Bukkit.getPlayer(mutation.getPlayer());
     
         if (p == null) {
-            mutation.remove();
             return false;
         }
     
         Player t = Bukkit.getPlayer(mutation.getTarget());
         if (t == null) {
             p.sendMessage(MCUtils.color(MsgType.WARN + "Your target is no longer online, mutation cancelled."));
-            mutation.remove();
             return false;
         }
     
         Game game = plugin.getGame();
         if (game == null) {
-            mutation.remove();
             return false;
         }
     

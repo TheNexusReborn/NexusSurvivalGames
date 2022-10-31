@@ -149,7 +149,7 @@ public class PlayerListener implements Listener {
                                 }
                             }
                         } else if (item.getType() == Material.ROTTEN_FLESH) {
-                            if (!(gamePlayer.deathByMutation() || !gamePlayer.hasMutated())) {
+                            if (!(gamePlayer.deathByMutation() || gamePlayer.hasMutated())) {
                                 player.openInventory(new MutateGui(plugin, gamePlayer.getNexusPlayer()).getInventory());
                             }
                         } else if (item.getType() == Material.WATCH) {

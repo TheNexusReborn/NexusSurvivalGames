@@ -16,7 +16,7 @@ public abstract class Mutation {
     
     protected final MutationType type;
     protected final UUID player;
-    protected final UUID target;
+    protected UUID target;
     protected Timer countdownTimer;
     
     public static Mutation createInstance(MutationType type, UUID player, UUID target) {
@@ -59,32 +59,23 @@ public abstract class Mutation {
         return target;
     }
     
-    public void remove() {
-        //TODO This handles the removal of the mutation from the game, this will have to account for a null Bukkit player
-    }
-    
-    public void success() {
-        //TODO This handles when a mutation is successful in taking revenge
-    }
-    
-    public void reassignTarget() {
-        //TODO This handles reassigning the target of the mutation in case their target dies to another player, use remove() if target dies to other means
-    }
-    
-    public void deathmatch() {
-        //TODO This handles for when a mutation lasts until deathmatch
-    }
-    
     public void startCountdown() {
         Player p = Bukkit.getPlayer(this.player);
         if (p == null) {
             return;
         }
         
+        
         this.countdownTimer = new Timer(new MutationCountdownCallback(this));
         this.countdownTimer.setLength((plugin.getGame().getSettings().getMutationSpawnDelay() * 1000L) + 10);
         p.sendMessage(MCUtils.color("&6&l>> &eYou will mutate as a(n) " + getType().getDisplayName() + "!"));
         p.sendMessage(MCUtils.color("&6&l>> &eYou will be mutated in &l" + this.countdownTimer.getSecondsLeft() + " Seconds&e."));
+        Player t = Bukkit.getPlayer(this.target);
+        t.sendMessage(MCUtils.color("&4&l>> &c" + p.getName() + "is &lMUTATING! &cThey spawn in &c&l" + this.countdownTimer.getSecondsLeft() + "s..."));
         this.countdownTimer.run();
+    }
+    
+    public void setTarget(UUID uniqueId) {
+        this.target = uniqueId;
     }
 }
