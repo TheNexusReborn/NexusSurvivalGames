@@ -2,27 +2,19 @@ package com.thenexusreborn.survivalgames.menu;
 
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
+import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.nexuscore.menu.element.Element;
 import com.thenexusreborn.nexuscore.menu.element.button.Button;
 import com.thenexusreborn.nexuscore.menu.gui.Menu;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.Game;
-import com.thenexusreborn.survivalgames.game.GamePlayer;
-import com.thenexusreborn.survivalgames.game.GameTeam;
-import com.thenexusreborn.survivalgames.game.death.DeathInfo;
-import com.thenexusreborn.survivalgames.game.death.DeathInfoPlayerKill;
-import com.thenexusreborn.survivalgames.game.death.DeathType;
-import com.thenexusreborn.survivalgames.mutations.Mutation;
-import com.thenexusreborn.survivalgames.mutations.MutationType;
-import com.thenexusreborn.survivalgames.mutations.PlayerMutations;
-import com.thenexusreborn.survivalgames.mutations.UnlockedMutation;
+import com.thenexusreborn.survivalgames.game.*;
+import com.thenexusreborn.survivalgames.game.death.*;
+import com.thenexusreborn.survivalgames.mutations.*;
 import org.bukkit.Material;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class MutateGui extends Menu {
     public MutateGui(SurvivalGames plugin, NexusPlayer player) {
@@ -67,7 +59,6 @@ public class MutateGui extends Menu {
                     player.sendMessage(MsgType.WARN + "You cannot mutate, a game is not running.");
                     return;
                 }
-                
     
                 GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
                 
@@ -104,6 +95,22 @@ public class MutateGui extends Menu {
                     player.sendMessage(MsgType.WARN + "Your killer has died, you cannot mutate.");
                     return;
                 }
+                
+                int passes = player.getStats().getValue("sg_mutation_passes").getAsInt();
+                
+                if (passes <= 0 && !game.getSettings().isUnlimitedPasses()) {
+                    player.sendMessage(MsgType.WARN + "You do not have any mutation passes.");
+                    return;
+                }
+                
+                double passUseValue = new Random().nextDouble();
+                if (passUseValue <= game.getSettings().getPassUseChance()) {
+                    player.getStats().change("sg_mutation_passes", 1, StatOperator.SUBTRACT);
+                } else {
+                    player.sendMessage(MsgType.INFO + "&aYou got lucky and you did not use a pass for this mutation!");
+                }
+                
+                player.getStats().change("sg_times_mutated", 1, StatOperator.ADD);
     
                 Mutation mutation = Mutation.createInstance(type, player.getUniqueId(), killerUUID);
                 gamePlayer.setMutation(mutation);

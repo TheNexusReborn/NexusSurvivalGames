@@ -47,7 +47,7 @@ public class PlayerListener implements Listener {
     public PlayerListener(SurvivalGames plugin) {
         this.plugin = plugin;
     }
-
+    
     @EventHandler
     public void onItemDrop(PlayerDropItemEvent e) {
         if (plugin.getLobby().checkMapEditing(e.getPlayer())) {
@@ -113,7 +113,7 @@ public class PlayerListener implements Listener {
                                 }
                             }
                         } else if (item.getType() == Material.ROTTEN_FLESH) {
-                            if (!(gamePlayer.deathByMutation() || gamePlayer.hasMutated()) && (game.getState() == INGAME || game.getState() == INGAME_DEATHMATCH)) {
+                            if (!(gamePlayer.deathByMutation() || gamePlayer.hasMutated()) && (game.getState() == INGAME || game.getState() == INGAME_DEATHMATCH) && game.getSettings().isAllowMutations()) {
                                 player.openInventory(new MutateGui(plugin, gamePlayer.getNexusPlayer()).getInventory());
                             }
                         } else if (item.getType() == Material.WATCH) {
@@ -240,14 +240,14 @@ public class PlayerListener implements Listener {
                             } else if (west != null && west.getType() == Material.CHEST) {
                                 secondHalf = west;
                             }
-    
+                            
                             if (secondHalf != null) {
                                 maxAmount += 3;
                             }
                         }
                         
                         inv.clear();
-    
+                        
                         LootTable lootTable = null;
                         
                         boolean useTieredLoot = game.getSettings().isUseNewLoot();
@@ -355,7 +355,7 @@ public class PlayerListener implements Listener {
         Toggle toggle = e.getToggle();
         Game game = plugin.getGame();
         Lobby lobby = plugin.getLobby();
-    
+        
         if (toggle.getInfo().getName().equalsIgnoreCase("fly")) {
             if (game != null) {
                 e.setCancelled(true);
@@ -363,14 +363,14 @@ public class PlayerListener implements Listener {
             } else {
                 player.setAllowFlight(e.newValue());
             }
-        
+            
             return;
         }
         
         if (!toggle.getInfo().getName().equalsIgnoreCase("vanish")) {
             return;
         }
-    
+        
         Collection<NexusPlayer> players = new ArrayList<>();
         if (game == null) {
             players.addAll(plugin.getLobby().getPlayers());

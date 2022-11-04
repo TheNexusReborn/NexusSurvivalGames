@@ -680,8 +680,9 @@ public class Game {
         }
         
         String winnerName;
+        NexusPlayer winnerPlayer = (winner != null) ? winner.getNexusPlayer() : null;
         if (winner != null) {
-            winnerName = winner.getNexusPlayer().getDisplayName();
+            winnerName = winnerPlayer.getDisplayName();
         } else {
             winnerName = "&f&lNo one";
         }
@@ -689,10 +690,10 @@ public class Game {
         sendMessage("&6&l>> " + winnerName + " &a&lhas won Survival Games!");
         
         if (winner != null) {
-            winner.getNexusPlayer().getStats().change("sg_wins", 1, StatOperator.ADD);
-            winner.getNexusPlayer().getStats().change("sg_win_streak", 1, StatOperator.ADD);
+            winnerPlayer.getStats().change("sg_wins", 1, StatOperator.ADD);
+            winnerPlayer.getStats().change("sg_win_streak", 1, StatOperator.ADD);
             int winGain = 50;
-            int currentScore = winner.getNexusPlayer().getStats().getValue("sg_score").getAsInt();
+            int currentScore = winnerPlayer.getStats().getValue("sg_score").getAsInt();
             if (currentScore < 100 && currentScore > 50) {
                 winGain *= 1.25;
             } else if (currentScore <= 50 && currentScore > 25) {
@@ -706,15 +707,15 @@ public class Game {
             } else if (currentScore >= 1000) {
                 winGain *= .5;
             }
-            winner.getNexusPlayer().getStats().change("sg_score", winGain, StatOperator.ADD);
+            winnerPlayer.getStats().change("sg_score", winGain, StatOperator.ADD);
             winner.sendMessage("&2&l>> &a+" + winGain + " Score!");
-            double multiplier = winner.getNexusPlayer().getRanks().get().getMultiplier();
-            Rank rank = winner.getNexusPlayer().getRanks().get();
+            double multiplier = winnerPlayer.getRanks().get().getMultiplier();
+            Rank rank = winnerPlayer.getRanks().get();
             String multiplierMessage = rank.getColor() + "&l * x" + MCUtils.formatNumber(multiplier) + " " + rank.getPrefix() + " Bonus";
             if (settings.isGiveXp()) {
                 double xp = 10;
                 xp *= multiplier;
-                winner.getNexusPlayer().getStats().change("xp", xp, StatOperator.ADD);
+                winnerPlayer.getStats().change("xp", xp, StatOperator.ADD);
                 String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(xp) + " &2&lXP&a&l!";
                 if (multiplier > 1) {
                     winner.sendMessage(baseMessage + multiplierMessage);
@@ -726,7 +727,7 @@ public class Game {
             if (settings.isGiveCredits()) {
                 double credits = 10;
                 credits *= multiplier;
-                winner.getNexusPlayer().getStats().change("credits", credits, StatOperator.ADD);
+                winnerPlayer.getStats().change("credits", credits, StatOperator.ADD);
                 String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(credits) + " &3&lCREDITS&a&l!";
                 if (multiplier > 1) {
                     winner.sendMessage(baseMessage + multiplierMessage);
@@ -734,12 +735,20 @@ public class Game {
                     winner.sendMessage(baseMessage);
                 }
             }
+            
+            double passWinValue = new Random().nextDouble();
+            if (passWinValue <= getSettings().getPassRewardChance()) {
+                winnerPlayer.getStats().change("sg_mutation_passes", 1, StatOperator.ADD);
+                winnerPlayer.sendMessage(MsgType.INFO + "&aYou won a mutation pass for winning!");
+            } else {
+                winnerPlayer.sendMessage(MsgType.INFO + "You did not win a mutation pass this time.");
+            }
         }
         
         gameInfo.setGameStart(this.start);
         gameInfo.setGameEnd(this.end);
         if (winner != null) {
-            gameInfo.setWinner(winner.getNexusPlayer().getName());
+            gameInfo.setWinner(winnerPlayer.getName());
         } else {
             gameInfo.setWinner("No one");
         }
@@ -859,6 +868,9 @@ public class Game {
             gamePlayer.getNexusPlayer().getStats().change("sg_games", 1, StatOperator.ADD);
             gamePlayer.getNexusPlayer().getStats().change("sg_win_streak", 0, StatOperator.SET);
             gamePlayer.getNexusPlayer().getStats().change("sg_deaths", 1, StatOperator.ADD);
+            if (oldTeam == GameTeam.MUTATIONS) {
+                gamePlayer.getNexusPlayer().getStats().change("sg_mutation_deaths", 1, StatOperator.ADD);
+            }
         }
         
         gamePlayer.sendMessage(oldTeam.getLeaveMessage());
@@ -934,6 +946,7 @@ public class Game {
             Player killerPlayer = Bukkit.getPlayer(killer.getUniqueId());
             killerPlayer.setGameMode(killer.getTeam().getGameMode());
             killer.sendMessage(killer.getTeam().getJoinMessage());
+            killer.getNexusPlayer().getStats().change("sg_mutation_kills", 1, StatOperator.ADD);
         }
         
         if (deathInfo.getType() != DeathType.LEAVE) {
@@ -1105,7 +1118,9 @@ public class Game {
         ItemStack mutationsBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&d&lMutations &7&o(Right Click)").build();
         ItemStack spectatorsBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&c&lSpectators &7&o(Right Click)").build();
         String mutateName;
-        if (!(getState() == INGAME || getState() == INGAME_DEATHMATCH)) {
+        if (!getSettings().isAllowMutations()) {
+            mutateName = "&cMutations Disabled";
+        } else if (!(getState() == INGAME || getState() == INGAME_DEATHMATCH)) {
             mutateName = "&cCannot mutate.";
         } else if (gamePlayer.hasMutated()) {
             mutateName = "&cCan't mutate again.";
@@ -1115,7 +1130,13 @@ public class Game {
             } else {
                 DeathInfoPlayerKill playerKill = (DeathInfoPlayerKill) gamePlayer.getDeathInfo();
                 GamePlayer killer = getPlayer(playerKill.getKiller());
-                mutateName = "&c&lTAKE REVENGE   &eTarget: " + killer.getNexusPlayer().getColoredName() + "   &ePasses: &b" + gamePlayer.getNexusPlayer().getStats().getValue("sg_mutation_passes").getAsInt();
+                String passes;
+                if (getSettings().isUnlimitedPasses()) {
+                    passes = "Unlimited";
+                } else {
+                    passes = gamePlayer.getNexusPlayer().getStats().getValue("sg_mutation_passes").getAsInt() + "";
+                }
+                mutateName = "&c&lTAKE REVENGE   &eTarget: " + killer.getNexusPlayer().getColoredName() + "   &ePasses: &b" + passes;
             }
         }
         ItemStack mutateItem = ItemBuilder.start(Material.ROTTEN_FLESH).displayName(mutateName).build();
