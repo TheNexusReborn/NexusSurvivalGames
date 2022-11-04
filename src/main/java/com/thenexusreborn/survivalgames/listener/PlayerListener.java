@@ -33,6 +33,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Openable;
 import org.bukkit.potion.*;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -156,6 +157,24 @@ public class PlayerListener implements Listener {
                     }
                 } else if (mutation instanceof ChickenMutation) {
                     ChickenMutation chickenMutation = (ChickenMutation) mutation;
+                    if (item.getType() == Material.SLIME_BALL) {
+                        if (!chickenMutation.isLaunchOnCooldown()) {
+                            player.setVelocity(new Vector(0, 2, 0));
+                            chickenMutation.startLaunchCooldown();
+                        } else {
+                            player.sendMessage(MCUtils.color(MsgType.WARN + "Chicken Launch is still on cooldown: &e" + chickenMutation.getLaunchCooldownTimer().getSecondsLeft() + "s&c!"));
+                        }
+                    } else if (item.getType() == Material.FEATHER) {
+                        if (!chickenMutation.isParachuteOnCooldown()) {
+                            if (chickenMutation.isChuteActive()) {
+                                chickenMutation.deactivateChute();
+                            } else {
+                                chickenMutation.activateChute();
+                            }
+                        } else {
+                            player.sendMessage(MCUtils.color(MsgType.WARN + "Chicken Chute is still on cooldown: &e" + chickenMutation.getParachuteCooldownTimer().getSecondsLeft() + "s&c!"));
+                        }
+                    }
                 }
             }
         } else {

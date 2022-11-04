@@ -415,6 +415,8 @@ public class Lobby {
         Location spawn = getSpawnpoint().clone();
         spawn.setY(spawn.getY() + 2);
         player.teleport(spawn);
+        player.setMaxHealth(20);
+        player.setLevel(0);
         
         for (Player online : Bukkit.getOnlinePlayers()) {
             online.showPlayer(player);

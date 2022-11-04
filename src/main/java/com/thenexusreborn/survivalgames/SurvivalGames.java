@@ -189,6 +189,9 @@ public class SurvivalGames extends NexusSpigotPlugin {
         new StatSignUpdateTask(this).start();
         new TributeSignUpdateTask(this).start();
         new EndermanWaterDamageTask(this).start();
+        new ChickenMutationTask(this).start();
+        new SpectatorUpdateTask(this).start();
+        new ServerStatusTask(this).start();
         
         getLogger().info("Registered Tasks");
         
@@ -201,9 +204,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
         }
         
         getLogger().info("Registered Listeners");
-        
-        new SpectatorUpdateTask(this).start();
-        new ServerStatusTask(this).start();
     }
     
     @Override

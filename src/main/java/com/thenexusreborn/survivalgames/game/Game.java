@@ -796,6 +796,7 @@ public class Game {
         player.getInventory().clear();
         player.getInventory().setArmorContents(null);
         player.setAllowFlight(false);
+        player.setMaxHealth(20);
         player.spigot().setCollidesWithEntities(true);
     }
     

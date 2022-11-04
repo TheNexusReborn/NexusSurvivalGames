@@ -2,8 +2,8 @@ package com.thenexusreborn.survivalgames.listener;
 
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
-import com.thenexusreborn.survivalgames.mutations.MutationType;
-import com.thenexusreborn.survivalgames.mutations.impl.SkeletonMutation;
+import com.thenexusreborn.survivalgames.mutations.*;
+import com.thenexusreborn.survivalgames.mutations.impl.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.bukkit.event.entity.*;
@@ -102,6 +102,21 @@ public class EntityListener implements Listener {
                         } else {
                             targetPlayer.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 160, 1));
                             targetPlayer.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 160, 1));
+                        }
+    
+                        if (e.getDamager() instanceof Egg) {
+                            ProjectileSource shooter = ((Egg) e.getDamager()).getShooter();
+                            if (shooter instanceof Player) {
+                                Player shooterPlayer = (Player) shooter;
+                                Mutation mutation = game.getPlayer(shooterPlayer.getUniqueId()).getMutation();
+                                if (mutation instanceof ChickenMutation) {
+                                    if (mutation.getTarget().equals(targetPlayer.getUniqueId())) {
+                                        targetPlayer.damage(2.5, shooterPlayer);
+                                    } else {
+                                        e.setCancelled(true);
+                                    }
+                                }
+                            }
                         }
                     }
                 } else if (e.getDamager() instanceof Arrow) {
