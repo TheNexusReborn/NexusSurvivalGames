@@ -293,8 +293,15 @@ public class Game {
     public void recalculateVisibility() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             GamePlayer gamePlayer = getPlayer(player.getUniqueId());
+            if (gamePlayer == null) {
+                continue;
+            }
             for (Player other : Bukkit.getOnlinePlayers()) {
                 GamePlayer otherGamePlayer = getPlayer(other.getUniqueId());
+                
+                if (otherGamePlayer == null) {
+                    continue;
+                }
                 
                 if (gamePlayer.getNexusPlayer().getToggles().getValue("vanish")) {
                     player.showPlayer(other);
