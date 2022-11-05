@@ -381,8 +381,8 @@ public class PlayerListener implements Listener {
         }
         
         String symbolColor = e.newValue() ? "a" : "c";
-        String symbol = e.newValue() ? ">>" : "<<";
-        String action = e.newValue() ? "joined" : "left";
+        String symbol = !e.newValue() ? ">>" : "<<";
+        String action = !e.newValue() ? "joined" : "left";
         String silent = incognito ? " &e&osilently" : "";
         
         String message = "&" + symbolColor + "&l" + symbol + " " + nexusPlayer.getColoredName() + " &e" + action + silent + "&e.";
@@ -395,10 +395,15 @@ public class PlayerListener implements Listener {
             }
         } else {
             if (game == null) {
-                lobby.recaculateVisibility();
+                Bukkit.getScheduler().runTaskLater(plugin, lobby::recalculateVisibility, 1L);
                 lobby.sendMessage(message);
             } else {
-                game.recalculateVisibility();
+                if (e.newValue()) {
+                    if (game.getPlayer(nexusPlayer.getUniqueId()).getTeam() != GameTeam.SPECTATORS) {
+                        game.killPlayer(nexusPlayer.getUniqueId(), new DeathInfoVanish(nexusPlayer.getUniqueId()));
+                    }
+                }
+                Bukkit.getScheduler().runTaskLater(plugin, game::recalculateVisibility, 1L);
                 game.sendMessage(message);
             }
         }

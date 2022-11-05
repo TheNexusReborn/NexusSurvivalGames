@@ -102,7 +102,7 @@ public class Game {
         }
         gameInfo.setSettings(sb.substring(0, sb.length() - 1));
     }
-
+    
     protected void setState(GameState state) {
         this.state = state;
         this.gameInfo.getActions().add(new GameAction(System.currentTimeMillis(), "statechange", state.name()));
@@ -266,15 +266,15 @@ public class Game {
             }
         }.runTaskLater(plugin, 1L);
     }
-
+    
     public void teleportTribute(Player tribute, Location mapSpawn, Location spawn) {
         teleportToGameSpawn(tribute, mapSpawn, spawn, GameTeam.TRIBUTES);
     }
-
+    
     public void teleportMutation(Player mutation, Location mapSpawn, Location spawn) {
         teleportToGameSpawn(mutation, mapSpawn, spawn, GameTeam.MUTATIONS);
     }
-
+    
     public void teleportSpectator(Player spectator, Location mapSpawn) {
         try {
             spectator.teleport(mapSpawn);
@@ -298,6 +298,9 @@ public class Game {
                 
                 if (gamePlayer.getNexusPlayer().getToggles().getValue("vanish")) {
                     player.showPlayer(other);
+                    if (otherGamePlayer.getNexusPlayer().getRanks().get().ordinal() > Rank.HELPER.ordinal()) {
+                        other.hidePlayer(player);
+                    }
                 } else if (gamePlayer.getTeam() != GameTeam.SPECTATORS && otherGamePlayer.getTeam() != GameTeam.SPECTATORS) {
                     player.showPlayer(other);
                     other.showPlayer(player);
@@ -554,7 +557,7 @@ public class Game {
     public void teleportDeathmatch() {
         try {
             setState(TELEPORT_DEATHMATCH);
-    
+            
             for (GamePlayer gp : this.players.values()) {
                 if (gp.getTeam() == GameTeam.MUTATIONS) {
                     removeMutation(gp.getMutation());
@@ -784,7 +787,7 @@ public class Game {
                                     }
                                 }
                             }
-
+                            
                             Tag tag = new Tag(nexusPlayer.getUniqueId(), gameInfo.getId() + "th", System.currentTimeMillis());
                             nexusPlayer.getTags().add(tag);
                             nexusPlayer.sendMessage(MsgType.INFO + "Unlocked the tag " + tag.getDisplayName());
@@ -856,12 +859,12 @@ public class Game {
         gamePlayer.setDeathInfo(deathInfo);
         gamePlayer.setTrackerInfo(null);
         GameTeam oldTeam = gamePlayer.getTeam();
-    
+        
         boolean vanished = deathInfo.getType() == DeathType.VANISH;
-    
+        
         int score = gamePlayer.getNexusPlayer().getStats().getValue("sg_score").getAsInt();
         int lost = (int) Math.ceil(score / 10D);
-    
+        
         if (!vanished) {
             gamePlayer.getNexusPlayer().getStats().change("sg_score", lost, StatOperator.SUBTRACT);
             gamePlayer.sendMessage("&4&l>> &cYou lost " + lost + " Score for dying.");
@@ -883,7 +886,7 @@ public class Game {
         if (deathInfo instanceof DeathInfoPlayerKill) {
             DeathInfoPlayerKill playerDeath = (DeathInfoPlayerKill) deathInfo;
             killer = getPlayer(playerDeath.getKiller());
-    
+            
             mutationKill = killer.getTeam() == GameTeam.MUTATIONS && killer.getMutation().getTarget() == gamePlayer.getUniqueId();
             
             if (settings.getColorMode() == ColorMode.GAME_TEAM) {
@@ -919,7 +922,7 @@ public class Game {
             DeathInfoProjectile death = (DeathInfoProjectile) deathInfo;
             if (death.getShooter() instanceof Player) {
                 killer = getPlayer(death.getShooter().getUniqueId());
-    
+                
                 mutationKill = killer.getTeam() == GameTeam.MUTATIONS && killer.getMutation().getTarget() == gamePlayer.getUniqueId();
                 
                 if (settings.getColorMode() == ColorMode.GAME_TEAM) {
@@ -936,7 +939,7 @@ public class Game {
                 killerHealth = death.getKillerHealth();
             }
         }
-    
+        
         if (mutationKill) {
             gamePlayer.setDeathByMutation(true);
             removeMutation(killer.getMutation());
@@ -1031,7 +1034,7 @@ public class Game {
                     killer.sendMessage("&2&l>> &cYou killed yourself. No Credits for you.");
                 }
             }
-    
+            
             for (GamePlayer gp : new ArrayList<>(this.players.values())) {
                 if (gp.getTeam() == GameTeam.MUTATIONS) {
                     if (gp.getMutation().getTarget().equals(gamePlayer.getUniqueId())) {
@@ -1091,7 +1094,7 @@ public class Game {
                     totalMutations++;
                 }
             }
-    
+            
             sendMessage("&6&l>> &d&l" + totalMutations + " mutations remain.");
         }
         
@@ -1226,7 +1229,7 @@ public class Game {
         GamePlayer gamePlayer = getPlayer(mutation.getPlayer());
         NexusPlayer nexusPlayer = gamePlayer.getNexusPlayer();
         sendMessage("&6&l>> " + nexusPlayer.getColoredName() + " &6has &lMUTATED &6as a(n) &l" + mutation.getType().getDisplayName() + " &6and seeks revenge on &a" + Bukkit.getPlayer(mutation.getTarget()).getName() + "&6!");
-
+        
         MapSpawn spawn = gameMap.getSpawns().get(new Random().nextInt(gameMap.getSpawns().size()));
         Location location = spawn.toLocation(this.gameMap.getWorld());
         Player player = Bukkit.getPlayer(nexusPlayer.getUniqueId());
@@ -1235,7 +1238,7 @@ public class Game {
         gamePlayer.setTeam(GameTeam.MUTATIONS);
         gamePlayer.sendMessage(gamePlayer.getTeam().getJoinMessage());
         DisguiseAPI.disguiseEntity(player, new MobDisguise(mutation.getType().getDisguiseType()));
-
+        
         gamePlayer.setMutated(true);
         teleportMutation(player, this.gameMap.getCenter().toLocation(gameMap.getWorld()), location);
         recalculateVisibility();
@@ -1244,7 +1247,7 @@ public class Game {
         player.setAllowFlight(false);
         player.setFlying(false);
         player.setSaturation(20);
-
+        
         MutationType type = mutation.getType();
         PlayerInventory inv = player.getInventory();
         inv.setItem(0, type.getWeapon());

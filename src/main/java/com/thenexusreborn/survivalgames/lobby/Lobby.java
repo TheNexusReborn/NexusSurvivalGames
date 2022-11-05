@@ -750,7 +750,7 @@ public class Lobby {
                 '}';
     }
     
-    public void recaculateVisibility() {
+    public void recalculateVisibility() {
         for (NexusPlayer player : this.getPlayers()) {
             Player bukkitPlayer = Bukkit.getPlayer(player.getUniqueId());
             boolean vanish = player.getToggles().getValue("vanish");
