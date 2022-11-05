@@ -30,7 +30,9 @@ public class MutateGui extends Menu {
     
         List<String> purchased = new ArrayList<>(), available = new ArrayList<>(), locked = new ArrayList<>();
         for (MutationType type : MutationType.TYPES) {
-            if (unlockedMutations.isUnlocked(type.getId().toLowerCase())) {
+            if (plugin.getGame() != null && plugin.getGame().getSettings().isUseAllMutations()) {
+                purchased.add(type.getId());
+            } else if (unlockedMutations.isUnlocked(type.getId().toLowerCase())) {
                 purchased.add(type.getId());
             } else if (type.getUnlockCost()<= credits) {
                 available.add(type.getId());

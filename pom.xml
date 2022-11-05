@@ -6,7 +6,7 @@
 
     <groupId>com.thenexusreborn</groupId>
     <artifactId>NexusSurvivalGames</artifactId>
-    <version>1.9-ALPHA</version>
+    <version>1.9.1-ALPHA</version>
 
     <properties>
         <java.version>1.8</java.version>

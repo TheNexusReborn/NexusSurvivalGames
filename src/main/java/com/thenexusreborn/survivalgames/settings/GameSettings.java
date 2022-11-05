@@ -30,8 +30,9 @@ public class GameSettings extends SGSettings {
     private boolean sounds = true;
     private boolean giveCredits = true;
     private boolean giveXp = true;
-    private boolean useNewLoot = false;
+    private boolean useNewLoot = true;
     private boolean allowEnderchests = true;
+    private boolean useAllMutations = false;
     private ColorMode colorMode = ColorMode.RANK;
     private Time time = Time.NOON;
     private Weather weather = Weather.CLEAR;
@@ -294,6 +295,14 @@ public class GameSettings extends SGSettings {
         return passUseChance;
     }
     
+    public boolean isUseAllMutations() {
+        return useAllMutations;
+    }
+    
+    public void setUseAllMutations(boolean useAllMutations) {
+        this.useAllMutations = useAllMutations;
+    }
+    
     @Override
     public String toString() {
         return "GameSettings{" +
@@ -306,8 +315,11 @@ public class GameSettings extends SGSettings {
                 ", deathmatchThreshold=" + deathmatchThreshold +
                 ", nextGameStart=" + nextGameStart +
                 ", deathmatchTimerLength=" + deathmatchTimerLength +
+                ", mutationSpawnDelay=" + mutationSpawnDelay +
+                ", passRewardChance=" + passRewardChance +
+                ", passUseChance=" + passUseChance +
                 ", teamingAllowed=" + teamingAllowed +
-                ", mutations=" + allowMutations +
+                ", allowMutations=" + allowMutations +
                 ", regeneration=" + regeneration +
                 ", gracePeriod=" + gracePeriod +
                 ", unlimitedPasses=" + unlimitedPasses +
@@ -319,11 +331,10 @@ public class GameSettings extends SGSettings {
                 ", giveXp=" + giveXp +
                 ", useNewLoot=" + useNewLoot +
                 ", allowEnderchests=" + allowEnderchests +
+                ", useAllMutations=" + useAllMutations +
                 ", colorMode=" + colorMode +
                 ", time=" + time +
                 ", weather=" + weather +
-                ", id=" + id +
-                ", type='" + type +
                 '}';
     }
     
