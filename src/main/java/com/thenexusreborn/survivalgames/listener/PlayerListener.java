@@ -12,7 +12,7 @@ import com.thenexusreborn.survivalgames.game.death.*;
 import com.thenexusreborn.survivalgames.lobby.*;
 import com.thenexusreborn.survivalgames.loot.*;
 import com.thenexusreborn.survivalgames.menu.*;
-import com.thenexusreborn.survivalgames.mutations.*;
+import com.thenexusreborn.survivalgames.mutations.Mutation;
 import com.thenexusreborn.survivalgames.mutations.impl.*;
 import com.thenexusreborn.survivalgames.settings.ColorMode;
 import com.thenexusreborn.survivalgames.util.SGUtils;
@@ -37,8 +37,6 @@ import org.bukkit.util.Vector;
 
 import java.lang.reflect.Field;
 import java.util.*;
-
-import static com.thenexusreborn.survivalgames.game.GameState.*;
 
 @SuppressWarnings("DuplicatedCode")
 public class PlayerListener implements Listener {
@@ -113,7 +111,7 @@ public class PlayerListener implements Listener {
                                 }
                             }
                         } else if (item.getType() == Material.ROTTEN_FLESH) {
-                            if (!(gamePlayer.deathByMutation() || gamePlayer.hasMutated()) && (game.getState() == INGAME || game.getState() == INGAME_DEATHMATCH) && game.getSettings().isAllowMutations()) {
+                            if (gamePlayer.canMutate()) {
                                 player.openInventory(new MutateGui(plugin, gamePlayer.getNexusPlayer()).getInventory());
                             }
                         } else if (item.getType() == Material.WATCH) {

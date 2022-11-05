@@ -5,7 +5,8 @@ import org.bukkit.GameMode;
 public enum GameTeam {
     TRIBUTES("Tributes", "&a", GameMode.SURVIVAL), 
     SPECTATORS("Spectators", "&c", GameMode.ADVENTURE), 
-    MUTATIONS("Mutations", "&d", GameMode.SURVIVAL);
+    MUTATIONS("Mutations", "&d", GameMode.SURVIVAL), 
+    ZOMBIES("Zombies", "&2", GameMode.SURVIVAL);
     private final String name, color;
     private final GameMode gameMode;
     
@@ -28,7 +29,7 @@ public enum GameTeam {
     }
     
     public String getJoinMessage() {
-        return "&d&l>> &7You joined " + getColor() + getName();    
+        return "&a&l>> &7You joined " + getColor() + getName();    
     }
     
     public String getLeaveMessage() {

@@ -1,6 +1,7 @@
 package com.thenexusreborn.survivalgames.game;
 
 import com.thenexusreborn.api.player.NexusPlayer;
+import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
 
@@ -111,5 +112,26 @@ public class GamePlayer {
     
     public boolean deathByMutation() {
         return deathByMutation;
+    }
+    
+    public boolean canMutate() {
+        if (deathByMutation) {
+            return false;
+        }
+        
+        if (mutated) {
+            return false;
+        }
+        
+        Game game = SurvivalGames.getPlugin(SurvivalGames.class).getGame();
+        if (game == null) {
+            return false;
+        }
+        
+        if (!(game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_DEATHMATCH)) {
+            return false;
+        }
+        
+        return game.getSettings().isAllowMutations();
     }
 }
