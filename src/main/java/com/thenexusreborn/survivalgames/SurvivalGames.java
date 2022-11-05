@@ -12,21 +12,19 @@ import com.thenexusreborn.nexuscore.api.NexusSpigotPlugin;
 import com.thenexusreborn.nexuscore.util.ServerProperties;
 import com.thenexusreborn.survivalgames.cmd.*;
 import com.thenexusreborn.survivalgames.game.Game;
-import com.thenexusreborn.survivalgames.game.death.DeathType;
 import com.thenexusreborn.survivalgames.game.tasks.*;
 import com.thenexusreborn.survivalgames.listener.*;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.tasks.*;
 import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.map.*;
-import com.thenexusreborn.survivalgames.mutations.PlayerMutations;
-import com.thenexusreborn.survivalgames.mutations.UnlockedMutation;
+import com.thenexusreborn.survivalgames.mutations.*;
 import com.thenexusreborn.survivalgames.settings.*;
 import com.thenexusreborn.survivalgames.tasks.ServerStatusTask;
 import org.bukkit.*;
 import org.bukkit.configuration.file.*;
 
-import java.io.*;
+import java.io.File;
 import java.sql.*;
 import java.util.*;
 
@@ -86,11 +84,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         }
         
         deathMessagesConfig = YamlConfiguration.loadConfiguration(deathMessagesFile);
-    
-        for (DeathType deathType : DeathType.values()) {
-            deathMessagesConfig.set(deathType.name(), "%playername%");
-        }
-    
+        
         getLogger().info("Loading Game and Lobby Settings");
         try {
             for (GameSettings gameSettings : NexusAPI.getApi().getPrimaryDatabase().get(GameSettings.class)) {
