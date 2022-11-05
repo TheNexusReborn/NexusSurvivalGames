@@ -13,7 +13,7 @@ public class GameSettings extends SGSettings {
     private int gameLength = 20;
     private int deathmatchLength = 5;
     private int warmupLength = 30;
-    private int deathmatchThreshold = 4;
+    private int deathmatchThreshold = 2; //Default: 4
     private int nextGameStart = 10;
     private int deathmatchTimerLength = 1;
     private int mutationSpawnDelay = 10;
@@ -23,7 +23,7 @@ public class GameSettings extends SGSettings {
     private boolean allowMutations = true;
     private boolean regeneration = true;
     private boolean gracePeriod = false;
-    private boolean unlimitedPasses = false;
+    private boolean unlimitedPasses = true; //Default: false
     private boolean timeProgression = false;
     private boolean weatherProgression = false;
     private boolean multiplier = true;
@@ -32,7 +32,7 @@ public class GameSettings extends SGSettings {
     private boolean giveXp = true;
     private boolean useNewLoot = true;
     private boolean allowEnderchests = true;
-    private boolean useAllMutations = false;
+    private boolean useAllMutations = true; //Default: false
     private ColorMode colorMode = ColorMode.RANK;
     private Time time = Time.NOON;
     private Weather weather = Weather.CLEAR;
