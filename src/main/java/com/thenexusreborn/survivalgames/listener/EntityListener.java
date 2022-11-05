@@ -2,11 +2,14 @@ package com.thenexusreborn.survivalgames.listener;
 
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
+import com.thenexusreborn.survivalgames.mutations.*;
+import com.thenexusreborn.survivalgames.mutations.impl.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.*;
+import org.bukkit.projectiles.ProjectileSource;
 
 import java.util.*;
 
@@ -39,6 +42,11 @@ public class EntityListener implements Listener {
                 e.setCancelled(true);
                 e.getEntity().setFireTicks(0);
                 return;
+            } else if (gamePlayer.getTeam() == GameTeam.MUTATIONS) {
+                MutationType mutationType = gamePlayer.getMutation().getType();
+                if (mutationType.getDamageImmunities().contains(e.getCause())) {
+                    e.setCancelled(true);
+                }
             }
             
             if (game.getState() == GameState.INGAME_GRACEPERIOD) {
@@ -82,7 +90,7 @@ public class EntityListener implements Listener {
                     e.setCancelled(true);
                 }
                 
-                //TODO mutations
+                checkMutationDamage(damagerPlayer, targetPlayer, e);
             } else if (e.getEntity() instanceof ItemFrame || e.getEntity() instanceof ArmorStand) {
                 e.setCancelled(true);
             } else if (e.getDamager() instanceof Projectile) {
@@ -95,15 +103,75 @@ public class EntityListener implements Listener {
                             targetPlayer.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 160, 1));
                             targetPlayer.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 160, 1));
                         }
+    
+                        if (e.getDamager() instanceof Egg) {
+                            ProjectileSource shooter = ((Egg) e.getDamager()).getShooter();
+                            if (shooter instanceof Player) {
+                                Player shooterPlayer = (Player) shooter;
+                                Mutation mutation = game.getPlayer(shooterPlayer.getUniqueId()).getMutation();
+                                if (mutation instanceof ChickenMutation) {
+                                    if (mutation.getTarget().equals(targetPlayer.getUniqueId())) {
+                                        targetPlayer.damage(2.5, shooterPlayer);
+                                    } else {
+                                        e.setCancelled(true);
+                                    }
+                                }
+                            }
+                        }
                     }
                 } else if (e.getDamager() instanceof Arrow) {
                     if (game.getState() == GameState.INGAME_GRACEPERIOD) {
                         e.setCancelled(true);
                     }
+    
+                    ProjectileSource shooter = ((Arrow) e.getDamager()).getShooter();
+                    if (shooter instanceof Player && e.getEntity() instanceof Player) {
+                        checkMutationDamage(game.getPlayer(((Player) shooter).getUniqueId()), game.getPlayer(e.getEntity().getUniqueId()), e);
+                    }
+                }
+            } else if (e.getDamager() instanceof TNTPrimed) {
+                if (e.getEntity() instanceof Player) {
+                    if (game.getSuicideLocations().containsKey(e.getDamager().getLocation())) {
+                        UUID source = game.getSuicideLocations().get(e.getDamager().getLocation());
+                        GamePlayer sourcePlayer = game.getPlayer(source);
+                        if (sourcePlayer.getTeam() == GameTeam.MUTATIONS) {
+                            if (!sourcePlayer.getMutation().getTarget().equals(e.getEntity().getUniqueId())) {
+                                e.setCancelled(true);
+                            }
+                        }
+                    }
+                    
+                    TNTPrimed tntPrimed = (TNTPrimed) e.getDamager();
+                    if (tntPrimed.getSource() instanceof Player) {
+                        GamePlayer sourcePlayer = game.getPlayer(tntPrimed.getSource().getUniqueId());
+                        if (sourcePlayer.getTeam() == GameTeam.MUTATIONS) {
+                            if (!sourcePlayer.getMutation().getTarget().equals(e.getEntity().getUniqueId())) {
+                                e.setCancelled(true);
+                            }
+                        }
+                    }
                 }
             }
         } else {
             e.setCancelled(true);
+        }
+    }
+    
+    private void checkMutationDamage(GamePlayer damagerPlayer, GamePlayer targetPlayer, EntityDamageByEntityEvent e) {
+        if (damagerPlayer.getTeam() == GameTeam.MUTATIONS) {
+            if (!damagerPlayer.getMutation().getTarget().equals(targetPlayer.getUniqueId())) {
+                e.setCancelled(true);
+                damagerPlayer.sendMessage("&4&l>> &cYou can only damage your target.");
+            }
+        } else if (targetPlayer.getTeam() == GameTeam.MUTATIONS) {
+            if (!targetPlayer.getMutation().getTarget().equals(damagerPlayer.getUniqueId())) {
+                e.setCancelled(true);
+                damagerPlayer.sendMessage("&4&l>> &cYou can only damage mutations that are after you.");
+            } else {
+                if (targetPlayer.getMutation() instanceof SkeletonMutation) {
+                    e.setDamage(e.getDamage() * 1.5);
+                }
+            }
         }
     }
     
@@ -113,8 +181,16 @@ public class EntityListener implements Listener {
             Game game = plugin.getGame();
             if (e.getEntity() instanceof Player) {
                 Player player = ((Player) e.getEntity());
+                GamePlayer gamePlayer = game.getPlayer(e.getEntity().getUniqueId());
                 if (!game.getSettings().isRegeneration()) {
-                    if (game.getPlayer(e.getEntity().getUniqueId()).getTeam() == GameTeam.TRIBUTES) {
+                    if (gamePlayer.getTeam() == GameTeam.TRIBUTES) {
+                        e.setCancelled(true);
+                    }
+                }
+                
+                if (gamePlayer.getTeam() == GameTeam.MUTATIONS) {
+                    MutationType mutationType = gamePlayer.getMutation().getType();
+                    if (!mutationType.healthRegen()) {
                         e.setCancelled(true);
                     }
                 }

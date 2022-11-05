@@ -3,6 +3,7 @@ package com.thenexusreborn.survivalgames.game;
 import com.thenexusreborn.api.player.IActionBar;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
+import com.thenexusreborn.survivalgames.mutations.Mutation;
 
 public class GameActionBar implements IActionBar {
     
@@ -52,8 +53,6 @@ public class GameActionBar implements IActionBar {
         if (game.getState() == GameState.WARMUP_DONE) {
             return "&aWarmup done, waiting for game...";
         }
-    
-        //SpigotUtils.sendActionBar(player, "&f&lTARGET: &a" + target.getName() + "   &f&lDISTANCE: &a" + ((int) distance) + "m" + "   &f&lHEALTH: &a" + health + "&f/&a" + maxHealth + " HP");
         
         if (game.getState().ordinal() >= GameState.INGAME_GRACEPERIOD.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal()) {
             TrackerInfo trackerInfo = player.getTrackerInfo();
@@ -64,6 +63,12 @@ public class GameActionBar implements IActionBar {
                 String maxHealth = trackerInfo.getMaxHealth();
                 return "&f&lTARGET: &a" + target + "   &f&lDISTANCE: &a" + distance + "m" + "   &f&lHEALTH: &a" + health + "&f/&a" + maxHealth + " HP";
             }
+        }
+    
+        if (player.getTeam() == GameTeam.MUTATIONS) {
+            Mutation mutation = player.getMutation();
+            GamePlayer target = game.getPlayer(mutation.getTarget());
+            return "&c&lSEEKING REVENGE ON &a" + target.getNexusPlayer().getName();
         }
         
         if (game.getState() == GameState.INGAME_GRACEPERIOD) {

@@ -4,7 +4,7 @@ import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
-import com.thenexusreborn.survivalgames.game.death.DeathInfoSpectate;
+import com.thenexusreborn.survivalgames.game.deathold.DeathInfoSpectate;
 import com.thenexusreborn.survivalgames.lobby.*;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;

@@ -1,5 +1,21 @@
 package com.thenexusreborn.survivalgames.game.death;
 
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+
 public enum DeathType {
-    PLAYER, PROJECTILE, SUFFOCATION, UNKNOWN, FALL, LAVA, FIRE, DROWNING, EXPLOSION, VOID, LIGHTNING, SUICIDE, STARVATION, POISON, MAGIC, WITHER, CHEAT, INCOGNITO, FALLING_BLOCK, THORNS, ENTITY, SUICIDE_KILLED, LEAVE, VANISH, SPECTATE
+    UNKNOWN, PLAYER, PLAYER_PROJECTILE, ENTITY, ENTITY_PROJECTILE, SUFFOCATION, MELTING, FALL, LAVA, FIRE, DROWNING, EXPLOSION, VOID, LIGHTNING, SUICIDE, STARVATION, POISON, MAGIC, WITHER, INCOGNITO, FALLING_BLOCK, THORNS, CHEAT, LEAVE, VANISH, SPECTATE;
+    
+    public static DeathType getTypeByCause(DamageCause cause) {
+        for (DeathType deathType : values()) {
+            if (deathType.name().equalsIgnoreCase(cause.name())) {
+                return deathType;
+            }
+            
+            if (cause.name().contains("EXPLOSION")) {
+                return EXPLOSION;
+            }
+        }
+        
+        return UNKNOWN;
+    }
 }

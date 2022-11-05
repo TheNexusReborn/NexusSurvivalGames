@@ -16,8 +16,11 @@ public class GameSettings extends SGSettings {
     private int deathmatchThreshold = 4;
     private int nextGameStart = 10;
     private int deathmatchTimerLength = 1;
+    private int mutationSpawnDelay = 10;
+    private double passRewardChance = 0.75;
+    private double passUseChance = 0.99;
     private boolean teamingAllowed = true;
-    private boolean mutations = false;
+    private boolean allowMutations = true;
     private boolean regeneration = true;
     private boolean gracePeriod = false;
     private boolean unlimitedPasses = false;
@@ -130,12 +133,12 @@ public class GameSettings extends SGSettings {
         return this;
     }
     
-    public boolean isMutations() {
-        return mutations;
+    public boolean isAllowMutations() {
+        return allowMutations;
     }
     
-    public GameSettings setMutations(boolean mutations) {
-        this.mutations = mutations;
+    public GameSettings setAllowMutations(boolean allowMutations) {
+        this.allowMutations = allowMutations;
         return this;
     }
     
@@ -264,6 +267,33 @@ public class GameSettings extends SGSettings {
         this.allowEnderchests = allowEnderchests;
     }
     
+    public GameSettings setMutationSpawnDelay(int mutationSpawnDelay) {
+        this.mutationSpawnDelay = mutationSpawnDelay;
+        return this;
+    }
+    
+    public GameSettings setPassRewardChance(double passRewardChance) {
+        this.passRewardChance = passRewardChance;
+        return this;
+    }
+    
+    public GameSettings setPassUseChance(double passUseChance) {
+        this.passUseChance = passUseChance;
+        return this;
+    }
+    
+    public int getMutationSpawnDelay() {
+        return mutationSpawnDelay;
+    }
+    
+    public double getPassRewardChance() {
+        return passRewardChance;
+    }
+    
+    public double getPassUseChance() {
+        return passUseChance;
+    }
+    
     @Override
     public String toString() {
         return "GameSettings{" +
@@ -277,7 +307,7 @@ public class GameSettings extends SGSettings {
                 ", nextGameStart=" + nextGameStart +
                 ", deathmatchTimerLength=" + deathmatchTimerLength +
                 ", teamingAllowed=" + teamingAllowed +
-                ", mutations=" + mutations +
+                ", mutations=" + allowMutations +
                 ", regeneration=" + regeneration +
                 ", gracePeriod=" + gracePeriod +
                 ", unlimitedPasses=" + unlimitedPasses +

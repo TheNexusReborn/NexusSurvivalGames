@@ -13,6 +13,9 @@ import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.server.Environment;
 import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.api.tags.Tag;
+import com.thenexusreborn.disguise.DisguiseAPI;
+import com.thenexusreborn.disguise.disguisetypes.MobDisguise;
+import com.thenexusreborn.nexuscore.util.ArmorType;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
@@ -20,10 +23,15 @@ import com.thenexusreborn.nexuscore.util.region.Cuboid;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.ControlType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.death.*;
+import com.thenexusreborn.survivalgames.game.deathold.*;
 import com.thenexusreborn.survivalgames.game.timer.*;
+import com.thenexusreborn.survivalgames.loot.Items;
 import com.thenexusreborn.survivalgames.map.GameMap;
 import com.thenexusreborn.survivalgames.map.MapSpawn;
+import com.thenexusreborn.survivalgames.mutations.Mutation;
+import com.thenexusreborn.survivalgames.mutations.MutationEffect;
+import com.thenexusreborn.survivalgames.mutations.MutationItem;
+import com.thenexusreborn.survivalgames.mutations.MutationType;
 import com.thenexusreborn.survivalgames.scoreboard.GameScoreboardView;
 import com.thenexusreborn.survivalgames.scoreboard.GameTablistHandler;
 import com.thenexusreborn.survivalgames.settings.ColorMode;
@@ -62,6 +70,7 @@ public class Game {
     private long start, end;
     private GamePlayer firstBlood;
     private final Map<Location, Inventory> enderchestInventories = new HashMap<>();
+    private final Map<Location, UUID> suicideLocations = new HashMap<>();
     
     public Game(GameMap gameMap, GameSettings settings, Collection<NexusPlayer> players, List<UUID> spectatingPlayers) {
         this.gameMap = gameMap;
@@ -241,21 +250,29 @@ public class Game {
         }
     }
     
-    public void teleportTribute(Player tribute, Location mapSpawn, Location spawn) {
+    private void teleportToGameSpawn(Player player, Location mapSpawn, Location spawn, GameTeam gameTeam) {
         spawn.setX(spawn.getX() + 0.5);
         spawn.setY(spawn.getY() + 2.0);
         spawn.setZ(spawn.getZ() + 0.5);
         spawn.setPitch(0);
         spawn.setYaw(SGUtils.getAngle(spawn.toVector(), mapSpawn.toVector()));
-        tribute.teleport(spawn);
-        tribute.setAllowFlight(false);
-        tribute.setFlying(false);
+        player.teleport(spawn);
+        player.setAllowFlight(false);
+        player.setFlying(false);
         new BukkitRunnable() {
             @Override
             public void run() {
-                tribute.setGameMode(GameTeam.TRIBUTES.getGameMode());
+                player.setGameMode(gameTeam.getGameMode());
             }
         }.runTaskLater(plugin, 1L);
+    }
+    
+    public void teleportTribute(Player tribute, Location mapSpawn, Location spawn) {
+        teleportToGameSpawn(tribute, mapSpawn, spawn, GameTeam.TRIBUTES);
+    }
+    
+    public void teleportMutation(Player mutation, Location mapSpawn, Location spawn) {
+        teleportToGameSpawn(mutation, mapSpawn, spawn, GameTeam.MUTATIONS);
     }
     
     public void teleportSpectator(Player spectator, Location mapSpawn) {
@@ -281,10 +298,13 @@ public class Game {
                 
                 if (gamePlayer.getNexusPlayer().getToggles().getValue("vanish")) {
                     player.showPlayer(other);
-                } else if (gamePlayer.getTeam() == GameTeam.TRIBUTES && otherGamePlayer.getTeam() == GameTeam.TRIBUTES) {
+                    if (otherGamePlayer.getNexusPlayer().getRanks().get().ordinal() > Rank.HELPER.ordinal()) {
+                        other.hidePlayer(player);
+                    }
+                } else if (gamePlayer.getTeam() != GameTeam.SPECTATORS && otherGamePlayer.getTeam() != GameTeam.SPECTATORS) {
                     player.showPlayer(other);
                     other.showPlayer(player);
-                } else if (gamePlayer.getTeam() == GameTeam.SPECTATORS && otherGamePlayer.getTeam() == GameTeam.TRIBUTES) {
+                } else if (gamePlayer.getTeam() == GameTeam.SPECTATORS && otherGamePlayer.getTeam() != GameTeam.SPECTATORS) {
                     player.showPlayer(other);
                     other.hidePlayer(player);
                 } else {
@@ -345,7 +365,6 @@ public class Game {
     public void assignStartingTeams() {
         try {
             setState(ASSIGN_TEAMS);
-            int totalTributes = 0;
             UUID uuid;
             Queue<UUID> tributes = new LinkedList<>(), spectators = new LinkedList<>();
             while ((uuid = SurvivalGames.PLAYER_QUEUE.poll()) != null) {
@@ -538,6 +557,19 @@ public class Game {
     public void teleportDeathmatch() {
         try {
             setState(TELEPORT_DEATHMATCH);
+            
+            for (GamePlayer gp : this.players.values()) {
+                if (gp.getTeam() == GameTeam.MUTATIONS) {
+                    removeMutation(gp.getMutation());
+                    gp.sendMessage(gp.getTeam().getLeaveMessage());
+                    gp.setTeam(GameTeam.SPECTATORS);
+                    gp.sendMessage(gp.getTeam().getJoinMessage());
+                    giveSpectatorItems(Bukkit.getPlayer(gp.getUniqueId()));
+                    recalculateVisibility();
+                    gp.sendMessage("&6&l>> &cYou were made a spectator because deathmatch started.");
+                }
+            }
+            
             sendMessage("&6&l>> &e&LPREPARE FOR DEATHMATCH...");
             List<UUID> tributes = new LinkedList<>(), spectators = new LinkedList<>();
             for (GamePlayer player : this.players.values()) {
@@ -651,8 +683,9 @@ public class Game {
         }
         
         String winnerName;
+        NexusPlayer winnerPlayer = (winner != null) ? winner.getNexusPlayer() : null;
         if (winner != null) {
-            winnerName = winner.getNexusPlayer().getDisplayName();
+            winnerName = winnerPlayer.getDisplayName();
         } else {
             winnerName = "&f&lNo one";
         }
@@ -660,10 +693,10 @@ public class Game {
         sendMessage("&6&l>> " + winnerName + " &a&lhas won Survival Games!");
         
         if (winner != null) {
-            winner.getNexusPlayer().getStats().change("sg_wins", 1, StatOperator.ADD);
-            winner.getNexusPlayer().getStats().change("sg_win_streak", 1, StatOperator.ADD);
+            winnerPlayer.getStats().change("sg_wins", 1, StatOperator.ADD);
+            winnerPlayer.getStats().change("sg_win_streak", 1, StatOperator.ADD);
             int winGain = 50;
-            int currentScore = winner.getNexusPlayer().getStats().getValue("sg_score").getAsInt();
+            int currentScore = winnerPlayer.getStats().getValue("sg_score").getAsInt();
             if (currentScore < 100 && currentScore > 50) {
                 winGain *= 1.25;
             } else if (currentScore <= 50 && currentScore > 25) {
@@ -677,15 +710,15 @@ public class Game {
             } else if (currentScore >= 1000) {
                 winGain *= .5;
             }
-            winner.getNexusPlayer().getStats().change("sg_score", winGain, StatOperator.ADD);
+            winnerPlayer.getStats().change("sg_score", winGain, StatOperator.ADD);
             winner.sendMessage("&2&l>> &a+" + winGain + " Score!");
-            double multiplier = winner.getNexusPlayer().getRanks().get().getMultiplier();
-            Rank rank = winner.getNexusPlayer().getRanks().get();
+            double multiplier = winnerPlayer.getRanks().get().getMultiplier();
+            Rank rank = winnerPlayer.getRanks().get();
             String multiplierMessage = rank.getColor() + "&l * x" + MCUtils.formatNumber(multiplier) + " " + rank.getPrefix() + " Bonus";
             if (settings.isGiveXp()) {
                 double xp = 10;
                 xp *= multiplier;
-                winner.getNexusPlayer().getStats().change("xp", xp, StatOperator.ADD);
+                winnerPlayer.getStats().change("xp", xp, StatOperator.ADD);
                 String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(xp) + " &2&lXP&a&l!";
                 if (multiplier > 1) {
                     winner.sendMessage(baseMessage + multiplierMessage);
@@ -697,7 +730,7 @@ public class Game {
             if (settings.isGiveCredits()) {
                 double credits = 10;
                 credits *= multiplier;
-                winner.getNexusPlayer().getStats().change("credits", credits, StatOperator.ADD);
+                winnerPlayer.getStats().change("credits", credits, StatOperator.ADD);
                 String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(credits) + " &3&lCREDITS&a&l!";
                 if (multiplier > 1) {
                     winner.sendMessage(baseMessage + multiplierMessage);
@@ -705,12 +738,20 @@ public class Game {
                     winner.sendMessage(baseMessage);
                 }
             }
+            
+            double passWinValue = new Random().nextDouble();
+            if (passWinValue <= getSettings().getPassRewardChance()) {
+                winnerPlayer.getStats().change("sg_mutation_passes", 1, StatOperator.ADD);
+                winnerPlayer.sendMessage(MsgType.INFO + "&aYou won a mutation pass for winning!");
+            } else {
+                winnerPlayer.sendMessage(MsgType.INFO + "You did not win a mutation pass this time.");
+            }
         }
         
         gameInfo.setGameStart(this.start);
         gameInfo.setGameEnd(this.end);
         if (winner != null) {
-            gameInfo.setWinner(winner.getNexusPlayer().getName());
+            gameInfo.setWinner(winnerPlayer.getName());
         } else {
             gameInfo.setWinner("No one");
         }
@@ -747,8 +788,8 @@ public class Game {
                                 }
                             }
                             
-                            Tag tag = new Tag(gameInfo.getId() + "th");
-                            nexusPlayer.unlockTag(tag.getName());
+                            Tag tag = new Tag(nexusPlayer.getUniqueId(), gameInfo.getId() + "th", System.currentTimeMillis());
+                            nexusPlayer.getTags().add(tag);
                             nexusPlayer.sendMessage(MsgType.INFO + "Unlocked the tag " + tag.getDisplayName());
                             NexusAPI.getApi().getPrimaryDatabase().push(nexusPlayer);
                         });
@@ -767,6 +808,7 @@ public class Game {
         player.getInventory().clear();
         player.getInventory().setArmorContents(null);
         player.setAllowFlight(false);
+        player.setMaxHealth(20);
         player.spigot().setCollidesWithEntities(true);
     }
     
@@ -829,9 +871,12 @@ public class Game {
             gamePlayer.getNexusPlayer().getStats().change("sg_games", 1, StatOperator.ADD);
             gamePlayer.getNexusPlayer().getStats().change("sg_win_streak", 0, StatOperator.SET);
             gamePlayer.getNexusPlayer().getStats().change("sg_deaths", 1, StatOperator.ADD);
+            if (oldTeam == GameTeam.MUTATIONS) {
+                gamePlayer.getNexusPlayer().getStats().change("sg_mutation_deaths", 1, StatOperator.ADD);
+            }
         }
         
-        gamePlayer.sendMessage(GameTeam.TRIBUTES.getLeaveMessage());
+        gamePlayer.sendMessage(oldTeam.getLeaveMessage());
         GamePlayer killer = null;
         String killerName = null;
         boolean mutationKill = false;
@@ -840,8 +885,12 @@ public class Game {
         GameTeam newTeam = GameTeam.SPECTATORS;
         if (deathInfo instanceof DeathInfoPlayerKill) {
             DeathInfoPlayerKill playerDeath = (DeathInfoPlayerKill) deathInfo;
+            killer = getPlayer(playerDeath.getKiller());
+            
+            mutationKill = killer.getTeam() == GameTeam.MUTATIONS && killer.getMutation().getTarget() == gamePlayer.getUniqueId();
+            
             if (settings.getColorMode() == ColorMode.GAME_TEAM) {
-                GameTeam killerTeam = getPlayer(playerDeath.getKiller()).getTeam();
+                GameTeam killerTeam = killer.getTeam();
                 if (killerTeam == GameTeam.TRIBUTES) {
                     killerName += "&a";
                 } else if (killerTeam == GameTeam.MUTATIONS) {
@@ -850,9 +899,8 @@ public class Game {
                     killerName += "&c";
                 }
             } else {
-                killerName = getPlayer(playerDeath.getKiller()).getNexusPlayer().getRanks().get().getColor();
+                killerName = killer.getNexusPlayer().getRanks().get().getColor();
             }
-            killer = getPlayer(playerDeath.getKiller());
             killerHealth = playerDeath.getKillerHealth();
         } else if (deathInfo instanceof DeathInfoKilledSuicide) {
             DeathInfoKilledSuicide death = (DeathInfoKilledSuicide) deathInfo;
@@ -868,26 +916,46 @@ public class Game {
             killer = getPlayer(death.getKiller());
             Player killerPlayer = Bukkit.getPlayer(killer.getUniqueId());
             killerPlayer.setMaxHealth(settings.getMaxHealth());
-            killerHealth = 20; //TODO Add better tracking of this for this type of death
+            killerHealth = death.getKillerHealth();
+            mutationKill = true;
         } else if (deathInfo instanceof DeathInfoProjectile) {
             DeathInfoProjectile death = (DeathInfoProjectile) deathInfo;
             if (death.getShooter() instanceof Player) {
+                killer = getPlayer(death.getShooter().getUniqueId());
+                
+                mutationKill = killer.getTeam() == GameTeam.MUTATIONS && killer.getMutation().getTarget() == gamePlayer.getUniqueId();
+                
                 if (settings.getColorMode() == ColorMode.GAME_TEAM) {
-                    if (getPlayer(death.getShooter().getUniqueId()).getTeam() == GameTeam.TRIBUTES) {
+                    if (killer.getTeam() == GameTeam.TRIBUTES) {
                         killerName += "&a";
                     } else {
                         killerName += "&d";
                     }
                 } else {
-                    killerName = getPlayer(death.getShooter().getUniqueId()).getNexusPlayer().getRanks().get().getColor();
+                    killerName = killer.getNexusPlayer().getRanks().get().getColor();
                 }
-                killer = getPlayer(death.getShooter().getUniqueId());
+                
                 newTeam = GameTeam.SPECTATORS;
                 killerHealth = death.getKillerHealth();
             }
         }
         
+        if (mutationKill) {
+            gamePlayer.setDeathByMutation(true);
+            removeMutation(killer.getMutation());
+            sendMessage("&6&l>> " + killer.getNexusPlayer().getColoredName() + " &ahas taken revenge and is back in the game!");
+            killer.sendMessage(killer.getTeam().getLeaveMessage());
+            killer.setTeam(GameTeam.TRIBUTES);
+            Player killerPlayer = Bukkit.getPlayer(killer.getUniqueId());
+            killerPlayer.setGameMode(killer.getTeam().getGameMode());
+            killer.sendMessage(killer.getTeam().getJoinMessage());
+            killer.getNexusPlayer().getStats().change("sg_mutation_kills", 1, StatOperator.ADD);
+        }
+        
         if (deathInfo.getType() != DeathType.LEAVE) {
+            if (oldTeam == GameTeam.MUTATIONS) {
+                removeMutation(gamePlayer.getMutation());
+            }
             gamePlayer.setSpectatorByDeath(true);
             resetPlayer(Bukkit.getPlayer(player.getUniqueId()));
             player.setGameMode(newTeam.getGameMode());
@@ -900,7 +968,11 @@ public class Game {
         gamePlayer.setTeam(newTeam);
         
         if (settings.isSounds()) {
-            playSound(Sound.WITHER_SPAWN);
+            if (oldTeam == GameTeam.TRIBUTES) {
+                playSound(Sound.WITHER_SPAWN);
+            } else if (oldTeam == GameTeam.MUTATIONS) {
+                playSound(Sound.ZOMBIE_PIG_DEATH);
+            }
         }
         
         recalculateVisibility();
@@ -962,10 +1034,32 @@ public class Game {
                     killer.sendMessage("&2&l>> &cYou killed yourself. No Credits for you.");
                 }
             }
+            
+            for (GamePlayer gp : new ArrayList<>(this.players.values())) {
+                if (gp.getTeam() == GameTeam.MUTATIONS) {
+                    if (gp.getMutation().getTarget().equals(gamePlayer.getUniqueId())) {
+                        gp.getMutation().setTarget(killer.getUniqueId());
+                        gp.sendMessage("&6&l>> &cYour previous target died, your new target is &a" + killer.getNexusPlayer().getName());
+                    }
+                }
+            }
+        } else {
+            for (GamePlayer gp : new ArrayList<>(this.players.values())) {
+                if (gp.getTeam() == GameTeam.MUTATIONS) {
+                    if (gp.getMutation().getTarget().equals(gamePlayer.getUniqueId())) {
+                        gp.sendMessage("&6&l>> &cYour target died without a killer, you have been set back as a spectator.");
+                        removeMutation(gp.getMutation());
+                        gp.sendMessage(gp.getTeam().getLeaveMessage());
+                        gp.setTeam(GameTeam.SPECTATORS);
+                        giveSpectatorItems(Bukkit.getPlayer(gp.getUniqueId()));
+                        gp.sendMessage(gp.getTeam().getJoinMessage());
+                    }
+                }
+            }
         }
         
-        int totalTributes = 0;
         if (oldTeam == GameTeam.TRIBUTES) {
+            int totalTributes = 0;
             for (GamePlayer gp : this.players.values()) {
                 if (gp.getTeam() == GameTeam.TRIBUTES) {
                     totalTributes++;
@@ -993,6 +1087,15 @@ public class Game {
                     }
                 }
             }
+        } else if (oldTeam == GameTeam.MUTATIONS) {
+            int totalMutations = 0;
+            for (GamePlayer gp : this.players.values()) {
+                if (gp.getTeam() == GameTeam.MUTATIONS) {
+                    totalMutations++;
+                }
+            }
+            
+            sendMessage("&6&l>> &d&l" + totalMutations + " mutations remain.");
         }
         
         if (sendDeathMessage) {
@@ -1013,10 +1116,33 @@ public class Game {
     }
     
     public void giveSpectatorItems(Player p) {
+        GamePlayer gamePlayer = getPlayer(p.getUniqueId());
         ItemStack tributesBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&a&lTributes &7&o(Right Click)").build();
-        ItemStack mutationsBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&d&lMutations &c(WIP)").build();
+        ItemStack mutationsBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&d&lMutations &7&o(Right Click)").build();
         ItemStack spectatorsBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&c&lSpectators &7&o(Right Click)").build();
-        ItemStack mutateItem = ItemBuilder.start(Material.ROTTEN_FLESH).displayName("&cWIP").build();
+        String mutateName;
+        if (!getSettings().isAllowMutations()) {
+            mutateName = "&cMutations Disabled";
+        } else if (!(getState() == INGAME || getState() == INGAME_DEATHMATCH)) {
+            mutateName = "&cCannot mutate.";
+        } else if (gamePlayer.hasMutated()) {
+            mutateName = "&cCan't mutate again.";
+        } else {
+            if (!(gamePlayer.getDeathInfo() instanceof DeathInfoPlayerKill) || gamePlayer.deathByMutation()) {
+                mutateName = "&cCannot mutate.";
+            } else {
+                DeathInfoPlayerKill playerKill = (DeathInfoPlayerKill) gamePlayer.getDeathInfo();
+                GamePlayer killer = getPlayer(playerKill.getKiller());
+                String passes;
+                if (getSettings().isUnlimitedPasses()) {
+                    passes = "Unlimited";
+                } else {
+                    passes = gamePlayer.getNexusPlayer().getStats().getValue("sg_mutation_passes").getAsInt() + "";
+                }
+                mutateName = "&c&lTAKE REVENGE   &eTarget: " + killer.getNexusPlayer().getColoredName() + "   &ePasses: &b" + passes;
+            }
+        }
+        ItemStack mutateItem = ItemBuilder.start(Material.ROTTEN_FLESH).displayName(mutateName).build();
         ItemStack compass = ItemBuilder.start(Material.COMPASS).displayName("&fPlayer Tracker").build();
         ItemStack tpCenter = ItemBuilder.start(Material.WATCH).displayName("&e&lTeleport to Map Center &7&o(Right Click)").build();
         ItemStack hubItem = ItemBuilder.start(Material.WOOD_DOOR).displayName("&e&lReturn to Hub &7(Right Click)").build();
@@ -1097,5 +1223,65 @@ public class Game {
     
     public GameInfo getGameInfo() {
         return gameInfo;
+    }
+    
+    public void addMutation(Mutation mutation) {
+        GamePlayer gamePlayer = getPlayer(mutation.getPlayer());
+        NexusPlayer nexusPlayer = gamePlayer.getNexusPlayer();
+        sendMessage("&6&l>> " + nexusPlayer.getColoredName() + " &6has &lMUTATED &6as a(n) &l" + mutation.getType().getDisplayName() + " &6and seeks revenge on &a" + Bukkit.getPlayer(mutation.getTarget()).getName() + "&6!");
+        
+        MapSpawn spawn = gameMap.getSpawns().get(new Random().nextInt(gameMap.getSpawns().size()));
+        Location location = spawn.toLocation(this.gameMap.getWorld());
+        Player player = Bukkit.getPlayer(nexusPlayer.getUniqueId());
+        
+        gamePlayer.sendMessage(gamePlayer.getTeam().getLeaveMessage());
+        gamePlayer.setTeam(GameTeam.MUTATIONS);
+        gamePlayer.sendMessage(gamePlayer.getTeam().getJoinMessage());
+        DisguiseAPI.disguiseEntity(player, new MobDisguise(mutation.getType().getDisguiseType()));
+        
+        gamePlayer.setMutated(true);
+        teleportMutation(player, this.gameMap.getCenter().toLocation(gameMap.getWorld()), location);
+        recalculateVisibility();
+        player.getInventory().clear();
+        player.getInventory().setArmorContents(null);
+        player.setAllowFlight(false);
+        player.setFlying(false);
+        player.setSaturation(20);
+        
+        MutationType type = mutation.getType();
+        PlayerInventory inv = player.getInventory();
+        inv.setItem(0, type.getWeapon());
+        inv.setItem(1, Items.PLAYER_TRACKER.getItemStack());
+        for (MutationItem item : type.getItems()) {
+            inv.setItem(1 + item.getSlotOffset(), item.getItemStack());
+        }
+        ArmorType armorType = type.getArmorType();
+        inv.setHelmet(new ItemStack(armorType.getHelmet()));
+        inv.setChestplate(new ItemStack(armorType.getChestplate()));
+        inv.setLeggings(new ItemStack(armorType.getLeggings()));
+        inv.setBoots(new ItemStack(armorType.getBoots()));
+        player.setMaxHealth(type.getHealth());
+        for (MutationEffect effect : type.getEffects()) {
+            player.addPotionEffect(new PotionEffect(effect.getPotionType(), Integer.MAX_VALUE, effect.getAmplifier(), false, false));
+        }
+    }
+    
+    public void removeMutation(Mutation mutation) {
+        Player player = Bukkit.getPlayer(mutation.getPlayer());
+        DisguiseAPI.undisguiseToAll(player);
+        player.getInventory().clear();
+        player.getInventory().setArmorContents(null);
+        player.setMaxHealth(20);
+        player.setHealth(20);
+        player.setExp(0);
+        player.setLevel(0);
+        player.spigot().setCollidesWithEntities(true);
+        for (PotionEffect effect : player.getActivePotionEffects()) {
+            player.removePotionEffect(effect.getType());
+        }
+    }
+    
+    public Map<Location, UUID> getSuicideLocations() {
+        return suicideLocations;
     }
 }

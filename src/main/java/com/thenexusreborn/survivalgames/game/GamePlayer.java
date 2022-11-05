@@ -1,7 +1,9 @@
 package com.thenexusreborn.survivalgames.game;
 
 import com.thenexusreborn.api.player.NexusPlayer;
-import com.thenexusreborn.survivalgames.game.death.DeathInfo;
+import com.thenexusreborn.survivalgames.SurvivalGames;
+import com.thenexusreborn.survivalgames.game.deathold.DeathInfo;
+import com.thenexusreborn.survivalgames.mutations.Mutation;
 
 import java.util.UUID;
 
@@ -12,6 +14,9 @@ public class GamePlayer {
     private boolean spectatorByDeath, newPersonalBestNotified = false;
     private TrackerInfo trackerInfo;
     private int kills, killStreak;
+    private boolean mutated;
+    private Mutation mutation;
+    private boolean deathByMutation;
     
     public GamePlayer(NexusPlayer nexusPlayer) {
         this.nexusPlayer = nexusPlayer;
@@ -83,5 +88,50 @@ public class GamePlayer {
     
     public void setNewPersonalBestNotified(boolean newPersonalBestNotified) {
         this.newPersonalBestNotified = newPersonalBestNotified;
+    }
+    
+    public boolean hasMutated() {
+        return mutated;
+    }
+    
+    public void setMutated(boolean mutated) {
+        this.mutated = mutated;
+    }
+    
+    public void setMutation(Mutation mutation) {
+        this.mutation = mutation;
+    }
+    
+    public Mutation getMutation() {
+        return mutation;
+    }
+    
+    public void setDeathByMutation(boolean value) {
+        this.deathByMutation = value;
+    }
+    
+    public boolean deathByMutation() {
+        return deathByMutation;
+    }
+    
+    public boolean canMutate() {
+        if (deathByMutation) {
+            return false;
+        }
+        
+        if (mutated) {
+            return false;
+        }
+        
+        Game game = SurvivalGames.getPlugin(SurvivalGames.class).getGame();
+        if (game == null) {
+            return false;
+        }
+        
+        if (!(game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_DEATHMATCH)) {
+            return false;
+        }
+        
+        return game.getSettings().isAllowMutations();
     }
 }

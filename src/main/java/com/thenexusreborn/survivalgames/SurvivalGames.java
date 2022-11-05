@@ -2,6 +2,7 @@ package com.thenexusreborn.survivalgames;
 
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.maven.MavenLibrary;
+import com.thenexusreborn.api.network.cmd.NetworkCommand;
 import com.thenexusreborn.api.registry.*;
 import com.thenexusreborn.api.server.Environment;
 import com.thenexusreborn.api.stats.StatType;
@@ -17,11 +18,13 @@ import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.tasks.*;
 import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.map.*;
+import com.thenexusreborn.survivalgames.mutations.*;
 import com.thenexusreborn.survivalgames.settings.*;
 import com.thenexusreborn.survivalgames.tasks.ServerStatusTask;
 import org.bukkit.*;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.*;
 
+import java.io.File;
 import java.sql.*;
 import java.util.*;
 
@@ -48,6 +51,11 @@ public class SurvivalGames extends NexusSpigotPlugin {
     private final Map<String, GameSettings> gameSettings = new HashMap<>();
     private Database mapDatabase;
     
+    private final Map<UUID, PlayerMutations> playerUnlockedMutations = new HashMap<>();
+    
+    private File deathMessagesFile;
+    private FileConfiguration deathMessagesConfig;
+
     @Override
     public void onLoad() {
         nexusCore = (NexusCore) Bukkit.getPluginManager().getPlugin("NexusCore");
@@ -69,6 +77,13 @@ public class SurvivalGames extends NexusSpigotPlugin {
         }
         
         saveDefaultConfig();
+        
+        deathMessagesFile = new File(getDataFolder(), "deathmessages.yml");
+        if (!deathMessagesFile.exists()) {
+            saveResource("deathmessages.yml", false);
+        }
+        
+        deathMessagesConfig = YamlConfiguration.loadConfiguration(deathMessagesFile);
         
         getLogger().info("Loading Game and Lobby Settings");
         try {
@@ -142,7 +157,24 @@ public class SurvivalGames extends NexusSpigotPlugin {
         } else {
             lobby.setSpawnpoint(Bukkit.getWorld(ServerProperties.getLevelName()).getSpawnLocation());
         }
-        
+
+        getLogger().info("Loading all unlocked mutations");
+        try {
+            List<UnlockedMutation> unlockedMutations = NexusAPI.getApi().getPrimaryDatabase().get(UnlockedMutation.class);
+            for (UnlockedMutation unlockedMutation : unlockedMutations) {
+                if (this.playerUnlockedMutations.containsKey(unlockedMutation.getUuid())) {
+                    this.playerUnlockedMutations.get(unlockedMutation.getUuid()).add(unlockedMutation);
+                } else {
+                    PlayerMutations value = new PlayerMutations(unlockedMutation.getUuid());
+                    value.add(unlockedMutation);
+                    this.playerUnlockedMutations.put(unlockedMutation.getUuid(), value);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        getLogger().info("Unlocked mutations loaded.");
+
         this.chatHandler = new SGChatHandler(this);
         nexusCore.getChatManager().setHandler(chatHandler);
         
@@ -151,6 +183,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         getCommand("survivalgames").setExecutor(new SGCommand(this));
         getCommand("spectate").setExecutor(new SpectateCommand(this));
         getCommand("map").setExecutor(new MapCommand(this));
+        getCommand("mutate").setExecutor(new MutateCmd(this));
         
         getLogger().info("Registered commands");
         
@@ -165,6 +198,10 @@ public class SurvivalGames extends NexusSpigotPlugin {
         new VoteStartMsgTask(this).start();
         new StatSignUpdateTask(this).start();
         new TributeSignUpdateTask(this).start();
+        new EndermanWaterDamageTask(this).start();
+        new ChickenMutationTask(this).start();
+        new SpectatorUpdateTask(this).start();
+        new ServerStatusTask(this).start();
         
         getLogger().info("Registered Tasks");
         
@@ -177,22 +214,19 @@ public class SurvivalGames extends NexusSpigotPlugin {
         }
         
         getLogger().info("Registered Listeners");
-        
-        new SpectatorUpdateTask(this).start();
-        new ServerStatusTask(this).start();
     }
     
     @Override
     public void registerStats(StatRegistry registry) {
-        registry.register("sg_score", "Score", StatType.INTEGER, 100);//
-        registry.register("sg_kills", "Kills", StatType.INTEGER, 0); //
-        registry.register("sg_highest_kill_streak", "Highest Kill Streak", StatType.INTEGER, 0);//
-        registry.register("sg_games", "Total Games", StatType.INTEGER, 0);//
-        registry.register("sg_wins", "Total Wins", StatType.INTEGER, 0); //
-        registry.register("sg_win_streak", "Winstreak", StatType.INTEGER, 0);//
-        registry.register("sg_deaths", "Deaths", StatType.INTEGER, 0); //
-        registry.register("sg_deathmatches_reached", "Deathmatches Reached", StatType.INTEGER, 0);//
-        registry.register("sg_chests_looted", "Chests Looted", StatType.INTEGER, 0); //
+        registry.register("sg_score", "Score", StatType.INTEGER, 100);
+        registry.register("sg_kills", "Kills", StatType.INTEGER, 0);
+        registry.register("sg_highest_kill_streak", "Highest Kill Streak", StatType.INTEGER, 0);
+        registry.register("sg_games", "Total Games", StatType.INTEGER, 0);
+        registry.register("sg_wins", "Total Wins", StatType.INTEGER, 0);
+        registry.register("sg_win_streak", "Winstreak", StatType.INTEGER, 0);
+        registry.register("sg_deaths", "Deaths", StatType.INTEGER, 0);
+        registry.register("sg_deathmatches_reached", "Deathmatches Reached", StatType.INTEGER, 0);
+        registry.register("sg_chests_looted", "Chests Looted", StatType.INTEGER, 0);
         registry.register("sg_assists", "Kill Assists", StatType.INTEGER, 0);
         registry.register("sg_times_mutated", "Times Mutated", StatType.INTEGER, 0);
         registry.register("sg_mutation_kills", "Kills as a Mutation", StatType.INTEGER, 0);
@@ -293,13 +327,24 @@ public class SurvivalGames extends NexusSpigotPlugin {
     public void addGameSettings(GameSettings settings) {
         this.gameSettings.put(settings.getType().toLowerCase(), settings);
     }
-    
+
+    @Override
+    public void registerNetworkCommands(NetworkCommandRegistry registry) {
+        registry.register(new NetworkCommand("unlockmutation", (cmd, origin, args) -> {
+            UUID uuid = UUID.fromString(args[0]);
+            String type = args[1];
+            long timestamp = Long.parseLong(args[2]);
+            getUnlockedMutations(uuid).add(new UnlockedMutation(uuid, type, timestamp));
+        }));
+    }
+
     @Override
     public void registerDatabases(DatabaseRegistry registry) {
         for (Database database : registry.getObjects()) {
             if (database.isPrimary()) {
                 database.registerClass(GameSettings.class);
                 database.registerClass(LobbySettings.class);
+                database.registerClass(UnlockedMutation.class);
             }
         }
         
@@ -308,5 +353,19 @@ public class SurvivalGames extends NexusSpigotPlugin {
         mapDatabase.registerClass(GameMap.class);
         mapDatabase.registerClass(MapSpawn.class);
         registry.register(mapDatabase);
+    }
+
+    public PlayerMutations getUnlockedMutations(UUID uniqueId) {
+        PlayerMutations playerMutations = this.playerUnlockedMutations.get(uniqueId);
+        if (playerMutations == null) {
+            playerMutations = new PlayerMutations(uniqueId);
+            this.playerUnlockedMutations.put(uniqueId, playerMutations);
+        }
+
+        return playerMutations;
+    }
+    
+    public FileConfiguration getDeathMessagesConfig() {
+        return deathMessagesConfig;
     }
 }

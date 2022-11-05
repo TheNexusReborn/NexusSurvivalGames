@@ -8,14 +8,18 @@ import com.thenexusreborn.nexuscore.api.events.*;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
-import com.thenexusreborn.survivalgames.game.death.*;
+import com.thenexusreborn.survivalgames.game.deathold.*;
 import com.thenexusreborn.survivalgames.lobby.*;
 import com.thenexusreborn.survivalgames.loot.*;
-import com.thenexusreborn.survivalgames.menu.TeamMenu;
+import com.thenexusreborn.survivalgames.menu.*;
+import com.thenexusreborn.survivalgames.mutations.Mutation;
+import com.thenexusreborn.survivalgames.mutations.impl.*;
 import com.thenexusreborn.survivalgames.settings.ColorMode;
 import com.thenexusreborn.survivalgames.util.SGUtils;
+import net.minecraft.server.v1_8_R3.EntityTNTPrimed;
 import org.bukkit.*;
 import org.bukkit.block.*;
+import org.bukkit.craftbukkit.v1_8_R3.entity.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.bukkit.event.block.Action;
@@ -29,7 +33,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Openable;
 import org.bukkit.potion.*;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
+import java.lang.reflect.Field;
 import java.util.*;
 
 @SuppressWarnings("DuplicatedCode")
@@ -75,10 +81,6 @@ public class PlayerListener implements Listener {
     
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent e) {
-        if (e.isCancelled()) {
-            return;
-        }
-    
         Player player = e.getPlayer();
         if (plugin.getLobby().checkMapEditing(player)) {
             return;
@@ -99,7 +101,7 @@ public class PlayerListener implements Listener {
                                 if (displayName.toLowerCase().contains("tributes")) {
                                     team = GameTeam.TRIBUTES;
                                 } else if (displayName.toLowerCase().contains("mutations")) {
-                                    gamePlayer.sendMessage("&6&l>> &cThat feature is not implemented yet.");
+                                    team = GameTeam.MUTATIONS;
                                 } else if (displayName.toLowerCase().contains("spectators")) {
                                     team = GameTeam.SPECTATORS;
                                 }
@@ -109,7 +111,9 @@ public class PlayerListener implements Listener {
                                 }
                             }
                         } else if (item.getType() == Material.ROTTEN_FLESH) {
-                            gamePlayer.sendMessage("&6&l>> &cThat is currently not implemented.");
+                            if (gamePlayer.canMutate()) {
+                                player.openInventory(new MutateGui(plugin, gamePlayer.getNexusPlayer()).getInventory());
+                            }
                         } else if (item.getType() == Material.WATCH) {
                             player.teleport(game.getGameMap().getCenter().toLocation(game.getGameMap().getWorld()));
                             gamePlayer.sendMessage("&6&l>> &eTeleported to the Map Center.");
@@ -120,9 +124,56 @@ public class PlayerListener implements Listener {
                     }
                 }
                 
-                
                 e.setCancelled(true);
                 return;
+            } else if (gamePlayer.getTeam() == GameTeam.MUTATIONS) {
+                Mutation mutation = gamePlayer.getMutation();
+                ItemStack item = player.getItemInHand();
+                if (item == null) {
+                    return;
+                }
+                if (mutation instanceof CreeperMutation) {
+                    if (item.getType() == Material.SULPHUR) {
+                        Location loc = player.getLocation();
+                        game.getSuicideLocations().put(loc, player.getUniqueId());
+                        TNTPrimed tnt = (TNTPrimed) player.getWorld().spawnEntity(loc.clone().add(0.5, 0, 0.5), EntityType.PRIMED_TNT);
+                        tnt.setFuseTicks(1);
+                        tnt.setYield(4F);
+                        EntityTNTPrimed nmsTnt = ((CraftTNTPrimed) tnt).getHandle();
+                        try {
+                            Field source = nmsTnt.getClass().getDeclaredField("source");
+                            source.setAccessible(true);
+                            source.set(nmsTnt, ((CraftPlayer) e.getPlayer()).getHandle());
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                            if (gamePlayer.getTeam() == GameTeam.MUTATIONS) {
+                                e.getPlayer().setHealth(0);
+                            }
+                        }, 10L);
+                    }
+                } else if (mutation instanceof ChickenMutation) {
+                    ChickenMutation chickenMutation = (ChickenMutation) mutation;
+                    if (item.getType() == Material.SLIME_BALL) {
+                        if (!chickenMutation.isLaunchOnCooldown()) {
+                            player.setVelocity(new Vector(0, 2, 0));
+                            chickenMutation.startLaunchCooldown();
+                        } else {
+                            player.sendMessage(MCUtils.color(MsgType.WARN + "Chicken Launch is still on cooldown: &e" + chickenMutation.getLaunchCooldownTimer().getSecondsLeft() + "s&c!"));
+                        }
+                    } else if (item.getType() == Material.FEATHER) {
+                        if (!chickenMutation.isParachuteOnCooldown()) {
+                            if (chickenMutation.isChuteActive()) {
+                                chickenMutation.deactivateChute();
+                            } else {
+                                chickenMutation.activateChute();
+                            }
+                        } else {
+                            player.sendMessage(MCUtils.color(MsgType.WARN + "Chicken Chute is still on cooldown: &e" + chickenMutation.getParachuteCooldownTimer().getSecondsLeft() + "s&c!"));
+                        }
+                    }
+                }
             }
         } else {
             Block block = e.getClickedBlock();
@@ -187,14 +238,14 @@ public class PlayerListener implements Listener {
                             } else if (west != null && west.getType() == Material.CHEST) {
                                 secondHalf = west;
                             }
-    
+                            
                             if (secondHalf != null) {
                                 maxAmount += 3;
                             }
                         }
                         
                         inv.clear();
-    
+                        
                         LootTable lootTable = null;
                         
                         boolean useTieredLoot = game.getSettings().isUseNewLoot();
@@ -302,7 +353,7 @@ public class PlayerListener implements Listener {
         Toggle toggle = e.getToggle();
         Game game = plugin.getGame();
         Lobby lobby = plugin.getLobby();
-    
+        
         if (toggle.getInfo().getName().equalsIgnoreCase("fly")) {
             if (game != null) {
                 e.setCancelled(true);
@@ -310,14 +361,14 @@ public class PlayerListener implements Listener {
             } else {
                 player.setAllowFlight(e.newValue());
             }
-        
+            
             return;
         }
         
         if (!toggle.getInfo().getName().equalsIgnoreCase("vanish")) {
             return;
         }
-    
+        
         Collection<NexusPlayer> players = new ArrayList<>();
         if (game == null) {
             players.addAll(plugin.getLobby().getPlayers());
@@ -328,8 +379,8 @@ public class PlayerListener implements Listener {
         }
         
         String symbolColor = e.newValue() ? "a" : "c";
-        String symbol = e.newValue() ? ">>" : "<<";
-        String action = e.newValue() ? "joined" : "left";
+        String symbol = !e.newValue() ? ">>" : "<<";
+        String action = !e.newValue() ? "joined" : "left";
         String silent = incognito ? " &e&osilently" : "";
         
         String message = "&" + symbolColor + "&l" + symbol + " " + nexusPlayer.getColoredName() + " &e" + action + silent + "&e.";
@@ -342,10 +393,15 @@ public class PlayerListener implements Listener {
             }
         } else {
             if (game == null) {
-                lobby.recaculateVisibility();
+                Bukkit.getScheduler().runTaskLater(plugin, lobby::recalculateVisibility, 1L);
                 lobby.sendMessage(message);
             } else {
-                game.recalculateVisibility();
+                if (e.newValue()) {
+                    if (game.getPlayer(nexusPlayer.getUniqueId()).getTeam() != GameTeam.SPECTATORS) {
+                        game.killPlayer(nexusPlayer.getUniqueId(), new DeathInfoVanish(nexusPlayer.getUniqueId()));
+                    }
+                }
+                Bukkit.getScheduler().runTaskLater(plugin, game::recalculateVisibility, 1L);
                 game.sendMessage(message);
             }
         }
@@ -400,7 +456,6 @@ public class PlayerListener implements Listener {
                 enchantingInventory.setSecondary(new ItemStack(Material.INK_SACK, 64, (short) 4));
             }
         }
-        //TODO custom guis when implemented
     }
     
     @EventHandler
@@ -496,6 +551,10 @@ public class PlayerListener implements Listener {
             return;
         }
         
+        if (gamePlayer.getTeam() == GameTeam.MUTATIONS) {
+            e.getDrops().clear();
+        }
+        
         DeathInfo deathInfo = null;
         final Player killer = player.getKiller();
         if (killer != null && player.getLastDamageCause().getCause() != DamageCause.PROJECTILE) {
@@ -549,13 +608,14 @@ public class PlayerListener implements Listener {
                     EntityDamageByEntityEvent edbe = ((EntityDamageByEntityEvent) player.getLastDamageCause());
                     Location dLoc = edbe.getDamager().getLocation().clone();
                     Location loc = new Location(dLoc.getWorld(), dLoc.getBlockX(), dLoc.getBlockY(), dLoc.getBlockZ());
-//                    if (game.getSuicideLocations().containsKey(loc)) {
-//                        UUID cause = game.getSuicideLocations().get(loc);
-//                        deathInfo = new DeathInfoKilledSuicide(player.getUniqueId(), cause, game.getGameTeam(cause).getColor());
-//                    } else {
-                    //}
+                    if (game.getSuicideLocations().containsKey(loc)) {
+                        UUID cause = game.getSuicideLocations().get(loc);
+                        double health = Bukkit.getPlayer(cause).getHealth();
+                        deathInfo = new DeathInfoKilledSuicide(player.getUniqueId(), cause, health, game.getPlayer(cause).getTeam().getColor());
+                    }
+                } else {
+                    deathInfo = new DeathInfo(player.getUniqueId(), DeathType.EXPLOSION, "&4&l>> %playername% &7exploded.", teamColor);
                 }
-                deathInfo = new DeathInfo(player.getUniqueId(), DeathType.EXPLOSION, "&4&l>> %playername% &7exploded.", teamColor);
             } else if (damageCause == DamageCause.VOID) {
                 deathInfo = new DeathInfo(player.getUniqueId(), DeathType.VOID, "&4&l>> %playername% &7fell in the void.", teamColor);
             } else if (damageCause == DamageCause.LIGHTNING) {
@@ -571,7 +631,7 @@ public class PlayerListener implements Listener {
             } else if (damageCause == DamageCause.WITHER) {
                 deathInfo = new DeathInfo(player.getUniqueId(), DeathType.WITHER, "&4&l>> %playername% &7withered away.", teamColor);
             } else if (damageCause == DamageCause.MELTING) {
-                deathInfo = new DeathInfo(player.getUniqueId(), DeathType.WITHER, "&4&l>> %playername% &7melted to death.", teamColor);
+                deathInfo = new DeathInfo(player.getUniqueId(), DeathType.MELTING, "&4&l>> %playername% &7melted to death.", teamColor);
             } else if (damageCause == DamageCause.FALLING_BLOCK) {
                 deathInfo = new DeathInfo(player.getUniqueId(), DeathType.FALLING_BLOCK, "&4&l>> %playername% &7had a block fall on their head.", teamColor);
             } else if (damageCause == DamageCause.THORNS) {

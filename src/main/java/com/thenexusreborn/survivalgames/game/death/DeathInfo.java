@@ -1,70 +1,45 @@
 package com.thenexusreborn.survivalgames.game.death;
 
+import com.thenexusreborn.api.helper.NumberHelper;
 import com.thenexusreborn.api.player.NexusPlayer;
+import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.settings.ColorMode;
-import org.bukkit.*;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.*;
 
 import java.util.UUID;
 
 public class DeathInfo {
-    protected final UUID player;
-    protected final DeathType type;
-    protected String deathMessage;
-    protected final String teamColor;
+    protected Game game;
+    protected UUID player;
+    protected DeathType type;
+    protected String teamColor;
+    protected KillerInfo killer;
     
-    public DeathInfo(UUID player, DeathType type) {
-        this.player = player;
+    public DeathInfo(Game game, GamePlayer player, DeathType type) {
+        this.game = game;
+        this.player = player.getUniqueId();
         this.type = type;
-        this.teamColor = SurvivalGames.getPlugin(SurvivalGames.class).getGame().getPlayer(player).getTeam().getColor();
+        this.teamColor = player.getTeam().getColor();
     }
     
-    public DeathInfo(UUID player, DeathType type, String deathMessage) {
-        this.player = player;
-        this.type = type;
-        this.deathMessage = deathMessage;
-        this.teamColor = SurvivalGames.getPlugin(SurvivalGames.class).getGame().getPlayer(player).getTeam().getColor();
+    public DeathInfo(Game game, GamePlayer player, DeathType type, KillerInfo killer) {
+        this(game, player, type);
+        this.killer = killer;
     }
     
-    public DeathInfo(UUID player, DeathType type, String deathMessage, String teamColor) {
-        this.player = player;
-        this.type = type;
-        this.deathMessage = deathMessage;
-        this.teamColor = teamColor;
+    public Player getBukkitPlayer() {
+        return Bukkit.getPlayer(this.player);
     }
     
-    public String getDeathMessage(Game game) {
-        String message = deathMessage;
-        if (message != null) {
-            if (game.getSettings().getColorMode() == ColorMode.GAME_TEAM) {
-                message = message.replace("%playername%", teamColor + Bukkit.getPlayer(player).getName());
-            } else {
-                NexusPlayer nexusPlayer = game.getPlayer(this.player).getNexusPlayer();
-                message = message.replace("%playername%", nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName());
-            }
-        }
-        return message;
+    public GamePlayer getGamePlayer() {
+        return game.getPlayer(this.player);
     }
     
-    public static String getKillerName(Game game, UUID killer) {
-        String teamColor = game.getPlayer(killer).getTeam().getColor();
-        return teamColor + game.getPlayer(killer).getNexusPlayer().getName();
-    }
-    
-    public static String getHandItem(ItemStack handItem) {
-        String itemName;
-        if (handItem != null && !handItem.getType().equals(Material.AIR)) {
-            if (!handItem.hasItemMeta() || handItem.getItemMeta().getDisplayName() == null) {
-                itemName = handItem.getType().name().toLowerCase().replace("_", " ");
-            } else {
-                itemName = handItem.getItemMeta().getDisplayName();
-            }
-        } else {
-            itemName = "their fists";
-        }
-        return itemName;
+    public NexusPlayer getNexusPlayer() {
+        return getGamePlayer().getNexusPlayer();
     }
     
     public UUID getPlayer() {
@@ -77,5 +52,44 @@ public class DeathInfo {
     
     public String getTeamColor() {
         return teamColor;
+    }
+    
+    public KillerInfo getKiller() {
+        return killer;
+    }
+    
+    public String getDeathMessage() {
+        GamePlayer gamePlayer = game.getPlayer(player);
+        String deathMessage = SurvivalGames.getPlugin(SurvivalGames.class).getDeathMessagesConfig().getString(type.name());
+        String playerName;
+        if (game.getSettings().getColorMode() == ColorMode.GAME_TEAM) {
+            playerName = teamColor;
+        } else {
+            playerName = gamePlayer.getNexusPlayer().getRanks().get().getColor();
+        }
+        
+        playerName += gamePlayer.getNexusPlayer().getName() + "&7";
+        deathMessage = deathMessage.replace("%playername%", playerName);
+        
+        if (killer != null) {
+            if (killer.getType() == EntityType.PLAYER) {
+                String killerName;
+                NexusPlayer killerPlayer = game.getPlayer(killer.getKiller()).getNexusPlayer();
+                if (game.getSettings().getColorMode() == ColorMode.GAME_TEAM) {
+                    killerName = killer.getTeamColor() + killerPlayer.getName();
+                } else {
+                    killerName = killerPlayer.getRanks().get().getColor() + killerPlayer.getName();
+                }
+                deathMessage = deathMessage.replace("%killername%", killerName);
+            } else {
+                deathMessage = deathMessage.replace("%entityname%", "&f" + EntityNames.getDefaultName(killer.getType()) + "&7");
+            }
+            
+            if (killer.getDistance() > 0) {
+                deathMessage = deathMessage.replace("%distance%", "&f" + NumberHelper.formatNumber(killer.getDistance()));
+            }
+        }
+        
+        return MCUtils.color("&4&l>> &7" + deathMessage + "&7.");
     }
 }

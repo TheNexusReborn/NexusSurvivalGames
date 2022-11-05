@@ -73,12 +73,17 @@ public class StatsCommand implements CommandExecutor {
                         continue;
                     }
 
-                    if (name.contains("mutat") || name.contains("sponsor")) {
+                    if (name.contains("sponsor")) {
                         continue;
                     }
 
                     name = stat.getDisplayName();
-                    sender.sendMessage(MCUtils.color("&6&l> &e" + name + "&7: &b" + new DecimalFormat(format).format(nexusPlayer.getStats().getValue(stat.getName()))));
+                    try {
+                        sender.sendMessage(MCUtils.color("&6&l> &e" + name + "&7: &b" + new DecimalFormat(format).format(nexusPlayer.getStats().getValue(stat.getName()).get())));
+                    } catch (Exception e) {
+                        plugin.getLogger().info("Stat: " + stat.getName());
+                        plugin.getLogger().info("Stat Type: " + stat.getType().name());
+                    }
                 }
             }
         }.runTaskAsynchronously(plugin);

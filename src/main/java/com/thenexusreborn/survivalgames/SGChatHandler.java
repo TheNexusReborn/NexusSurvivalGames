@@ -31,8 +31,8 @@ public class SGChatHandler implements ChatHandler {
         String level = "&8(&2&l" + player.getStats().getValue("level").getAsInt() + "&8)";
         String spectators = "&8[&cSpectators&8]";
         String tag = "";
-        if (player.getTag() != null && !player.getTag().getName().equalsIgnoreCase("null")) {
-            tag = " " + player.getTag().getDisplayName();
+        if (player.getTags().hasActiveTag()) {
+            tag = " " + player.getTags().getActive().getDisplayName();
         }
         
         Game game = plugin.getGame();

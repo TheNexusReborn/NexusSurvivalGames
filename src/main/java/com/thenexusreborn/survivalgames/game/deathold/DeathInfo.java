@@ -1,0 +1,73 @@
+package com.thenexusreborn.survivalgames.game.deathold;
+
+import com.thenexusreborn.api.player.NexusPlayer;
+import com.thenexusreborn.survivalgames.SurvivalGames;
+import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.settings.ColorMode;
+import com.thenexusreborn.survivalgames.util.SGUtils;
+import org.bukkit.*;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.UUID;
+
+@SuppressWarnings("DuplicatedCode")
+public class DeathInfo {
+    protected final UUID player;
+    protected final DeathType type;
+    protected String deathMessage;
+    protected final String teamColor;
+    
+    public DeathInfo(UUID player, DeathType type) {
+        this.player = player;
+        this.type = type;
+        this.teamColor = SurvivalGames.getPlugin(SurvivalGames.class).getGame().getPlayer(player).getTeam().getColor();
+    }
+    
+    public DeathInfo(UUID player, DeathType type, String deathMessage) {
+        this.player = player;
+        this.type = type;
+        this.deathMessage = deathMessage;
+        this.teamColor = SurvivalGames.getPlugin(SurvivalGames.class).getGame().getPlayer(player).getTeam().getColor();
+    }
+    
+    public DeathInfo(UUID player, DeathType type, String deathMessage, String teamColor) {
+        this.player = player;
+        this.type = type;
+        this.deathMessage = deathMessage;
+        this.teamColor = teamColor;
+    }
+    
+    public String getDeathMessage(Game game) {
+        String message = deathMessage;
+        if (message != null) {
+            if (game.getSettings().getColorMode() == ColorMode.GAME_TEAM) {
+                message = message.replace("%playername%", teamColor + Bukkit.getPlayer(player).getName());
+            } else {
+                NexusPlayer nexusPlayer = game.getPlayer(this.player).getNexusPlayer();
+                message = message.replace("%playername%", nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName());
+            }
+        }
+        return message;
+    }
+    
+    public static String getKillerName(Game game, UUID killer) {
+        String teamColor = game.getPlayer(killer).getTeam().getColor();
+        return teamColor + game.getPlayer(killer).getNexusPlayer().getName();
+    }
+    
+    public static String getHandItem(ItemStack handItem) {
+        return SGUtils.getHandItemName(handItem);
+    }
+    
+    public UUID getPlayer() {
+        return player;
+    }
+    
+    public DeathType getType() {
+        return type;
+    }
+    
+    public String getTeamColor() {
+        return teamColor;
+    }
+}

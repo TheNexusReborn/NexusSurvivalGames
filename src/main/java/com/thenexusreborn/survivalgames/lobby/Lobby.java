@@ -415,6 +415,8 @@ public class Lobby {
         Location spawn = getSpawnpoint().clone();
         spawn.setY(spawn.getY() + 2);
         player.teleport(spawn);
+        player.setMaxHealth(20);
+        player.setLevel(0);
         
         for (Player online : Bukkit.getOnlinePlayers()) {
             online.showPlayer(player);
@@ -748,7 +750,7 @@ public class Lobby {
                 '}';
     }
     
-    public void recaculateVisibility() {
+    public void recalculateVisibility() {
         for (NexusPlayer player : this.getPlayers()) {
             Player bukkitPlayer = Bukkit.getPlayer(player.getUniqueId());
             boolean vanish = player.getToggles().getValue("vanish");
