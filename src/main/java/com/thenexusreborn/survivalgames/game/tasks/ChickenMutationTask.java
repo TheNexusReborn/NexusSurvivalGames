@@ -27,6 +27,9 @@ public class ChickenMutationTask extends BukkitRunnable {
         
         for (Player player : Bukkit.getOnlinePlayers()) {
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
+            if (gamePlayer == null) {
+                continue;
+            }
             if (gamePlayer.getTeam() != GameTeam.MUTATIONS) {
                 continue;
             }
