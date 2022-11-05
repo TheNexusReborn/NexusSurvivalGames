@@ -1,4 +1,4 @@
-package com.thenexusreborn.survivalgames.game.death;
+package com.thenexusreborn.survivalgames.game.deathold;
 
 import com.thenexusreborn.survivalgames.game.Game;
 import org.bukkit.entity.EntityType;

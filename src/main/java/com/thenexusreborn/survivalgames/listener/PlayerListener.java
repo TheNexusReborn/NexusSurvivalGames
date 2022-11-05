@@ -8,7 +8,7 @@ import com.thenexusreborn.nexuscore.api.events.*;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
-import com.thenexusreborn.survivalgames.game.death.*;
+import com.thenexusreborn.survivalgames.game.deathold.*;
 import com.thenexusreborn.survivalgames.lobby.*;
 import com.thenexusreborn.survivalgames.loot.*;
 import com.thenexusreborn.survivalgames.menu.*;

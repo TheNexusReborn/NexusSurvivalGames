@@ -10,7 +10,7 @@ import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
-import com.thenexusreborn.survivalgames.game.death.*;
+import com.thenexusreborn.survivalgames.game.deathold.*;
 import com.thenexusreborn.survivalgames.mutations.*;
 import org.bukkit.Material;
 

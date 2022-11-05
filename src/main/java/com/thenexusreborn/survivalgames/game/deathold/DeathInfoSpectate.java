@@ -1,4 +1,4 @@
-package com.thenexusreborn.survivalgames.game.death;
+package com.thenexusreborn.survivalgames.game.deathold;
 
 import java.util.UUID;
 

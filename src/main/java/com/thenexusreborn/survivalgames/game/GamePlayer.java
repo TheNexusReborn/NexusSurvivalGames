@@ -2,7 +2,7 @@ package com.thenexusreborn.survivalgames.game;
 
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.death.DeathInfo;
+import com.thenexusreborn.survivalgames.game.deathold.DeathInfo;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
 
 import java.util.UUID;

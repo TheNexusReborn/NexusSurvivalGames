@@ -1,4 +1,4 @@
-package com.thenexusreborn.survivalgames.game.death;
+package com.thenexusreborn.survivalgames.game.deathold;
 
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.survivalgames.game.*;

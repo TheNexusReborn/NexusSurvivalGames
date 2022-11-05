@@ -1,4 +1,4 @@
-package com.thenexusreborn.survivalgames.game.death;
+package com.thenexusreborn.survivalgames.game.deathold;
 
 public enum DeathType {
     PLAYER, PROJECTILE, SUFFOCATION, UNKNOWN, FALL, LAVA, FIRE, DROWNING, EXPLOSION, VOID, LIGHTNING, SUICIDE, STARVATION, POISON, MAGIC, WITHER, CHEAT, INCOGNITO, FALLING_BLOCK, THORNS, ENTITY, SUICIDE_KILLED, LEAVE, VANISH, SPECTATE

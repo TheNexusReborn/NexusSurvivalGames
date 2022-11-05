@@ -23,7 +23,7 @@ import com.thenexusreborn.nexuscore.util.region.Cuboid;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.ControlType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.death.*;
+import com.thenexusreborn.survivalgames.game.deathold.*;
 import com.thenexusreborn.survivalgames.game.timer.*;
 import com.thenexusreborn.survivalgames.loot.Items;
 import com.thenexusreborn.survivalgames.map.GameMap;
