@@ -12,6 +12,7 @@ import com.thenexusreborn.nexuscore.api.NexusSpigotPlugin;
 import com.thenexusreborn.nexuscore.util.ServerProperties;
 import com.thenexusreborn.survivalgames.cmd.*;
 import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.death.DeathType;
 import com.thenexusreborn.survivalgames.game.tasks.*;
 import com.thenexusreborn.survivalgames.listener.*;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
@@ -23,8 +24,9 @@ import com.thenexusreborn.survivalgames.mutations.UnlockedMutation;
 import com.thenexusreborn.survivalgames.settings.*;
 import com.thenexusreborn.survivalgames.tasks.ServerStatusTask;
 import org.bukkit.*;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.*;
 
+import java.io.*;
 import java.sql.*;
 import java.util.*;
 
@@ -52,6 +54,9 @@ public class SurvivalGames extends NexusSpigotPlugin {
     private Database mapDatabase;
     
     private final Map<UUID, PlayerMutations> playerUnlockedMutations = new HashMap<>();
+    
+    private File deathMessagesFile;
+    private FileConfiguration deathMessagesConfig;
 
     @Override
     public void onLoad() {
@@ -75,6 +80,17 @@ public class SurvivalGames extends NexusSpigotPlugin {
         
         saveDefaultConfig();
         
+        deathMessagesFile = new File(getDataFolder(), "deathmessages.yml");
+        if (!deathMessagesFile.exists()) {
+            saveResource("deathmessages.yml", false);
+        }
+        
+        deathMessagesConfig = YamlConfiguration.loadConfiguration(deathMessagesFile);
+    
+        for (DeathType deathType : DeathType.values()) {
+            deathMessagesConfig.set(deathType.name(), "%playername%");
+        }
+    
         getLogger().info("Loading Game and Lobby Settings");
         try {
             for (GameSettings gameSettings : NexusAPI.getApi().getPrimaryDatabase().get(GameSettings.class)) {
@@ -353,5 +369,9 @@ public class SurvivalGames extends NexusSpigotPlugin {
         }
 
         return playerMutations;
+    }
+    
+    public FileConfiguration getDeathMessagesConfig() {
+        return deathMessagesConfig;
     }
 }

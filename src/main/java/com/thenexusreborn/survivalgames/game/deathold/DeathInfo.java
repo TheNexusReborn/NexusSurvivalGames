@@ -4,11 +4,13 @@ import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.settings.ColorMode;
+import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.*;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 
+@SuppressWarnings("DuplicatedCode")
 public class DeathInfo {
     protected final UUID player;
     protected final DeathType type;
@@ -54,17 +56,7 @@ public class DeathInfo {
     }
     
     public static String getHandItem(ItemStack handItem) {
-        String itemName;
-        if (handItem != null && !handItem.getType().equals(Material.AIR)) {
-            if (!handItem.hasItemMeta() || handItem.getItemMeta().getDisplayName() == null) {
-                itemName = handItem.getType().name().toLowerCase().replace("_", " ");
-            } else {
-                itemName = handItem.getItemMeta().getDisplayName();
-            }
-        } else {
-            itemName = "their fists";
-        }
-        return itemName;
+        return SGUtils.getHandItemName(handItem);
     }
     
     public UUID getPlayer() {

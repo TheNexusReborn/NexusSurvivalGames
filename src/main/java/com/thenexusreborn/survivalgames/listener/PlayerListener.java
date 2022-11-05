@@ -631,7 +631,7 @@ public class PlayerListener implements Listener {
             } else if (damageCause == DamageCause.WITHER) {
                 deathInfo = new DeathInfo(player.getUniqueId(), DeathType.WITHER, "&4&l>> %playername% &7withered away.", teamColor);
             } else if (damageCause == DamageCause.MELTING) {
-                deathInfo = new DeathInfo(player.getUniqueId(), DeathType.WITHER, "&4&l>> %playername% &7melted to death.", teamColor);
+                deathInfo = new DeathInfo(player.getUniqueId(), DeathType.MELTING, "&4&l>> %playername% &7melted to death.", teamColor);
             } else if (damageCause == DamageCause.FALLING_BLOCK) {
                 deathInfo = new DeathInfo(player.getUniqueId(), DeathType.FALLING_BLOCK, "&4&l>> %playername% &7had a block fall on their head.", teamColor);
             } else if (damageCause == DamageCause.THORNS) {

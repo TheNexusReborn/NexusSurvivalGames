@@ -4,8 +4,10 @@ import com.google.common.io.*;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.map.GameMap;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 public class SGUtils {
@@ -72,5 +74,19 @@ public class SGUtils {
             angle += 360.0F;
         }
         return angle;
+    }
+    
+    public static String getHandItemName(ItemStack handItem) {
+        String itemName;
+        if (handItem != null && !handItem.getType().equals(Material.AIR)) {
+            if (!handItem.hasItemMeta() || handItem.getItemMeta().getDisplayName() == null) {
+                itemName = handItem.getType().name().toLowerCase().replace("_", " ");
+            } else {
+                itemName = handItem.getItemMeta().getDisplayName();
+            }
+        } else {
+            itemName = "their fists";
+        }
+        return itemName;
     }
 }
