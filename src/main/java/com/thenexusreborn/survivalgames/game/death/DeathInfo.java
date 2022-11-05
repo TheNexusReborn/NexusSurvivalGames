@@ -18,6 +18,18 @@ public class DeathInfo {
     protected String teamColor;
     protected KillerInfo killer;
     
+    public DeathInfo(Game game, GamePlayer player, DeathType type) {
+        this.game = game;
+        this.player = player.getUniqueId();
+        this.type = type;
+        this.teamColor = player.getTeam().getColor();
+    }
+    
+    public DeathInfo(Game game, GamePlayer player, DeathType type, KillerInfo killer) {
+        this(game, player, type);
+        this.killer = killer;
+    }
+    
     public Player getBukkitPlayer() {
         return Bukkit.getPlayer(this.player);
     }
