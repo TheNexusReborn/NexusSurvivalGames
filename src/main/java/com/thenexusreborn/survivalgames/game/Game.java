@@ -164,6 +164,7 @@ public class Game {
         GamePlayer gamePlayer = new GamePlayer(nexusPlayer);
         gamePlayer.setTeam(GameTeam.SPECTATORS);
         gamePlayer.sendMessage(GameTeam.SPECTATORS.getJoinMessage());
+        this.players.put(nexusPlayer.getUniqueId(), gamePlayer);
         Player player = Bukkit.getPlayer(nexusPlayer.getUniqueId());
         player.getInventory().clear();
         player.getInventory().setArmorContents(null);
@@ -171,7 +172,6 @@ public class Game {
         giveSpectatorItems(player);
         player.spigot().setCollidesWithEntities(false);
         teleportSpectator(player, this.gameMap.getCenter().toLocation(this.gameMap.getWorld()));
-        this.players.put(nexusPlayer.getUniqueId(), gamePlayer);
         
         if (nexusPlayer.getToggles().getValue("vanish")) {
             for (GamePlayer gp : this.players.values()) {
