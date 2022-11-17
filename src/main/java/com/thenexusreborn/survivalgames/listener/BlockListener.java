@@ -2,15 +2,12 @@ package com.thenexusreborn.survivalgames.listener;
 
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
-import net.minecraft.server.v1_8_R3.EntityTNTPrimed;
-import org.bukkit.*;
-import org.bukkit.craftbukkit.v1_8_R3.entity.*;
-import org.bukkit.entity.*;
+import com.thenexusreborn.survivalgames.util.SGUtils;
+import org.bukkit.Material;
 import org.bukkit.event.*;
 import org.bukkit.event.block.*;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.lang.reflect.Field;
 import java.util.*;
 
 import static org.bukkit.Material.*;
@@ -54,17 +51,7 @@ public class BlockListener implements Listener {
             }
             if (game.getState() == GameState.INGAME_GRACEPERIOD || game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_DEATHMATCH || game.getState() == GameState.DEATHMATCH) {
                 if (e.getBlock().getType() == Material.TNT) {
-                    TNTPrimed entity = (TNTPrimed) e.getBlock().getWorld().spawnEntity(e.getBlock().getLocation(), EntityType.PRIMED_TNT);
-                    entity.setFuseTicks(20);
-                    entity.setYield(3.0F);
-                    EntityTNTPrimed nmsTnt = ((CraftTNTPrimed) entity).getHandle();
-                    try {
-                        Field source = nmsTnt.getClass().getDeclaredField("source");
-                        source.setAccessible(true);
-                        source.set(nmsTnt, ((CraftPlayer) e.getPlayer()).getHandle());
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
+                    SGUtils.spawnTNTWithSource(e.getBlock().getLocation(), e.getPlayer(), 20, 3.0F);
                     new BukkitRunnable() {
                         public void run() {
                             e.getBlock().setType(AIR);

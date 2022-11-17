@@ -16,10 +16,8 @@ import com.thenexusreborn.survivalgames.mutations.Mutation;
 import com.thenexusreborn.survivalgames.mutations.impl.*;
 import com.thenexusreborn.survivalgames.settings.ColorMode;
 import com.thenexusreborn.survivalgames.util.SGUtils;
-import net.minecraft.server.v1_8_R3.EntityTNTPrimed;
 import org.bukkit.*;
 import org.bukkit.block.*;
-import org.bukkit.craftbukkit.v1_8_R3.entity.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.bukkit.event.block.Action;
@@ -35,10 +33,8 @@ import org.bukkit.potion.*;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.lang.reflect.Field;
 import java.util.*;
 
-@SuppressWarnings("DuplicatedCode")
 public class PlayerListener implements Listener {
     private final SurvivalGames plugin;
     
@@ -136,17 +132,7 @@ public class PlayerListener implements Listener {
                     if (item.getType() == Material.SULPHUR) {
                         Location loc = player.getLocation();
                         game.getSuicideLocations().put(loc, player.getUniqueId());
-                        TNTPrimed tnt = (TNTPrimed) player.getWorld().spawnEntity(loc.clone().add(0.5, 0, 0.5), EntityType.PRIMED_TNT);
-                        tnt.setFuseTicks(1);
-                        tnt.setYield(4F);
-                        EntityTNTPrimed nmsTnt = ((CraftTNTPrimed) tnt).getHandle();
-                        try {
-                            Field source = nmsTnt.getClass().getDeclaredField("source");
-                            source.setAccessible(true);
-                            source.set(nmsTnt, ((CraftPlayer) e.getPlayer()).getHandle());
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
+                        SGUtils.spawnTNTWithSource(loc, player, 1, 4F);
                         Bukkit.getScheduler().runTaskLater(plugin, () -> {
                             if (gamePlayer.getTeam() == GameTeam.MUTATIONS) {
                                 e.getPlayer().setHealth(0);

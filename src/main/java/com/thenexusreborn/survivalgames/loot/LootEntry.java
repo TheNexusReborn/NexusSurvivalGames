@@ -6,7 +6,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
-@SuppressWarnings("DuplicatedCode")
 public class LootEntry {
     protected final int maxAmount;
     protected final Rarity rarity;

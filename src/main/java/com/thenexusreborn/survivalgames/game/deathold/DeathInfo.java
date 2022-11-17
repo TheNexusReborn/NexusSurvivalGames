@@ -10,7 +10,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 
-@SuppressWarnings("DuplicatedCode")
 public class DeathInfo {
     protected final UUID player;
     protected final DeathType type;

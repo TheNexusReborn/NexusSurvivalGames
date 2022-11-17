@@ -4,15 +4,33 @@ import com.google.common.io.*;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.map.GameMap;
-import org.bukkit.Material;
+import net.minecraft.server.v1_8_R3.EntityTNTPrimed;
+import org.bukkit.*;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+import org.bukkit.craftbukkit.v1_8_R3.entity.*;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+
+import java.lang.reflect.Field;
 
 public class SGUtils {
     
     private static final SurvivalGames plugin = SurvivalGames.getPlugin(SurvivalGames.class);
+    
+    public static void spawnTNTWithSource(Location location, Player player, int fuseTicks, float yield) {
+        TNTPrimed entity = (TNTPrimed) location.getWorld().spawnEntity(location, EntityType.PRIMED_TNT);
+        entity.setFuseTicks(fuseTicks);
+        entity.setYield(yield);
+        EntityTNTPrimed nmsTnt = ((CraftTNTPrimed) entity).getHandle();
+        try {
+            Field source = nmsTnt.getClass().getDeclaredField("source");
+            source.setAccessible(true);
+            source.set(nmsTnt, ((CraftPlayer) player).getHandle());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
     
     public static void updatePlayerHealthAndFood(Player player) {
         if (player == null) {

@@ -1,6 +1,5 @@
 package com.thenexusreborn.survivalgames.lobby;
 
-import com.thenexusreborn.survivalgames.lobby.tasks.TributeSignUpdateTask;
 import org.bukkit.Location;
 
 import java.util.UUID;
