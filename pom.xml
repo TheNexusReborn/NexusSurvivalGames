@@ -9,11 +9,17 @@
     <version>1.9.4-ALPHA</version>
 
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>17</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <jar.output>${user.home}\Documents\JarOutput\NexusReborn</jar.output>
         <minecraft.version>1.8.8-R0.1-SNAPSHOT</minecraft.version>
+        <maven.plugin.compiler.version>3.10.1</maven.plugin.compiler.version>
+        <maven.plugin.jar.version>3.3.0</maven.plugin.jar.version>
+        <maven.plugin.shade.version>3.4.1</maven.plugin.shade.version>
+        <mysql.version>8.0.31</mysql.version>
+        <nexus.core.version>1.8.1-ALPHA</nexus.core.version>
+        <nexus.disguises.version>1.0-ALPHA</nexus.disguises.version>
     </properties>
 
     <build>
@@ -21,12 +27,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>${maven.plugin.compiler.version}</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
+                <version>${maven.plugin.shade.version}</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -42,7 +48,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.1</version>
+                <version>${maven.plugin.jar.version}</version>
                 <configuration>
                     <outputDirectory>${jar.output}</outputDirectory>
                 </configuration>
@@ -67,7 +73,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.30</version>
+            <version>${mysql.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -79,13 +85,13 @@
         <dependency>
             <groupId>com.thenexusreborn</groupId>
             <artifactId>NexusCore</artifactId>
-            <version>1.7-ALPHA</version>
+            <version>${nexus.core.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.thenexusreborn</groupId>
             <artifactId>NexusDisguises</artifactId>
-            <version>1.0-ALPHA</version>
+            <version>${nexus.disguises.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
