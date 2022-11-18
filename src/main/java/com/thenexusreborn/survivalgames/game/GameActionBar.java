@@ -57,10 +57,10 @@ public class GameActionBar implements IActionBar {
         if (game.getState().ordinal() >= GameState.INGAME_GRACEPERIOD.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal()) {
             TrackerInfo trackerInfo = player.getTrackerInfo();
             if (trackerInfo != null) {
-                String target = trackerInfo.getTarget();
-                int distance = trackerInfo.getDistance();
-                String health = trackerInfo.getHealth();
-                String maxHealth = trackerInfo.getMaxHealth();
+                String target = trackerInfo.target();
+                int distance = trackerInfo.distance();
+                String health = trackerInfo.health();
+                String maxHealth = trackerInfo.maxHealth();
                 return "&f&lTARGET: &a" + target + "   &f&lDISTANCE: &a" + distance + "m" + "   &f&lHEALTH: &a" + health + "&f/&a" + maxHealth + " HP";
             }
         }

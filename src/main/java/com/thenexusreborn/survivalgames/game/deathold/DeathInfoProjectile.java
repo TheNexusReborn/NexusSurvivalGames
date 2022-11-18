@@ -26,8 +26,7 @@ public class DeathInfoProjectile extends DeathInfo {
     
     public String getDeathMessage(Game game) {
         String killerName;
-        if (shooter instanceof Player) {
-            Player playerShooter = (Player) shooter;
+        if (shooter instanceof Player playerShooter) {
             //killerName = killerTeamColor + playerShooter.getName();
             NexusPlayer nexusPlayer = game.getPlayer(playerShooter.getUniqueId()).getNexusPlayer();
             killerName = nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName();

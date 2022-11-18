@@ -34,8 +34,7 @@ public class ChickenMutationTask extends BukkitRunnable {
                 continue;
             }
         
-            if (gamePlayer.getMutation() instanceof ChickenMutation) {
-                ChickenMutation chickenMutation = (ChickenMutation) gamePlayer.getMutation();
+            if (gamePlayer.getMutation() instanceof ChickenMutation chickenMutation) {
     
                 if (this.eggGain == 0) {
                     chickenMutation.incrementAmmunition();

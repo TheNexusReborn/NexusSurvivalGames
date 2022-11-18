@@ -41,10 +41,9 @@ public class MapSignUpdateTask extends BukkitRunnable {
         for (Entry<Integer, Location> entry : lobby.getMapSigns().entrySet()) {
             GameMap map = lobby.getMapOptions().get(entry.getKey());
             BlockState state = entry.getValue().getBlock().getState();
-            if (!(state instanceof Sign)) {
+            if (!(state instanceof Sign sign)) {
                 continue;
             }
-            Sign sign = (Sign) state;
             String mapName;
             if (map.getName().length() > 16) {
                 mapName = map.getName().substring(0, 16);

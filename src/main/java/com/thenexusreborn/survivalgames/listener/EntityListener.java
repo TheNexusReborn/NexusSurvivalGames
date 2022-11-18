@@ -80,9 +80,7 @@ public class EntityListener implements Listener {
                 }
             }
             
-            if (e.getDamager() instanceof Player && e.getEntity() instanceof Player) {
-                Player damager = (Player) e.getDamager();
-                Player target = (Player) e.getEntity();
+            if (e.getDamager() instanceof Player damager && e.getEntity() instanceof Player target) {
     
                 GamePlayer damagerPlayer = game.getPlayer(damager.getUniqueId());
                 GamePlayer targetPlayer = game.getPlayer(target.getUniqueId());
@@ -95,8 +93,7 @@ public class EntityListener implements Listener {
                 e.setCancelled(true);
             } else if (e.getDamager() instanceof Projectile) {
                 if (e.getDamager() instanceof Snowball || e.getDamager() instanceof Egg) {
-                    if (e.getEntity() instanceof Player) {
-                        Player targetPlayer = (Player) e.getEntity();
+                    if (e.getEntity() instanceof Player targetPlayer) {
                         if (e.getDamager() instanceof Snowball) {
                             targetPlayer.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 160, 0));
                         } else {
@@ -106,8 +103,7 @@ public class EntityListener implements Listener {
     
                         if (e.getDamager() instanceof Egg) {
                             ProjectileSource shooter = ((Egg) e.getDamager()).getShooter();
-                            if (shooter instanceof Player) {
-                                Player shooterPlayer = (Player) shooter;
+                            if (shooter instanceof Player shooterPlayer) {
                                 Mutation mutation = game.getPlayer(shooterPlayer.getUniqueId()).getMutation();
                                 if (mutation instanceof ChickenMutation) {
                                     if (mutation.getTarget().equals(targetPlayer.getUniqueId())) {
@@ -179,8 +175,7 @@ public class EntityListener implements Listener {
     public void onHealthRegen(EntityRegainHealthEvent e) {
         if (plugin.getGame() != null) {
             Game game = plugin.getGame();
-            if (e.getEntity() instanceof Player) {
-                Player player = ((Player) e.getEntity());
+            if (e.getEntity() instanceof Player player) {
                 GamePlayer gamePlayer = game.getPlayer(e.getEntity().getUniqueId());
                 if (!game.getSettings().isRegeneration()) {
                     if (gamePlayer.getTeam() == GameTeam.TRIBUTES) {

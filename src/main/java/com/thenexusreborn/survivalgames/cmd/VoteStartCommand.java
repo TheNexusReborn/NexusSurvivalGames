@@ -18,13 +18,11 @@ public class VoteStartCommand implements CommandExecutor {
     
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!(sender instanceof Player)) {
+        if (!(sender instanceof Player senderPlayer)) {
             sender.sendMessage(MCUtils.color("&cOnly players can use that command."));
             return true;
         }
-        
-        Player senderPlayer = (Player) sender;
-        
+    
         if (plugin.getGame() != null) {
             senderPlayer.sendMessage(MCUtils.color("&cThere is already a game running. You cannot use that command."));
             return true;

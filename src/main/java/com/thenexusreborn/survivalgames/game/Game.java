@@ -890,8 +890,7 @@ public class Game {
         boolean sendDeathMessage = true;
         double killerHealth = 0;
         GameTeam newTeam = GameTeam.SPECTATORS;
-        if (deathInfo instanceof DeathInfoPlayerKill) {
-            DeathInfoPlayerKill playerDeath = (DeathInfoPlayerKill) deathInfo;
+        if (deathInfo instanceof DeathInfoPlayerKill playerDeath) {
             killer = getPlayer(playerDeath.getKiller());
             
             mutationKill = killer.getTeam() == GameTeam.MUTATIONS && killer.getMutation().getTarget() == gamePlayer.getUniqueId();
@@ -909,8 +908,7 @@ public class Game {
                 killerName = killer.getNexusPlayer().getRanks().get().getColor();
             }
             killerHealth = playerDeath.getKillerHealth();
-        } else if (deathInfo instanceof DeathInfoKilledSuicide) {
-            DeathInfoKilledSuicide death = (DeathInfoKilledSuicide) deathInfo;
+        } else if (deathInfo instanceof DeathInfoKilledSuicide death) {
             if (settings.getColorMode() == ColorMode.GAME_TEAM) {
                 if (getPlayer(death.getKiller()).getTeam() == GameTeam.TRIBUTES) {
                     killerName += "&a";
@@ -925,8 +923,7 @@ public class Game {
             killerPlayer.setMaxHealth(settings.getMaxHealth());
             killerHealth = death.getKillerHealth();
             mutationKill = true;
-        } else if (deathInfo instanceof DeathInfoProjectile) {
-            DeathInfoProjectile death = (DeathInfoProjectile) deathInfo;
+        } else if (deathInfo instanceof DeathInfoProjectile death) {
             if (death.getShooter() instanceof Player) {
                 killer = getPlayer(death.getShooter().getUniqueId());
                 
@@ -1135,10 +1132,9 @@ public class Game {
         } else if (gamePlayer.hasMutated()) {
             mutateName = "&cCan't mutate again.";
         } else {
-            if (!(gamePlayer.getDeathInfo() instanceof DeathInfoPlayerKill) || gamePlayer.deathByMutation()) {
+            if (!(gamePlayer.getDeathInfo() instanceof DeathInfoPlayerKill playerKill) || gamePlayer.deathByMutation()) {
                 mutateName = "&cCannot mutate.";
             } else {
-                DeathInfoPlayerKill playerKill = (DeathInfoPlayerKill) gamePlayer.getDeathInfo();
                 GamePlayer killer = getPlayer(playerKill.getKiller());
                 String passes;
                 if (getSettings().isUnlimitedPasses()) {
@@ -1260,7 +1256,7 @@ public class Game {
         inv.setItem(0, type.getWeapon());
         inv.setItem(1, Items.PLAYER_TRACKER.getItemStack());
         for (MutationItem item : type.getItems()) {
-            inv.setItem(1 + item.getSlotOffset(), item.getItemStack());
+            inv.setItem(1 + item.slotOffset(), item.itemStack());
         }
         ArmorType armorType = type.getArmorType();
         inv.setHelmet(new ItemStack(armorType.getHelmet()));

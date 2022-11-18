@@ -29,13 +29,11 @@ public class SpectateCommand implements CommandExecutor {
             return true;
         }
         
-        if (!(sender instanceof Player)) {
+        if (!(sender instanceof Player player)) {
             sender.sendMessage(MCUtils.color(MsgType.WARN + "Only players can use that command."));
             return true;
         }
-        
-        Player player = (Player) sender; 
-        
+    
         Game game = plugin.getGame();
         if (game != null) {
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());

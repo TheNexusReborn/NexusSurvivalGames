@@ -139,8 +139,7 @@ public class PlayerListener implements Listener {
                             }
                         }, 10L);
                     }
-                } else if (mutation instanceof ChickenMutation) {
-                    ChickenMutation chickenMutation = (ChickenMutation) mutation;
+                } else if (mutation instanceof ChickenMutation chickenMutation) {
                     if (item.getType() == Material.SLIME_BALL) {
                         if (!chickenMutation.isLaunchOnCooldown()) {
                             player.setVelocity(new Vector(0, 2, 0));
@@ -431,14 +430,13 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerOpenEnchant(InventoryOpenEvent e) {
         if (plugin.getGame() != null) {
-            if (e.getInventory() instanceof EnchantingInventory) {
+            if (e.getInventory() instanceof EnchantingInventory enchantingInventory) {
                 Game game = plugin.getGame();
                 if (game.getPlayer(e.getPlayer().getUniqueId()).getTeam() != GameTeam.TRIBUTES) {
                     e.setCancelled(true);
                     return;
                 }
-                
-                EnchantingInventory enchantingInventory = (EnchantingInventory) e.getInventory();
+    
                 enchantingInventory.setSecondary(new ItemStack(Material.INK_SACK, 64, (short) 4));
             }
         }
@@ -458,8 +456,7 @@ public class PlayerListener implements Listener {
                 e.setCancelled(true);
             }
             
-            if (e.getInventory() instanceof EnchantingInventory) {
-                EnchantingInventory enchantingInventory = (EnchantingInventory) e.getInventory();
+            if (e.getInventory() instanceof EnchantingInventory enchantingInventory) {
                 if (e.getCurrentItem() != null && e.getCurrentItem().getType().equals(Material.INK_SACK)) {
                     e.setCancelled(true);
                 }
@@ -470,8 +467,7 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerCloseEnchant(InventoryCloseEvent e) {
         try {
-            if (e.getInventory() instanceof EnchantingInventory) {
-                EnchantingInventory enchantingInventory = (EnchantingInventory) e.getInventory();
+            if (e.getInventory() instanceof EnchantingInventory enchantingInventory) {
                 enchantingInventory.setSecondary(null);
             }
         } catch (Exception ex) {
@@ -561,12 +557,9 @@ public class PlayerListener implements Listener {
             
             String teamColor = gamePlayer.getTeam().getColor();
             if (damageCause == DamageCause.PROJECTILE) {
-                if (lastDamageCause instanceof EntityDamageByEntityEvent) {
-                    EntityDamageByEntityEvent edbee = (EntityDamageByEntityEvent) lastDamageCause;
-                    if (edbee.getDamager() instanceof Projectile) {
-                        Projectile projectile = (Projectile) edbee.getDamager();
-                        if (projectile.getShooter() instanceof Entity) {
-                            Entity entity = ((Entity) projectile.getShooter());
+                if (lastDamageCause instanceof EntityDamageByEntityEvent edbee) {
+                    if (edbee.getDamager() instanceof Projectile projectile) {
+                        if (projectile.getShooter() instanceof Entity entity) {
                             String color = "";
                             if (entity instanceof Player) {
                                 if (game.getSettings().getColorMode() == ColorMode.GAME_TEAM) {
@@ -590,8 +583,7 @@ public class PlayerListener implements Listener {
             } else if (damageCause == DamageCause.DROWNING) {
                 deathInfo = new DeathInfo(player.getUniqueId(), DeathType.DROWNING, "&4&l>> %playername% &7drowned.", teamColor);
             } else if (damageCause == DamageCause.ENTITY_EXPLOSION || damageCause == DamageCause.BLOCK_EXPLOSION) {
-                if (player.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
-                    EntityDamageByEntityEvent edbe = ((EntityDamageByEntityEvent) player.getLastDamageCause());
+                if (player.getLastDamageCause() instanceof EntityDamageByEntityEvent edbe) {
                     Location dLoc = edbe.getDamager().getLocation().clone();
                     Location loc = new Location(dLoc.getWorld(), dLoc.getBlockX(), dLoc.getBlockY(), dLoc.getBlockZ());
                     if (game.getSuicideLocations().containsKey(loc)) {
@@ -623,8 +615,7 @@ public class PlayerListener implements Listener {
             } else if (damageCause == DamageCause.THORNS) {
                 deathInfo = new DeathInfo(player.getUniqueId(), DeathType.THORNS, "&4&l>> %playername% &7was poked to death by armor.", teamColor);
             } else if (damageCause == DamageCause.ENTITY_ATTACK) {
-                if (lastDamageCause instanceof EntityDamageByEntityEvent) {
-                    EntityDamageByEntityEvent edbee = (EntityDamageByEntityEvent) lastDamageCause;
+                if (lastDamageCause instanceof EntityDamageByEntityEvent edbee) {
                     Entity damager = edbee.getDamager();
                     if (damager instanceof Player) {
                         deathInfo = new DeathInfoSuicide(player.getUniqueId());
