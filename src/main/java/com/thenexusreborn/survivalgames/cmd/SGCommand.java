@@ -53,7 +53,7 @@ public class SGCommand implements CommandExecutor {
             }
             
             String gameSubCommand = args[1].toLowerCase();
-    
+            
             if (gameSubCommand.equals("automatic") || gameSubCommand.equals("auto") || gameSubCommand.equals("manual") || gameSubCommand.equals("mnl")) {
                 ControlType controlType = null;
                 try {
@@ -65,17 +65,17 @@ public class SGCommand implements CommandExecutor {
                         controlType = ControlType.MANUAL;
                     }
                 }
-        
+                
                 if (controlType == null) {
                     sender.sendMessage(MCUtils.color(MsgType.SEVERE + "Invalid control type detection. This is a bug, please report to Firestar311"));
                     return true;
                 }
-        
+                
                 if (Game.getControlType() == controlType) {
                     sender.sendMessage(MCUtils.color(MsgType.WARN + "The game is already in " + controlType.name().toLowerCase() + " "));
                     return true;
                 }
-        
+                
                 Game.setControlType(controlType);
                 sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the game to " + MsgType.INFO.getVariableColor() + controlType.name().toLowerCase() + MsgType.INFO.getBaseColor() + " control."));
                 return true;
@@ -91,135 +91,157 @@ public class SGCommand implements CommandExecutor {
                 return true;
             }
             
-            if (gameSubCommand.equals("setup")) {
-                if (game.getState() != GameState.UNDEFINED) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "The game has already been setup."));
-                    return true;
-                }
-                
-                game.setup();
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        if (game.getState() == GameState.SETUP_COMPLETE) {
-                            sender.sendMessage(MCUtils.color(MsgType.INFO + "The game setup is now complete."));
-                            cancel();
-                        } else if (game.getState() == GameState.ERROR) {
-                            sender.sendMessage(MCUtils.color(MsgType.ERROR + "There was a problem during Game Setup"));
-                            cancel();
+            switch (gameSubCommand) {
+                case "setup":
+                    if (game.getState() != GameState.UNDEFINED) {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "The game has already been setup."));
+                        return true;
+                    }
+                    
+                    game.setup();
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            if (game.getState() == GameState.SETUP_COMPLETE) {
+                                sender.sendMessage(MCUtils.color(MsgType.INFO + "The game setup is now complete."));
+                                cancel();
+                            } else if (game.getState() == GameState.ERROR) {
+                                sender.sendMessage(MCUtils.color(MsgType.ERROR + "There was a problem during Game Setup"));
+                                cancel();
+                            }
                         }
+                    }.runTaskTimer(plugin, 1L, 1L);
+                    break;
+                case "assignstartingteams":
+                case "ast":
+                    if (game.getState() == GameState.SETUP_COMPLETE) {
+                        game.assignStartingTeams();
+                        if (game.getState() == GameState.TEAMS_ASSIGNED) {
+                            sender.sendMessage(MCUtils.color(MsgType.INFO + "Starting teams have been assigned."));
+                        } else {
+                            sender.sendMessage(MCUtils.color(MsgType.WARN + "&cThere was a problem assigning starting teams"));
+                        }
+                    } else {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "The game is not yet setup. Please run the setup task before assigning teams."));
                     }
-                }.runTaskTimer(plugin, 1L, 1L);
-            } else if (gameSubCommand.equals("assignstartingteams") || gameSubCommand.equals("ast")) {
-                if (game.getState() == GameState.SETUP_COMPLETE) {
-                    game.assignStartingTeams();
+                    break;
+                case "teleportplayers":
+                case "tpp":
                     if (game.getState() == GameState.TEAMS_ASSIGNED) {
-                        sender.sendMessage(MCUtils.color(MsgType.INFO + "Starting teams have been assigned."));
+                        game.teleportStart();
+                        if (game.getState() == GameState.TELEPORT_START_DONE) {
+                            sender.sendMessage(MCUtils.color(MsgType.INFO + "Players have been teleported."));
+                        } else {
+                            sender.sendMessage(MCUtils.color(MsgType.WARN + "There was a problem teleporting players."));
+                        }
                     } else {
-                        sender.sendMessage(MCUtils.color(MsgType.WARN + "&cThere was a problem assigning starting teams"));
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "The teams have not be assigned yet. Please run the team assignment task."));
                     }
-                } else {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "The game is not yet setup. Please run the setup task before assigning teams."));
-                }
-            } else if (gameSubCommand.equals("teleportplayers") || gameSubCommand.equals("tpp")) {
-                if (game.getState() == GameState.TEAMS_ASSIGNED) {
-                    game.teleportStart();
+                    break;
+                case "startwarmupcountdown":
+                case "swcd":
                     if (game.getState() == GameState.TELEPORT_START_DONE) {
-                        sender.sendMessage(MCUtils.color(MsgType.INFO + "Players have been teleported."));
+                        game.startWarmup();
+                        if (game.getState() == GameState.WARMUP || game.getState() == GameState.WARMUP_DONE) {
+                            sender.sendMessage(MCUtils.color(MsgType.INFO + "The warmup countdown has been started successfully."));
+                        } else {
+                            sender.sendMessage(MCUtils.color(MsgType.WARN + "There was a problem starting the warmup countdown."));
+                        }
                     } else {
-                        sender.sendMessage(MCUtils.color(MsgType.WARN + "There was a problem teleporting players."));
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "You must run the teleport players task before starting the countdown."));
                     }
-                } else {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "The teams have not be assigned yet. Please run the team assignment task."));
-                }
-            } else if (gameSubCommand.equals("startwarmupcountdown") || gameSubCommand.equals("swcd")) {
-                if (game.getState() == GameState.TELEPORT_START_DONE) {
-                    game.startWarmup();
-                    if (game.getState() == GameState.WARMUP || game.getState() == GameState.WARMUP_DONE) {
-                        sender.sendMessage(MCUtils.color(MsgType.INFO + "The warmup countdown has been started successfully."));
+                    break;
+                case "start":
+                    if (game.getState() == GameState.WARMUP_DONE || game.getState() == GameState.TELEPORT_START_DONE) {
+                        game.startGame();
+                    } else if (game.getState() == GameState.WARMUP) {
+                        if (game.getTimer() != null) {
+                            game.getTimer().cancel();
+                        } else {
+                            sender.sendMessage(MCUtils.color(MsgType.WARN + "The game state was in warmup countdown, but no timer was actively running. Please report this as a bug, started game anyways."));
+                        }
+                        game.startGame();
+                    } else if (game.getState() != GameState.TELEPORT_START_DONE) {
+                        sender.sendMessage(MsgType.WARN + "You must run the teleport players task at the minimum before starting the game");
+                        return true;
+                    }
+                    
+                    if (game.getState() == GameState.INGAME) {
+                        sender.sendMessage(MCUtils.color(MsgType.INFO + "The game has been started."));
                     } else {
-                        sender.sendMessage(MCUtils.color(MsgType.WARN + "There was a problem starting the warmup countdown."));
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "There was a problem starting the game."));
                     }
-                } else {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "You must run the teleport players task before starting the countdown."));
-                }
-            } else if (gameSubCommand.equals("start")) {
-                if (game.getState() == GameState.WARMUP_DONE || game.getState() == GameState.TELEPORT_START_DONE) {
-                    game.startGame();
-                } else if (game.getState() == GameState.WARMUP) {
-                    if (game.getTimer() != null) {
-                        game.getTimer().cancel();
+                    break;
+                case "startdeathmatchcountdown":
+                case "sdmcd":
+                    if (game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_GRACEPERIOD) {
+                        game.startDeathmatchTimer();
+                        if (game.getState() == GameState.INGAME_DEATHMATCH) {
+                            sender.sendMessage(MCUtils.color(MsgType.INFO + "You started the deathmatch timer"));
+                        } else {
+                            sender.sendMessage(MCUtils.color(MsgType.WARN + "There was a problem starting the deathmatch timer."));
+                        }
                     } else {
-                        sender.sendMessage(MCUtils.color(MsgType.WARN + "The game state was in warmup countdown, but no timer was actively running. Please report this as a bug, started game anyways."));
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "Invalid state. Please ensure that the game is in the INGAME state."));
                     }
-                    game.startGame();
-                } else if (game.getState() != GameState.TELEPORT_START_DONE){
-                    sender.sendMessage(MsgType.WARN + "You must run the teleport players task at the minimum before starting the game");
-                    return true;
-                }
-    
-                if (game.getState() == GameState.INGAME) {
-                    sender.sendMessage(MCUtils.color(MsgType.INFO + "The game has been started."));
-                } else {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "There was a problem starting the game."));
-                }
-            } else if (gameSubCommand.equals("startdeathmatchcountdown") || gameSubCommand.equals("sdmcd")) {
-                if (game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_GRACEPERIOD) {
-                    game.startDeathmatchTimer();
-                    if (game.getState() == GameState.INGAME_DEATHMATCH) {
-                        sender.sendMessage(MCUtils.color(MsgType.INFO + "You started the deathmatch timer"));
+                    break;
+                case "teleportdeathmatch":
+                case "tpdm":
+                    if (game.getState().ordinal() >= GameState.INGAME_GRACEPERIOD.ordinal() && game.getState().ordinal() <= GameState.INGAME_DEATHMATCH.ordinal()) {
+                        game.teleportDeathmatch();
+                        if (game.getState() == GameState.TELEPORT_DEATHMATCH_DONE) {
+                            sender.sendMessage(MCUtils.color(MsgType.INFO + "You teleported everyone to the deathmatch"));
+                        } else {
+                            sender.sendMessage(MCUtils.color(MsgType.WARN + "There was a problem teleporting players to the deathmatch."));
+                        }
                     } else {
-                        sender.sendMessage(MCUtils.color(MsgType.WARN + "There was a problem starting the deathmatch timer."));
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "Invalid game state. Must be ingame, ingame deathmatch."));
                     }
-                } else {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "Invalid state. Please ensure that the game is in the INGAME state."));
-                }
-            } else if (gameSubCommand.equals("teleportdeathmatch") || gameSubCommand.equals("tpdm")) {
-                if (game.getState().ordinal() >= GameState.INGAME_GRACEPERIOD.ordinal() && game.getState().ordinal() <= GameState.INGAME_DEATHMATCH.ordinal()) {
-                    game.teleportDeathmatch();
+                    break;
+                case "startdeathmatchwarmup":
+                case "sdmw":
                     if (game.getState() == GameState.TELEPORT_DEATHMATCH_DONE) {
-                        sender.sendMessage(MCUtils.color(MsgType.INFO + "You teleported everyone to the deathmatch"));
+                        game.startDeathmatchWarmup();
+                        sender.sendMessage(MCUtils.color(MsgType.INFO + "You started the deathmatch warmup"));
                     } else {
-                        sender.sendMessage(MCUtils.color(MsgType.WARN + "There was a problem teleporting players to the deathmatch."));
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "The players have not been teleported to the deathmatch, or the deathmatch has already started."));
                     }
-                } else {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "Invalid game state. Must be ingame, ingame deathmatch."));
-                }
-            } else if (gameSubCommand.equals("startdeathmatchwarmup") || gameSubCommand.equals("sdmw")) {
-                if (game.getState() == GameState.TELEPORT_DEATHMATCH_DONE) {
-                    game.startDeathmatchWarmup();
-                    sender.sendMessage(MCUtils.color(MsgType.INFO + "You started the deathmatch warmup"));
-                } else {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "The players have not been teleported to the deathmatch, or the deathmatch has already started."));
-                }
-            } else if (gameSubCommand.equals("startdeathmatch") || gameSubCommand.equals("sdm")) {
-                if (game.getState() == GameState.TELEPORT_DEATHMATCH_DONE || game.getState() == GameState.DEATHMATCH_WARMUP || game.getState() == GameState.DEATHMATCH_WARMUP_DONE) {
-                    game.startDeathmatch();
-                    sender.sendMessage(MCUtils.color(MsgType.INFO + "You started the deathmatch"));
-                } else {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "You must at least teleport players to the deathmatch, or it cannot have been started already."));
-                }
-            } else if (gameSubCommand.equals("end")) {
-                if (game.getState() != GameState.ENDING && game.getState() != GameState.ENDED) {
-                    game.end();
-                    sender.sendMessage(MCUtils.color(MsgType.INFO + "You ended the game."));
-                } else {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "The game has already ended"));
-                }
-            } else if (gameSubCommand.equals("restockchests") || gameSubCommand.equals("rc")) {
-                if (game.getState().ordinal() >= GameState.INGAME_GRACEPERIOD.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal()) {
-                    game.restockChests();
-                    game.sendMessage("&6&l>> &a&lALL CHESTS HAVE BEEN RESTOCKED");
-                } else {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "Invalid game state. Must be playing, playing deathmatch, deathmatch countdown or deathmatch countdown complete."));
-                }
-            } else if (gameSubCommand.equals("nextgame") || gameSubCommand.equals("ng")) {
-                if (game.getState() == GameState.ENDING || game.getState() == GameState.ENDED) {
-                    game.nextGame();
-                    sender.sendMessage(MCUtils.color(MsgType.INFO + "Moved everyone to the next game"));
-                } else {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "You must end the game first before going to the next one."));
-                }
+                    break;
+                case "startdeathmatch":
+                case "sdm":
+                    if (game.getState() == GameState.TELEPORT_DEATHMATCH_DONE || game.getState() == GameState.DEATHMATCH_WARMUP || game.getState() == GameState.DEATHMATCH_WARMUP_DONE) {
+                        game.startDeathmatch();
+                        sender.sendMessage(MCUtils.color(MsgType.INFO + "You started the deathmatch"));
+                    } else {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "You must at least teleport players to the deathmatch, or it cannot have been started already."));
+                    }
+                    break;
+                case "end":
+                    if (game.getState() != GameState.ENDING && game.getState() != GameState.ENDED) {
+                        game.end();
+                        sender.sendMessage(MCUtils.color(MsgType.INFO + "You ended the game."));
+                    } else {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "The game has already ended"));
+                    }
+                    break;
+                case "restockchests":
+                case "rc":
+                    if (game.getState().ordinal() >= GameState.INGAME_GRACEPERIOD.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal()) {
+                        game.restockChests();
+                        game.sendMessage("&6&l>> &a&lALL CHESTS HAVE BEEN RESTOCKED");
+                    } else {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "Invalid game state. Must be playing, playing deathmatch, deathmatch countdown or deathmatch countdown complete."));
+                    }
+                    break;
+                case "nextgame":
+                case "ng":
+                    if (game.getState() == GameState.ENDING || game.getState() == GameState.ENDED) {
+                        game.nextGame();
+                        sender.sendMessage(MCUtils.color(MsgType.INFO + "Moved everyone to the next game"));
+                    } else {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "You must end the game first before going to the next one."));
+                    }
+                    break;
             }
         } else if (subCommand.equals("lobby") || subCommand.equals("l")) {
             if (!(args.length > 1)) {
@@ -228,321 +250,319 @@ public class SGCommand implements CommandExecutor {
             }
             
             String lobbySubCommand = args[1].toLowerCase();
-            if (lobbySubCommand.equals("forcestart") || lobbySubCommand.equals("fs")) {
-                if (game != null) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "The server has a game in progress."));
-                    return true;
-                }
-                
-                if (plugin.getLobby().getState() != LobbyState.WAITING) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "Invalid state to start the lobby."));
-                    return true;
-                }
-                
-                plugin.getLobby().forceStart();
-                sender.sendMessage(MCUtils.color(MsgType.INFO + "You forcefully started the lobby."));
-            } else if (lobbySubCommand.equals("map") || lobbySubCommand.equals("m")) {
-                if (!(args.length > 2)) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "You must provide a map name."));
-                    return true;
-                }
-                
-                if (game != null) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "The server has a game in progress."));
-                    return true;
-                }
-                
-                GameMap gameMap = plugin.getMapManager().getMap(SGUtils.getMapNameFromCommand(args, 2));
-                if (gameMap == null) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "Could not find a map with that name."));
-                    return true;
-                }
-                
-                if (!gameMap.isActive()) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "That map is not active."));
-                    return true;
-                }
-                
-                plugin.getLobby().setGameMap(gameMap);
-                sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the map to " + MsgType.INFO.getVariableColor() + gameMap.getName()));
-            } else if (lobbySubCommand.equals("automatic") || lobbySubCommand.equals("auto")) {
-                if (plugin.getLobby().getControlType() == ControlType.AUTOMATIC) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "The lobby is already in automatic control."));
-                    return true;
-                }
-                
-                plugin.getLobby().automatic();
-                sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the lobby to automatic control."));
-            } else if (lobbySubCommand.equals("manual") || lobbySubCommand.equals("mnl")) {
-                if (plugin.getLobby().getControlType() == ControlType.MANUAL) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "The lobby is already in manual control."));
-                    return true;
-                }
-                
-                plugin.getLobby().manual();
-                sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the lobby to manual control."));
-            } else if (lobbySubCommand.equals("editmaps") || lobbySubCommand.equals("em")) {
-                if (game != null) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "The server has a game in progress."));
-                    return true;
-                }
-                
-                if (plugin.getLobby().getState() == LobbyState.MAP_EDITING) {
-                    plugin.getLobby().stopEditingMaps();
-                    sender.sendMessage(MCUtils.color(MsgType.INFO + "You stopped editing maps."));
-                } else {
-                    plugin.getLobby().editMaps();
-                    sender.sendMessage(MCUtils.color(MsgType.INFO + "You started editing maps."));
-                }
-            } else if (lobbySubCommand.equals("mapsigns") || lobbySubCommand.equals("ms")) {
-                if (game != null) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "The server has a game in progress."));
-                    return true;
-                }
-                
-                if (!(args.length > 2)) {
-                    sender.sendMessage("&cYou must provide a sub command.");
-                    return true;
-                }
-                
-                if (!(sender instanceof Player)) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "Only players can use that command."));
-                    return true;
-                }
-                Player player = (Player) sender;
-                
-                Block targetBlock = player.getTargetBlock((Set<Material>) null, 10);
-                if (targetBlock == null) {
-                    player.sendMessage("&cYou are not looking at a block.");
-                    return true;
-                }
-                
-                if (!(targetBlock.getType() == Material.SIGN || targetBlock.getType() == Material.WALL_SIGN)) {
-                    player.sendMessage("&cYou are not looking at a sign.");
-                    return true;
-                }
-                
-                if (args[2].equalsIgnoreCase("remove")) {
-                    Iterator<Entry<Integer, Location>> iterator = plugin.getLobby().getMapSigns().entrySet().iterator();
-                    while (iterator.hasNext()) {
-                        Entry<Integer, Location> entry = iterator.next();
-                        if (entry.getValue().equals(targetBlock.getLocation())) {
-                            iterator.remove();
-                            player.sendMessage(MCUtils.color(MsgType.WARN + "You removed a sign with the position &b" + entry.getKey()));
-                            break;
-                        }
+            switch (lobbySubCommand) {
+                case "forcestart", "fs" -> {
+                    if (game != null) {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "The server has a game in progress."));
+                        return true;
                     }
-                } else if (args[2].equalsIgnoreCase("set")) {
-                    if (!(args.length > 3)) {
-                        player.sendMessage(MCUtils.color(MsgType.WARN + "You must provide a position number."));
+                    if (plugin.getLobby().getState() != LobbyState.WAITING) {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "Invalid state to start the lobby."));
+                        return true;
+                    }
+                    plugin.getLobby().forceStart();
+                    sender.sendMessage(MCUtils.color(MsgType.INFO + "You forcefully started the lobby."));
+                }
+                case "map", "m" -> {
+                    if (!(args.length > 2)) {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "You must provide a map name."));
+                        return true;
+                    }
+                    if (game != null) {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "The server has a game in progress."));
+                        return true;
+                    }
+                    GameMap gameMap = plugin.getMapManager().getMap(SGUtils.getMapNameFromCommand(args, 2));
+                    if (gameMap == null) {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "Could not find a map with that name."));
+                        return true;
+                    }
+                    if (!gameMap.isActive()) {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "That map is not active."));
+                        return true;
+                    }
+                    plugin.getLobby().setGameMap(gameMap);
+                    sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the map to " + MsgType.INFO.getVariableColor() + gameMap.getName()));
+                }
+                case "automatic", "auto" -> {
+                    if (plugin.getLobby().getControlType() == ControlType.AUTOMATIC) {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "The lobby is already in automatic control."));
+                        return true;
+                    }
+                    plugin.getLobby().automatic();
+                    sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the lobby to automatic control."));
+                }
+                case "manual", "mnl" -> {
+                    if (plugin.getLobby().getControlType() == ControlType.MANUAL) {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "The lobby is already in manual control."));
+                        return true;
+                    }
+                    plugin.getLobby().manual();
+                    sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the lobby to manual control."));
+                }
+                case "editmaps", "em" -> {
+                    if (game != null) {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "The server has a game in progress."));
+                        return true;
+                    }
+                    if (plugin.getLobby().getState() == LobbyState.MAP_EDITING) {
+                        plugin.getLobby().stopEditingMaps();
+                        sender.sendMessage(MCUtils.color(MsgType.INFO + "You stopped editing maps."));
+                    } else {
+                        plugin.getLobby().editMaps();
+                        sender.sendMessage(MCUtils.color(MsgType.INFO + "You started editing maps."));
+                    }
+                }
+                case "mapsigns", "ms" -> {
+                    if (game != null) {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "The server has a game in progress."));
                         return true;
                     }
                     
-                    int position;
-                    try {
-                        position = Integer.parseInt(args[3]);
-                    } catch (NumberFormatException e) {
-                        player.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid number."));
+                    if (!(args.length > 2)) {
+                        sender.sendMessage("&cYou must provide a sub command.");
                         return true;
                     }
                     
-                    plugin.getLobby().getMapSigns().put(position, targetBlock.getLocation());
-                    player.sendMessage(MCUtils.color(MsgType.INFO + "You set the sign you are looking at as a map sign in position &b" + position));
-                    plugin.getLobby().generateMapOptions();
-                }
-            } else if (lobbySubCommand.equals("statsigns") || lobbySubCommand.equals("sts")) {
-                if (game != null) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "The server has a game in progress."));
-                    return true;
-                }
-    
-                if (!(args.length > 2)) {
-                    sender.sendMessage("&cYou must provide a sub command.");
-                    return true;
-                }
-    
-                if (!(sender instanceof Player)) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "Only players can use that command."));
-                    return true;
-                }
-                Player player = (Player) sender;
-    
-                Block targetBlock = player.getTargetBlock((Set<Material>) null, 10);
-                if (targetBlock == null) {
-                    player.sendMessage("&cYou are not looking at a block.");
-                    return true;
-                }
-    
-                if (!(targetBlock.getType() == Material.SIGN || targetBlock.getType() == Material.WALL_SIGN)) {
-                    player.sendMessage("&cYou are not looking at a sign.");
-                    return true;
-                }
-    
-                if (args[2].equalsIgnoreCase("remove")) {
-                    Iterator<StatSign> iterator = plugin.getLobby().getStatSigns().iterator();
-                    while (iterator.hasNext()) {
-                        StatSign entry = iterator.next();
-                        if (entry.getLocation().equals(targetBlock.getLocation())) {
-                            iterator.remove();
-                            player.sendMessage(MCUtils.color(MsgType.WARN + "You removed that stat sign"));
-                            break;
+                    if (!(sender instanceof Player player)) {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "Only players can use that command."));
+                        return true;
+                    }
+                    
+                    Block targetBlock = player.getTargetBlock((Set<Material>) null, 10);
+                    if (targetBlock == null) {
+                        player.sendMessage("&cYou are not looking at a block.");
+                        return true;
+                    }
+                    
+                    if (!(targetBlock.getType() == Material.SIGN || targetBlock.getType() == Material.WALL_SIGN)) {
+                        player.sendMessage("&cYou are not looking at a sign.");
+                        return true;
+                    }
+                    
+                    if (args[2].equalsIgnoreCase("remove")) {
+                        Iterator<Entry<Integer, Location>> iterator = plugin.getLobby().getMapSigns().entrySet().iterator();
+                        while (iterator.hasNext()) {
+                            Entry<Integer, Location> entry = iterator.next();
+                            if (entry.getValue().equals(targetBlock.getLocation())) {
+                                iterator.remove();
+                                player.sendMessage(MCUtils.color(MsgType.WARN + "You removed a sign with the position &b" + entry.getKey()));
+                                break;
+                            }
                         }
-                    }
-                } else if (args[2].equalsIgnoreCase("add")) {
-                    if (!(args.length > 4)) {
-                        player.sendMessage(MCUtils.color(MsgType.WARN + "Usage: /survivalgames lobby statsigns add <stat> <displayName>"));
-                        return true;
-                    }
-        
-                    String stat = args[3];
-                    Stat.Info info = StatHelper.getInfo(stat);
-                    if (info == null) {
-                        player.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid stat name."));
-                        return true;
-                    }
-    
-                    for (StatSign statSign : plugin.getLobby().getStatSigns()) {
-                        if (statSign.getStat().equalsIgnoreCase(stat)) {
-                            player.sendMessage(MCUtils.color(MsgType.WARN + "A stat sign with that stat already exists. You can only have one per stat."));
+                    } else if (args[2].equalsIgnoreCase("set")) {
+                        if (!(args.length > 3)) {
+                            player.sendMessage(MCUtils.color(MsgType.WARN + "You must provide a position number."));
                             return true;
                         }
-                    }
-                    
-                    StringBuilder sb = new StringBuilder();
-                    for (int i = 4; i < args.length; i++) {
-                        sb.append(args[i]).append(" ");
-                    }
-                    
-                    String displayName = ChatColor.stripColor(MCUtils.color(sb.toString().trim()));
-                    if (displayName.length() > 14) {
-                        player.sendMessage(MCUtils.color(MsgType.WARN + "The display name cannot be larger than 14 characters"));
-                        return true;
-                    }
-                    
-                    StatSign statSign = new StatSign(targetBlock.getLocation(), stat, displayName);
-                    plugin.getLobby().getStatSigns().add(statSign);
-                    player.sendMessage(MCUtils.color(MsgType.INFO + "You added a stat sign for &b" + stat + " &ewith the display name &b" + displayName));
-                }
-            } else if (lobbySubCommand.equals("tributesigns") || lobbySubCommand.equals("ts")) {
-                if (game != null) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "The server has a game in progress."));
-                    return true;
-                }
-    
-                if (!(args.length > 2)) {
-                    sender.sendMessage("&cYou must provide a sub command.");
-                    return true;
-                }
-    
-                if (!(sender instanceof Player)) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "Only players can use that command."));
-                    return true;
-                }
-                Player player = (Player) sender;
-    
-                Block targetBlock = player.getTargetBlock((Set<Material>) null, 10);
-                if (targetBlock == null) {
-                    player.sendMessage("&cYou are not looking at a block.");
-                    return true;
-                }
-    
-                if (!(targetBlock.getType() == Material.SIGN || targetBlock.getType() == Material.WALL_SIGN || targetBlock.getType() == Material.SKULL)) {
-                    player.sendMessage("&cYou are not looking at a sign or a head.");
-                    return true;
-                }
-    
-                if (args[2].equalsIgnoreCase("remove")) {
-                    Iterator<TributeSign> iterator = plugin.getLobby().getTributeSigns().iterator();
-                    while (iterator.hasNext()) {
-                        TributeSign sign = iterator.next();
-                        if (sign.getSignLocation().equals(targetBlock.getLocation()) || sign.getHeadLocation().equals(targetBlock.getLocation())) {
-                            iterator.remove();
-                            player.sendMessage(MCUtils.color(MsgType.INFO + "You removed the tribute sign with index " + sign.getIndex()));
+                        
+                        int position;
+                        try {
+                            position = Integer.parseInt(args[3]);
+                        } catch (NumberFormatException e) {
+                            player.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid number."));
+                            return true;
                         }
+                        
+                        plugin.getLobby().getMapSigns().put(position, targetBlock.getLocation());
+                        player.sendMessage(MCUtils.color(MsgType.INFO + "You set the sign you are looking at as a map sign in position &b" + position));
+                        plugin.getLobby().generateMapOptions();
                     }
-                } else if (args[2].equalsIgnoreCase("set")) {
-                    if (!(args.length > 3)) {
-                        player.sendMessage(MCUtils.color(MsgType.WARN + "You must provide an index number."));
+                }
+                case "statsigns", "sts" -> {
+                    if (game != null) {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "The server has a game in progress."));
                         return true;
-                    }
-        
-                    int index;
-                    try {
-                        index = Integer.parseInt(args[3]);
-                    } catch (NumberFormatException e) {
-                        player.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid number."));
-                        return true;
-                    }
-        
-                    Location signLocation = null, headLocation = null;
-                    if (targetBlock.getType() == Material.SIGN || targetBlock.getType() == Material.WALL_SIGN) {
-                        signLocation = targetBlock.getLocation();
-                    } else if (targetBlock.getType() == Material.SKULL) {
-                        headLocation = targetBlock.getLocation();
-                    }
-    
-                    TributeSign tributeSign = null;
-                    for (TributeSign sign : plugin.getLobby().getTributeSigns()) {
-                        if (sign.getIndex() == index) {
-                            tributeSign = sign;
-                            break;
-                        }
                     }
                     
-                    if (tributeSign == null) {
-                        tributeSign = new TributeSign(index, signLocation, headLocation);
-                        String msg = "You created a new tribute sign with index &b" + index;
-                        if (signLocation == null) {
-                            msg += "&e, however you still need to add a sign to it. Just use the same command while looking at a sign.";
-                        } else if (headLocation == null) {
-                            msg += "&e, however you still need to add a head to it. Just use the same command while looking at a head.";
+                    if (!(args.length > 2)) {
+                        sender.sendMessage("&cYou must provide a sub command.");
+                        return true;
+                    }
+                    
+                    if (!(sender instanceof Player player)) {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "Only players can use that command."));
+                        return true;
+                    }
+                    
+                    Block targetBlock = player.getTargetBlock((Set<Material>) null, 10);
+                    if (targetBlock == null) {
+                        player.sendMessage("&cYou are not looking at a block.");
+                        return true;
+                    }
+                    
+                    if (!(targetBlock.getType() == Material.SIGN || targetBlock.getType() == Material.WALL_SIGN)) {
+                        player.sendMessage("&cYou are not looking at a sign.");
+                        return true;
+                    }
+                    
+                    if (args[2].equalsIgnoreCase("remove")) {
+                        Iterator<StatSign> iterator = plugin.getLobby().getStatSigns().iterator();
+                        while (iterator.hasNext()) {
+                            StatSign entry = iterator.next();
+                            if (entry.getLocation().equals(targetBlock.getLocation())) {
+                                iterator.remove();
+                                player.sendMessage(MCUtils.color(MsgType.WARN + "You removed that stat sign"));
+                                break;
+                            }
+                        }
+                    } else if (args[2].equalsIgnoreCase("add")) {
+                        if (!(args.length > 4)) {
+                            player.sendMessage(MCUtils.color(MsgType.WARN + "Usage: /survivalgames lobby statsigns add <stat> <displayName>"));
+                            return true;
+                        }
+                        
+                        String stat = args[3];
+                        Stat.Info info = StatHelper.getInfo(stat);
+                        if (info == null) {
+                            player.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid stat name."));
+                            return true;
+                        }
+                        
+                        for (StatSign statSign : plugin.getLobby().getStatSigns()) {
+                            if (statSign.getStat().equalsIgnoreCase(stat)) {
+                                player.sendMessage(MCUtils.color(MsgType.WARN + "A stat sign with that stat already exists. You can only have one per stat."));
+                                return true;
+                            }
+                        }
+                        
+                        StringBuilder sb = new StringBuilder();
+                        for (int i = 4; i < args.length; i++) {
+                            sb.append(args[i]).append(" ");
+                        }
+                        
+                        String displayName = ChatColor.stripColor(MCUtils.color(sb.toString().trim()));
+                        if (displayName.length() > 14) {
+                            player.sendMessage(MCUtils.color(MsgType.WARN + "The display name cannot be larger than 14 characters"));
+                            return true;
+                        }
+                        
+                        StatSign statSign = new StatSign(targetBlock.getLocation(), stat, displayName);
+                        plugin.getLobby().getStatSigns().add(statSign);
+                        player.sendMessage(MCUtils.color(MsgType.INFO + "You added a stat sign for &b" + stat + " &ewith the display name &b" + displayName));
+                    }
+                }
+                case "tributesigns", "ts" -> {
+                    if (game != null) {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "The server has a game in progress."));
+                        return true;
+                    }
+                    
+                    if (!(args.length > 2)) {
+                        sender.sendMessage("&cYou must provide a sub command.");
+                        return true;
+                    }
+                    
+                    if (!(sender instanceof Player player)) {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "Only players can use that command."));
+                        return true;
+                    }
+                    
+                    Block targetBlock = player.getTargetBlock((Set<Material>) null, 10);
+                    if (targetBlock == null) {
+                        player.sendMessage("&cYou are not looking at a block.");
+                        return true;
+                    }
+                    
+                    if (!(targetBlock.getType() == Material.SIGN || targetBlock.getType() == Material.WALL_SIGN || targetBlock.getType() == Material.SKULL)) {
+                        player.sendMessage("&cYou are not looking at a sign or a head.");
+                        return true;
+                    }
+                    
+                    if (args[2].equalsIgnoreCase("remove")) {
+                        Iterator<TributeSign> iterator = plugin.getLobby().getTributeSigns().iterator();
+                        while (iterator.hasNext()) {
+                            TributeSign sign = iterator.next();
+                            if (sign.getSignLocation().equals(targetBlock.getLocation()) || sign.getHeadLocation().equals(targetBlock.getLocation())) {
+                                iterator.remove();
+                                player.sendMessage(MCUtils.color(MsgType.INFO + "You removed the tribute sign with index " + sign.getIndex()));
+                            }
+                        }
+                    } else if (args[2].equalsIgnoreCase("set")) {
+                        if (!(args.length > 3)) {
+                            player.sendMessage(MCUtils.color(MsgType.WARN + "You must provide an index number."));
+                            return true;
+                        }
+                        
+                        int index;
+                        try {
+                            index = Integer.parseInt(args[3]);
+                        } catch (NumberFormatException e) {
+                            player.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid number."));
+                            return true;
+                        }
+                        
+                        Location signLocation = null, headLocation = null;
+                        if (targetBlock.getType() == Material.SIGN || targetBlock.getType() == Material.WALL_SIGN) {
+                            signLocation = targetBlock.getLocation();
+                        } else if (targetBlock.getType() == Material.SKULL) {
+                            headLocation = targetBlock.getLocation();
+                        }
+                        
+                        TributeSign tributeSign = null;
+                        for (TributeSign sign : plugin.getLobby().getTributeSigns()) {
+                            if (sign.getIndex() == index) {
+                                tributeSign = sign;
+                                break;
+                            }
+                        }
+                        
+                        if (tributeSign == null) {
+                            tributeSign = new TributeSign(index, signLocation, headLocation);
+                            String msg = "You created a new tribute sign with index &b" + index;
+                            if (signLocation == null) {
+                                msg += "&e, however you still need to add a sign to it. Just use the same command while looking at a sign.";
+                            } else if (headLocation == null) {
+                                msg += "&e, however you still need to add a head to it. Just use the same command while looking at a head.";
+                            } else {
+                                player.sendMessage(MCUtils.color(MsgType.WARN + "Unknown error occured. Please report as a bug."));
+                                return true;
+                            }
+                            plugin.getLobby().getTributeSigns().add(tributeSign);
+                            player.sendMessage(MCUtils.color(MsgType.INFO + msg));
+                            return true;
+                        }
+                        
+                        if (signLocation != null) {
+                            tributeSign.setSignLocation(signLocation);
+                            player.sendMessage(MCUtils.color(MsgType.INFO + "You set the sign location of the tribute sign at index &b" + index));
+                        } else if (headLocation != null) {
+                            tributeSign.setHeadLocation(headLocation);
+                            player.sendMessage(MCUtils.color(MsgType.INFO + "You set the head location of the tribute sign at index &b" + index));
                         } else {
                             player.sendMessage(MCUtils.color(MsgType.WARN + "Unknown error occured. Please report as a bug."));
                             return true;
                         }
-                        plugin.getLobby().getTributeSigns().add(tributeSign);
-                        player.sendMessage(MCUtils.color(MsgType.INFO + msg));
+                    }
+                }
+                case "preparegame", "pg" -> {
+                    if (game != null) {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "The server has a game in progress."));
+                        return true;
+                    }
+                    LobbyState lobbyState = plugin.getLobby().getState();
+                    if (lobbyState == LobbyState.WAITING || lobbyState == LobbyState.COUNTDOWN) {
+                        plugin.getLobby().prepareGame();
+                        sender.sendMessage(MCUtils.color(MsgType.INFO + "You forcefully had the lobby prepare the game."));
+                    } else {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "The lobby is in an invalid state to prepare a game."));
+                        return true;
+                    }
+                }
+                case "setspawn", "ss" -> {
+                    if (game != null) {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "The server has a game in progress."));
                         return true;
                     }
                     
-                    if (signLocation != null) {
-                        tributeSign.setSignLocation(signLocation);
-                        player.sendMessage(MCUtils.color(MsgType.INFO + "You set the sign location of the tribute sign at index &b" + index));
-                    } else if (headLocation != null) {
-                        tributeSign.setHeadLocation(headLocation);
-                        player.sendMessage(MCUtils.color(MsgType.INFO + "You set the head location of the tribute sign at index &b" + index));
-                    } else {
-                        player.sendMessage(MCUtils.color(MsgType.WARN + "Unknown error occured. Please report as a bug."));
+                    if (!(sender instanceof Player player)) {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "Only players can use that sub command."));
                         return true;
                     }
+                    
+                    plugin.getLobby().setSpawnpoint(player.getLocation());
+                    sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the lobby spawnpoint to your location."));
                 }
-            } else if (lobbySubCommand.equals("preparegame") || lobbySubCommand.equals("pg")) {
-                if (game != null) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "The server has a game in progress."));
-                    return true;
-                }
-                LobbyState lobbyState = plugin.getLobby().getState();
-                if (lobbyState == LobbyState.WAITING || lobbyState == LobbyState.COUNTDOWN) {
-                    plugin.getLobby().prepareGame();
-                    sender.sendMessage(MCUtils.color(MsgType.INFO + "You forcefully had the lobby prepare the game."));
-                } else {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "The lobby is in an invalid state to prepare a game."));
-                    return true;
-                }
-            } else if (lobbySubCommand.equals("setspawn") || lobbySubCommand.equals("ss")) {
-                if (game != null) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "The server has a game in progress."));
-                    return true;
-                }
-                
-                if (!(sender instanceof Player)) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "Only players can use that sub command."));
-                    return true;
-                }
-                
-                Player player = (Player) sender;
-                plugin.getLobby().setSpawnpoint(player.getLocation());
-                sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the lobby spawnpoint to your location."));
             }
         } else if (subCommand.equals("settings") || subCommand.equals("setting") || subCommand.equals("s")) {
             if (!(args.length > 3)) {
@@ -680,12 +700,10 @@ public class SGCommand implements CommandExecutor {
                 return true;
             }
             
-            if (!(sender instanceof Player)) {
+            if (!(sender instanceof Player player)) {
                 sender.sendMessage(MCUtils.color(MsgType.WARN + "Only players can use that command."));
                 return true;
             }
-            
-            Player player = (Player) sender;
             
             String mapSubCommand = args[1].toLowerCase();
             
@@ -739,168 +757,180 @@ public class SGCommand implements CommandExecutor {
                     return true;
                 }
                 
-                if (mapSubCommand.equals("download") || mapSubCommand.equals("dl")) {
-                    GameMap finalGameMap = gameMap;
-                    player.sendMessage(MCUtils.color(MsgType.VERBOSE + "Please wait, downloading the map " + MsgType.VERBOSE.getVariableColor() + finalGameMap.getName() + MsgType.VERBOSE.getBaseColor() + "."));
-                    NexusAPI.getApi().getThreadFactory().runAsync(() -> {
-                        finalGameMap.download(plugin);
-                        player.sendMessage(MCUtils.color(MsgType.INFO + "Downloaded the map " + MsgType.INFO.getVariableColor() + finalGameMap.getName() + MsgType.INFO.getBaseColor() + "."));
-                    });
-                    return true;
-                } else if (mapSubCommand.equals("load") || mapSubCommand.equals("l")) {
-                    gameMap.unzip(plugin);
-                    gameMap.copyFolder(plugin, false);
-                    gameMap.load(plugin);
-                    if (gameMap.getWorld() != null) {
-                        sender.sendMessage(MCUtils.color(MsgType.INFO + "Successfully loaded the map " + MsgType.INFO.getVariableColor() + gameMap.getName() + MsgType.INFO.getBaseColor() + "."));
-                    } else {
-                        sender.sendMessage(MCUtils.color(MsgType.ERROR + "Could not load the map " + MsgType.ERROR.getVariableColor() + gameMap.getName() + MsgType.ERROR.getBaseColor() + ". Please report as a bug."));
-                    }
-                    return true;
-                } else if (mapSubCommand.equals("teleport") || mapSubCommand.equals("tp")) {
-                    Location spawn;
-                    if (gameMap.getWorld() == null) {
-                        sender.sendMessage(MsgType.WARN + "That map is not loaded. Please load before teleporting.");
+                switch (mapSubCommand) {
+                    case "download", "dl" -> {
+                        GameMap finalGameMap = gameMap;
+                        player.sendMessage(MCUtils.color(MsgType.VERBOSE + "Please wait, downloading the map " + MsgType.VERBOSE.getVariableColor() + finalGameMap.getName() + MsgType.VERBOSE.getBaseColor() + "."));
+                        NexusAPI.getApi().getThreadFactory().runAsync(() -> {
+                            finalGameMap.download(plugin);
+                            player.sendMessage(MCUtils.color(MsgType.INFO + "Downloaded the map " + MsgType.INFO.getVariableColor() + finalGameMap.getName() + MsgType.INFO.getBaseColor() + "."));
+                        });
                         return true;
                     }
-                    if (gameMap.getCenter() != null) {
-                        spawn = gameMap.getCenter().toLocation(gameMap.getWorld());
-                    } else {
-                        spawn = gameMap.getWorld().getSpawnLocation();
-                    }
-                    
-                    player.teleport(spawn);
-                    player.sendMessage(MCUtils.color(MsgType.INFO + "Teleported to the map " + MsgType.INFO.getVariableColor() + gameMap.getName()));
-                    return true;
-                } else if (mapSubCommand.equals("save")) {
-                    plugin.getMapManager().saveToDatabase(gameMap);
-                    player.sendMessage(MCUtils.color(MsgType.INFO + "Saved the settings for the map " + MsgType.INFO.getVariableColor() + gameMap.getName()));
-                } else if (mapSubCommand.equals("delete")) {
-                    gameMap.delete(plugin);
-                    player.sendMessage(MCUtils.color(MsgType.INFO + "Deleted the map " + MsgType.INFO.getVariableColor() + gameMap.getName() + MsgType.INFO.getBaseColor() + " from the server."));
-                    return true;
-                } else if (mapSubCommand.equals("addspawn") || mapSubCommand.equals("as")) {
-                    Location location = player.getLocation();
-                    int position = gameMap.addSpawn(new MapSpawn(0, 0, location.getBlockX(), location.getBlockY(), location.getBlockZ()));
-                    sender.sendMessage(MCUtils.color(MsgType.INFO + "You added a spawn with index &b" + position + " &eto the map &b" + gameMap.getName()));
-                } else if (mapSubCommand.equals("setspawn") || mapSubCommand.equals("sp")) {
-                    int argIndex;
-                    if (mapFromArgument) {
-                        argIndex = 3;
-                    } else {
-                        argIndex = 2;
-                    }
-                    
-                    if (!(args.length > argIndex)) {
-                        sender.sendMessage(MCUtils.color(MsgType.WARN + "You must provide an index for the spawn."));
+                    case "load", "l" -> {
+                        gameMap.unzip(plugin);
+                        gameMap.copyFolder(plugin, false);
+                        gameMap.load(plugin);
+                        if (gameMap.getWorld() != null) {
+                            sender.sendMessage(MCUtils.color(MsgType.INFO + "Successfully loaded the map " + MsgType.INFO.getVariableColor() + gameMap.getName() + MsgType.INFO.getBaseColor() + "."));
+                        } else {
+                            sender.sendMessage(MCUtils.color(MsgType.ERROR + "Could not load the map " + MsgType.ERROR.getVariableColor() + gameMap.getName() + MsgType.ERROR.getBaseColor() + ". Please report as a bug."));
+                        }
                         return true;
                     }
-                    
-                    int position;
-                    try {
-                        position = Integer.parseInt(args[argIndex]);
-                    } catch (NumberFormatException e) {
-                        sender.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid number for the spawn index."));
+                    case "teleport", "tp" -> {
+                        Location spawn;
+                        if (gameMap.getWorld() == null) {
+                            sender.sendMessage(MsgType.WARN + "That map is not loaded. Please load before teleporting.");
+                            return true;
+                        }
+                        if (gameMap.getCenter() != null) {
+                            spawn = gameMap.getCenter().toLocation(gameMap.getWorld());
+                        } else {
+                            spawn = gameMap.getWorld().getSpawnLocation();
+                        }
+                        player.teleport(spawn);
+                        player.sendMessage(MCUtils.color(MsgType.INFO + "Teleported to the map " + MsgType.INFO.getVariableColor() + gameMap.getName()));
                         return true;
                     }
-                    
-                    Location location = player.getLocation();
-                    gameMap.setSpawn(position, new MapSpawn(gameMap.getId(), position, location.getBlockX(), location.getBlockY(), location.getBlockZ()));
-                    sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the spawn at position &b" + position + " &eto your location in the map &b" + gameMap.getName()));
-                } else if (mapSubCommand.equals("setcenter") || mapSubCommand.equals("sc")) {
-                    Location location = player.getPlayer().getLocation();
-                    gameMap.setCenter(new Position(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
-                    player.sendMessage(MCUtils.color(MsgType.INFO + "You set the center of the map &b" + gameMap.getName() + " &eto your current location."));
-                } else if (mapSubCommand.equals("setborderradius") || mapSubCommand.equals("sbr")) {
-                    int argIndex;
-                    if (mapFromArgument) {
-                        argIndex = 3;
-                    } else {
-                        argIndex = 2;
+                    case "save" -> {
+                        plugin.getMapManager().saveToDatabase(gameMap);
+                        player.sendMessage(MCUtils.color(MsgType.INFO + "Saved the settings for the map " + MsgType.INFO.getVariableColor() + gameMap.getName()));
                     }
-                    
-                    if (!(args.length > argIndex)) {
-                        sender.sendMessage(MCUtils.color(MsgType.WARN + "You must provide a radius."));
+                    case "delete" -> {
+                        gameMap.delete(plugin);
+                        player.sendMessage(MCUtils.color(MsgType.INFO + "Deleted the map " + MsgType.INFO.getVariableColor() + gameMap.getName() + MsgType.INFO.getBaseColor() + " from the server."));
                         return true;
                     }
-                    
-                    int radius;
-                    try {
-                        radius = Integer.parseInt(args[argIndex]);
-                    } catch (NumberFormatException e) {
-                        sender.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid number for the radius."));
-                        return true;
+                    case "addspawn", "as" -> {
+                        Location location = player.getLocation();
+                        int position = gameMap.addSpawn(new MapSpawn(0, 0, location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+                        sender.sendMessage(MCUtils.color(MsgType.INFO + "You added a spawn with index &b" + position + " &eto the map &b" + gameMap.getName()));
                     }
-                    
-                    gameMap.setBorderDistance(radius);
-                    sender.sendMessage(MCUtils.color("You set the border radius on map &b" + gameMap.getName() + " &eto &b" + radius));
-                } else if (mapSubCommand.equals("setdeathmatchborderradius") || mapSubCommand.equals("sdmbr")) {
-                    int argIndex;
-                    if (mapFromArgument) {
-                        argIndex = 3;
-                    } else {
-                        argIndex = 2;
+                    case "setspawn", "sp" -> {
+                        int argIndex;
+                        if (mapFromArgument) {
+                            argIndex = 3;
+                        } else {
+                            argIndex = 2;
+                        }
+                        
+                        if (!(args.length > argIndex)) {
+                            sender.sendMessage(MCUtils.color(MsgType.WARN + "You must provide an index for the spawn."));
+                            return true;
+                        }
+                        
+                        int position;
+                        try {
+                            position = Integer.parseInt(args[argIndex]);
+                        } catch (NumberFormatException e) {
+                            sender.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid number for the spawn index."));
+                            return true;
+                        }
+                        
+                        Location location = player.getLocation();
+                        gameMap.setSpawn(position, new MapSpawn(gameMap.getId(), position, location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+                        sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the spawn at position &b" + position + " &eto your location in the map &b" + gameMap.getName()));
                     }
-                    
-                    if (!(args.length > argIndex)) {
-                        sender.sendMessage(MCUtils.color(MsgType.WARN + "You must provide a radius."));
-                        return true;
+                    case "setcenter", "sc" -> {
+                        Location location = player.getPlayer().getLocation();
+                        gameMap.setCenter(new Position(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+                        player.sendMessage(MCUtils.color(MsgType.INFO + "You set the center of the map &b" + gameMap.getName() + " &eto your current location."));
                     }
-                    
-                    int radius;
-                    try {
-                        radius = Integer.parseInt(args[argIndex]);
-                    } catch (NumberFormatException e) {
-                        sender.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid number for the radius."));
-                        return true;
+                    case "setborderradius", "sbr" -> {
+                        int argIndex;
+                        if (mapFromArgument) {
+                            argIndex = 3;
+                        } else {
+                            argIndex = 2;
+                        }
+                        
+                        if (!(args.length > argIndex)) {
+                            sender.sendMessage(MCUtils.color(MsgType.WARN + "You must provide a radius."));
+                            return true;
+                        }
+                        
+                        int radius;
+                        try {
+                            radius = Integer.parseInt(args[argIndex]);
+                        } catch (NumberFormatException e) {
+                            sender.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid number for the radius."));
+                            return true;
+                        }
+                        
+                        gameMap.setBorderDistance(radius);
+                        sender.sendMessage(MCUtils.color("You set the border radius on map &b" + gameMap.getName() + " &eto &b" + radius));
                     }
-                    
-                    gameMap.setDeathmatchBorderDistance(radius);
-                    sender.sendMessage(MCUtils.color("You set the deathmatch border radius on map &b" + gameMap.getName() + " &eto &b" + radius));
-                } else if (mapSubCommand.equals("creators")) {
-                    int argIndex;
-                    if (mapFromArgument) {
-                        argIndex = 3;
-                    } else {
-                        argIndex = 2;
+                    case "setdeathmatchborderradius", "sdmbr" -> {
+                        int argIndex;
+                        if (mapFromArgument) {
+                            argIndex = 3;
+                        } else {
+                            argIndex = 2;
+                        }
+                        
+                        if (!(args.length > argIndex)) {
+                            sender.sendMessage(MCUtils.color(MsgType.WARN + "You must provide a radius."));
+                            return true;
+                        }
+                        
+                        int radius;
+                        try {
+                            radius = Integer.parseInt(args[argIndex]);
+                        } catch (NumberFormatException e) {
+                            sender.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid number for the radius."));
+                            return true;
+                        }
+                        
+                        gameMap.setDeathmatchBorderDistance(radius);
+                        sender.sendMessage(MCUtils.color("You set the deathmatch border radius on map &b" + gameMap.getName() + " &eto &b" + radius));
                     }
-                    
-                    if (!(args.length > argIndex)) {
-                        sender.sendMessage(MCUtils.color(MsgType.WARN + "You must provide the creators."));
-                        return true;
+                    case "creators" -> {
+                        int argIndex;
+                        if (mapFromArgument) {
+                            argIndex = 3;
+                        } else {
+                            argIndex = 2;
+                        }
+                        
+                        if (!(args.length > argIndex)) {
+                            sender.sendMessage(MCUtils.color(MsgType.WARN + "You must provide the creators."));
+                            return true;
+                        }
+                        
+                        StringBuilder cb = new StringBuilder();
+                        for (int i = argIndex; i < args.length; i++) {
+                            cb.append(args[i]).append(" ");
+                        }
+                        
+                        String[] creators = cb.toString().trim().split(",");
+                        if (creators == null || creators.length == 0) {
+                            sender.sendMessage(MCUtils.color(MsgType.WARN + "You must separate the creators with commas."));
+                            return true;
+                        }
+                        
+                        for (String creator : creators) {
+                            gameMap.addCreator(creator);
+                            sender.sendMessage(MCUtils.color(MsgType.INFO + "You added " + MsgType.INFO.getVariableColor() + creator + MsgType.INFO.getBaseColor() + " as a creator on map " + MsgType.INFO.getVariableColor() + gameMap.getName()));
+                        }
                     }
-                    
-                    StringBuilder cb = new StringBuilder();
-                    for (int i = argIndex; i < args.length; i++) {
-                        cb.append(args[i]).append(" ");
+                    case "setactive" -> {
+                        int argIndex;
+                        if (mapFromArgument) {
+                            argIndex = 3;
+                        } else {
+                            argIndex = 2;
+                        }
+                        
+                        if (!(args.length > argIndex)) {
+                            sender.sendMessage(MCUtils.color(MsgType.WARN + "You must provide a true or false value."));
+                            return true;
+                        }
+                        
+                        boolean value = Boolean.parseBoolean(args[argIndex]);
+                        gameMap.setActive(value);
+                        sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the status of the map to " + MsgType.INFO.getVariableColor() + value));
                     }
-                    
-                    String[] creators = cb.toString().trim().split(",");
-                    if (creators == null || creators.length == 0) {
-                        sender.sendMessage(MCUtils.color(MsgType.WARN + "You must separate the creators with commas."));
-                        return true;
-                    }
-                    
-                    for (String creator : creators) {
-                        gameMap.addCreator(creator);
-                        sender.sendMessage(MCUtils.color(MsgType.INFO + "You added " + MsgType.INFO.getVariableColor() + creator + MsgType.INFO.getBaseColor() + " as a creator on map " + MsgType.INFO.getVariableColor() + gameMap.getName()));
-                    }
-                } else if (mapSubCommand.equals("setactive")) {
-                    int argIndex;
-                    if (mapFromArgument) {
-                        argIndex = 3;
-                    } else {
-                        argIndex = 2;
-                    }
-    
-                    if (!(args.length > argIndex)) {
-                        sender.sendMessage(MCUtils.color(MsgType.WARN + "You must provide a true or false value."));
-                        return true;
-                    }
-                    
-                    boolean value = Boolean.parseBoolean(args[argIndex]);
-                    gameMap.setActive(value);
-                    sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the status of the map to " + MsgType.INFO.getVariableColor() + value));
                 }
                 GameMap finalGameMap = gameMap;
                 new BukkitRunnable() {
@@ -933,85 +963,90 @@ public class SGCommand implements CommandExecutor {
             }
             
             String timerSubCommand = args[1].toLowerCase();
-            if (timerSubCommand.equals("pause")) {
-                if (timer.isPaused()) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "The timer is already paused."));
-                    return true;
-                }
-                
-                timer.setPaused(true);
-                sender.sendMessage(MCUtils.color(MsgType.INFO + "You paused the timer."));
-            } else if (timerSubCommand.equals("resume")) {
-                if (!timer.isPaused()) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "The timer is not paused."));
-                    return true;
-                }
-                
-                timer.setPaused(false);
-                sender.sendMessage(MCUtils.color(MsgType.INFO + "You paused the timer."));
-            } else if (timerSubCommand.equals("reset")) {
-                timer.reset();
-                sender.sendMessage(MCUtils.color(MsgType.INFO + "You reset the timer."));
-            } else if (timerSubCommand.equals("modify")) {
-                if (!(args.length > 2)) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "You must provide a value."));
-                    return true;
-                }
-                
-                String input = args[2];
-                Operator operator = Operator.getOperator(input);
-                if (operator != null) {
-                    input = input.substring(1);
-                }
-                
-                int seconds;
-                try {
-                    seconds = Integer.parseInt(input);
-                } catch (NumberFormatException e) {
-                    sender.sendMessage(MsgType.WARN + "You provided an invalid integer value.");
-                    return true;
-                }
-                
-                long milliseconds = (seconds * 1000L) + 50;
-                if (operator == null) {
-                    timer.setLength(milliseconds);
-                } else {
-                    if (operator == Operator.ADD) {
-                        long newTime = timer.getTimeLeft() + milliseconds;
-                        if (newTime > timer.getLength()) {
-                            newTime = timer.getLength();
-                            sender.sendMessage(MCUtils.color(MsgType.WARN + "The new timer length exceeds the specified length of the timer. Using the max length. Please use this command without an operator to change the specified length"));
-                        }
-                        timer.setRawTime(newTime);
-                    } else if (operator == Operator.SUBTRACT) {
-                        long newTime = timer.getTimeLeft() - milliseconds;
-                        if (newTime <= 0) {
-                            sender.sendMessage(MCUtils.color(MsgType.WARN + "The new timer length is less than or equal to 0. Please use the timer cancel command instead."));
-                            return true;
-                        }
-                        
-                        timer.setRawTime(newTime);
-                    } else if (operator == Operator.MULTIPLY) {
-                        long newTime = timer.getTimeLeft() * milliseconds;
-                        if (newTime > timer.getLength()) {
-                            newTime = timer.getLength();
-                            sender.sendMessage(MCUtils.color(MsgType.VERBOSE + "The new timer length exceeds the specified length of the timer. Using the max length. Please use this command without an operator to change the specified length"));
-                        }
-                        timer.setRawTime(newTime);
-                    } else if (operator == Operator.DIVIDE) {
-                        if (milliseconds == 0) {
-                            sender.sendMessage(MCUtils.color(MsgType.WARN + "Cannot divide by zero"));
-                            return true;
-                        }
-                        long newTime = timer.getTimeLeft() / milliseconds;
-                        if (newTime <= 0) {
-                            sender.sendMessage(MCUtils.color(MsgType.WARN + "The new timer length is less than or equal to 0. Please use the timer cancel command instead."));
-                            return true;
-                        }
-                        
-                        timer.setRawTime(newTime);
+            switch (timerSubCommand) {
+                case "pause" -> {
+                    if (timer.isPaused()) {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "The timer is already paused."));
+                        return true;
                     }
-                    sender.sendMessage(MCUtils.color(MsgType.INFO + "You modified the " + timerType + " timer."));
+                    timer.setPaused(true);
+                    sender.sendMessage(MCUtils.color(MsgType.INFO + "You paused the timer."));
+                }
+                case "resume" -> {
+                    if (!timer.isPaused()) {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "The timer is not paused."));
+                        return true;
+                    }
+                    timer.setPaused(false);
+                    sender.sendMessage(MCUtils.color(MsgType.INFO + "You paused the timer."));
+                }
+                case "reset" -> {
+                    timer.reset();
+                    sender.sendMessage(MCUtils.color(MsgType.INFO + "You reset the timer."));
+                }
+                case "modify" -> {
+                    if (!(args.length > 2)) {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "You must provide a value."));
+                        return true;
+                    }
+                    String input = args[2];
+                    Operator operator = Operator.getOperator(input);
+                    if (operator != null) {
+                        input = input.substring(1);
+                    }
+                    int seconds;
+                    try {
+                        seconds = Integer.parseInt(input);
+                    } catch (NumberFormatException e) {
+                        sender.sendMessage(MsgType.WARN + "You provided an invalid integer value.");
+                        return true;
+                    }
+                    long milliseconds = (seconds * 1000L) + 50;
+                    if (operator == null) {
+                        timer.setLength(milliseconds);
+                    } else {
+                        switch (operator) {
+                            case ADD -> {
+                                long newTime = timer.getTimeLeft() + milliseconds;
+                                if (newTime > timer.getLength()) {
+                                    newTime = timer.getLength();
+                                    sender.sendMessage(MCUtils.color(MsgType.WARN + "The new timer length exceeds the specified length of the timer. Using the max length. Please use this command without an operator to change the specified length"));
+                                }
+                                timer.setRawTime(newTime);
+                            }
+                            case SUBTRACT -> {
+                                long newTime = timer.getTimeLeft() - milliseconds;
+                                if (newTime <= 0) {
+                                    sender.sendMessage(MCUtils.color(MsgType.WARN + "The new timer length is less than or equal to 0. Please use the timer cancel command instead."));
+                                    return true;
+                                }
+                                
+                                timer.setRawTime(newTime);
+                            }
+                            case MULTIPLY -> {
+                                long newTime = timer.getTimeLeft() * milliseconds;
+                                if (newTime > timer.getLength()) {
+                                    newTime = timer.getLength();
+                                    sender.sendMessage(MCUtils.color(MsgType.VERBOSE + "The new timer length exceeds the specified length of the timer. Using the max length. Please use this command without an operator to change the specified length"));
+                                }
+                                timer.setRawTime(newTime);
+                            }
+                            case DIVIDE -> {
+                                if (milliseconds == 0) {
+                                    sender.sendMessage(MCUtils.color(MsgType.WARN + "Cannot divide by zero"));
+                                    return true;
+                                }
+                                long newTime = timer.getTimeLeft() / milliseconds;
+                                if (newTime <= 0) {
+                                    sender.sendMessage(MCUtils.color(MsgType.WARN + "The new timer length is less than or equal to 0. Please use the timer cancel command instead."));
+                                    return true;
+                                }
+                                
+                                timer.setRawTime(newTime);
+                            }
+                        }
+                        sender.sendMessage(MCUtils.color(MsgType.INFO + "You modified the " + timerType + " timer."));
+                    }
                 }
             }
         } else if (args[0].equalsIgnoreCase("skull")) {

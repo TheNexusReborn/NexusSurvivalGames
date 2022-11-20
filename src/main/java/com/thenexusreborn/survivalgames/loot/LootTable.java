@@ -55,7 +55,7 @@ public class LootTable {
             int rand = random.nextInt(categoryTotal + 1);
             for (Range<LootCategory> range : categoryProbabilities) {
                 if (range.contains(rand)) {
-                    LootCategory category = range.getObject();
+                    LootCategory category = range.object();
                     int current = categoryAmounts.getOrDefault(category, 0);
                     if (current < category.getMaxAmountPerChest()) {
                         categoryAmounts.put(category, current + 1);

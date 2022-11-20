@@ -102,7 +102,7 @@ public class LootCategory {
         int rand = random.nextInt(entryTotal + 1);
         for (Range<LootEntry> range : entryProbabilties) {
             if (range.contains(rand)) {
-                return range.getObject();
+                return range.object();
             }
         }
         return null;
