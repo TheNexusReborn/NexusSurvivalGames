@@ -17,9 +17,15 @@ public class GamePlayer {
     private boolean mutated;
     private Mutation mutation;
     private boolean deathByMutation;
+    private Bounty bounty;
+    private CombatTag combatTag;
+    private DamageInfo damageInfo;
     
     public GamePlayer(NexusPlayer nexusPlayer) {
         this.nexusPlayer = nexusPlayer;
+        this.bounty = new Bounty(nexusPlayer.getUniqueId());
+        this.combatTag = new CombatTag(nexusPlayer.getUniqueId());
+        this.damageInfo = new DamageInfo(nexusPlayer.getUniqueId());
     }
     
     public NexusPlayer getNexusPlayer() {
@@ -114,6 +120,18 @@ public class GamePlayer {
         return deathByMutation;
     }
     
+    public Bounty getBounty() {
+        return bounty;
+    }
+    
+    public CombatTag getCombatTag() {
+        return combatTag;
+    }
+    
+    public DamageInfo getDamageInfo() {
+        return damageInfo;
+    }
+    
     public boolean canMutate() {
         if (deathByMutation) {
             return false;
@@ -133,5 +151,12 @@ public class GamePlayer {
         }
         
         return game.getSettings().isAllowMutations();
+    }
+    
+    public void setCombat(NexusPlayer other) {
+        if (!getCombatTag().isInCombatWith(other.getUniqueId())) {
+            sendMessage("&6&l>> &cYou are now in combat with " + other.getColoredName() + "&c!");
+        }
+        getCombatTag().setOther(other.getUniqueId());
     }
 }

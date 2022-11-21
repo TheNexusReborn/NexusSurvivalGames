@@ -3,17 +3,17 @@ package com.thenexusreborn.survivalgames.game;
 import java.util.UUID;
 
 public final class CombatTag {
-    private UUID player, target;
+    private UUID player, other;
     private long timestamp;
     
-    public CombatTag(UUID player, UUID target, long timestamp) {
+    public CombatTag(UUID player, UUID other, long timestamp) {
         this.player = player;
-        this.target = target;
+        this.other = other;
         this.timestamp = timestamp;
     }
     
-    public CombatTag(UUID player, UUID target) {
-        this(player, target, System.currentTimeMillis());
+    public CombatTag(UUID player, UUID other) {
+        this(player, other, System.currentTimeMillis());
     }
     
     public CombatTag(UUID player) {
@@ -24,16 +24,13 @@ public final class CombatTag {
         return player;
     }
     
-    public void setPlayer(UUID player) {
-        this.player = player;
+    public UUID getOther() {
+        return other;
     }
     
-    public UUID getTarget() {
-        return target;
-    }
-    
-    public void setTarget(UUID target) {
-        this.target = target;
+    public void setOther(UUID other) {
+        this.other = other;
+        this.timestamp = System.currentTimeMillis();
     }
     
     public long getTimestamp() {
@@ -42,5 +39,17 @@ public final class CombatTag {
     
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+    }
+    
+    public boolean isInCombatWith(UUID uuid) {
+        if (!isInCombat()) {
+            return false;
+        }
+        
+        return this.other.equals(uuid);
+    }
+    
+    public boolean isInCombat() {
+        return this.other != null && System.currentTimeMillis() < this.timestamp + 5000;
     }
 }
