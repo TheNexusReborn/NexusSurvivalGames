@@ -1287,4 +1287,13 @@ public class Game {
     public Map<Location, UUID> getSuicideLocations() {
         return suicideLocations;
     }
+
+    public GamePlayer getPlayer(String name) {
+        for (GamePlayer gamePlayer : new ArrayList<>(this.players.values())) {
+            if (gamePlayer.getNexusPlayer().getName().equalsIgnoreCase(name)) {
+                return gamePlayer;
+            }
+        }
+        return null;
+    }
 }

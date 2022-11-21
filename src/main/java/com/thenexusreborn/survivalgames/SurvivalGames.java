@@ -183,6 +183,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         getCommand("survivalgames").setExecutor(new SGCommand(this));
         getCommand("spectate").setExecutor(new SpectateCommand(this));
         getCommand("map").setExecutor(new MapCommand(this));
+        getCommand("bounty").setExecutor(new BountyCmd(this));
         
         getLogger().info("Registered commands");
         
