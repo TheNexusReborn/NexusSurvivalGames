@@ -11,7 +11,7 @@ import com.thenexusreborn.nexuscore.NexusCore;
 import com.thenexusreborn.nexuscore.api.NexusSpigotPlugin;
 import com.thenexusreborn.nexuscore.util.ServerProperties;
 import com.thenexusreborn.survivalgames.cmd.*;
-import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.game.tasks.*;
 import com.thenexusreborn.survivalgames.listener.*;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
@@ -202,6 +202,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         new ChickenMutationTask(this).start();
         new SpectatorUpdateTask(this).start();
         new ServerStatusTask(this).start();
+        new CombatTagTask(this).start();
         
         getLogger().info("Registered Tasks");
         
