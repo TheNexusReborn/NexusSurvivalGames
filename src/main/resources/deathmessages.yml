@@ -27,7 +27,9 @@ EXPLOSION:
 VOID:
   normal: '%playername% died in the void'
   player: '%playername% was thrown into the void by %killername%'
-LIGHTNING: '%playername% was struck by lightning'
+LIGHTNING:
+  normal: '%playername% was struck by lightning'
+  player: '%playername% was struck by lightning while fighting %killername%'
 SUICIDE: '%playername% died'
 STARVATION:
   normal: '%playername% starved to death'

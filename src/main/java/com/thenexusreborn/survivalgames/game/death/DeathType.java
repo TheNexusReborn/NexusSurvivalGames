@@ -19,7 +19,7 @@ public enum DeathType {
     DROWNING(true), 
     EXPLOSION(true),
     VOID(true), 
-    LIGHTNING, 
+    LIGHTNING(true), 
     SUICIDE, 
     STARVATION(true), 
     POISON(true), 
