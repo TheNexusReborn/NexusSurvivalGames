@@ -203,6 +203,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         new SpectatorUpdateTask(this).start();
         new ServerStatusTask(this).start();
         new CombatTagTask(this).start();
+        new DamagersTask(this).start();
         
         getLogger().info("Registered Tasks");
         
