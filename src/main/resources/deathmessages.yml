@@ -60,3 +60,6 @@ VANISH:
   normal: '%playername% died'
   player: '%playername% was killed by %killername% using %helditem%'
 SPECTATE: '%playername% decided to spectate'
+CACTUS:
+  normal: '%playername% was pricked to death'
+  player: '%playername% was pricked to death while fighting %killername%'

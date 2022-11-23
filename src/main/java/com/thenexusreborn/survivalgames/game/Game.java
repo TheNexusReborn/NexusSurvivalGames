@@ -849,6 +849,12 @@ public class Game {
         }
     }
     
+    //TODO Rename when old killPlayer method is removed
+    public void killPlayerRewrite(GamePlayer gamePlayer, com.thenexusreborn.survivalgames.game.death.DeathInfo deathInfo) {
+        
+    }
+    
+    //TODO Remove when new rewrite is done, keeping this to prevent errors for now
     public void killPlayer(UUID uniqueId, DeathInfo deathInfo) {
         GamePlayer gamePlayer = getPlayer(uniqueId);
         if (gamePlayer == null) {

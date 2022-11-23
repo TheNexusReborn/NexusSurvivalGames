@@ -62,6 +62,10 @@ public class DeathInfo {
         return killer;
     }
     
+    public void setKiller(KillerInfo killer) {
+        this.killer = killer;
+    }
+    
     public String getDeathMessage() {
         GamePlayer gamePlayer = game.getPlayer(player);
         FileConfiguration deathMessagesConfig = plugin.getDeathMessagesConfig();
