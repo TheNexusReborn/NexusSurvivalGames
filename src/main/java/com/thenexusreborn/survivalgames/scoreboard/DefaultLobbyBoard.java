@@ -57,6 +57,7 @@ public class DefaultLobbyBoard extends SpigotScoreboardView {
                     }
                 }
             }
+            team.setSuffix(waiting + "");
         }));
         createTeam(new TeamBuilder("neededValue").entry("&fNeeded: &e").score(10).valueUpdater((player, team) -> {
             Lobby lobby = plugin.getLobby();
