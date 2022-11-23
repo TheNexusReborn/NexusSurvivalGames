@@ -9,7 +9,7 @@ import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.loot.*;
 import com.thenexusreborn.survivalgames.map.GameMap;
-import com.thenexusreborn.survivalgames.scoreboard.LobbyScoreboardView;
+import com.thenexusreborn.survivalgames.scoreboard.DefaultLobbyBoard;
 import com.thenexusreborn.survivalgames.settings.*;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
@@ -470,7 +470,7 @@ public class Lobby {
             player.setAllowFlight(nexusPlayer.getToggles().getValue("fly"));
         }
         
-        nexusPlayer.getScoreboard().setView(new LobbyScoreboardView(nexusPlayer.getScoreboard(), plugin));
+        nexusPlayer.getScoreboard().setView(new DefaultLobbyBoard(nexusPlayer.getScoreboard(), plugin));
         nexusPlayer.getScoreboard().setTablistHandler(new RankTablistHandler(nexusPlayer.getScoreboard()));
         nexusPlayer.setActionBar(new LobbyActionBar(plugin));
         sendMapOptions(nexusPlayer);

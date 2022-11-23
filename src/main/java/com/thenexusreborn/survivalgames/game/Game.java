@@ -32,7 +32,7 @@ import com.thenexusreborn.survivalgames.mutations.Mutation;
 import com.thenexusreborn.survivalgames.mutations.MutationEffect;
 import com.thenexusreborn.survivalgames.mutations.MutationItem;
 import com.thenexusreborn.survivalgames.mutations.MutationType;
-import com.thenexusreborn.survivalgames.scoreboard.GameScoreboardView;
+import com.thenexusreborn.survivalgames.scoreboard.DefaultGameBoard;
 import com.thenexusreborn.survivalgames.scoreboard.GameTablistHandler;
 import com.thenexusreborn.survivalgames.settings.ColorMode;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
@@ -188,7 +188,7 @@ public class Game {
         } else {
             sendMessage("&a&l>> &b" + nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName() + " &ejoined.");
         }
-        nexusPlayer.getScoreboard().setView(new GameScoreboardView(nexusPlayer.getScoreboard(), plugin));
+        nexusPlayer.getScoreboard().setView(new DefaultGameBoard(nexusPlayer.getScoreboard(), plugin));
         nexusPlayer.getScoreboard().setTablistHandler(new GameTablistHandler(nexusPlayer.getScoreboard(), plugin));
         nexusPlayer.setActionBar(new GameActionBar(plugin, gamePlayer));
         recalculateVisibility();
@@ -418,7 +418,7 @@ public class Game {
         setState(SETTING_UP);
         
         for (GamePlayer player : this.players.values()) {
-            player.getNexusPlayer().getScoreboard().setView(new GameScoreboardView(player.getNexusPlayer().getScoreboard(), plugin));
+            player.getNexusPlayer().getScoreboard().setView(new DefaultGameBoard(player.getNexusPlayer().getScoreboard(), plugin));
         }
         
         new BukkitRunnable() {
