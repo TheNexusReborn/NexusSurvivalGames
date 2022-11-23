@@ -2,16 +2,13 @@ package com.thenexusreborn.survivalgames.scoreboard;
 
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
-import com.thenexusreborn.api.scoreboard.NexusScoreboard;
-import com.thenexusreborn.api.scoreboard.wrapper.ITeam;
+import com.thenexusreborn.api.scoreboard.*;
 import com.thenexusreborn.nexuscore.scoreboard.SpigotScoreboardView;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.map.GameMap;
 import org.bukkit.ChatColor;
-
-import java.util.*;
 
 @SuppressWarnings("DuplicatedCode")
 public class DefaultLobbyBoard extends SpigotScoreboardView {
@@ -29,58 +26,44 @@ public class DefaultLobbyBoard extends SpigotScoreboardView {
     
     @Override
     public void registerTeams() {
-        createTeam(mapLabelName, "&6&lMAP:", 15);
-        createTeam(mapValueName, ChatColor.AQUA.toString(), "&7Voting", 14);
-        createTeam(blank1Name, ChatColor.DARK_GRAY.toString(), 13);
-        createTeam(playersLabelName, "&6&lPLAYERS:", 12);
-        createTeam(waitingValueName, "&fWaiting: ", 11);
-        createTeam(neededValueName, "&fNeeded: ", 10);
-        createTeam(blank2Name, ChatColor.DARK_PURPLE.toString(), 9);
-        createTeam(serverLabelName, "&6&lSERVER:", 2);
-        createTeam(serverValueName, NexusAPI.getApi().getServerManager().getCurrentServer().getName(), 1);
-    }
-    
-    @Override
-    public void update() {
-        if (plugin.getGame() != null) {
-            return;
-        }
-        Lobby lobby = plugin.getLobby();
-        NexusPlayer player = this.scoreboard.getPlayer();
-        ITeam mapValue = scoreboard.getScoreboard().getTeam(mapValueName);
-        if (lobby.getGameMap() != null) {
-            GameMap map = lobby.getGameMap();
-            String prefix = "&f", suffix = "&f";
-            if (map.getName().length() > 14) {
-                prefix += map.getName().substring(0, 14);
-                suffix += map.getName().substring(14);
+        createTeam(new TeamBuilder("mapLabel").entry("&6&lMAP:").score(15));
+        createTeam(new TeamBuilder("mapValue").entry(ChatColor.AQUA.toString()).score(14).valueUpdater((player, team) -> {
+            Lobby lobby = plugin.getLobby();
+            if (lobby.getGameMap() != null) {
+                GameMap map = lobby.getGameMap();
+                String prefix = "&f", suffix = "&f";
+                if (map.getName().length() > 14) {
+                    prefix += map.getName().substring(0, 14);
+                    suffix += map.getName().substring(14);
+                } else {
+                    prefix += map.getName();
+                }
+                team.setPrefix(MCUtils.color(prefix));
+                team.setSuffix(MCUtils.color(suffix));
             } else {
-                prefix += map.getName();
+                team.setPrefix(MCUtils.color("&7Voting"));
+                team.setSuffix("");
             }
-            mapValue.setPrefix(MCUtils.color(prefix));
-            mapValue.setSuffix(MCUtils.color(suffix));
-        } else {
-            mapValue.setPrefix(MCUtils.color("&7Voting"));
-            mapValue.setSuffix("");
-        }
-        
-        int waiting = 0;
-        for (NexusPlayer waitingPlayer : lobby.getPlayers()) {
-            if (!lobby.getSpectatingPlayers().contains(waitingPlayer.getUniqueId())) {
-                if (!waitingPlayer.getToggles().getValue("vanish")) {
-                    waiting++;
+        }));
+        createTeam(new TeamBuilder("blank1").entry(ChatColor.DARK_GRAY).score(13));
+        createTeam(new TeamBuilder("playersLabel").entry("&6&lPLAYERS:").score(12));
+        createTeam(new TeamBuilder("waitingValue").entry("&fWaiting: &e").score(11).valueUpdater((player, team) -> {
+            Lobby lobby = plugin.getLobby();
+            int waiting = 0;
+            for (NexusPlayer waitingPlayer : lobby.getPlayers()) {
+                if (!lobby.getSpectatingPlayers().contains(waitingPlayer.getUniqueId())) {
+                    if (!waitingPlayer.getToggles().getValue("vanish")) {
+                        waiting++;
+                    }
                 }
             }
-        }
-        
-        this.scoreboard.getScoreboard().getTeam(waitingValueName).setSuffix(MCUtils.color("&e" + waiting));
-        if (lobby.getLobbySettings() != null) {
-            this.scoreboard.getScoreboard().getTeam(neededValueName).setSuffix(MCUtils.color("&e" + lobby.getLobbySettings().getMinPlayers()));
-        }
-    }
-    
-    @Override
-    public List<String> getTeams() {
-        return Arrays.asList(mapLabelName, mapValueName, blank1Name, playersLabelName, waitingValueName, neededValueName, blank2Name, serverLabelName, serverValueName);
+        }));
+        createTeam(new TeamBuilder("neededValue").entry("&fNeeded: &e").score(10).valueUpdater((player, team) -> {
+            Lobby lobby = plugin.getLobby();
+            team.setSuffix(lobby.getLobbySettings().getMinPlayers() + "");
+        }));
+        createTeam(new TeamBuilder("blank2").entry(ChatColor.DARK_PURPLE).score(9));
+        createTeam(new TeamBuilder("serverLabel").entry("&6&lSERVER:").score(2));
+        createTeam(new TeamBuilder("serverValue").entry(NexusAPI.getApi().getServerManager().getCurrentServer().getName()).score(1));
     }
 }
