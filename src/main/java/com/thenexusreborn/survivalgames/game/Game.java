@@ -1,52 +1,35 @@
 package com.thenexusreborn.survivalgames.game;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
+import com.google.common.io.*;
 import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.api.gamearchive.GameAction;
-import com.thenexusreborn.api.gamearchive.GameInfo;
+import com.thenexusreborn.api.gamearchive.*;
 import com.thenexusreborn.api.helper.NumberHelper;
 import com.thenexusreborn.api.multicraft.MulticraftAPI;
-import com.thenexusreborn.api.player.CachedPlayer;
-import com.thenexusreborn.api.player.NexusPlayer;
-import com.thenexusreborn.api.player.Rank;
+import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.api.server.Environment;
 import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.api.tags.Tag;
 import com.thenexusreborn.disguise.DisguiseAPI;
 import com.thenexusreborn.disguise.disguisetypes.MobDisguise;
-import com.thenexusreborn.nexuscore.util.ArmorType;
-import com.thenexusreborn.nexuscore.util.MCUtils;
-import com.thenexusreborn.nexuscore.util.MsgType;
+import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.nexuscore.util.region.Cuboid;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
-import com.thenexusreborn.survivalgames.ControlType;
-import com.thenexusreborn.survivalgames.SurvivalGames;
+import com.thenexusreborn.survivalgames.*;
+import com.thenexusreborn.survivalgames.game.death.KillerInfo;
 import com.thenexusreborn.survivalgames.game.deathold.*;
 import com.thenexusreborn.survivalgames.game.timer.*;
 import com.thenexusreborn.survivalgames.loot.Items;
-import com.thenexusreborn.survivalgames.map.GameMap;
-import com.thenexusreborn.survivalgames.map.MapSpawn;
-import com.thenexusreborn.survivalgames.mutations.Mutation;
-import com.thenexusreborn.survivalgames.mutations.MutationEffect;
-import com.thenexusreborn.survivalgames.mutations.MutationItem;
-import com.thenexusreborn.survivalgames.mutations.MutationType;
-import com.thenexusreborn.survivalgames.scoreboard.DefaultGameBoard;
-import com.thenexusreborn.survivalgames.scoreboard.GameTablistHandler;
-import com.thenexusreborn.survivalgames.settings.ColorMode;
+import com.thenexusreborn.survivalgames.map.*;
+import com.thenexusreborn.survivalgames.mutations.*;
+import com.thenexusreborn.survivalgames.scoreboard.*;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Monster;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
+import org.bukkit.entity.*;
+import org.bukkit.inventory.*;
+import org.bukkit.potion.*;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.lang.reflect.Field;
@@ -816,6 +799,7 @@ public class Game {
         player.getInventory().setArmorContents(null);
         player.setAllowFlight(false);
         player.setMaxHealth(20);
+        player.setHealth(20);
         player.spigot().setCollidesWithEntities(true);
     }
     
@@ -851,267 +835,197 @@ public class Game {
     
     //TODO Rename when old killPlayer method is removed
     public void killPlayerRewrite(GamePlayer gamePlayer, com.thenexusreborn.survivalgames.game.death.DeathInfo deathInfo) {
-        
-    }
-    
-    //TODO Remove when new rewrite is done, keeping this to prevent errors for now
-    public void killPlayer(UUID uniqueId, DeathInfo deathInfo) {
-        GamePlayer gamePlayer = getPlayer(uniqueId);
-        if (gamePlayer == null) {
-            return;
-        }
-        
-        String strippedDeathMessage = ChatColor.stripColor(MCUtils.color(deathInfo.getDeathMessage(this)));
-        this.gameInfo.getActions().add(new GameAction(System.currentTimeMillis(), "death", strippedDeathMessage.substring(3)));
-        
-        Player player = Bukkit.getPlayer(gamePlayer.getUniqueId());
-        if (player != null) {
-            player.getInventory().clear();
-            player.getInventory().setArmorContents(null);
-        }
-        gamePlayer.setDeathInfo(deathInfo);
-        gamePlayer.setTrackerInfo(null);
+        //TODO Handle the stat changes stuff differently in the future. 
         GameTeam oldTeam = gamePlayer.getTeam();
+        gamePlayer.setTeam(GameTeam.SPECTATORS);
+        Player player = Bukkit.getPlayer(gamePlayer.getUniqueId());
+        String strippedDeathMessage = ChatColor.stripColor(deathInfo.getDeathMessage());
+        strippedDeathMessage = strippedDeathMessage.substring(3, strippedDeathMessage.length() - 1);
+        this.gameInfo.getActions().add(new GameAction(System.currentTimeMillis(), "death", strippedDeathMessage));
+        if (player != null) {
+            resetPlayer(player);
+            player.setAllowFlight(true);
+            player.setFlying(true);
+            player.setGameMode(GameTeam.SPECTATORS.getGameMode());
+            player.spigot().setCollidesWithEntities(false);
+        }
         
-        boolean vanished = deathInfo.getType() == DeathType.VANISH;
+        gamePlayer.addDeathInfo(deathInfo);
+        gamePlayer.setSpectatorByDeath(deathInfo.getType() != com.thenexusreborn.survivalgames.game.death.DeathType.LEAVE);
+        KillerInfo killer = deathInfo.getKiller();
+        gamePlayer.setDeathByMutation(killer != null && killer.isMutationKill());
         
-        int score = gamePlayer.getNexusPlayer().getStats().getValue("sg_score").getAsInt();
+        boolean vanished = deathInfo.getType() == com.thenexusreborn.survivalgames.game.death.DeathType.VANISH;
+        NexusPlayer nexusPlayer = gamePlayer.getNexusPlayer();
+        PlayerStats stats = nexusPlayer.getStats();
+        int score = stats.getValue("sg_score").getAsInt();
         int lost = (int) Math.ceil(score / 10D);
-        
+        if (score - lost < 0) {
+            lost = 0;
+        }
+    
         if (!vanished) {
-            gamePlayer.getNexusPlayer().getStats().change("sg_score", lost, StatOperator.SUBTRACT);
-            gamePlayer.sendMessage("&4&l>> &cYou lost " + lost + " Score for dying.");
-            gamePlayer.getNexusPlayer().getStats().change("sg_games", 1, StatOperator.ADD);
-            gamePlayer.getNexusPlayer().getStats().change("sg_win_streak", 0, StatOperator.SET);
-            gamePlayer.getNexusPlayer().getStats().change("sg_deaths", 1, StatOperator.ADD);
+            if (lost > 0) {
+                stats.change("sg_score", lost, StatOperator.SUBTRACT);
+            }
+            stats.change("sg_games", 1, StatOperator.ADD);
+            stats.change("sg_win_streak", 0, StatOperator.SET);
+            stats.change("sg_deaths", 1, StatOperator.ADD);
             if (oldTeam == GameTeam.MUTATIONS) {
                 gamePlayer.getNexusPlayer().getStats().change("sg_mutation_deaths", 1, StatOperator.ADD);
             }
         }
         
-        gamePlayer.sendMessage(oldTeam.getLeaveMessage());
-        GamePlayer killer = null;
-        String killerName = null;
-        boolean mutationKill = false;
-        boolean sendDeathMessage = true;
-        double killerHealth = 0;
-        GameTeam newTeam = GameTeam.SPECTATORS;
-        if (deathInfo instanceof DeathInfoPlayerKill playerDeath) {
-            killer = getPlayer(playerDeath.getKiller());
+        boolean playerKiller = killer != null && killer.getType() == EntityType.PLAYER;
+        
+        int scoreGain = 0;
+        int currentStreak = 0;
+        int personalBest = 0;
+        int xpGain = 0;
+        int creditGain;
+        Rank killerRank = null;
+        if (playerKiller) {
+            GamePlayer killerPlayer = getPlayer(killer.getKiller());
+            PlayerStats killerStats = killerPlayer.getNexusPlayer().getStats();
+            killerRank = killerPlayer.getNexusPlayer().getRanks().get();
+            scoreGain = lost;
             
-            mutationKill = killer.getTeam() == GameTeam.MUTATIONS && killer.getMutation().getTarget() == gamePlayer.getUniqueId();
+            killerStats.change("sg_score", scoreGain, StatOperator.ADD);
             
-            if (settings.getColorMode() == ColorMode.GAME_TEAM) {
-                GameTeam killerTeam = killer.getTeam();
-                if (killerTeam == GameTeam.TRIBUTES) {
-                    killerName += "&a";
-                } else if (killerTeam == GameTeam.MUTATIONS) {
-                    killerName += "&d";
-                } else if (killerTeam == GameTeam.SPECTATORS) {
-                    killerName += "&c";
-                }
-            } else {
-                killerName = killer.getNexusPlayer().getRanks().get().getColor();
+            killerPlayer.setKillStreak(killerPlayer.getKillStreak() + 1);
+            currentStreak = killerPlayer.getKillStreak();
+            killerPlayer.setKills(killerPlayer.getKills() + 1);
+            personalBest = killerStats.getValue("sg_highest_kill_streak").getAsInt();
+            
+            if (currentStreak > personalBest) {
+                killerStats.change("sg_highest_kill_streak", currentStreak, StatOperator.SET);
             }
-            killerHealth = playerDeath.getKillerHealth();
-        } else if (deathInfo instanceof DeathInfoKilledSuicide death) {
-            if (settings.getColorMode() == ColorMode.GAME_TEAM) {
-                if (getPlayer(death.getKiller()).getTeam() == GameTeam.TRIBUTES) {
-                    killerName += "&a";
-                } else {
-                    killerName += "&d";
+            
+            if (getSettings().isGiveXp()) {
+                xpGain = 2;
+                if (getSettings().isMultiplier()) {
+                    xpGain *= killerRank.getMultiplier();
                 }
-            } else {
-                killerName = getPlayer(death.getKiller()).getNexusPlayer().getRanks().get().getColor();
+                killerStats.change("xp", xpGain, StatOperator.ADD);
             }
-            killer = getPlayer(death.getKiller());
-            Player killerPlayer = Bukkit.getPlayer(killer.getUniqueId());
-            killerPlayer.setMaxHealth(settings.getMaxHealth());
-            killerHealth = death.getKillerHealth();
-            mutationKill = true;
-        } else if (deathInfo instanceof DeathInfoProjectile death) {
-            if (death.getShooter() instanceof Player) {
-                killer = getPlayer(death.getShooter().getUniqueId());
-                
-                mutationKill = killer.getTeam() == GameTeam.MUTATIONS && killer.getMutation().getTarget() == gamePlayer.getUniqueId();
-                
-                if (settings.getColorMode() == ColorMode.GAME_TEAM) {
-                    if (killer.getTeam() == GameTeam.TRIBUTES) {
-                        killerName += "&a";
-                    } else {
-                        killerName += "&d";
-                    }
-                } else {
-                    killerName = killer.getNexusPlayer().getRanks().get().getColor();
+            
+            if (getSettings().isGiveCredits()) {
+                creditGain = 2;
+                if (getSettings().isMultiplier()) {
+                    creditGain *= killerRank.getMultiplier();
                 }
-                
-                newTeam = GameTeam.SPECTATORS;
-                killerHealth = death.getKillerHealth();
+                killerStats.change("credits", creditGain, StatOperator.ADD);
+            }
+            
+            killerStats.change("sg_kills", 1, StatOperator.ADD);
+            if (killer.isMutationKill()) {
+                killerStats.change("sg_mutation_kills", 1, StatOperator.ADD);
+                removeMutation(killerPlayer.getMutation());
+                killerPlayer.sendMessage(killerPlayer.getTeam().getLeaveMessage());
+                killerPlayer.setTeam(GameTeam.TRIBUTES);
+                Bukkit.getPlayer(killerPlayer.getUniqueId()).setGameMode(GameTeam.TRIBUTES.getGameMode());
+                killerPlayer.sendMessage(killerPlayer.getTeam().getJoinMessage());
             }
         }
         
-        if (mutationKill) {
-            gamePlayer.setDeathByMutation(true);
-            removeMutation(killer.getMutation());
-            sendMessage("&6&l>> " + killer.getNexusPlayer().getColoredName() + " &ahas taken revenge and is back in the game!");
-            killer.sendMessage(killer.getTeam().getLeaveMessage());
-            killer.setTeam(GameTeam.TRIBUTES);
-            Player killerPlayer = Bukkit.getPlayer(killer.getUniqueId());
-            killerPlayer.setGameMode(killer.getTeam().getGameMode());
-            killer.sendMessage(killer.getTeam().getJoinMessage());
-            killer.getNexusPlayer().getStats().change("sg_mutation_kills", 1, StatOperator.ADD);
-        }
-        
-        if (deathInfo.getType() != DeathType.LEAVE) {
-            if (oldTeam == GameTeam.MUTATIONS) {
-                removeMutation(gamePlayer.getMutation());
-            }
-            gamePlayer.setSpectatorByDeath(true);
-            resetPlayer(Bukkit.getPlayer(player.getUniqueId()));
-            player.setGameMode(newTeam.getGameMode());
-            player.setAllowFlight(true);
-            player.setFlying(true);
-            player.spigot().setCollidesWithEntities(false);
-            gamePlayer.sendMessage(newTeam.getJoinMessage());
-            giveSpectatorItems(Bukkit.getPlayer(player.getUniqueId()));
-        }
-        gamePlayer.setTeam(newTeam);
-        
-        if (settings.isSounds()) {
-            if (oldTeam == GameTeam.TRIBUTES) {
-                playSound(Sound.WITHER_SPAWN);
-            } else if (oldTeam == GameTeam.MUTATIONS) {
-                playSound(Sound.ZOMBIE_PIG_DEATH);
+        List<UUID> assistors = gamePlayer.getDamageInfo().getDamagers();
+        if (!assistors.isEmpty()) {
+            for (UUID damager : assistors) {
+                GamePlayer assisterPlayer = getPlayer(damager);
+                assisterPlayer.setAssists(assisterPlayer.getAssists() + 1);
+                assisterPlayer.getNexusPlayer().getStats().change("sg_assists", 1, StatOperator.ADD);
             }
         }
         
-        recalculateVisibility();
+        int oldTeamRemaining = 0;
+        for (GamePlayer gp : new ArrayList<>(getPlayers().values())) {
+            if (gp.getTeam() == oldTeam) {
+                oldTeamRemaining++;
+            }
+        }
         
-        if (killer != null) {
-            killer.setKills(killer.getKills() + 1);
-            killer.getNexusPlayer().getStats().change("sg_kills", 1, StatOperator.ADD);
-            killer.setKillStreak(killer.getKillStreak() + 1);
-            int highestKillStreak = killer.getNexusPlayer().getStats().getValue("sg_highest_kill_streak").getAsInt();
-            if (highestKillStreak < killer.getKillStreak()) {
-                killer.getNexusPlayer().getStats().change("sg_highest_kill_streak", killer.getKillStreak() - highestKillStreak, StatOperator.ADD);
-                if (!killer.isNewPersonalBestNotified()) {
-                    killer.sendMessage("&6&l>> &a&lNEW PERSONAL BEST!");
-                    killer.setNewPersonalBestNotified(true);
-                }
-                highestKillStreak += 1;
-            }
-            killer.sendMessage("&6&l>> &f&lCurrent Streak: &a" + killer.getKillStreak() + "  &f&lPersonal Best: &a" + highestKillStreak);
-            
-            killerName += killer.getNexusPlayer().getName();
-            gamePlayer.sendMessage("&4&l>> &cYour killer &8(" + killerName + "&8) &chad &4" + NumberHelper.formatNumber(killerHealth) + " HP &cremaining!");
-            if (!killer.getUniqueId().equals(player.getUniqueId())) {
-                killer.getNexusPlayer().getStats().change("sg_score", lost, StatOperator.ADD);
-                killer.sendMessage("&2&l>> &a+" + lost + " Score!");
-            } else {
-                killer.sendMessage("&2&l>> &cYou killed yourself. No score for you.");
-            }
-            double multiplier = killer.getNexusPlayer().getRanks().get().getMultiplier();
-            Rank rank = killer.getNexusPlayer().getRanks().get();
-            String multiplierMessage = rank.getColor() + "&l * x" + MCUtils.formatNumber(multiplier) + " " + rank.getPrefix() + " Bonus";
-            if (settings.isGiveXp()) {
-                double xp = 2;
-                xp *= multiplier;
-                if (!killer.getUniqueId().equals(player.getUniqueId())) {
-                    killer.getNexusPlayer().getStats().change("xp", xp, StatOperator.ADD);
-                    String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(xp) + " &2&lXP&a&l!";
-                    if (multiplier > 1) {
-                        killer.sendMessage(baseMessage + multiplierMessage);
-                    } else {
-                        killer.sendMessage(baseMessage);
-                    }
-                } else {
-                    killer.sendMessage("&2&l>> &cYou killed yourself. No XP for you.");
-                }
-            }
-            
-            if (settings.isGiveCredits()) {
-                double credits = 2;
-                credits *= multiplier;
-                if (!(killer.getUniqueId().equals(player.getUniqueId()))) {
-                    killer.getNexusPlayer().getStats().change("credits", credits, StatOperator.ADD);
-                    String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(credits) + " &3&lCREDITS&a&l!";
-                    if (multiplier > 1) {
-                        killer.sendMessage(baseMessage + multiplierMessage);
-                    } else {
-                        killer.sendMessage(baseMessage);
-                    }
-                } else {
-                    killer.sendMessage("&2&l>> &cYou killed yourself. No Credits for you.");
-                }
-            }
-            
-            for (GamePlayer gp : new ArrayList<>(this.players.values())) {
-                if (gp.getTeam() == GameTeam.MUTATIONS) {
-                    if (gp.getMutation().getTarget().equals(gamePlayer.getUniqueId())) {
-                        gp.getMutation().setTarget(killer.getUniqueId());
-                        gp.sendMessage("&6&l>> &cYour previous target died, your new target is &a" + killer.getNexusPlayer().getName());
-                    }
-                }
-            }
-        } else {
-            for (GamePlayer gp : new ArrayList<>(this.players.values())) {
-                if (gp.getTeam() == GameTeam.MUTATIONS) {
-                    if (gp.getMutation().getTarget().equals(gamePlayer.getUniqueId())) {
-                        gp.sendMessage("&6&l>> &cYour target died without a killer, you have been set back as a spectator.");
-                        removeMutation(gp.getMutation());
-                        gp.sendMessage(gp.getTeam().getLeaveMessage());
-                        gp.setTeam(GameTeam.SPECTATORS);
-                        giveSpectatorItems(Bukkit.getPlayer(gp.getUniqueId()));
-                        gp.sendMessage(gp.getTeam().getJoinMessage());
-                    }
-                }
-            }
+        if (oldTeam == GameTeam.MUTATIONS) {
+            removeMutation(gamePlayer.getMutation());
         }
         
         if (oldTeam == GameTeam.TRIBUTES) {
-            int totalTributes = 0;
             for (GamePlayer gp : this.players.values()) {
-                if (gp.getTeam() == GameTeam.TRIBUTES) {
-                    totalTributes++;
+                if (gp.getTeam() != GameTeam.MUTATIONS) {
+                    continue;
                 }
-            }
-            
-            if (deathInfo.getType() != DeathType.LEAVE) {
-                if (totalTributes <= settings.getDeathmatchThreshold()) {
-                    if (this.state == INGAME || this.state == INGAME_GRACEPERIOD) {
-                        if (totalTributes > 1) {
-                            if (controlType == ControlType.AUTOMATIC) {
-                                this.startDeathmatchTimer();
-                            } else {
-                                sendMessage("&eTribute count reached or went below the deathmatch threashold, but was not automatically started due to being in manual mode.");
-                            }
-                        }
-                    }
+    
+                Mutation mutation = gp.getMutation();
+                if (!mutation.getTarget().equals(gamePlayer.getUniqueId())) {
+                    continue;
                 }
                 
-                sendMessage("&6&l>> &c&l" + totalTributes + " tributes remain.");
-                if (firstBlood == null) {
-                    firstBlood = killer;
-                    if (firstBlood != null) {
-                        sendMessage("&6&l>> &c&l" + (firstBlood.getNexusPlayer().getName() + " claimed first blood!").toUpperCase());
-                    }
+                if (!playerKiller) {
+                    gp.sendMessage("&6&l>> &cYour killer died without a killer, you have been set back as a spectator.");
+                    removeMutation(mutation);
+                    gp.sendMessage(gp.getTeam().getLeaveMessage());
+                    gp.setTeam(GameTeam.SPECTATORS);
+                    Player mutationPlayer = Bukkit.getPlayer(gp.getUniqueId());
+                    mutationPlayer.spigot().setCollidesWithEntities(false);
+                    mutationPlayer.setAllowFlight(true);
+                    giveSpectatorItems(mutationPlayer);
+                    gp.sendMessage(gp.getTeam().getJoinMessage());
+                } else {
+                    mutation.setTarget(killer.getKiller());
+                    gp.sendMessage("&6&l>> &cYour target died, your  new target is &a" + getPlayer(killer.getKiller()).getNexusPlayer().getName());
                 }
             }
-        } else if (oldTeam == GameTeam.MUTATIONS) {
-            int totalMutations = 0;
-            for (GamePlayer gp : this.players.values()) {
-                if (gp.getTeam() == GameTeam.MUTATIONS) {
-                    totalMutations++;
+        }
+        
+        GamePlayer killerPlayer = null;
+        if (playerKiller) {
+            killerPlayer = getPlayer(killer.getKiller());
+        }
+        
+        gamePlayer.sendMessage(oldTeam.getLeaveMessage());
+        
+        if (killerPlayer != null) {
+            sendMessage("&6&l>> " + killerPlayer.getNexusPlayer().getColoredName() + " &ahas taken revenge and is back in the game!");
+            if (currentStreak > personalBest) {
+                if (!killerPlayer.isNewPersonalBestNotified()) {
+                    killerPlayer.sendMessage("&6&l>> &a&lNEW PERSONAL BEST!");
+                    killerPlayer.setNewPersonalBestNotified(true);
                 }
+                personalBest = currentStreak;
             }
+            killerPlayer.sendMessage("&6&l>> &f&lCurrent Streak: &a" + currentStreak + "  &f&lPersonal Best: &a" + personalBest);
+            killerPlayer.sendMessage("&2&l>> &a+" + scoreGain + "Score!");
+            double multiplier = killerRank.getMultiplier();
+            String multiplierMessage = killerRank.getColor() + "&l * x" + MCUtils.formatNumber(multiplier) + " " + killerRank.getPrefix() + " Bonus";
             
-            sendMessage("&6&l>> &d&l" + totalMutations + " mutations remain.");
+            if (settings.isGiveXp()) {
+                String xpMsg = "&2&l>> &a&l+" + xpGain + "&2&lXP&a&l!";
+                if (settings.isMultiplier()) {
+                    xpMsg += multiplierMessage;
+                }
+                killerPlayer.sendMessage(xpMsg);
+            }
+    
+            if (settings.isGiveCredits()) {
+                String creditsMsg = "&2&l>> &a&l+" + xpGain + "&3&lCREDITS&a&l!";
+                if (settings.isMultiplier()) {
+                    creditsMsg += multiplierMessage;
+                }
+                killerPlayer.sendMessage(creditsMsg);
+            }
         }
         
-        if (sendDeathMessage) {
-            this.sendMessage(deathInfo.getDeathMessage(this));
+        gamePlayer.sendMessage("&4&l>> &cYou lost " + lost + " Points for dying!");
+        sendMessage("&6&l>> " + oldTeam.getRemainColor() + "&l" + oldTeamRemaining + oldTeam.name().toLowerCase() + " remain.");
+        if (killerPlayer != null) {
+            String killerName = killerPlayer.getNexusPlayer().getColoredName();
+            String killerHealth = NumberHelper.formatNumber(killer.getHealth());
+            gamePlayer.sendMessage("&4&l>> &cYour killer &8(" + killerName + "&8) &chad &4" + killerHealth + " HP &cremaining!");
         }
         
+        sendMessage(deathInfo.getDeathMessage());
+        gamePlayer.sendMessage(GameTeam.SPECTATORS.getJoinMessage());
+        playSound(oldTeam.getDeathSound());
+    
         new BukkitRunnable() {
             public void run() {
                 if (state == ENDING || state == ENDED) {
@@ -1123,6 +1037,11 @@ public class Game {
                 }
             }
         }.runTaskLater(plugin, 1L);
+    }
+    
+    //TODO Remove when new rewrite is done, keeping this to prevent errors for now
+    public void killPlayer(UUID uniqueId, DeathInfo deathInfo) {
+        
     }
     
     public void giveSpectatorItems(Player p) {
@@ -1293,7 +1212,7 @@ public class Game {
     public Map<Location, UUID> getSuicideLocations() {
         return suicideLocations;
     }
-
+    
     public GamePlayer getPlayer(String name) {
         for (GamePlayer gamePlayer : new ArrayList<>(this.players.values())) {
             if (gamePlayer.getNexusPlayer().getName().equalsIgnoreCase(name)) {

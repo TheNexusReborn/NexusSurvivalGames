@@ -21,16 +21,17 @@ public class DeathInfo {
     protected DeathType type;
     protected String teamColor;
     protected KillerInfo killer;
+    private long time;
     
-    public DeathInfo(Game game, GamePlayer player, DeathType type) {
+    public DeathInfo(Game game, long time, GamePlayer player, DeathType type) {
         this.game = game;
         this.player = player.getUniqueId();
         this.type = type;
         this.teamColor = player.getTeam().getColor();
     }
     
-    public DeathInfo(Game game, GamePlayer player, DeathType type, KillerInfo killer) {
-        this(game, player, type);
+    public DeathInfo(Game game, long time, GamePlayer player, DeathType type, KillerInfo killer) {
+        this(game, time, player, type);
         this.killer = killer;
     }
     
@@ -111,5 +112,9 @@ public class DeathInfo {
         }
         
         return MCUtils.color("&4&l>> &7" + deathMessage + "&7.");
+    }
+    
+    public long getTime() {
+        return this.time;
     }
 }

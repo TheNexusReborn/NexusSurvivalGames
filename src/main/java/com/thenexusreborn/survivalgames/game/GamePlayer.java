@@ -5,7 +5,7 @@ import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.deathold.DeathInfo;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
 
-import java.util.UUID;
+import java.util.*;
 
 public class GamePlayer {
     private final NexusPlayer nexusPlayer;
@@ -13,13 +13,14 @@ public class GamePlayer {
     private DeathInfo deathInfo;
     private boolean spectatorByDeath, newPersonalBestNotified = false;
     private TrackerInfo trackerInfo;
-    private int kills, killStreak;
+    private int kills, killStreak, assists;
     private boolean mutated;
     private Mutation mutation;
     private boolean deathByMutation;
     private Bounty bounty;
     private CombatTag combatTag;
     private DamageInfo damageInfo;
+    private Map<Long, com.thenexusreborn.survivalgames.game.death.DeathInfo> newDeathInfos = new TreeMap<>();
     
     public GamePlayer(NexusPlayer nexusPlayer) {
         this.nexusPlayer = nexusPlayer;
@@ -158,5 +159,21 @@ public class GamePlayer {
             sendMessage("&6&l>> &cYou are now in combat with " + other.getColoredName() + "&c!");
         }
         getCombatTag().setOther(other.getUniqueId());
+    }
+    
+    public void addDeathInfo(com.thenexusreborn.survivalgames.game.death.DeathInfo deathInfo) {
+        this.newDeathInfos.put(deathInfo.getTime(), deathInfo);
+    }
+    
+    public Map<Long, com.thenexusreborn.survivalgames.game.death.DeathInfo> getNewDeathInfos() {
+        return newDeathInfos;
+    }
+    
+    public int getAssists() {
+        return this.assists;
+    }
+    
+    public void setAssists(int amount) {
+        this.assists = amount;
     }
 }

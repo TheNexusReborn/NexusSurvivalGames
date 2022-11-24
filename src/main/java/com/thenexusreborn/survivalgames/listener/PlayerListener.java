@@ -589,7 +589,7 @@ public class PlayerListener implements Listener {
             }
         }
         
-        DeathInfo deathInfo = new DeathInfo(game, gamePlayer, deathType, killerInfo);
+        DeathInfo deathInfo = new DeathInfo(game, System.currentTimeMillis(), gamePlayer, deathType, killerInfo);
     
         new BukkitRunnable() {
             public void run() {
