@@ -25,6 +25,7 @@ public class KillerInfo {
         killerInfo.teamColor = killer.getTeam().getColor();
         killerInfo.killer = killer.getUniqueId();
         killerInfo.mutationKill = killer.getTeam() == GameTeam.MUTATIONS;
+        killerInfo.handItem = player.getItemInHand();
         return killerInfo;
     }
     

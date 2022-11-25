@@ -838,6 +838,7 @@ public class Game {
         //TODO Handle the stat changes stuff differently in the future. 
         GameTeam oldTeam = gamePlayer.getTeam();
         gamePlayer.setTeam(GameTeam.SPECTATORS);
+        recalculateVisibility();
         Player player = Bukkit.getPlayer(gamePlayer.getUniqueId());
         String strippedDeathMessage = ChatColor.stripColor(deathInfo.getDeathMessage());
         strippedDeathMessage = strippedDeathMessage.substring(3, strippedDeathMessage.length() - 1);
@@ -975,6 +976,25 @@ public class Game {
                 }
             }
         }
+
+        int totalTributes = 0;
+        for (GamePlayer gp : new ArrayList<>(this.players.values())) {
+            if (gp.getTeam() == GameTeam.TRIBUTES) {
+                totalTributes++;
+            }
+        }
+
+        if (totalTributes <= settings.getDeathmatchThreshold()) {
+            if (state == INGAME || state == INGAME_GRACEPERIOD) {
+                if (totalTributes > 1) {
+                    if (controlType == ControlType.AUTOMATIC) {
+                        this.startDeathmatchTimer();
+                    } else {
+                        sendMessage("&eTribute count reached or went below the deathmatch threashold, but was not automatically started due to being in manual mode.");
+                    }
+                }
+            }
+        }
         
         GamePlayer killerPlayer = null;
         if (playerKiller) {
@@ -984,7 +1004,9 @@ public class Game {
         gamePlayer.sendMessage(oldTeam.getLeaveMessage());
         
         if (killerPlayer != null) {
-            sendMessage("&6&l>> " + killerPlayer.getNexusPlayer().getColoredName() + " &ahas taken revenge and is back in the game!");
+            if (killer.isMutationKill()) {
+                sendMessage("&6&l>> " + killerPlayer.getNexusPlayer().getColoredName() + " &ahas taken revenge and is back in the game!");
+            }
             if (currentStreak > personalBest) {
                 if (!killerPlayer.isNewPersonalBestNotified()) {
                     killerPlayer.sendMessage("&6&l>> &a&lNEW PERSONAL BEST!");
@@ -993,12 +1015,12 @@ public class Game {
                 personalBest = currentStreak;
             }
             killerPlayer.sendMessage("&6&l>> &f&lCurrent Streak: &a" + currentStreak + "  &f&lPersonal Best: &a" + personalBest);
-            killerPlayer.sendMessage("&2&l>> &a+" + scoreGain + "Score!");
+            killerPlayer.sendMessage("&2&l>> &a+" + scoreGain + " Score!");
             double multiplier = killerRank.getMultiplier();
             String multiplierMessage = killerRank.getColor() + "&l * x" + MCUtils.formatNumber(multiplier) + " " + killerRank.getPrefix() + " Bonus";
             
             if (settings.isGiveXp()) {
-                String xpMsg = "&2&l>> &a&l+" + xpGain + "&2&lXP&a&l!";
+                String xpMsg = "&2&l>> &a&l+" + xpGain + " &2&lXP&a&l!";
                 if (settings.isMultiplier()) {
                     xpMsg += multiplierMessage;
                 }
@@ -1006,7 +1028,7 @@ public class Game {
             }
     
             if (settings.isGiveCredits()) {
-                String creditsMsg = "&2&l>> &a&l+" + xpGain + "&3&lCREDITS&a&l!";
+                String creditsMsg = "&2&l>> &a&l+" + xpGain + " &3&lCREDITS&a&l!";
                 if (settings.isMultiplier()) {
                     creditsMsg += multiplierMessage;
                 }
@@ -1015,7 +1037,7 @@ public class Game {
         }
         
         gamePlayer.sendMessage("&4&l>> &cYou lost " + lost + " Points for dying!");
-        sendMessage("&6&l>> " + oldTeam.getRemainColor() + "&l" + oldTeamRemaining + oldTeam.name().toLowerCase() + " remain.");
+        sendMessage("&6&l>> " + oldTeam.getRemainColor() + "&l" + oldTeamRemaining + " " + oldTeam.name().toLowerCase() + " remain.");
         if (killerPlayer != null) {
             String killerName = killerPlayer.getNexusPlayer().getColoredName();
             String killerHealth = NumberHelper.formatNumber(killer.getHealth());

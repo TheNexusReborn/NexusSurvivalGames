@@ -523,6 +523,8 @@ public class PlayerListener implements Listener {
         if (game == null) {
             return;
         }
+
+        e.setDeathMessage(null);
     
         Player player = e.getEntity();
         GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());

@@ -154,9 +154,21 @@ public class GamePlayer {
         return game.getSettings().isAllowMutations();
     }
     
-    public void setCombat(NexusPlayer other) {
+    public void setCombat(GamePlayer other) {
+        if (other.getUniqueId() == this.getUniqueId()) {
+            return;
+        }
+
+        if (other.getTeam() == GameTeam.SPECTATORS) {
+            return;
+        }
+
+        if (getTeam() == GameTeam.SPECTATORS) {
+            return;
+        }
+
         if (!getCombatTag().isInCombatWith(other.getUniqueId())) {
-            sendMessage("&6&l>> &cYou are now in combat with " + other.getColoredName() + "&c!");
+            sendMessage("&6&l>> &cYou are now in combat with " + other.getNexusPlayer().getColoredName() + "&c!");
         }
         getCombatTag().setOther(other.getUniqueId());
     }

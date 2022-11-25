@@ -7,8 +7,11 @@ import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.settings.ColorMode;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.*;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.UUID;
 
@@ -100,8 +103,20 @@ public class DeathInfo {
                 } else {
                     killerName = killerPlayer.getRanks().get().getColor() + killerPlayer.getName();
                 }
-                deathMessage = deathMessage.replace("%killername%", killerName);
-                deathMessage = deathMessage.replace("%helditem%", killer.getHandItem().getItemMeta().getDisplayName());
+                deathMessage = deathMessage.replace("%killername%", killerName + "&7");
+
+                String itemName = "air";
+                ItemStack handItem = killer.getHandItem();
+                if (handItem != null) {
+                    ItemMeta itemMeta = handItem.getItemMeta();
+                    String displayName = itemMeta.getDisplayName();
+                    if (displayName != null && !displayName.equals("")) {
+                        itemName = ChatColor.stripColor(displayName);
+                    } else {
+                        itemName = handItem.getType().name().toLowerCase().replace("_", " ");
+                    }
+                }
+                deathMessage = deathMessage.replace("%helditem%", itemName);
             } else {
                 deathMessage = deathMessage.replace("%entityname%", "&f" + EntityNames.getDefaultName(killer.getType()) + "&7");
             }
