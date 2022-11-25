@@ -1,25 +1,28 @@
 package com.thenexusreborn.survivalgames.game.tasks;
 
+import com.thenexusreborn.nexuscore.api.NexusTask;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.*;
+import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.GamePlayer;
+import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.mutations.impl.ChickenMutation;
-import org.bukkit.*;
-import org.bukkit.entity.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.entity.Egg;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 
-public class ChickenMutationTask extends BukkitRunnable {
-    
-    private SurvivalGames plugin;
+public class ChickenMutationTask extends NexusTask<SurvivalGames> {
     
     private int eggGain = 19;
     
     public ChickenMutationTask(SurvivalGames plugin) {
-        this.plugin = plugin;
+        super(plugin, 1L, 0L, false);
     }
     
     @Override
-    public void run() {
+    public void onRun() {
         Game game = plugin.getGame();
         if (game == null) {
             return;
@@ -65,9 +68,5 @@ public class ChickenMutationTask extends BukkitRunnable {
         } else {
             eggGain--;
         }
-    }
-    
-    public void start() {
-        runTaskTimer(plugin, 20L, 1L);
     }
 }

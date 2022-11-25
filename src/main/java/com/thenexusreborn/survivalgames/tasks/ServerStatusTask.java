@@ -2,20 +2,18 @@ package com.thenexusreborn.survivalgames.tasks;
 
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.server.ServerInfo;
+import com.thenexusreborn.nexuscore.api.NexusTask;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
-import org.bukkit.scheduler.BukkitRunnable;
 
-public class ServerStatusTask extends BukkitRunnable { 
-    
-    private SurvivalGames plugin;
+public class ServerStatusTask extends NexusTask<SurvivalGames> {
     
     public ServerStatusTask(SurvivalGames plugin) {
-        this.plugin = plugin;
+        super(plugin, 20L, 1L, false);
     }
     
-    public void run() {
+    public void onRun() {
         Game game = plugin.getGame();
         Lobby lobby = plugin.getLobby();
         ServerInfo serverInfo = NexusAPI.getApi().getServerManager().getCurrentServer();
@@ -24,9 +22,5 @@ public class ServerStatusTask extends BukkitRunnable {
         } else {
             serverInfo.setState("lobby:" + lobby.getState().toString());
         }
-    }
-    
-    public void start() {
-        runTaskTimer(plugin, 1L, 20L);
     }
 }

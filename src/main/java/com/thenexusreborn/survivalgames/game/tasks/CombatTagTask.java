@@ -1,19 +1,20 @@
 package com.thenexusreborn.survivalgames.game.tasks;
 
+import com.thenexusreborn.nexuscore.api.NexusTask;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.*;
-import org.bukkit.scheduler.BukkitRunnable;
+import com.thenexusreborn.survivalgames.game.CombatTag;
+import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.GamePlayer;
+import com.thenexusreborn.survivalgames.game.GameTeam;
 
 import java.util.ArrayList;
 
-public class CombatTagTask extends BukkitRunnable {
-    private SurvivalGames plugin;
-    
+public class CombatTagTask extends NexusTask<SurvivalGames> {
     public CombatTagTask(SurvivalGames plugin) {
-        this.plugin = plugin;
+        super(plugin, 5L, 0L, false);
     }
     
-    public void run() {
+    public void onRun() {
         Game game = plugin.getGame();
         if (game == null) {
             return;
@@ -37,9 +38,5 @@ public class CombatTagTask extends BukkitRunnable {
             combatTag.setOther(null);
             gamePlayer.sendMessage("&6&l>> &eYou are no longer in combat.");
         }
-    }
-    
-    public void start() {
-        runTaskTimer(plugin, 20L, 5L);
     }
 }

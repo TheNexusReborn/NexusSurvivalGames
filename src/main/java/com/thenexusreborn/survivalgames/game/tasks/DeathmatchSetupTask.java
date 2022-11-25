@@ -1,18 +1,18 @@
 package com.thenexusreborn.survivalgames.game.tasks;
 
-import com.thenexusreborn.survivalgames.*;
-import com.thenexusreborn.survivalgames.game.*;
-import org.bukkit.scheduler.BukkitRunnable;
+import com.thenexusreborn.nexuscore.api.NexusTask;
+import com.thenexusreborn.survivalgames.ControlType;
+import com.thenexusreborn.survivalgames.SurvivalGames;
+import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.GameState;
 
-public class DeathmatchSetupTask extends BukkitRunnable {
-    private final SurvivalGames plugin;
-    
+public class DeathmatchSetupTask extends NexusTask<SurvivalGames> {
     public DeathmatchSetupTask(SurvivalGames plugin) {
-        this.plugin = plugin;
+        super(plugin, 1L, 0L, false);
     }
     
     @Override
-    public void run() {
+    public void onRun() {
         if (plugin.getGame() == null) {
             return;
         }

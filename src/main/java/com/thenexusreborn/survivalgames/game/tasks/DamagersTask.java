@@ -1,22 +1,21 @@
 package com.thenexusreborn.survivalgames.game.tasks;
 
+import com.thenexusreborn.nexuscore.api.NexusTask;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.*;
+import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.GamePlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 
-public class DamagersTask extends BukkitRunnable {
-    
-    private SurvivalGames plugin;
+public class DamagersTask extends NexusTask<SurvivalGames> {
     
     public DamagersTask(SurvivalGames plugin) {
-        this.plugin = plugin;
+        super(plugin, 10L, 0L, false);
     }
     
-    public void run() {
+    public void onRun() {
         Game game = plugin.getGame();
         
         if (game == null) {
@@ -29,9 +28,5 @@ public class DamagersTask extends BukkitRunnable {
                 gamePlayer.getDamageInfo().clearDamagers();
             }
         }
-    }
-    
-    public void start() {
-        runTaskTimer(plugin, 20L, 10L);
     }
 }

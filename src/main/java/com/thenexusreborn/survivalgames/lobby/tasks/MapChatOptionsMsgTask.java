@@ -1,19 +1,18 @@
 package com.thenexusreborn.survivalgames.lobby.tasks;
 
 import com.thenexusreborn.api.player.NexusPlayer;
+import com.thenexusreborn.nexuscore.api.NexusTask;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.lobby.*;
-import org.bukkit.scheduler.BukkitRunnable;
+import com.thenexusreborn.survivalgames.lobby.Lobby;
+import com.thenexusreborn.survivalgames.lobby.LobbyState;
 
-public class MapChatOptionsMsgTask extends BukkitRunnable {
-    
-    private SurvivalGames plugin;
+public class MapChatOptionsMsgTask extends NexusTask<SurvivalGames> {
     
     public MapChatOptionsMsgTask(SurvivalGames plugin) {
-        this.plugin = plugin;
+        super(plugin, 2400L, 60L, true);
     }
     
-    public void run() {
+    public void onRun() {
         Lobby lobby = plugin.getLobby();
         
         if (plugin.getGame() != null) {
@@ -31,9 +30,5 @@ public class MapChatOptionsMsgTask extends BukkitRunnable {
         for (NexusPlayer nexusPlayer : lobby.getPlayers()) {
             lobby.sendMapOptions(nexusPlayer);
         }
-    }
-    
-    public void start() {
-        runTaskTimerAsynchronously(plugin, 60L, 2400);
     }
 }

@@ -1,22 +1,21 @@
 package com.thenexusreborn.survivalgames.lobby.tasks;
 
 import com.thenexusreborn.api.player.NexusPlayer;
+import com.thenexusreborn.nexuscore.api.NexusTask;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.lobby.*;
+import com.thenexusreborn.survivalgames.lobby.Lobby;
+import com.thenexusreborn.survivalgames.lobby.LobbyState;
+import com.thenexusreborn.survivalgames.lobby.StatSign;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
-public class StatSignUpdateTask extends BukkitRunnable {
-    
-    private SurvivalGames plugin;
-    
+public class StatSignUpdateTask extends NexusTask<SurvivalGames> {
     public StatSignUpdateTask(SurvivalGames plugin) {
-        this.plugin = plugin;
+        super(plugin, 20L, false);
     }
     
-    public void run() {
+    public void onRun() {
         Lobby lobby = plugin.getLobby();
         if (lobby == null) {
             return;
@@ -45,9 +44,5 @@ public class StatSignUpdateTask extends BukkitRunnable {
                 player.sendSignChange(statSign.getLocation(), lines);
             }
         }
-    }
-    
-    public void start() {
-        runTaskTimer(plugin, 20L, 20L);
     }
 }

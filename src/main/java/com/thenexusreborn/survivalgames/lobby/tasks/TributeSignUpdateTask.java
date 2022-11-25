@@ -2,28 +2,28 @@ package com.thenexusreborn.survivalgames.lobby.tasks;
 
 import com.mojang.authlib.GameProfile;
 import com.thenexusreborn.api.player.NexusPlayer;
+import com.thenexusreborn.nexuscore.api.NexusTask;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.lobby.*;
+import com.thenexusreborn.survivalgames.lobby.Lobby;
+import com.thenexusreborn.survivalgames.lobby.LobbyState;
+import com.thenexusreborn.survivalgames.lobby.TributeSign;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Skull;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.lang.reflect.Field;
 import java.util.*;
 
-public class TributeSignUpdateTask extends BukkitRunnable {
-    
-    private SurvivalGames plugin;
+public class TributeSignUpdateTask extends NexusTask<SurvivalGames> {
     
     private UUID randomUUID = UUID.randomUUID();
     
     public TributeSignUpdateTask(SurvivalGames plugin) {
-        this.plugin = plugin;
+        super(plugin, 20L, false);
     }
     
-    public void run() {
+    public void onRun() {
         Lobby lobby = plugin.getLobby();
         if (lobby == null) {
             return;
@@ -92,9 +92,5 @@ public class TributeSignUpdateTask extends BukkitRunnable {
                 }
             }
         }
-    }
-    
-    public void start() {
-        runTaskTimer(plugin, 20L, 20L);
     }
 }

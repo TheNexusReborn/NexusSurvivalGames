@@ -1,19 +1,19 @@
 package com.thenexusreborn.survivalgames.lobby.tasks;
 
-import com.thenexusreborn.survivalgames.*;
-import com.thenexusreborn.survivalgames.lobby.*;
-import org.bukkit.scheduler.BukkitRunnable;
+import com.thenexusreborn.nexuscore.api.NexusTask;
+import com.thenexusreborn.survivalgames.ControlType;
+import com.thenexusreborn.survivalgames.SurvivalGames;
+import com.thenexusreborn.survivalgames.lobby.Lobby;
+import com.thenexusreborn.survivalgames.lobby.LobbyState;
 
-public class TimerCountdownCheck extends BukkitRunnable {
-    
-    private final SurvivalGames plugin;
+public class TimerCountdownCheck extends NexusTask<SurvivalGames> {
     
     public TimerCountdownCheck(SurvivalGames plugin) {
-        this.plugin = plugin;
+        super(plugin, 1L, false);
     }
     
     @Override
-    public void run() {
+    public void onRun() {
         Lobby lobby = plugin.getLobby();
         
         if (lobby.getState() != LobbyState.WAITING) {

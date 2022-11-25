@@ -1,21 +1,20 @@
 package com.thenexusreborn.survivalgames.game.tasks;
 
+import com.thenexusreborn.nexuscore.api.NexusTask;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.*;
+import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.GameState;
 import com.thenexusreborn.survivalgames.settings.Weather;
 import org.bukkit.World;
-import org.bukkit.scheduler.BukkitRunnable;
 
-public class GameWorldTask extends BukkitRunnable {
-    
-    private final SurvivalGames plugin;
+public class GameWorldTask extends NexusTask<SurvivalGames> {
     
     public GameWorldTask(SurvivalGames plugin) {
-        this.plugin = plugin;
+        super(plugin, 20L, false);
     }
     
     @Override
-    public void run() {
+    public void onRun() {
         Game game = plugin.getGame();
         if (game == null) {
             return;

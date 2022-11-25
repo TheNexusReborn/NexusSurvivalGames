@@ -1,6 +1,7 @@
 package com.thenexusreborn.survivalgames.game.tasks;
 
 import com.thenexusreborn.api.helper.NumberHelper;
+import com.thenexusreborn.nexuscore.api.NexusTask;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import org.bukkit.*;
@@ -10,11 +11,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
-public class PlayerTrackerTask extends BukkitRunnable {
+public class PlayerTrackerTask extends NexusTask<SurvivalGames> {
 
-    private final SurvivalGames plugin = SurvivalGames.getPlugin(SurvivalGames.class);
+    public PlayerTrackerTask(SurvivalGames plugin) {
+        super(plugin, 2L, true);
+    }
 
-    public void run() {
+    public void onRun() {
         Game game = plugin.getGame();
         long start = System.currentTimeMillis();
         if (game == null) {
@@ -119,10 +122,5 @@ public class PlayerTrackerTask extends BukkitRunnable {
             plugin.getLogger().severe("Player Tracker task took " + totalTime);
         }
 
-    }
-
-    public PlayerTrackerTask start() {
-        runTaskTimerAsynchronously(plugin, 20L, 2L);
-        return this;
     }
 }

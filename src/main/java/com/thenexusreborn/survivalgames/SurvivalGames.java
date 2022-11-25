@@ -185,12 +185,12 @@ public class SurvivalGames extends NexusSpigotPlugin {
         
         getLogger().info("Registered commands");
         
-        new GameSetupTask(this).runTaskTimer(this, 1L, 1L);
-        new TimerCountdownCheck(this).runTaskTimer(this, 1L, 1L);
-        new DeathmatchSetupTask(this).runTaskTimer(this, 1L, 1L);
-        new GameWorldTask(this).runTaskTimer(this, 1L, 20L);
-        new LobbyTask(this).runTaskTimer(this, 1L, 20L);
-        new PlayerTrackerTask().start();
+        new GameSetupTask(this).start();
+        new TimerCountdownCheck(this).start();
+        new DeathmatchSetupTask(this).start();
+        new GameWorldTask(this).start();
+        new LobbyTask(this).start();
+        new PlayerTrackerTask(this).start();
         new MapSignUpdateTask(this).start();
         new MapChatOptionsMsgTask(this).start();
         new VoteStartMsgTask(this).start();

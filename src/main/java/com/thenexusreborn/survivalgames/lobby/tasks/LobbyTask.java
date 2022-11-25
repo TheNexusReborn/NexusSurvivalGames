@@ -1,24 +1,26 @@
 package com.thenexusreborn.survivalgames.lobby.tasks;
 
-import com.thenexusreborn.api.player.*;
+import com.thenexusreborn.api.player.NexusPlayer;
+import com.thenexusreborn.api.player.Rank;
+import com.thenexusreborn.nexuscore.api.NexusTask;
 import com.thenexusreborn.nexuscore.util.ServerProperties;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.lobby.*;
+import com.thenexusreborn.survivalgames.lobby.Lobby;
+import com.thenexusreborn.survivalgames.lobby.LobbyState;
 import com.thenexusreborn.survivalgames.util.SGUtils;
-import org.bukkit.*;
-import org.bukkit.entity.*;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 
-public class LobbyTask extends BukkitRunnable {
-    
-    private final SurvivalGames plugin;
+public class LobbyTask extends NexusTask<SurvivalGames> {
     
     public LobbyTask(SurvivalGames plugin) {
-        this.plugin = plugin;
+        super(plugin, 20L, false);
     }
     
     @Override
-    public void run() {
+    public void onRun() {
         if (plugin.getGame() != null) {
             return;
         }
