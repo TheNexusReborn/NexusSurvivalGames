@@ -520,7 +520,6 @@ public class Game {
         } else {
             sendMessage("&6&l>> &d&lTEAMING IS NOT ALLOWED.");
         }
-        plugin.getChatHandler().enableChat();
     }
     
     public void restockChests() {

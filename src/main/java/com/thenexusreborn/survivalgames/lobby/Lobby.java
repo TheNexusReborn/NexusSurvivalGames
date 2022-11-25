@@ -335,7 +335,6 @@ public class Lobby {
         }
         
         Game game = new Game(gameMap, this.gameSettings, this.players.values(), this.spectatingPlayers);
-        plugin.getChatHandler().disableChat();
         this.voteStart.clear();
         plugin.setGame(game);
         if (plugin.getGamesPlayed() + 1 >= this.lobbySettings.getMaxGames()) {
@@ -588,7 +587,6 @@ public class Lobby {
         game.getPlayers().clear();
         plugin.getGame().getGameMap().delete(plugin);
         plugin.setGame(null);
-        plugin.getChatHandler().enableChat();
     }
     
     public Location getSpawnpoint() {

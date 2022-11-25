@@ -12,19 +12,12 @@ public class SGChatHandler implements ChatHandler {
     
     private final SurvivalGames plugin;
     
-    private boolean enabled = true;
-    
     public SGChatHandler(SurvivalGames plugin) {
         this.plugin = plugin;
     }
     
     @Override
     public boolean handleChat(NexusPlayer player, String chatColor, AsyncPlayerChatEvent e) {
-        if (!enabled) {
-            player.sendMessage("&cChat is currently disabled. You cannot speak.");
-            return true;
-        }
-        
         String format = "{score} {level} &r{displayName}&8: {message}";
         String nameColor; 
         String score = "&8<&3" + MCUtils.formatNumber(player.getStats().getValue("sg_score").getAsInt()) + "&8>";
@@ -84,15 +77,5 @@ public class SGChatHandler implements ChatHandler {
             plugin.getLobby().sendMessage(format);
         }
         return true;
-    }
-    
-    public void enableChat() {
-        this.enabled = true;
-        Bukkit.broadcastMessage(MCUtils.color("&d&l>> &7Chat &aenabled&7."));
-    }
-    
-    public void disableChat() {
-        this.enabled = false;
-        Bukkit.broadcastMessage(MCUtils.color("&d&l>> &7Chat &cdisabled&7."));
     }
 }
