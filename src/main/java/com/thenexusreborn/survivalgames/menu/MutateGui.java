@@ -9,12 +9,19 @@ import com.thenexusreborn.nexuscore.menu.gui.Menu;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.*;
-import com.thenexusreborn.survivalgames.game.deathold.*;
-import com.thenexusreborn.survivalgames.mutations.*;
+import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.GamePlayer;
+import com.thenexusreborn.survivalgames.game.GameTeam;
+import com.thenexusreborn.survivalgames.mutations.Mutation;
+import com.thenexusreborn.survivalgames.mutations.MutationType;
+import com.thenexusreborn.survivalgames.mutations.PlayerMutations;
+import com.thenexusreborn.survivalgames.mutations.UnlockedMutation;
 import org.bukkit.Material;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 public class MutateGui extends Menu {
     public MutateGui(SurvivalGames plugin, NexusPlayer player) {
@@ -74,19 +81,17 @@ public class MutateGui extends Menu {
                     return;
                 }
     
-                DeathInfo deathInfo = gamePlayer.getDeathInfo();
-                if (deathInfo == null) {
+                if (!gamePlayer.isSpectatorByDeath()) {
                     player.sendMessage(MsgType.WARN + "You can only mutate if you have died.");
                     return;
                 }
                 
-                if (deathInfo.getType() != DeathType.PLAYER) {
+                if (!gamePlayer.killedByPlayer()) {
                     player.sendMessage(MsgType.WARN + "You can only mutate if you died to a player.");
                     return;
                 }
                 
-                DeathInfoPlayerKill playerDeath = (DeathInfoPlayerKill) deathInfo;
-                UUID killerUUID = playerDeath.getKiller();
+                UUID killerUUID = gamePlayer.getKiller();
                 GamePlayer killer = game.getPlayer(killerUUID);
                 if (killer == null) {
                     player.sendMessage(MsgType.WARN + "Your killer left, you cannot mutate.");

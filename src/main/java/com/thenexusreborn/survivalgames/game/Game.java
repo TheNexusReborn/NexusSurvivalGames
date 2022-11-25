@@ -1,35 +1,54 @@
 package com.thenexusreborn.survivalgames.game;
 
-import com.google.common.io.*;
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.api.gamearchive.*;
+import com.thenexusreborn.api.gamearchive.GameAction;
+import com.thenexusreborn.api.gamearchive.GameInfo;
 import com.thenexusreborn.api.helper.NumberHelper;
 import com.thenexusreborn.api.multicraft.MulticraftAPI;
-import com.thenexusreborn.api.player.*;
+import com.thenexusreborn.api.player.CachedPlayer;
+import com.thenexusreborn.api.player.NexusPlayer;
+import com.thenexusreborn.api.player.PlayerStats;
+import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.server.Environment;
 import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.api.tags.Tag;
 import com.thenexusreborn.disguise.DisguiseAPI;
 import com.thenexusreborn.disguise.disguisetypes.MobDisguise;
-import com.thenexusreborn.nexuscore.util.*;
+import com.thenexusreborn.nexuscore.util.ArmorType;
+import com.thenexusreborn.nexuscore.util.MCUtils;
+import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.nexuscore.util.region.Cuboid;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
-import com.thenexusreborn.survivalgames.*;
+import com.thenexusreborn.survivalgames.ControlType;
+import com.thenexusreborn.survivalgames.SurvivalGames;
+import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.game.death.KillerInfo;
-import com.thenexusreborn.survivalgames.game.deathold.*;
 import com.thenexusreborn.survivalgames.game.timer.*;
 import com.thenexusreborn.survivalgames.loot.Items;
-import com.thenexusreborn.survivalgames.map.*;
-import com.thenexusreborn.survivalgames.mutations.*;
-import com.thenexusreborn.survivalgames.scoreboard.*;
+import com.thenexusreborn.survivalgames.map.GameMap;
+import com.thenexusreborn.survivalgames.map.MapSpawn;
+import com.thenexusreborn.survivalgames.mutations.Mutation;
+import com.thenexusreborn.survivalgames.mutations.MutationEffect;
+import com.thenexusreborn.survivalgames.mutations.MutationItem;
+import com.thenexusreborn.survivalgames.mutations.MutationType;
+import com.thenexusreborn.survivalgames.scoreboard.DefaultGameBoard;
+import com.thenexusreborn.survivalgames.scoreboard.GameTablistHandler;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.entity.*;
-import org.bukkit.inventory.*;
-import org.bukkit.potion.*;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Monster;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.lang.reflect.Field;
@@ -185,7 +204,7 @@ public class Game {
         EnumSet<GameState> ignoreStates = EnumSet.of(UNDEFINED, SETTING_UP, SETUP_COMPLETE, ASSIGN_TEAMS, TEAMS_ASSIGNED, TELEPORT_START, TELEPORT_START_DONE, ERROR, ENDING, ENDED);
         if (!ignoreStates.contains(this.state)) {
             if (gamePlayer.getTeam() == GameTeam.TRIBUTES || gamePlayer.getTeam() == GameTeam.MUTATIONS) {
-                killPlayer(nexusPlayer.getUniqueId(), new DeathInfoSuicide(nexusPlayer.getUniqueId()));
+                killPlayer(gamePlayer, new DeathInfo(plugin.getGame(), System.currentTimeMillis(), gamePlayer, com.thenexusreborn.survivalgames.game.death.DeathType.SUICIDE));
             }
         }
         
@@ -834,7 +853,7 @@ public class Game {
     }
     
     //TODO Rename when old killPlayer method is removed
-    public void killPlayerRewrite(GamePlayer gamePlayer, com.thenexusreborn.survivalgames.game.death.DeathInfo deathInfo) {
+    public void killPlayer(GamePlayer gamePlayer, DeathInfo deathInfo) {
         //TODO Handle the stat changes stuff differently in the future. 
         GameTeam oldTeam = gamePlayer.getTeam();
         gamePlayer.setTeam(GameTeam.SPECTATORS);
@@ -1061,11 +1080,6 @@ public class Game {
         }.runTaskLater(plugin, 1L);
     }
     
-    //TODO Remove when new rewrite is done, keeping this to prevent errors for now
-    public void killPlayer(UUID uniqueId, DeathInfo deathInfo) {
-        
-    }
-    
     public void giveSpectatorItems(Player p) {
         GamePlayer gamePlayer = getPlayer(p.getUniqueId());
         ItemStack tributesBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&a&lTributes &7&o(Right Click)").build();
@@ -1079,10 +1093,10 @@ public class Game {
         } else if (gamePlayer.hasMutated()) {
             mutateName = "&cCan't mutate again.";
         } else {
-            if (!(gamePlayer.getDeathInfo() instanceof DeathInfoPlayerKill playerKill) || gamePlayer.deathByMutation()) {
+            if (!(gamePlayer.killedByPlayer()) || gamePlayer.deathByMutation()) {
                 mutateName = "&cCannot mutate.";
             } else {
-                GamePlayer killer = getPlayer(playerKill.getKiller());
+                GamePlayer killer = getPlayer(gamePlayer.getKiller());
                 String passes;
                 if (getSettings().isUnlimitedPasses()) {
                     passes = "Unlimited";

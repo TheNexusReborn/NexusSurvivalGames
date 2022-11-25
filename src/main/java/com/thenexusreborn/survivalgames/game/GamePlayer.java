@@ -2,15 +2,17 @@ package com.thenexusreborn.survivalgames.game;
 
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.deathold.DeathInfo;
+import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
+import org.bukkit.entity.EntityType;
 
-import java.util.*;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.UUID;
 
 public class GamePlayer {
     private final NexusPlayer nexusPlayer;
     private GameTeam team;
-    private DeathInfo deathInfo;
     private boolean spectatorByDeath, newPersonalBestNotified = false;
     private TrackerInfo trackerInfo;
     private int kills, killStreak, assists;
@@ -20,7 +22,7 @@ public class GamePlayer {
     private Bounty bounty;
     private CombatTag combatTag;
     private DamageInfo damageInfo;
-    private Map<Long, com.thenexusreborn.survivalgames.game.death.DeathInfo> newDeathInfos = new TreeMap<>();
+    private Map<Long, DeathInfo> newDeathInfos = new TreeMap<>();
     
     public GamePlayer(NexusPlayer nexusPlayer) {
         this.nexusPlayer = nexusPlayer;
@@ -57,16 +59,8 @@ public class GamePlayer {
         return nexusPlayer.getUniqueId();
     }
     
-    public void setDeathInfo(DeathInfo deathInfo) {
-        this.deathInfo = deathInfo;
-    }
-    
     public void setSpectatorByDeath(boolean value) {
         this.spectatorByDeath = value;
-    }
-    
-    public DeathInfo getDeathInfo() {
-        return deathInfo;
     }
     
     public boolean isSpectatorByDeath() {
@@ -187,5 +181,27 @@ public class GamePlayer {
     
     public void setAssists(int amount) {
         this.assists = amount;
+    }
+
+    public boolean killedByPlayer() {
+        for (DeathInfo death : this.newDeathInfos.values()) {
+            if (death.getKiller() != null) {
+                if (death.getKiller().getType() == EntityType.PLAYER) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public UUID getKiller() {
+        for (DeathInfo death : this.newDeathInfos.values()) {
+            if (death.getKiller() != null) {
+                if (death.getKiller().getType() == EntityType.PLAYER) {
+                    return death.getKiller().getKiller();
+                }
+            }
+        }
+        return null;
     }
 }

@@ -1,15 +1,26 @@
 package com.thenexusreborn.survivalgames.cmd;
 
 import com.thenexusreborn.api.player.Rank;
-import com.thenexusreborn.nexuscore.util.*;
+import com.thenexusreborn.nexuscore.util.MCUtils;
+import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.*;
-import com.thenexusreborn.survivalgames.game.deathold.DeathInfoSpectate;
-import com.thenexusreborn.survivalgames.lobby.*;
-import org.bukkit.command.*;
+import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.GamePlayer;
+import com.thenexusreborn.survivalgames.game.GameState;
+import com.thenexusreborn.survivalgames.game.GameTeam;
+import com.thenexusreborn.survivalgames.game.death.DeathInfo;
+import com.thenexusreborn.survivalgames.game.death.DeathType;
+import com.thenexusreborn.survivalgames.lobby.Lobby;
+import com.thenexusreborn.survivalgames.lobby.LobbyState;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 public class SpectateCommand implements CommandExecutor {
     
@@ -44,7 +55,7 @@ public class SpectateCommand implements CommandExecutor {
             }
         
             if (gamePlayer.getTeam() == GameTeam.TRIBUTES || gamePlayer.getTeam() == GameTeam.MUTATIONS) {
-                game.killPlayer(gamePlayer.getUniqueId(), new DeathInfoSpectate(gamePlayer.getUniqueId(), gamePlayer.getTeam().getColor()));
+                game.killPlayer(gamePlayer, new DeathInfo(game, System.currentTimeMillis(), gamePlayer, DeathType.SPECTATE));
             } else {
                 player.sendMessage(MsgType.WARN + "You are already spectating the game.");
             }
