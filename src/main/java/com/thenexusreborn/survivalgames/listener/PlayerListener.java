@@ -1,39 +1,69 @@
 package com.thenexusreborn.survivalgames.listener;
 
-import com.google.common.io.*;
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.api.player.*;
+import com.thenexusreborn.api.player.NexusPlayer;
+import com.thenexusreborn.api.player.Rank;
+import com.thenexusreborn.api.player.Toggle;
 import com.thenexusreborn.api.stats.StatOperator;
-import com.thenexusreborn.nexuscore.api.events.*;
-import com.thenexusreborn.nexuscore.util.*;
+import com.thenexusreborn.nexuscore.api.events.NexusPlayerLoadEvent;
+import com.thenexusreborn.nexuscore.api.events.ToggleChangeEvent;
+import com.thenexusreborn.nexuscore.util.MCUtils;
+import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
-import com.thenexusreborn.survivalgames.game.death.*;
-import com.thenexusreborn.survivalgames.game.deathold.DeathInfoVanish;
-import com.thenexusreborn.survivalgames.lobby.*;
-import com.thenexusreborn.survivalgames.loot.*;
-import com.thenexusreborn.survivalgames.menu.*;
+import com.thenexusreborn.survivalgames.game.death.DeathInfo;
+import com.thenexusreborn.survivalgames.game.death.DeathType;
+import com.thenexusreborn.survivalgames.game.death.KillerInfo;
+import com.thenexusreborn.survivalgames.lobby.Lobby;
+import com.thenexusreborn.survivalgames.lobby.LobbyState;
+import com.thenexusreborn.survivalgames.loot.LootManager;
+import com.thenexusreborn.survivalgames.loot.LootTable;
+import com.thenexusreborn.survivalgames.menu.MutateGui;
+import com.thenexusreborn.survivalgames.menu.TeamMenu;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
-import com.thenexusreborn.survivalgames.mutations.impl.*;
+import com.thenexusreborn.survivalgames.mutations.impl.ChickenMutation;
+import com.thenexusreborn.survivalgames.mutations.impl.CreeperMutation;
 import com.thenexusreborn.survivalgames.util.SGUtils;
-import org.bukkit.*;
-import org.bukkit.block.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.Chest;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.*;
-import org.bukkit.event.*;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.*;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.inventory.*;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.player.PlayerFishEvent.State;
-import org.bukkit.inventory.*;
+import org.bukkit.inventory.CraftingInventory;
+import org.bukkit.inventory.EnchantingInventory;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Openable;
-import org.bukkit.potion.*;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Random;
 
 public class PlayerListener implements Listener {
     private final SurvivalGames plugin;
@@ -382,8 +412,9 @@ public class PlayerListener implements Listener {
                 lobby.sendMessage(message);
             } else {
                 if (e.newValue()) {
-                    if (game.getPlayer(nexusPlayer.getUniqueId()).getTeam() != GameTeam.SPECTATORS) {
-                        game.killPlayer(nexusPlayer.getUniqueId(), new DeathInfoVanish(nexusPlayer.getUniqueId()));
+                    GamePlayer gamePlayer = game.getPlayer(nexusPlayer.getUniqueId());
+                    if (gamePlayer.getTeam() != GameTeam.SPECTATORS) {
+                        game.killPlayer(gamePlayer, new DeathInfo(game, System.currentTimeMillis(), gamePlayer, DeathType.VANISH));
                     }
                 }
                 Bukkit.getScheduler().runTaskLater(plugin, game::recalculateVisibility, 1L);
@@ -516,9 +547,8 @@ public class PlayerListener implements Listener {
         }
     }
     
-    //TODO Rename when done
     @EventHandler
-    public void onPlayerDeathRewrite(PlayerDeathEvent e) {
+    public void onPlayerDeath(PlayerDeathEvent e) {
         Game game = plugin.getGame();
         if (game == null) {
             return;
@@ -601,142 +631,10 @@ public class PlayerListener implements Listener {
                 } else {
                     player.teleport(deathLocation);
                 }
-                game.killPlayerRewrite(gamePlayer, deathInfo);
+                game.killPlayer(gamePlayer, deathInfo);
             }
         }.runTaskLater(plugin, 2L);
     }
-    
-    //TODO Remove when done
-//    @EventHandler
-//    public void onPlayerDeath(PlayerDeathEvent e) {
-//        if (plugin.getLobby().checkMapEditing(e.getEntity())) {
-//            return;
-//        }
-//        e.setDeathMessage(null);
-//    
-//        Game game = plugin.getGame();
-//        if (game == null) {
-//            return;
-//        }
-//        Player player = e.getEntity();
-//        System.out.println(player.getLastDamageCause().getCause());
-//        System.out.println(player.getKiller());
-//        GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
-//        if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
-//            return;
-//        }
-//    
-//        if (gamePlayer.getTeam() == GameTeam.MUTATIONS) {
-//            e.getDrops().clear();
-//        }
-//    
-//        DeathInfo deathInfo = null;
-//        final Player killer = player.getKiller();
-//        if (killer != null && player.getLastDamageCause().getCause() != DamageCause.PROJECTILE) {
-//            GamePlayer killerPlayer = game.getPlayer(killer.getUniqueId());
-//            if (player.getLastDamageCause().getCause() == DamageCause.ENTITY_EXPLOSION) {
-//                deathInfo = new DeathInfoTntKill(player.getUniqueId(), killerPlayer.getUniqueId(), killer.getHealth(), game.getPlayer(killer.getUniqueId()).getTeam().getColor());
-//            } else {
-//                deathInfo = new DeathInfoPlayerKill(player.getUniqueId(), killerPlayer.getUniqueId(), killer.getItemInHand(), killer.getHealth(), game.getPlayer(killer.getUniqueId()).getTeam().getColor());
-//            }
-//        } else {
-//            EntityDamageEvent lastDamageCause = player.getLastDamageCause();
-//            DamageCause damageCause;
-//            if (lastDamageCause == null) {
-//                damageCause = DamageCause.VOID;
-//            } else {
-//                damageCause = lastDamageCause.getCause();
-//            }
-//        
-//            String teamColor = gamePlayer.getTeam().getColor();
-//            if (damageCause == DamageCause.PROJECTILE) {
-//                if (lastDamageCause instanceof EntityDamageByEntityEvent edbee) {
-//                    if (edbee.getDamager() instanceof Projectile projectile) {
-//                        if (projectile.getShooter() instanceof Entity entity) {
-//                            String color = "";
-//                            if (entity instanceof Player) {
-//                                if (game.getSettings().getColorMode() == ColorMode.GAME_TEAM) {
-//                                    color = game.getPlayer(entity.getUniqueId()).getTeam().getColor();
-//                                } else {
-//                                    color = game.getPlayer(entity.getUniqueId()).getNexusPlayer().getRanks().get().getColor();
-//                                }
-//                            }
-//                            deathInfo = new DeathInfoProjectile(player.getUniqueId(), ((Entity) projectile.getShooter()), player.getLocation().distance(entity.getLocation()), color, ((LivingEntity) projectile.getShooter()).getHealth());
-//                        }
-//                    }
-//                }
-//            } else if (damageCause == DamageCause.SUFFOCATION) {
-//                deathInfo = new DeathInfo(player.getUniqueId(), DeathType.SUFFOCATION, "&4&l>> %playername% &7suffocated to death.", teamColor);
-//            } else if (damageCause == DamageCause.FALL) {
-//                deathInfo = new DeathInfo(player.getUniqueId(), DeathType.FALL, "&4&l>> %playername% &7fell to their death.", teamColor);
-//            } else if (damageCause == DamageCause.LAVA) {
-//                deathInfo = new DeathInfo(player.getUniqueId(), DeathType.LAVA, "&4&l>> %playername% &7roasted in lava.", teamColor);
-//            } else if (damageCause == DamageCause.FIRE || damageCause == DamageCause.FIRE_TICK) {
-//                deathInfo = new DeathInfo(player.getUniqueId(), DeathType.FIRE, "&4&l>> %playername% &7burned to death.", teamColor);
-//            } else if (damageCause == DamageCause.DROWNING) {
-//                deathInfo = new DeathInfo(player.getUniqueId(), DeathType.DROWNING, "&4&l>> %playername% &7drowned.", teamColor);
-//            } else if (damageCause == DamageCause.ENTITY_EXPLOSION || damageCause == DamageCause.BLOCK_EXPLOSION) {
-//                if (player.getLastDamageCause() instanceof EntityDamageByEntityEvent edbe) {
-//                    Location dLoc = edbe.getDamager().getLocation().clone();
-//                    Location loc = new Location(dLoc.getWorld(), dLoc.getBlockX(), dLoc.getBlockY(), dLoc.getBlockZ());
-//                    if (game.getSuicideLocations().containsKey(loc)) {
-//                        UUID cause = game.getSuicideLocations().get(loc);
-//                        double health = Bukkit.getPlayer(cause).getHealth();
-//                        deathInfo = new DeathInfoKilledSuicide(player.getUniqueId(), cause, health, game.getPlayer(cause).getTeam().getColor());
-//                    }
-//                } else {
-//                    deathInfo = new DeathInfo(player.getUniqueId(), DeathType.EXPLOSION, "&4&l>> %playername% &7exploded.", teamColor);
-//                }
-//            } else if (damageCause == DamageCause.VOID) {
-//                deathInfo = new DeathInfo(player.getUniqueId(), DeathType.VOID, "&4&l>> %playername% &7fell in the void.", teamColor);
-//            } else if (damageCause == DamageCause.LIGHTNING) {
-//                deathInfo = new DeathInfo(player.getUniqueId(), DeathType.LIGHTNING, "&4&l>> %playername% &7was struck by lightning and died.", teamColor);
-//            } else if (damageCause == DamageCause.SUICIDE) {
-//                deathInfo = new DeathInfo(player.getUniqueId(), DeathType.SUICIDE, "&4&l>> %playername% &7died.", teamColor);
-//            } else if (damageCause == DamageCause.STARVATION) {
-//                deathInfo = new DeathInfo(player.getUniqueId(), DeathType.STARVATION, "&4&l>> %playername% &7starved to death.", teamColor);
-//            } else if (damageCause == DamageCause.POISON) {
-//                deathInfo = new DeathInfo(player.getUniqueId(), DeathType.POISON, "&4&l>> %playername% &7was poisoned to death.", teamColor);
-//            } else if (damageCause == DamageCause.MAGIC) {
-//                deathInfo = new DeathInfo(player.getUniqueId(), DeathType.MAGIC, "&4&l>> %playername% &7was killed by magic.", teamColor);
-//            } else if (damageCause == DamageCause.WITHER) {
-//                deathInfo = new DeathInfo(player.getUniqueId(), DeathType.WITHER, "&4&l>> %playername% &7withered away.", teamColor);
-//            } else if (damageCause == DamageCause.MELTING) {
-//                deathInfo = new DeathInfo(player.getUniqueId(), DeathType.MELTING, "&4&l>> %playername% &7melted to death.", teamColor);
-//            } else if (damageCause == DamageCause.FALLING_BLOCK) {
-//                deathInfo = new DeathInfo(player.getUniqueId(), DeathType.FALLING_BLOCK, "&4&l>> %playername% &7had a block fall on their head.", teamColor);
-//            } else if (damageCause == DamageCause.THORNS) {
-//                deathInfo = new DeathInfo(player.getUniqueId(), DeathType.THORNS, "&4&l>> %playername% &7was poked to death by armor.", teamColor);
-//            } else if (damageCause == DamageCause.ENTITY_ATTACK) {
-//                if (lastDamageCause instanceof EntityDamageByEntityEvent edbee) {
-//                    Entity damager = edbee.getDamager();
-//                    if (damager instanceof Player) {
-//                        deathInfo = new DeathInfoSuicide(player.getUniqueId());
-//                    } else {
-//                        deathInfo = new DeathInfoEntity(player.getUniqueId(), damager.getType());
-//                    }
-//                }
-//            }
-//        }
-//    
-//        if (deathInfo == null) {
-//            deathInfo = new DeathInfo(player.getUniqueId(), DeathType.UNKNOWN, "%playername% &7died to unknown reasons.", gamePlayer.getTeam().getColor());
-//        }
-//    
-//        Location deathLocation = player.getLocation().clone();
-//        DeathInfo finalDeathInfo = deathInfo;
-//        new BukkitRunnable() {
-//            public void run() {
-//                player.spigot().respawn();
-//                if (e.getEntity().getLastDamageCause().getCause() == DamageCause.VOID) {
-//                    player.teleport(game.getGameMap().getCenter().toLocation(game.getGameMap().getWorld()));
-//                } else {
-//                    player.teleport(deathLocation);
-//                }
-//                game.killPlayer(e.getEntity().getUniqueId(), finalDeathInfo);
-//            }
-//        }.runTaskLater(plugin, 2L);
-//    }
     
     @EventHandler
     public void onConsume(PlayerItemConsumeEvent e) {
