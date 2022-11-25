@@ -667,8 +667,6 @@ public class Lobby {
                 return;
             }
         }
-        
-        nexusPlayer.sendMessage("&cInvalid map voting sign.");
     }
     
     public void forceStart() {
