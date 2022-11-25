@@ -851,7 +851,6 @@ public class Game {
         }
     }
     
-    //TODO Rename when old killPlayer method is removed
     public void killPlayer(GamePlayer gamePlayer, DeathInfo deathInfo) {
         //TODO Handle the stat changes stuff differently in the future. 
         GameTeam oldTeam = gamePlayer.getTeam();
@@ -897,18 +896,23 @@ public class Game {
         
         boolean playerKiller = killer != null && killer.getType() == EntityType.PLAYER;
         
-        int scoreGain = 0;
-        int currentStreak = 0;
-        int personalBest = 0;
-        int xpGain = 0;
-        int creditGain;
+        int scoreGain = 0, currentStreak = 0, personalBest = 0, xpGain = 0, creditGain = 0;
         Rank killerRank = null;
+        boolean claimedScoreBounty = false, claimedCreditBounty = false;
+        Bounty bounty = gamePlayer.getBounty();
+        double scoreBounty = bounty.getAmount(Bounty.Type.SCORE);
+        double creditBounty = bounty.getAmount(Bounty.Type.CREDIT);
         if (playerKiller) {
             GamePlayer killerPlayer = getPlayer(killer.getKiller());
             PlayerStats killerStats = killerPlayer.getNexusPlayer().getStats();
             killerRank = killerPlayer.getNexusPlayer().getRanks().get();
             scoreGain = lost;
-            
+            if (scoreBounty > 0) {
+                scoreGain += scoreBounty;
+                claimedScoreBounty = true;
+                bounty.remove(Bounty.Type.SCORE);
+            }
+
             killerStats.change("sg_score", scoreGain, StatOperator.ADD);
             
             killerPlayer.setKillStreak(killerPlayer.getKillStreak() + 1);
@@ -933,6 +937,13 @@ public class Game {
                 if (getSettings().isMultiplier()) {
                     creditGain *= killerRank.getMultiplier();
                 }
+
+                if (creditBounty > 0) {
+                    creditGain += creditBounty;
+                    bounty.remove(Bounty.Type.CREDIT);
+                    claimedCreditBounty = true;
+                }
+
                 killerStats.change("credits", creditGain, StatOperator.ADD);
             }
             
@@ -1033,7 +1044,7 @@ public class Game {
                 personalBest = currentStreak;
             }
             killerPlayer.sendMessage("&6&l>> &f&lCurrent Streak: &a" + currentStreak + "  &f&lPersonal Best: &a" + personalBest);
-            killerPlayer.sendMessage("&2&l>> &a+" + scoreGain + " Score!");
+            killerPlayer.sendMessage("&2&l>> &a+" + scoreGain + " Score!" + (claimedScoreBounty ? " &e&lClaimed Bounty" : ""));
             double multiplier = killerRank.getMultiplier();
             String multiplierMessage = killerRank.getColor() + "&l * x" + MCUtils.formatNumber(multiplier) + " " + killerRank.getPrefix() + " Bonus";
             
@@ -1046,10 +1057,15 @@ public class Game {
             }
     
             if (settings.isGiveCredits()) {
-                String creditsMsg = "&2&l>> &a&l+" + xpGain + " &3&lCREDITS&a&l!";
+                String creditsMsg = "&2&l>> &a&l+" + creditGain + " &3&lCREDITS&a&l!";
                 if (settings.isMultiplier()) {
                     creditsMsg += multiplierMessage;
                 }
+
+                if (claimedCreditBounty) {
+                    creditsMsg += " &e&lClaimed Bounty";
+                }
+
                 killerPlayer.sendMessage(creditsMsg);
             }
         }
@@ -1064,6 +1080,15 @@ public class Game {
         
         sendMessage(deathInfo.getDeathMessage());
         gamePlayer.sendMessage(GameTeam.SPECTATORS.getJoinMessage());
+
+        if (claimedScoreBounty) {
+            sendMessage("&6&l>> " + killerPlayer.getNexusPlayer().getColoredName() + " &b&lhas claimed the &b&l" + scoreBounty + " Score &6&lbounty on " + nexusPlayer.getColoredName());
+        }
+
+        if (claimedCreditBounty && settings.isGiveCredits()) {
+            sendMessage("&6&l>> " + killerPlayer.getNexusPlayer().getColoredName() + " &b&lhas claimed the &b&l" + scoreBounty + " Credit &6&lbounty on " + nexusPlayer.getColoredName());
+        }
+
         playSound(oldTeam.getDeathSound());
     
         new BukkitRunnable() {

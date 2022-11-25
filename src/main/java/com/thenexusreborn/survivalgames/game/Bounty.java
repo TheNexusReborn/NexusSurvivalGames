@@ -21,7 +21,11 @@ public final class Bounty {
     public UUID getPlayer() {
         return player;
     }
-    
+
+    public void remove(Type type) {
+        this.amounts.remove(type);
+    }
+
     public enum Type {
         CREDIT, SCORE
     }
