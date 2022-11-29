@@ -895,6 +895,12 @@ public class Game {
         }
         
         boolean playerKiller = killer != null && killer.getType() == EntityType.PLAYER;
+    
+        boolean claimedFirstBlood = false;
+        if (this.firstBlood == null) {
+            this.firstBlood = gamePlayer;
+            claimedFirstBlood = true;
+        }
         
         int scoreGain = 0, currentStreak = 0, personalBest = 0, xpGain = 0, creditGain = 0;
         Rank killerRank = null;
@@ -907,6 +913,11 @@ public class Game {
             PlayerStats killerStats = killerPlayer.getNexusPlayer().getStats();
             killerRank = killerPlayer.getNexusPlayer().getRanks().get();
             scoreGain = lost;
+            
+            if (claimedFirstBlood) {
+                scoreGain = (int) (scoreGain * 1.25);
+            }
+            
             if (scoreBounty > 0) {
                 scoreGain += scoreBounty;
                 claimedScoreBounty = true;
@@ -1025,6 +1036,8 @@ public class Game {
             }
         }
         
+        
+        
         GamePlayer killerPlayer = null;
         if (playerKiller) {
             killerPlayer = getPlayer(killer.getKiller());
@@ -1044,7 +1057,7 @@ public class Game {
                 personalBest = currentStreak;
             }
             killerPlayer.sendMessage("&6&l>> &f&lCurrent Streak: &a" + currentStreak + "  &f&lPersonal Best: &a" + personalBest);
-            killerPlayer.sendMessage("&2&l>> &a+" + scoreGain + " Score!" + (claimedScoreBounty ? " &e&lClaimed Bounty" : ""));
+            killerPlayer.sendMessage("&2&l>> &a+" + scoreGain + " Score!" + (claimedScoreBounty ? " &e&lClaimed Bounty" : "") + (claimedFirstBlood ? " &c&lFirst Blood" : ""));
             double multiplier = killerRank.getMultiplier();
             String multiplierMessage = killerRank.getColor() + "&l * x" + MCUtils.formatNumber(multiplier) + " " + killerRank.getPrefix() + " Bonus";
             
@@ -1072,6 +1085,10 @@ public class Game {
         
         gamePlayer.sendMessage("&4&l>> &cYou lost " + lost + " Points for dying!");
         sendMessage("&6&l>> " + oldTeam.getRemainColor() + "&l" + oldTeamRemaining + " " + oldTeam.name().toLowerCase() + " remain.");
+        if (claimedFirstBlood) {
+            sendMessage("&6&l>> &c&l" + firstBlood.getNexusPlayer().getName().toUpperCase() + " CLAIMED FIRST BLOOD!");
+        }
+    
         if (killerPlayer != null) {
             String killerName = killerPlayer.getNexusPlayer().getColoredName();
             String killerHealth = NumberHelper.formatNumber(killer.getHealth());
