@@ -1,54 +1,35 @@
 package com.thenexusreborn.survivalgames.game;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
+import com.google.common.io.*;
 import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.api.gamearchive.GameAction;
-import com.thenexusreborn.api.gamearchive.GameInfo;
-import com.thenexusreborn.api.helper.NumberHelper;
+import com.thenexusreborn.api.gamearchive.*;
+import com.thenexusreborn.api.helper.*;
 import com.thenexusreborn.api.multicraft.MulticraftAPI;
-import com.thenexusreborn.api.player.CachedPlayer;
-import com.thenexusreborn.api.player.NexusPlayer;
-import com.thenexusreborn.api.player.PlayerStats;
-import com.thenexusreborn.api.player.Rank;
+import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.api.server.Environment;
 import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.api.tags.Tag;
 import com.thenexusreborn.disguise.DisguiseAPI;
 import com.thenexusreborn.disguise.disguisetypes.MobDisguise;
-import com.thenexusreborn.nexuscore.util.ArmorType;
-import com.thenexusreborn.nexuscore.util.MCUtils;
-import com.thenexusreborn.nexuscore.util.MsgType;
+import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.nexuscore.util.region.Cuboid;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
-import com.thenexusreborn.survivalgames.ControlType;
-import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.death.DeathInfo;
-import com.thenexusreborn.survivalgames.game.death.KillerInfo;
+import com.thenexusreborn.survivalgames.*;
+import com.thenexusreborn.survivalgames.game.Bounty.Type;
+import com.thenexusreborn.survivalgames.game.death.*;
 import com.thenexusreborn.survivalgames.game.timer.*;
 import com.thenexusreborn.survivalgames.loot.Items;
-import com.thenexusreborn.survivalgames.map.GameMap;
-import com.thenexusreborn.survivalgames.map.MapSpawn;
-import com.thenexusreborn.survivalgames.mutations.Mutation;
-import com.thenexusreborn.survivalgames.mutations.MutationEffect;
-import com.thenexusreborn.survivalgames.mutations.MutationItem;
-import com.thenexusreborn.survivalgames.mutations.MutationType;
-import com.thenexusreborn.survivalgames.scoreboard.DefaultGameBoard;
-import com.thenexusreborn.survivalgames.scoreboard.GameTablistHandler;
+import com.thenexusreborn.survivalgames.map.*;
+import com.thenexusreborn.survivalgames.mutations.*;
+import com.thenexusreborn.survivalgames.scoreboard.*;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Monster;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
+import org.bukkit.entity.*;
+import org.bukkit.inventory.*;
+import org.bukkit.potion.*;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.lang.reflect.Field;
@@ -750,9 +731,22 @@ public class Game {
             double passWinValue = new Random().nextDouble();
             if (passWinValue <= getSettings().getPassRewardChance()) {
                 winnerPlayer.getStats().change("sg_mutation_passes", 1, StatOperator.ADD);
-                winnerPlayer.sendMessage(MsgType.INFO + "&aYou won a mutation pass for winning!");
+                winnerPlayer.sendMessage("&2&l>> &a&lYou won a mutation pass! Great job!");
             } else {
                 winnerPlayer.sendMessage(MsgType.INFO + "You did not win a mutation pass this time.");
+            }
+            
+            Bounty bounty = winner.getBounty();
+            for (Type type : Type.values()) {
+                double amount = bounty.getAmount(type);
+                if (amount > 0) {
+                    sendMessage("&6&l>> For winning the game, " + winnerPlayer.getColoredName() + " &6&l has kept their &b&l" + NumberHelper.formatNumber(amount) + " " + StringHelper.capitalizeEveryWord(type.name()) + " &6&lbounty!");
+                    if (type == Type.CREDIT) {
+                        winnerPlayer.getStats().change("credits", (int) amount, StatOperator.ADD);
+                    } else if (type == Type.SCORE) {
+                        winnerPlayer.getStats().change("sg_score", (int) amount, StatOperator.ADD);
+                    }
+                }
             }
         }
         
