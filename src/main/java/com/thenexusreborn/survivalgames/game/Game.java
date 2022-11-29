@@ -876,7 +876,7 @@ public class Game {
         if (score - lost < 0) {
             lost = 0;
         }
-    
+        
         if (!vanished) {
             if (lost > 0) {
                 stats.change("sg_score", lost, StatOperator.SUBTRACT);
@@ -890,7 +890,7 @@ public class Game {
         }
         
         boolean playerKiller = killer != null && killer.getType() == EntityType.PLAYER;
-    
+        
         boolean claimedFirstBlood = false;
         
         int scoreGain = 0, currentStreak = 0, personalBest = 0, xpGain = 0, creditGain = 0;
@@ -904,7 +904,7 @@ public class Game {
             PlayerStats killerStats = killerPlayer.getNexusPlayer().getStats();
             killerRank = killerPlayer.getNexusPlayer().getRanks().get();
             scoreGain = lost;
-    
+            
             if (this.firstBlood == null) {
                 this.firstBlood = killerPlayer;
                 claimedFirstBlood = true;
@@ -919,7 +919,7 @@ public class Game {
                 claimedScoreBounty = true;
                 bounty.remove(Bounty.Type.SCORE);
             }
-
+            
             killerStats.change("sg_score", scoreGain, StatOperator.ADD);
             
             killerPlayer.setKillStreak(killerPlayer.getKillStreak() + 1);
@@ -944,13 +944,13 @@ public class Game {
                 if (getSettings().isMultiplier()) {
                     creditGain *= killerRank.getMultiplier();
                 }
-
+                
                 if (creditBounty > 0) {
                     creditGain += creditBounty;
                     bounty.remove(Bounty.Type.CREDIT);
                     claimedCreditBounty = true;
                 }
-
+                
                 killerStats.change("credits", creditGain, StatOperator.ADD);
             }
             
@@ -968,7 +968,8 @@ public class Game {
         List<UUID> assistors = gamePlayer.getDamageInfo().getDamagers();
         if (!assistors.isEmpty()) {
             for (UUID damager : assistors) {
-                if (damager != killer.getKiller()) {
+                if (killer == null || damager != killer.getKiller()) {
+                    System.out.println("Damager is not equal to the killer");
                     GamePlayer assisterPlayer = getPlayer(damager);
                     assisterPlayer.setAssists(assisterPlayer.getAssists() + 1);
                     assisterPlayer.getNexusPlayer().getStats().change("sg_assists", 1, StatOperator.ADD);
@@ -992,7 +993,7 @@ public class Game {
                 if (gp.getTeam() != GameTeam.MUTATIONS) {
                     continue;
                 }
-    
+                
                 Mutation mutation = gp.getMutation();
                 if (!mutation.getTarget().equals(gamePlayer.getUniqueId())) {
                     continue;
@@ -1014,14 +1015,14 @@ public class Game {
                 }
             }
         }
-
+        
         int totalTributes = 0;
         for (GamePlayer gp : new ArrayList<>(this.players.values())) {
             if (gp.getTeam() == GameTeam.TRIBUTES) {
                 totalTributes++;
             }
         }
-
+        
         if (totalTributes <= settings.getDeathmatchThreshold()) {
             if (state == INGAME || state == INGAME_GRACEPERIOD) {
                 if (totalTributes > 1) {
@@ -1064,19 +1065,24 @@ public class Game {
                 }
                 killerPlayer.sendMessage(xpMsg);
             }
-    
+            
             if (settings.isGiveCredits()) {
                 String creditsMsg = "&2&l>> &a&l+" + creditGain + " &3&lCREDITS&a&l!";
                 if (settings.isMultiplier()) {
                     creditsMsg += multiplierMessage;
                 }
-
+                
                 if (claimedCreditBounty) {
                     creditsMsg += " &e&lClaimed Bounty";
                 }
-
+                
                 killerPlayer.sendMessage(creditsMsg);
             }
+        }
+        
+        for (UUID assistor : assistors) {
+            GamePlayer assistorPlayer = getPlayer(assistor);
+            assistorPlayer.sendMessage("&2&l>> &a+1 &aAssist");
         }
         
         gamePlayer.sendMessage("&4&l>> &cYou lost " + lost + " Points for dying!");
@@ -1084,7 +1090,7 @@ public class Game {
         if (claimedFirstBlood) {
             sendMessage("&6&l>> &c&l" + firstBlood.getNexusPlayer().getName().toUpperCase() + " CLAIMED FIRST BLOOD!");
         }
-    
+        
         if (killerPlayer != null) {
             String killerName = killerPlayer.getNexusPlayer().getColoredName();
             String killerHealth = NumberHelper.formatNumber(killer.getHealth());
@@ -1093,17 +1099,17 @@ public class Game {
         
         sendMessage(deathInfo.getDeathMessage());
         gamePlayer.sendMessage(GameTeam.SPECTATORS.getJoinMessage());
-
+        
         if (claimedScoreBounty) {
             sendMessage("&6&l>> " + killerPlayer.getNexusPlayer().getColoredName() + " &6&lhas claimed the &b&l" + scoreBounty + " Score &6&lbounty on " + nexusPlayer.getColoredName());
         }
-
+        
         if (claimedCreditBounty && settings.isGiveCredits()) {
             sendMessage("&6&l>> " + killerPlayer.getNexusPlayer().getColoredName() + " &6&lhas claimed the &b&l" + scoreBounty + " Credit &6&lbounty on " + nexusPlayer.getColoredName());
         }
-
+        
         playSound(oldTeam.getDeathSound());
-    
+        
         new BukkitRunnable() {
             public void run() {
                 if (state == ENDING || state == ENDED) {
