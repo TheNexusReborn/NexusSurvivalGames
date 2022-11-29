@@ -891,10 +891,6 @@ public class Game {
         boolean playerKiller = killer != null && killer.getType() == EntityType.PLAYER;
     
         boolean claimedFirstBlood = false;
-        if (this.firstBlood == null) {
-            this.firstBlood = gamePlayer;
-            claimedFirstBlood = true;
-        }
         
         int scoreGain = 0, currentStreak = 0, personalBest = 0, xpGain = 0, creditGain = 0;
         Rank killerRank = null;
@@ -907,6 +903,11 @@ public class Game {
             PlayerStats killerStats = killerPlayer.getNexusPlayer().getStats();
             killerRank = killerPlayer.getNexusPlayer().getRanks().get();
             scoreGain = lost;
+    
+            if (this.firstBlood == null) {
+                this.firstBlood = killerPlayer;
+                claimedFirstBlood = true;
+            }
             
             if (claimedFirstBlood) {
                 scoreGain = (int) (scoreGain * 1.25);
