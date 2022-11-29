@@ -53,7 +53,6 @@ public class Game {
     private long start, end;
     private GamePlayer firstBlood;
     private final Map<Location, Inventory> enderchestInventories = new HashMap<>();
-    private final Map<Location, UUID> suicideLocations = new HashMap<>();
     
     public Game(GameMap gameMap, GameSettings settings, Collection<NexusPlayer> players, List<UUID> spectatingPlayers) {
         this.gameMap = gameMap;
@@ -1288,10 +1287,6 @@ public class Game {
         for (PotionEffect effect : player.getActivePotionEffects()) {
             player.removePotionEffect(effect.getType());
         }
-    }
-    
-    public Map<Location, UUID> getSuicideLocations() {
-        return suicideLocations;
     }
     
     public GamePlayer getPlayer(String name) {

@@ -161,7 +161,6 @@ public class PlayerListener implements Listener {
                 if (mutation instanceof CreeperMutation) {
                     if (item.getType() == Material.SULPHUR) {
                         Location loc = player.getLocation();
-                        game.getSuicideLocations().put(loc, player.getUniqueId());
                         SGUtils.spawnTNTWithSource(loc, player, 1, 4F);
                         Bukkit.getScheduler().runTaskLater(plugin, () -> {
                             if (gamePlayer.getTeam() == GameTeam.MUTATIONS) {
