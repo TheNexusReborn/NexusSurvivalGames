@@ -4,7 +4,7 @@ import java.util.*;
 
 public class DamageInfo {
     private UUID player;
-    private List<UUID> damagers = new ArrayList<>();
+    private Set<UUID> damagers = new HashSet<>();
     
     public DamageInfo(UUID player) {
         this.player = player;
