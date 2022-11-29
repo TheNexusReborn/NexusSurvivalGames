@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames.cmd;
 
+import com.thenexusreborn.api.helper.NumberHelper;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.nexuscore.util.MCUtils;
@@ -28,30 +29,30 @@ public class BountyCmd implements CommandExecutor {
             sender.sendMessage(MCUtils.color(MsgType.WARN + "Only players can use that command."));
             return true;
         }
-        
+    
         Game game = plugin.getGame();
         
         if (game == null) {
             player.sendMessage(MCUtils.color(MsgType.WARN + "You can only bounty a player during a game."));
             return true;
         }
-        
+    
         if (!(args.length > 1)) {
             player.sendMessage(MCUtils.color(MsgType.WARN + "Usage: /" + label + " <player> <amount> [type: default score]"));
             return true;
         }
-        
+    
         GamePlayer gamePlayer = game.getPlayer(args[0]);
         if (gamePlayer == null) {
             player.sendMessage(MCUtils.color(MsgType.WARN + "The name you provided is not a player in the game."));
             return true;
         }
-        
+    
         if (gamePlayer.getTeam() != GameTeam.TRIBUTES) {
             player.sendMessage(MCUtils.color(MsgType.WARN + "You can only set a bounty on a Tribute."));
             return true;
         }
-        
+    
         int amount;
         try {
             amount = Integer.parseInt(args[1]);
@@ -59,7 +60,7 @@ public class BountyCmd implements CommandExecutor {
             player.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid number value."));
             return true;
         }
-        
+    
         Bounty.Type type = Bounty.Type.SCORE;
         if (args.length > 2) {
             try {
@@ -69,7 +70,7 @@ public class BountyCmd implements CommandExecutor {
                 return true;
             }
         }
-        
+    
         NexusPlayer nexusPlayer = gamePlayer.getNexusPlayer();
         if (type == Type.SCORE) {
             if (nexusPlayer.getStats().getValue("sg_score").getAsInt() < amount) {
@@ -86,12 +87,14 @@ public class BountyCmd implements CommandExecutor {
                 nexusPlayer.getStats().change("credits", amount, StatOperator.SUBTRACT);
             }
         }
-        
+    
         Bounty bounty = gamePlayer.getBounty();
         bounty.add(type, amount);
         String coloredName = nexusPlayer.getColoredName();
-        game.sendMessage("&6&l>> &dThe bounty on " + coloredName + " &dwas increased by &b" + amount + " " + type.name().toLowerCase() + "&d!");
-        game.sendMessage("&6&l>> &dThe current value is &d" + bounty.getAmount(type) + " " + type.name().toLowerCase() + "&d.");
+        String formattedAmount = NumberHelper.formatNumber(amount);
+        String totalFormattedAmount = NumberHelper.formatNumber(bounty.getAmount(type));
+        game.sendMessage("&6&l>> &dThe bounty on " + coloredName + " &dwas increased by &b" + formattedAmount + " " + type.name().toLowerCase() + "&d!");
+        game.sendMessage("&6&l>> &dThe current value is &b" + totalFormattedAmount + " " + type.name().toLowerCase() + "&d.");
         return true;
     }
 }
