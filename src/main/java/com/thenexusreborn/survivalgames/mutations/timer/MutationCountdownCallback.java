@@ -1,6 +1,7 @@
 package com.thenexusreborn.survivalgames.mutations.timer;
 
 import com.thenexusreborn.api.NexusAPI;
+import com.thenexusreborn.api.gamearchive.GameAction;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.nexuscore.util.timer.TimerSnapshot;
@@ -61,6 +62,7 @@ public class MutationCountdownCallback implements ReturnableCallback<TimerSnapsh
             t.sendMessage(MCUtils.color("&6&l>> " + nexusPlayer.getColoredName().toUpperCase() + " &c&lIS AFTER YOU! RUN!"));
             
             game.addMutation(mutation);
+            game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "mutation", nexusPlayer.getName() + " mutated agaisnt " + t.getName()));
             return false;
         }
     
