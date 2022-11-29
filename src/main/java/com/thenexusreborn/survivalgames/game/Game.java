@@ -851,6 +851,7 @@ public class Game {
         gamePlayer.setTeam(GameTeam.SPECTATORS);
         recalculateVisibility();
         Player player = Bukkit.getPlayer(gamePlayer.getUniqueId());
+        giveSpectatorItems(player);
         String strippedDeathMessage = ChatColor.stripColor(deathInfo.getDeathMessage());
         strippedDeathMessage = strippedDeathMessage.substring(3, strippedDeathMessage.length() - 1);
         this.gameInfo.getActions().add(new GameAction(System.currentTimeMillis(), "death", strippedDeathMessage));
