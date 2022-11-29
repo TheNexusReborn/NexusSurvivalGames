@@ -7,32 +7,32 @@ import java.io.*;
 
 public enum DeathType {
     UNKNOWN, 
-    PLAYER, //
-    PLAYER_PROJECTILE, //
-    ENTITY, //
-    ENTITY_PROJECTILE, //
-    SUFFOCATION(true), //done
-    MELTING(true), //done
-    FALL(true), //done
-    LAVA(true), //done
-    FIRE(true), //done
-    DROWNING(true), //done
-    EXPLOSION(true), //done
-    VOID(true), //done
-    LIGHTNING(true), //done
-    SUICIDE, //done
-    STARVATION(true), //done
-    POISON(true), //done
-    MAGIC(true),//done
-    WITHER(true), //done
-    INCOGNITO(true), //done
-    FALLING_BLOCK(true), //done
-    THORNS(true), //done
-    CHEAT, //done
-    LEAVE(true), //done
-    VANISH(true), //done
-    SPECTATE, //done
-    CACTUS(true); //done
+    PLAYER,
+    PLAYER_PROJECTILE,
+    ENTITY,
+    ENTITY_PROJECTILE,
+    SUFFOCATION(true),
+    MELTING(true),
+    FALL(true),
+    LAVA(true),
+    FIRE(true),
+    DROWNING(true),
+    EXPLOSION(true),
+    VOID(true),
+    LIGHTNING(true),
+    SUICIDE,
+    STARVATION(true),
+    POISON(true),
+    MAGIC(true),
+    WITHER(true), 
+    INCOGNITO(true), 
+    FALLING_BLOCK(true), 
+    THORNS(true),
+    CHEAT, 
+    LEAVE(true), 
+    VANISH(true),
+    SPECTATE, 
+    CACTUS(true);
     
     private final boolean playerSubtype;
     
