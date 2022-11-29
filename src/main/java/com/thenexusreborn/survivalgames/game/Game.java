@@ -968,9 +968,11 @@ public class Game {
         List<UUID> assistors = gamePlayer.getDamageInfo().getDamagers();
         if (!assistors.isEmpty()) {
             for (UUID damager : assistors) {
-                GamePlayer assisterPlayer = getPlayer(damager);
-                assisterPlayer.setAssists(assisterPlayer.getAssists() + 1);
-                assisterPlayer.getNexusPlayer().getStats().change("sg_assists", 1, StatOperator.ADD);
+                if (damager != killer.getKiller()) {
+                    GamePlayer assisterPlayer = getPlayer(damager);
+                    assisterPlayer.setAssists(assisterPlayer.getAssists() + 1);
+                    assisterPlayer.getNexusPlayer().getStats().change("sg_assists", 1, StatOperator.ADD);
+                }
             }
         }
         
@@ -1031,8 +1033,6 @@ public class Game {
                 }
             }
         }
-        
-        
         
         GamePlayer killerPlayer = null;
         if (playerKiller) {
