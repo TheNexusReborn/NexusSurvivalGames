@@ -29,7 +29,7 @@ public class MutationType {
     public static final MutationType CHICKEN = new Builder("chicken", ChickenMutation.class, DisguiseType.CHICKEN).icon(Material.FEATHER).weapon(ItemBuilder.start(Material.WOOD_SWORD).displayName("&bEgg Launcher").addItemFlag(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS).addEnchantment(Enchantment.ARROW_DAMAGE, 1).build()).health(4).unlockCost(5000).addItem(1, ItemBuilder.start(Material.SLIME_BALL).displayName("&bChicken Launch").build()).addItem(2, ItemBuilder.start(Material.FEATHER).displayName("&bChicken Chute").build()).addDamageImmunity(FALL).create();
     public static final MutationType CREEPER = new Builder("creeper", CreeperMutation.class, DisguiseType.CREEPER).icon(Material.SULPHUR).armor(CHAINMAIL).weapon(new ItemStack(Material.TNT, 64)).health(10).unlockCost(3000).addDamageImmunity(BLOCK_EXPLOSION).addDamageImmunity(ENTITY_EXPLOSION).addEffect(SPEED, 0).addItem(1, ItemBuilder.start(Material.SULPHUR).displayName("&cSuicide").build()).create();
     
-//    TODO (These are MVP only) Blaze, Spider, Witch and Wither Skeleton
+//  (These are MVP only) Blaze, Spider, Witch and Wither Skeleton
     
     protected String id;
     protected String displayName;

@@ -845,7 +845,6 @@ public class Game {
     }
     
     public void killPlayer(GamePlayer gamePlayer, DeathInfo deathInfo) {
-        //TODO Handle the stat changes stuff differently in the future. 
         GameTeam oldTeam = gamePlayer.getTeam();
         gamePlayer.setTeam(GameTeam.SPECTATORS);
         recalculateVisibility();
