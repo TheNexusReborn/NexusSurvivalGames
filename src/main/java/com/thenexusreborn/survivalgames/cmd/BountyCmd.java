@@ -41,7 +41,8 @@ public class BountyCmd implements CommandExecutor {
             player.sendMessage(MCUtils.color(MsgType.WARN + "Usage: /" + label + " <player> <amount> [type: default score]"));
             return true;
         }
-    
+        
+        GamePlayer senderPlayer = game.getPlayer(player.getUniqueId());
         GamePlayer gamePlayer = game.getPlayer(args[0]);
         if (gamePlayer == null) {
             player.sendMessage(MCUtils.color(MsgType.WARN + "The name you provided is not a player in the game."));
@@ -71,23 +72,24 @@ public class BountyCmd implements CommandExecutor {
             }
         }
     
-        NexusPlayer nexusPlayer = gamePlayer.getNexusPlayer();
+        NexusPlayer senderNexusPlayer = senderPlayer.getNexusPlayer();
         if (type == Type.SCORE) {
-            if (nexusPlayer.getStats().getValue("sg_score").getAsInt() < amount) {
-                nexusPlayer.sendMessage(MsgType.WARN + "You do not have enough score to set a bounty of " + amount);
+            if (senderNexusPlayer.getStats().getValue("sg_score").getAsInt() < amount) {
+                senderNexusPlayer.sendMessage(MsgType.WARN + "You do not have enough score to set a bounty of " + amount);
                 return true;
             } else {
-                nexusPlayer.getStats().change("sg_score", amount, StatOperator.SUBTRACT);
+                senderNexusPlayer.getStats().change("sg_score", amount, StatOperator.SUBTRACT);
             }
         } else if (type == Type.CREDIT) {
-            if (nexusPlayer.getStats().getValue("credits").getAsInt() < amount) {
-                nexusPlayer.sendMessage(MsgType.WARN + "You do not have enough credits to set a bounty of " + amount);
+            if (senderNexusPlayer.getStats().getValue("credits").getAsInt() < amount) {
+                senderNexusPlayer.sendMessage(MsgType.WARN + "You do not have enough credits to set a bounty of " + amount);
                 return true;
             } else {
-                nexusPlayer.getStats().change("credits", amount, StatOperator.SUBTRACT);
+                senderNexusPlayer.getStats().change("credits", amount, StatOperator.SUBTRACT);
             }
         }
     
+        NexusPlayer nexusPlayer = gamePlayer.getNexusPlayer();
         Bounty bounty = gamePlayer.getBounty();
         bounty.add(type, amount);
         String coloredName = nexusPlayer.getColoredName();
