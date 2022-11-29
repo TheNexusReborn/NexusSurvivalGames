@@ -965,15 +965,18 @@ public class Game {
             }
         }
         
-        List<UUID> assistors = gamePlayer.getDamageInfo().getDamagers();
-        if (!assistors.isEmpty()) {
-            for (UUID damager : assistors) {
-                if (killer == null || damager != killer.getKiller()) {
-                    System.out.println("Damager is not equal to the killer");
-                    GamePlayer assisterPlayer = getPlayer(damager);
-                    assisterPlayer.setAssists(assisterPlayer.getAssists() + 1);
-                    assisterPlayer.getNexusPlayer().getStats().change("sg_assists", 1, StatOperator.ADD);
+        List<UUID> damagers = gamePlayer.getDamageInfo().getDamagers();
+        List<GamePlayer> assisters = new ArrayList<>();
+        if (!damagers.isEmpty()) {
+            for (UUID damager : damagers) {
+                if (killer != null && killer.getKiller().equals(damager)) {
+                    continue;
                 }
+                
+                GamePlayer assisterPlayer = getPlayer(damager);
+                assisterPlayer.setAssists(assisterPlayer.getAssists() + 1);
+                assisterPlayer.getNexusPlayer().getStats().change("sg_assists", 1, StatOperator.ADD);
+                assisters.add(assisterPlayer);
             }
         }
         
@@ -1080,9 +1083,8 @@ public class Game {
             }
         }
         
-        for (UUID assistor : assistors) {
-            GamePlayer assistorPlayer = getPlayer(assistor);
-            assistorPlayer.sendMessage("&2&l>> &a+1 &aAssist");
+        for (GamePlayer assister : assisters) {
+            assister.sendMessage("&2&l>> &a+1 &aAssist");
         }
         
         gamePlayer.sendMessage("&4&l>> &cYou lost " + lost + " Points for dying!");
