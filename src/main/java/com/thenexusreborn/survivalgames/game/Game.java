@@ -1095,11 +1095,11 @@ public class Game {
         gamePlayer.sendMessage(GameTeam.SPECTATORS.getJoinMessage());
 
         if (claimedScoreBounty) {
-            sendMessage("&6&l>> " + killerPlayer.getNexusPlayer().getColoredName() + " &b&lhas claimed the &b&l" + scoreBounty + " Score &6&lbounty on " + nexusPlayer.getColoredName());
+            sendMessage("&6&l>> " + killerPlayer.getNexusPlayer().getColoredName() + " &6&lhas claimed the &b&l" + scoreBounty + " Score &6&lbounty on " + nexusPlayer.getColoredName());
         }
 
         if (claimedCreditBounty && settings.isGiveCredits()) {
-            sendMessage("&6&l>> " + killerPlayer.getNexusPlayer().getColoredName() + " &b&lhas claimed the &b&l" + scoreBounty + " Credit &6&lbounty on " + nexusPlayer.getColoredName());
+            sendMessage("&6&l>> " + killerPlayer.getNexusPlayer().getColoredName() + " &6&lhas claimed the &b&l" + scoreBounty + " Credit &6&lbounty on " + nexusPlayer.getColoredName());
         }
 
         playSound(oldTeam.getDeathSound());
