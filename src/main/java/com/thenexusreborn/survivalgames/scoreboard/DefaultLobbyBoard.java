@@ -1,12 +1,11 @@
 package com.thenexusreborn.survivalgames.scoreboard;
 
 import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.scoreboard.*;
 import com.thenexusreborn.nexuscore.scoreboard.SpigotScoreboardView;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.lobby.Lobby;
+import com.thenexusreborn.survivalgames.lobby.*;
 import com.thenexusreborn.survivalgames.map.GameMap;
 import org.bukkit.ChatColor;
 
@@ -50,11 +49,9 @@ public class DefaultLobbyBoard extends SpigotScoreboardView {
         createTeam(new TeamBuilder("waitingValue").entry("&fWaiting: &e").score(11).valueUpdater((player, team) -> {
             Lobby lobby = plugin.getLobby();
             int waiting = 0;
-            for (NexusPlayer waitingPlayer : lobby.getPlayers()) {
-                if (!lobby.getSpectatingPlayers().contains(waitingPlayer.getUniqueId())) {
-                    if (!waitingPlayer.getToggles().getValue("vanish")) {
-                        waiting++;
-                    }
+            for (LobbyPlayer waitingPlayer : lobby.getPlayers()) {
+                if (!waitingPlayer.isSpectating()) {
+                    waiting++;
                 }
             }
             team.setSuffix(waiting + "");

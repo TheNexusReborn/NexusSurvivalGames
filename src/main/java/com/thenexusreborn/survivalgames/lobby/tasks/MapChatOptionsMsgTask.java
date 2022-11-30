@@ -1,10 +1,8 @@
 package com.thenexusreborn.survivalgames.lobby.tasks;
 
-import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.nexuscore.api.NexusTask;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.lobby.Lobby;
-import com.thenexusreborn.survivalgames.lobby.LobbyState;
+import com.thenexusreborn.survivalgames.lobby.*;
 
 public class MapChatOptionsMsgTask extends NexusTask<SurvivalGames> {
     
@@ -27,8 +25,8 @@ public class MapChatOptionsMsgTask extends NexusTask<SurvivalGames> {
             return;
         }
     
-        for (NexusPlayer nexusPlayer : lobby.getPlayers()) {
-            lobby.sendMapOptions(nexusPlayer);
+        for (LobbyPlayer nexusPlayer : lobby.getPlayers()) {
+            lobby.sendMapOptions(nexusPlayer.getPlayer());
         }
     }
 }

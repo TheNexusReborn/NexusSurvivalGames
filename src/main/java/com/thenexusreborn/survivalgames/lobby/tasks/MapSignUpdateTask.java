@@ -1,17 +1,12 @@
 package com.thenexusreborn.survivalgames.lobby.tasks;
 
-import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.nexuscore.api.NexusTask;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.lobby.Lobby;
-import com.thenexusreborn.survivalgames.lobby.LobbyState;
+import com.thenexusreborn.survivalgames.lobby.*;
 import com.thenexusreborn.survivalgames.map.GameMap;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.Sign;
+import org.bukkit.*;
+import org.bukkit.block.*;
 import org.bukkit.entity.Player;
 
 import java.util.Map.Entry;
@@ -57,7 +52,7 @@ public class MapSignUpdateTask extends NexusTask<SurvivalGames> {
             
             sign.setLine(3, MCUtils.color("&n" + votes + " Vote(s)"));
             
-            for (NexusPlayer player : lobby.getPlayers()) {
+            for (LobbyPlayer player : lobby.getPlayers()) {
                 Player bukkitPlayer = Bukkit.getPlayer(player.getUniqueId());
                 if (bukkitPlayer != null) {
                     World world = bukkitPlayer.getWorld();
@@ -65,7 +60,7 @@ public class MapSignUpdateTask extends NexusTask<SurvivalGames> {
                         if (!world.getName().equalsIgnoreCase(lobby.getSpawnpoint().getWorld().getName())) {
                             continue;
                         }
-                        if (lobby.getMapVotes().get(entry.getKey()).contains(player.getUniqueId())) {
+                        if (player.getMapVote() == entry.getKey()) {
                             sign.setLine(0, MCUtils.color("&n#" + entry.getKey()));
                             sign.setLine(2, MCUtils.color("&2&lVOTED!"));
                         } else {

@@ -26,8 +26,7 @@ import java.util.logging.Level;
 
 public class Lobby {
     private final SurvivalGames plugin;
-    private final Map<UUID, NexusPlayer> players = new HashMap<>();
-    private final List<UUID> spectatingPlayers = new ArrayList<>();
+    private final Map<UUID, LobbyPlayer> players = new HashMap<>();
     private Timer timer;
     private GameSettings gameSettings;
     private LobbySettings lobbySettings;
@@ -35,10 +34,8 @@ public class Lobby {
     private ControlType controlType = ControlType.MANUAL;
     private LobbyState state = LobbyState.WAITING;
     private Location spawnpoint;
-    private final Set<UUID> voteStart = new HashSet<>();
     private final Map<Integer, Location> mapSigns = new HashMap<>();
     private final Map<Integer, GameMap> mapOptions = new HashMap<>();
-    private final Map<Integer, Set<UUID>> mapVotes = new HashMap<>();
     private boolean forceStarted;
     private final List<StatSign> statSigns = new ArrayList<>();
     private final List<TributeSign> tributeSigns = new ArrayList<>();
@@ -113,11 +110,16 @@ public class Lobby {
         
         this.players.entrySet().removeIf(entry -> Bukkit.getPlayer(entry.getKey()) == null);
         
+        this.players.values().forEach(player -> {
+            player.setSpectating(false);
+            player.setMapVote(-1);
+            player.setVoteStart(false);
+        });
+        
         sendMessage(MsgType.ERROR + "Resetting lobby from an Invalid State...");
         this.timer = null;
         this.gameMap = null;
         this.state = LobbyState.WAITING;
-        this.voteStart.clear();
         this.generateMapOptions();
         this.forceStarted = false;
         sendMessage(MsgType.SUCCESS + "Lobby Reset from Invalid State complete");
@@ -198,15 +200,19 @@ public class Lobby {
         });
     }
     
+    public List<LobbyPlayer> getPlayers() {
+        return new ArrayList<>(this.players.values());
+    }
+    
     public void generateMapOptions() {
         plugin.getLogger().info("Generating Map Options");
         this.mapOptions.clear();
-        this.mapVotes.clear();
+        
+        getPlayers().forEach(player -> player.setMapVote(-1));
         
         
         if (plugin.getMapManager().getMaps().size() == 1 && this.mapSigns.size() == 1) {
             this.mapOptions.put(1, plugin.getMapManager().getMaps().get(0));
-            this.mapVotes.put(1, new HashSet<>());
         } else if (plugin.getMapManager().getMaps().size() >= this.mapSigns.size()) {
             List<GameMap> maps = new ArrayList<>(plugin.getMapManager().getMaps());
             for (Integer position : new HashSet<>(this.mapSigns.keySet())) {
@@ -217,7 +223,6 @@ public class Lobby {
                     map = maps.get(index);
                 } while (!map.isActive());
                 this.mapOptions.put(position, map);
-                this.mapVotes.put(position, new HashSet<>());
                 maps.remove(index);
             }
         }
@@ -236,7 +241,7 @@ public class Lobby {
     }
     
     public void sendMessage(String message) {
-        for (NexusPlayer player : this.players.values()) {
+        for (LobbyPlayer player : getPlayers()) {
             player.sendMessage(message);
         }
         Bukkit.getConsoleSender().sendMessage(MCUtils.color(message));
@@ -289,17 +294,13 @@ public class Lobby {
     
     public int getTotalMapVotes(int position) {
         int votes = 0;
-        Set<UUID> playerVotes = mapVotes.get(position);
-        for (UUID vote : playerVotes) {
-            NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(vote);
-            if (nexusPlayer == null) {
-                continue;
-            }
-            
-            if (lobbySettings.isVoteWeight()) {
-                votes += nexusPlayer.getRanks().get().getMultiplier();
-            } else {
-                votes++;
+        for (LobbyPlayer player : getPlayers()) {
+            if (player.getMapVote() == position) {
+                if (getLobbySettings().isVoteWeight()) {
+                    votes += (int) player.getRank().getMultiplier();
+                } else {
+                    votes += 1;
+                }
             }
         }
         return votes;
@@ -334,8 +335,8 @@ public class Lobby {
             }
         }
         
-        Game game = new Game(gameMap, this.gameSettings, this.players.values(), this.spectatingPlayers);
-        this.voteStart.clear();
+        Game game = new Game(gameMap, this.gameSettings, getPlayers());
+        this.players.clear();
         plugin.setGame(game);
         if (plugin.getGamesPlayed() + 1 >= this.lobbySettings.getMaxGames()) {
             plugin.setRestart(true);
@@ -352,7 +353,6 @@ public class Lobby {
     public void resetLobby() {
         this.state = LobbyState.SETUP;
         this.players.clear();
-        this.spectatingPlayers.clear();
         if (timer != null) {
             if (timer.isRunning()) {
                 timer.cancel();
@@ -363,10 +363,6 @@ public class Lobby {
         this.state = LobbyState.WAITING;
         this.forceStarted = false;
         generateMapOptions();
-    }
-    
-    public List<NexusPlayer> getPlayers() {
-        return new ArrayList<>(this.players.values());
     }
     
     public Timer getTimer() {
@@ -395,15 +391,15 @@ public class Lobby {
             return;
         }
         
-        this.players.put(nexusPlayer.getUniqueId(), nexusPlayer);
+        this.players.put(nexusPlayer.getUniqueId(), new LobbyPlayer(nexusPlayer));
         
         int totalPlayers = 0;
-        for (NexusPlayer player : this.players.values()) {
-            if (!this.spectatingPlayers.contains(player.getUniqueId())) {
-                if (!player.getToggles().getValue("vanish")) {
-                    totalPlayers++;
-                }
+        for (LobbyPlayer player : getPlayers()) {
+            if (player.isSpectating()) {
+                continue;
             }
+            
+            totalPlayers++;
         }
         
         if (totalPlayers > lobbySettings.getMaxPlayers()) {
@@ -424,9 +420,9 @@ public class Lobby {
         
         if (nexusPlayer.getToggles().getValue("vanish")) {
             for (Player p : Bukkit.getOnlinePlayers()) {
-                NexusPlayer psp = this.players.get(p.getUniqueId());
+                LobbyPlayer psp = this.players.get(p.getUniqueId());
                 if (psp != null) {
-                    if (psp.getRanks().get().ordinal() > Rank.HELPER.ordinal()) {
+                    if (psp.getRank().ordinal() > Rank.HELPER.ordinal()) {
                         p.hidePlayer(player);
                     } else {
                         psp.sendMessage("&a&l>> " + nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName() + " &ejoined &e&overy silently&e.");
@@ -434,9 +430,9 @@ public class Lobby {
                 }
             }
         } else if (nexusPlayer.getToggles().getValue("incognito")) {
-            for (NexusPlayer np : this.players.values()) {
+            for (LobbyPlayer np : getPlayers()) {
                 if (np != null) {
-                    if (np.getRanks().get().ordinal() <= Rank.HELPER.ordinal()) {
+                    if (np.getRank().ordinal() <= Rank.HELPER.ordinal()) {
                         np.sendMessage("&a&l>> " + nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName() + " &ejoined &e&osilently&e.");
                     }
                 }
@@ -447,9 +443,9 @@ public class Lobby {
         
         boolean joiningPlayerStaff = nexusPlayer.getRanks().get().ordinal() <= Rank.HELPER.ordinal();
         for (Player p : Bukkit.getOnlinePlayers()) {
-            NexusPlayer psp = this.players.get(p.getUniqueId());
+            LobbyPlayer psp = this.players.get(p.getUniqueId());
             if (psp != null) {
-                if (psp.getToggles().getValue("vanish") && !joiningPlayerStaff) {
+                if (psp.getToggleValue("vanish") && !joiningPlayerStaff) {
                     Bukkit.getPlayer(nexusPlayer.getUniqueId()).hidePlayer(p);
                 }
             }
@@ -480,23 +476,23 @@ public class Lobby {
             return;
         }
         this.players.remove(nexusPlayer.getUniqueId());
-        this.spectatingPlayers.remove(nexusPlayer.getUniqueId());
         int totalPlayers = 0;
-        for (NexusPlayer player : this.players.values()) {
-            if (!this.spectatingPlayers.contains(player.getUniqueId())) {
-                totalPlayers++;
+        for (LobbyPlayer player : getPlayers()) {
+            if (player.isSpectating()) {
+                continue;
             }
+            totalPlayers++;
         }
         
         if (nexusPlayer.getToggles().getValue("vanish")) {
-            for (NexusPlayer snp : this.players.values()) {
-                if (snp.getRanks().get().ordinal() <= Rank.HELPER.ordinal()) {
+            for (LobbyPlayer snp : getPlayers()) {
+                if (snp.getRank().ordinal() <= Rank.HELPER.ordinal()) {
                     snp.sendMessage("&c&l<< " + nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName() + " &eleft &e&overy silently&e.");
                 }
             }
         } else if (nexusPlayer.getToggles().getValue("incognito")) {
-            for (NexusPlayer snp : this.players.values()) {
-                if (snp.getRanks().get().ordinal() <= Rank.HELPER.ordinal()) {
+            for (LobbyPlayer snp : getPlayers()) {
+                if (snp.getRank().ordinal() <= Rank.HELPER.ordinal()) {
                     snp.sendMessage("&c&l<< " + nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName() + " &eleft &e&osilently&e.");
                 }
             }
@@ -504,17 +500,9 @@ public class Lobby {
             sendMessage("&c&l<< " + nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName() + " &eleft.");
         }
         
-        if (this.voteStart.contains(nexusPlayer.getUniqueId())) {
-            removeStartVote(nexusPlayer.getUniqueId());
-        }
-        
-        for (Set<UUID> votes : this.mapVotes.values()) {
-            votes.remove(nexusPlayer.getUniqueId());
-        }
-        
         if (this.state == LobbyState.COUNTDOWN) {
-            if (totalPlayers < lobbySettings.getMinPlayers() && !(voteStart.size() >= 2)) {
-                if (this.players.size() > 1 && !forceStarted) {
+            if (totalPlayers < lobbySettings.getMinPlayers() && !(getVoteStartCount() >= 2)) {
+                if (getPlayers().size() > 1 && !forceStarted) {
                     sendMessage("&cNot enough players to start.");
                     if (this.timer != null) {
                         this.timer.cancel();
@@ -543,14 +531,21 @@ public class Lobby {
     }
     
     public void addSpectatingPlayer(UUID uuid) {
-        this.spectatingPlayers.add(uuid);
+        this.players.get(uuid).setSpectating(true);
     }
     
     public void removeSpectatingPlayer(UUID uuid) {
-        this.spectatingPlayers.remove(uuid);
+        this.players.get(uuid).setSpectating(false);
     }
     
     public List<UUID> getSpectatingPlayers() {
+        List<UUID> spectatingPlayers = new ArrayList<>();
+        getPlayers().forEach(player -> {
+            if (player.isSpectating()) {
+                spectatingPlayers.add(player.getUniqueId());
+            }
+        });
+        
         return spectatingPlayers;
     }
     
@@ -559,8 +554,8 @@ public class Lobby {
     }
     
     public boolean hasPlayer(UUID uniqueId) {
-        for (NexusPlayer player : this.players.values()) {
-            if (player.getUniqueId().toString().equalsIgnoreCase(uniqueId.toString())) {
+        for (LobbyPlayer player : getPlayers()) {
+            if (player.getUniqueId().equals(uniqueId)) {
                 return true;
             }
         }
@@ -602,7 +597,7 @@ public class Lobby {
     }
     
     public void playSound(Sound sound) {
-        for (NexusPlayer player : this.players.values()) {
+        for (LobbyPlayer player : getPlayers()) {
             Player p = Bukkit.getPlayer(player.getUniqueId());
             if (p != null) {
                 p.playSound(p.getLocation(), sound, 1, 1);
@@ -618,23 +613,35 @@ public class Lobby {
         return this.players.containsKey(uniqueId);
     }
     
+    public int getVoteStartCount() {
+        int count = 0;
+        for (LobbyPlayer player : getPlayers()) {
+            if (player.isVoteStart()) {
+                count++;
+            }
+        }
+        
+        return count;
+    }
+    
     public void addStartVote(NexusPlayer player) {
-        this.voteStart.add(player.getUniqueId());
+        this.players.get(player.getUniqueId()).setVoteStart(true);
         sendMessage("&6&l>> " + player.getRanks().get().getColor() + player.getName() + " &ehas voted to start the lobby.");
         if (this.state == LobbyState.WAITING) {
-            if (this.voteStart.size() >= 2) {
+            if (getVoteStartCount() >= 2) {
                 this.startTimer();
             }
         }
     }
     
     public boolean hasVotedToStart(NexusPlayer player) {
-        return this.voteStart.contains(player.getUniqueId());
+        return this.players.get(player.getUniqueId()).isVoteStart();
     }
     
     public void removeStartVote(UUID uuid) {
-        this.voteStart.remove(uuid);
-        if (this.voteStart.size() <= 1) {
+        this.players.get(uuid).setVoteStart(false);
+        
+        if (getVoteStartCount() <= 1) {
             if (this.timer != null) {
                 sendMessage("&6&l>> &eNot enough votes to start.");
                 this.timer.cancel();
@@ -647,23 +654,22 @@ public class Lobby {
         if (plugin.getGame() != null) {
             return;
         }
-        for (Set<UUID> value : this.mapVotes.values()) {
-            if (value.contains(nexusPlayer.getUniqueId())) {
-                nexusPlayer.sendMessage("&cYou cannot vote for more than one map.");
-                return;
-            }
-        }
+        
+        LobbyPlayer player = this.players.get(nexusPlayer.getUniqueId());
         
         for (Entry<Integer, Location> entry : this.mapSigns.entrySet()) {
-            boolean contains = this.mapVotes.get(entry.getKey()).contains(nexusPlayer.getUniqueId());
             if (entry.getValue().equals(location)) {
-                if (contains) {
+                if (entry.getKey() == player.getMapVote()) {
                     nexusPlayer.sendMessage("&cYou have already voted for this map.");
                     return;
                 }
                 
-                this.mapVotes.get(entry.getKey()).add(nexusPlayer.getUniqueId());
-                nexusPlayer.sendMessage("&6&l>> &eYou voted for the map &b" + this.mapOptions.get(entry.getKey()).getName());
+                if (player.getMapVote() > -1) {
+                    player.sendMessage("&6&l>> &eYou changed your vote to &b" + this.mapOptions.get(entry.getKey()).getName());
+                } else {
+                    player.sendMessage("&6&l>> &eYou voted for the map &b" + this.mapOptions.get(entry.getKey()).getName());
+                }
+                player.setMapVote(entry.getKey());
                 return;
             }
         }
@@ -682,11 +688,9 @@ public class Lobby {
         this.lobbySettings = settings;
         if (this.timer != null && this.timer.isRunning()) {
             int playerCount = 0;
-            for (NexusPlayer player : getPlayers()) {
-                if (!getSpectatingPlayers().contains(player.getUniqueId())) {
-                    if (!player.getToggles().getValue("vanish")) {
-                        playerCount++;
-                    }
+            for (LobbyPlayer player : getPlayers()) {
+                if (!player.isSpectating()) {
+                    playerCount++;
                 }
             }
             
@@ -703,11 +707,9 @@ public class Lobby {
     
     public int getPlayingCount() {
         int playerCount = 0;
-        for (NexusPlayer player : getPlayers()) {
-            if (!getSpectatingPlayers().contains(player.getUniqueId())) {
-                if (!player.getToggles().getValue("vanish")) {
-                    playerCount++;
-                }
+        for (LobbyPlayer player : getPlayers()) {
+            if (!player.isSpectating()) {
+                playerCount++;
             }
         }
         return playerCount;
@@ -715,10 +717,6 @@ public class Lobby {
     
     public List<StatSign> getStatSigns() {
         return statSigns;
-    }
-    
-    public Map<Integer, Set<UUID>> getMapVotes() {
-        return this.mapVotes;
     }
     
     public List<TributeSign> getTributeSigns() {
@@ -730,7 +728,6 @@ public class Lobby {
         return "Lobby{" +
                 "plugin=" + plugin.getName() +
                 ", players=" + players +
-                ", spectatingPlayers=" + spectatingPlayers +
                 ", timer=" + timer +
                 ", gameSettings=" + gameSettings +
                 ", lobbySettings=" + lobbySettings +
@@ -738,24 +735,22 @@ public class Lobby {
                 ", controlType=" + controlType +
                 ", state=" + state +
                 ", spawnpoint=" + spawnpoint +
-                ", voteStart=" + voteStart +
                 ", mapSigns=" + mapSigns +
                 ", mapOptions=" + mapOptions +
-                ", mapVotes=" + mapVotes +
                 ", forceStarted=" + forceStarted +
                 '}';
     }
     
     public void recalculateVisibility() {
-        for (NexusPlayer player : this.getPlayers()) {
+        for (LobbyPlayer player : this.getPlayers()) {
             Player bukkitPlayer = Bukkit.getPlayer(player.getUniqueId());
-            boolean vanish = player.getToggles().getValue("vanish");
-            for (NexusPlayer other : this.getPlayers()) {
+            boolean vanish = player.getToggleValue("vanish");
+            for (LobbyPlayer other : this.getPlayers()) {
                 Player otherBukkit = Bukkit.getPlayer(other.getUniqueId());
                 if (!vanish) {
                     otherBukkit.showPlayer(bukkitPlayer);
                 } else {
-                    if (other.getRanks().get().ordinal() > Rank.HELPER.ordinal()) {
+                    if (other.getRank().ordinal() > Rank.HELPER.ordinal()) {
                         otherBukkit.hidePlayer(bukkitPlayer);
                     }
                 }

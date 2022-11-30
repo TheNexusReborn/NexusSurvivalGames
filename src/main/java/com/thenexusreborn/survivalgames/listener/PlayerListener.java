@@ -385,7 +385,7 @@ public class PlayerListener implements Listener {
         
         Collection<NexusPlayer> players = new ArrayList<>();
         if (game == null) {
-            players.addAll(plugin.getLobby().getPlayers());
+            plugin.getLobby().getPlayers().forEach(p -> players.add(p.getPlayer()));
         } else {
             for (GamePlayer value : game.getPlayers().values()) {
                 players.add(value.getNexusPlayer());

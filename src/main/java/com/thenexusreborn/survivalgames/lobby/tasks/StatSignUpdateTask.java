@@ -1,12 +1,9 @@
 package com.thenexusreborn.survivalgames.lobby.tasks;
 
-import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.nexuscore.api.NexusTask;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.lobby.Lobby;
-import com.thenexusreborn.survivalgames.lobby.LobbyState;
-import com.thenexusreborn.survivalgames.lobby.StatSign;
+import com.thenexusreborn.survivalgames.lobby.*;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -34,13 +31,13 @@ public class StatSignUpdateTask extends NexusTask<SurvivalGames> {
         }
     
         for (StatSign statSign : lobby.getStatSigns()) {
-            for (NexusPlayer nexusPlayer : lobby.getPlayers()) {
-                Player player = Bukkit.getPlayer(nexusPlayer.getUniqueId());
+            for (LobbyPlayer lobbyPlayer : lobby.getPlayers()) {
+                Player player = Bukkit.getPlayer(lobbyPlayer.getUniqueId());
                 if (player.getWorld() != statSign.getLocation().getWorld()) {
                     continue;
                 }
                 
-                String[] lines = new String[] {MCUtils.color("&n" + statSign.getDisplayName()), "", nexusPlayer.getStats().getValue(statSign.getStat()).get().toString(), ""};
+                String[] lines = new String[] {MCUtils.color("&n" + statSign.getDisplayName()), "", lobbyPlayer.getStatValue(statSign.getStat()).get().toString(), ""};
                 player.sendSignChange(statSign.getLocation(), lines);
             }
         }

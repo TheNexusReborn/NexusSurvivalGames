@@ -19,6 +19,7 @@ import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.Bounty.Type;
 import com.thenexusreborn.survivalgames.game.death.*;
 import com.thenexusreborn.survivalgames.game.timer.*;
+import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
 import com.thenexusreborn.survivalgames.loot.Items;
 import com.thenexusreborn.survivalgames.map.*;
 import com.thenexusreborn.survivalgames.mutations.*;
@@ -54,24 +55,26 @@ public class Game {
     private GamePlayer firstBlood;
     private final Map<Location, Inventory> enderchestInventories = new HashMap<>();
     
-    public Game(GameMap gameMap, GameSettings settings, Collection<NexusPlayer> players, List<UUID> spectatingPlayers) {
+    public Game(GameMap gameMap, GameSettings settings, Collection<LobbyPlayer> players) {
         this.gameMap = gameMap;
         this.settings = settings;
         this.gameInfo = new GameInfo();
         gameInfo.setMapName(this.gameMap.getName().replace("'", "''"));
-        gameInfo.setPlayerCount(players.size() - spectatingPlayers.size());
         gameInfo.setServerName(NexusAPI.getApi().getServerManager().getCurrentServer().getName());
         List<String> playerNames = new ArrayList<>();
-        for (NexusPlayer player : players) {
-            GamePlayer gamePlayer = new GamePlayer(player);
-            if (spectatingPlayers.contains(player.getUniqueId()) || player.getToggles().getValue("vanish")) {
+        int tributeCount = 0;
+        for (LobbyPlayer player : players) {
+            GamePlayer gamePlayer = new GamePlayer(player.getPlayer());
+            if (player.isSpectating()) {
                 gamePlayer.setTeam(GameTeam.SPECTATORS);
             } else {
                 playerNames.add(player.getName());
+                tributeCount++;
             }
             player.setActionBar(new GameActionBar(plugin, gamePlayer));
             this.players.put(gamePlayer.getUniqueId(), gamePlayer);
         }
+        gameInfo.setPlayerCount(tributeCount);
         gameInfo.setPlayers(playerNames.toArray(new String[0]));
         StringBuilder sb = new StringBuilder();
         for (Field field : this.settings.getClass().getDeclaredFields()) {
