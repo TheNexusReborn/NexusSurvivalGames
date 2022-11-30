@@ -26,14 +26,14 @@ import java.util.logging.Level;
 
 public class Lobby {
     private final SurvivalGames plugin;
-    private final Map<UUID, LobbyPlayer> players = new HashMap<>();
-    private Timer timer;
-    private GameSettings gameSettings;
-    private LobbySettings lobbySettings;
-    private GameMap gameMap;
     private ControlType controlType = ControlType.MANUAL;
     private LobbyState state = LobbyState.WAITING;
+    private Timer timer;
+    private final Map<UUID, LobbyPlayer> players = new HashMap<>();
+    private GameSettings gameSettings;
+    private LobbySettings lobbySettings;
     private Location spawnpoint;
+    private GameMap gameMap;
     private final Map<Integer, Location> mapSigns = new HashMap<>();
     private final Map<Integer, GameMap> mapOptions = new HashMap<>();
     private boolean forceStarted;
