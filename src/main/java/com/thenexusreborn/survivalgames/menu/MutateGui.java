@@ -1,7 +1,6 @@
 package com.thenexusreborn.survivalgames.menu;
 
 import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.nexuscore.menu.element.Element;
 import com.thenexusreborn.nexuscore.menu.element.button.Button;
@@ -24,16 +23,16 @@ import java.util.Random;
 import java.util.UUID;
 
 public class MutateGui extends Menu {
-    public MutateGui(SurvivalGames plugin, NexusPlayer player) {
+    public MutateGui(SurvivalGames plugin, GamePlayer player) {
         super(plugin, "mutateas", "&lMutate as...", 3);
 
         PlayerMutations unlockedMutations = plugin.getUnlockedMutations(player.getUniqueId());
 
         if (!unlockedMutations.isUnlocked("pig_zombie")) {
-            unlockedMutations.add(new UnlockedMutation(player.getUniqueId(), "pig_zombie", player.getStats().getValue("firstjoined").getAsLong()));
+            unlockedMutations.add(new UnlockedMutation(player.getUniqueId(), "pig_zombie", player.getStatValue("firstjoined").getAsLong()));
         }
 
-        double credits = player.getStats().getValue("credits").getAsDouble();
+        double credits = player.getStatValue("credits").getAsDouble();
     
         List<String> purchased = new ArrayList<>(), available = new ArrayList<>(), locked = new ArrayList<>();
         for (MutationType type : MutationType.TYPES) {
@@ -103,7 +102,7 @@ public class MutateGui extends Menu {
                     return;
                 }
                 
-                int passes = player.getStats().getValue("sg_mutation_passes").getAsInt();
+                int passes = player.getStatValue("sg_mutation_passes").getAsInt();
                 
                 if (passes <= 0 && !game.getSettings().isUnlimitedPasses()) {
                     player.sendMessage(MsgType.WARN + "You do not have any mutation passes.");
@@ -112,12 +111,12 @@ public class MutateGui extends Menu {
                 
                 double passUseValue = new Random().nextDouble();
                 if (passUseValue <= game.getSettings().getPassUseChance()) {
-                    player.getStats().change("sg_mutation_passes", 1, StatOperator.SUBTRACT);
+                    player.changeStat("sg_mutation_passes", 1, StatOperator.SUBTRACT);
                 } else {
                     player.sendMessage(MsgType.INFO + "&aYou got lucky and you did not use a pass for this mutation!");
                 }
                 
-                player.getStats().change("sg_times_mutated", 1, StatOperator.ADD);
+                player.changeStat("sg_times_mutated", 1, StatOperator.ADD);
     
                 Mutation mutation = Mutation.createInstance(type, player.getUniqueId(), killerUUID);
                 gamePlayer.setMutation(mutation);

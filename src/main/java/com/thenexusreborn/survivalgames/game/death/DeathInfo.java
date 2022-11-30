@@ -1,15 +1,17 @@
 package com.thenexusreborn.survivalgames.game.death;
 
 import com.thenexusreborn.api.helper.NumberHelper;
-import com.thenexusreborn.api.player.NexusPlayer;
-import com.thenexusreborn.nexuscore.util.*;
+import com.thenexusreborn.nexuscore.util.EntityNames;
+import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.*;
+import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.settings.ColorMode;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.*;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -44,10 +46,6 @@ public class DeathInfo {
     
     public GamePlayer getGamePlayer() {
         return game.getPlayer(this.player);
-    }
-    
-    public NexusPlayer getNexusPlayer() {
-        return getGamePlayer().getNexusPlayer();
     }
     
     public UUID getPlayer() {
@@ -88,20 +86,20 @@ public class DeathInfo {
         if (game.getSettings().getColorMode() == ColorMode.GAME_TEAM) {
             playerName = teamColor;
         } else {
-            playerName = gamePlayer.getNexusPlayer().getRanks().get().getColor();
+            playerName = gamePlayer.getRank().getColor();
         }
         
-        playerName += gamePlayer.getNexusPlayer().getName() + "&7";
+        playerName += gamePlayer.getName() + "&7";
         deathMessage = deathMessage.replace("%playername%", playerName);
         
         if (killer != null) {
             if (killer.getType() == EntityType.PLAYER) {
                 String killerName;
-                NexusPlayer killerPlayer = game.getPlayer(killer.getKiller()).getNexusPlayer();
+                GamePlayer killerPlayer = game.getPlayer(killer.getKiller());
                 if (game.getSettings().getColorMode() == ColorMode.GAME_TEAM) {
                     killerName = killer.getTeamColor() + killerPlayer.getName();
                 } else {
-                    killerName = killerPlayer.getRanks().get().getColor() + killerPlayer.getName();
+                    killerName = killerPlayer.getRank().getColor() + killerPlayer.getName();
                 }
                 deathMessage = deathMessage.replace("%killername%", killerName + "&7");
 

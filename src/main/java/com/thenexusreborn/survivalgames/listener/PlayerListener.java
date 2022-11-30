@@ -138,7 +138,7 @@ public class PlayerListener implements Listener {
                             }
                         } else if (item.getType() == Material.ROTTEN_FLESH) {
                             if (gamePlayer.canMutate()) {
-                                player.openInventory(new MutateGui(plugin, gamePlayer.getNexusPlayer()).getInventory());
+                                player.openInventory(new MutateGui(plugin, gamePlayer).getInventory());
                             }
                         } else if (item.getType() == Material.WATCH) {
                             player.teleport(game.getGameMap().getCenter().toLocation(game.getGameMap().getWorld()));
@@ -222,7 +222,7 @@ public class PlayerListener implements Listener {
                             return;
                         }
                         
-                        game.getPlayer(player.getUniqueId()).getNexusPlayer().getStats().change("sg_chests_looted", 1, StatOperator.ADD);
+                        game.getPlayer(player.getUniqueId()).changeStat("sg_chests_looted", 1, StatOperator.ADD);
                         
                         Inventory inv;
                         if (block.getType() == Material.ENDER_CHEST) {
@@ -487,7 +487,7 @@ public class PlayerListener implements Listener {
             }
             
             if (e.getInventory() instanceof EnchantingInventory enchantingInventory) {
-                if (e.getCurrentItem() != null && e.getCurrentItem().getType().equals(Material.INK_SACK)) {
+                if (e.getCurrentItem() != null && e.getCurrentItem().getType() == Material.INK_SACK) {
                     e.setCancelled(true);
                 }
             }

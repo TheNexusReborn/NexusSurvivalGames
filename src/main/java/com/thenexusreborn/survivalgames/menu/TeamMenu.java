@@ -15,11 +15,11 @@ public class TeamMenu extends Menu {
         
         if (plugin.getGame() != null) {
             for (GamePlayer player : plugin.getGame().getPlayers().values()) {
-                if (!player.getNexusPlayer().getToggles().getValue("vanish")) {
+                if (!player.getToggleValue("vanish")) {
                     if (player.getTeam() == team) {
                         ItemStack skull = SpigotUtils.getPlayerSkull(Bukkit.getPlayer(player.getUniqueId()));
                         ItemMeta meta = skull.getItemMeta();
-                        meta.setDisplayName(MCUtils.color(player.getNexusPlayer().getDisplayName()));
+                        meta.setDisplayName(MCUtils.color(player.getDisplayName()));
                         skull.setItemMeta(meta);
                         Button button = new Button(skull);
                         button.setLeftClickAction((p, menu, clickType) -> {

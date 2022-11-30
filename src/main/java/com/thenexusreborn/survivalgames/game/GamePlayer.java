@@ -1,6 +1,10 @@
 package com.thenexusreborn.survivalgames.game;
 
 import com.thenexusreborn.api.player.NexusPlayer;
+import com.thenexusreborn.api.player.Rank;
+import com.thenexusreborn.api.scoreboard.NexusScoreboard;
+import com.thenexusreborn.api.stats.StatOperator;
+import com.thenexusreborn.api.stats.StatValue;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
@@ -29,6 +33,42 @@ public class GamePlayer {
         this.bounty = new Bounty(nexusPlayer.getUniqueId());
         this.combatTag = new CombatTag(nexusPlayer.getUniqueId());
         this.damageInfo = new DamageInfo(nexusPlayer.getUniqueId());
+    }
+
+    public void changeStat(String statName, Object value, StatOperator operator) {
+        getNexusPlayer().getStats().change(statName, value, operator);
+    }
+
+    public StatValue getStatValue(String statName) {
+        return getNexusPlayer().getStats().getValue(statName);
+    }
+
+    public String getColoredName() {
+        return getNexusPlayer().getColoredName();
+    }
+
+    public Rank getRank() {
+        return getNexusPlayer().getRanks().get();
+    }
+
+    public boolean getToggleValue(String toggle) {
+        return getNexusPlayer().getToggles().getValue(toggle);
+    }
+
+    public NexusScoreboard getScoreboard() {
+        return getNexusPlayer().getScoreboard();
+    }
+
+    public String getDisplayName() {
+        return getNexusPlayer().getDisplayName();
+    }
+
+    public String getName() {
+        return getNexusPlayer().getName();
+    }
+
+    public void removeCredits(int credits) {
+        getNexusPlayer().removeCredits(credits);
     }
     
     public NexusPlayer getNexusPlayer() {

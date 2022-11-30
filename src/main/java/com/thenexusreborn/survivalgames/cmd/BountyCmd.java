@@ -1,7 +1,6 @@
 package com.thenexusreborn.survivalgames.cmd;
 
 import com.thenexusreborn.api.helper.NumberHelper;
-import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
@@ -72,27 +71,25 @@ public class BountyCmd implements CommandExecutor {
             }
         }
     
-        NexusPlayer senderNexusPlayer = senderPlayer.getNexusPlayer();
         if (type == Type.SCORE) {
-            if (senderNexusPlayer.getStats().getValue("sg_score").getAsInt() < amount) {
-                senderNexusPlayer.sendMessage(MsgType.WARN + "You do not have enough score to set a bounty of " + amount);
+            if (senderPlayer.getStatValue("sg_score").getAsInt() < amount) {
+                senderPlayer.sendMessage(MsgType.WARN + "You do not have enough score to set a bounty of " + amount);
                 return true;
             } else {
-                senderNexusPlayer.getStats().change("sg_score", amount, StatOperator.SUBTRACT);
+               senderPlayer.changeStat("sg_score", amount, StatOperator.SUBTRACT);
             }
         } else if (type == Type.CREDIT) {
-            if (senderNexusPlayer.getStats().getValue("credits").getAsInt() < amount) {
-                senderNexusPlayer.sendMessage(MsgType.WARN + "You do not have enough credits to set a bounty of " + amount);
+            if (senderPlayer.getStatValue("credits").getAsInt() < amount) {
+                senderPlayer.sendMessage(MsgType.WARN + "You do not have enough credits to set a bounty of " + amount);
                 return true;
             } else {
-                senderNexusPlayer.getStats().change("credits", amount, StatOperator.SUBTRACT);
+                senderPlayer.changeStat("credits", amount, StatOperator.SUBTRACT);
             }
         }
     
-        NexusPlayer nexusPlayer = gamePlayer.getNexusPlayer();
         Bounty bounty = gamePlayer.getBounty();
         bounty.add(type, amount);
-        String coloredName = nexusPlayer.getColoredName();
+        String coloredName = senderPlayer.getColoredName();
         String formattedAmount = NumberHelper.formatNumber(amount);
         String totalFormattedAmount = NumberHelper.formatNumber(bounty.getAmount(type));
         game.sendMessage("&6&l>> &dThe bounty on " + coloredName + " &dwas increased by &b" + formattedAmount + " " + type.name().toLowerCase() + "&d!");

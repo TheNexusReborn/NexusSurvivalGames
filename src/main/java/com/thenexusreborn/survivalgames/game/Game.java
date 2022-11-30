@@ -157,13 +157,13 @@ public class Game {
         
         if (nexusPlayer.getToggles().getValue("vanish")) {
             for (GamePlayer gp : this.players.values()) {
-                if (gp.getNexusPlayer().getRanks().get().ordinal() <= Rank.HELPER.ordinal() || gp.getUniqueId().equals(nexusPlayer.getUniqueId())) {
+                if (gp.getRank().ordinal() <= Rank.HELPER.ordinal() || gp.getUniqueId().equals(nexusPlayer.getUniqueId())) {
                     gp.sendMessage("&a&l>> " + nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName() + " &ejoined &e&overy silently&e.");
                 }
             }
         } else if (nexusPlayer.getToggles().getValue("incognito")) {
             for (GamePlayer gp : this.players.values()) {
-                if (gp.getNexusPlayer().getRanks().get().ordinal() <= Rank.HELPER.ordinal() || gp.getUniqueId().equals(nexusPlayer.getUniqueId())) {
+                if (gp.getRank().ordinal() <= Rank.HELPER.ordinal() || gp.getUniqueId().equals(nexusPlayer.getUniqueId())) {
                     gp.sendMessage("&a&l>> " + nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName() + " &ejoined &e&osilently&e.");
                 }
             }
@@ -192,13 +192,13 @@ public class Game {
         
         if (nexusPlayer.getToggles().getValue("vanish")) {
             for (GamePlayer gp : this.players.values()) {
-                if (gp.getNexusPlayer().getRanks().get().ordinal() <= Rank.HELPER.ordinal()) {
+                if (gp.getRank().ordinal() <= Rank.HELPER.ordinal()) {
                     gp.sendMessage("&c&l<< " + nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName() + " &eleft &e&overy silently&e.");
                 }
             }
         } else if (nexusPlayer.getToggles().getValue("incognito")) {
             for (GamePlayer gp : this.players.values()) {
-                if (gp.getNexusPlayer().getRanks().get().ordinal() <= Rank.HELPER.ordinal()) {
+                if (gp.getRank().ordinal() <= Rank.HELPER.ordinal()) {
                     gp.sendMessage("&c&l<< " + nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName() + " &eleft &e&osilently&e.");
                 }
             }
@@ -285,9 +285,9 @@ public class Game {
                     continue;
                 }
                 
-                if (gamePlayer.getNexusPlayer().getToggles().getValue("vanish")) {
+                if (gamePlayer.getToggleValue("vanish")) {
                     player.showPlayer(other);
-                    if (otherGamePlayer.getNexusPlayer().getRanks().get().ordinal() > Rank.HELPER.ordinal()) {
+                    if (otherGamePlayer.getRank().ordinal() > Rank.HELPER.ordinal()) {
                         other.hidePlayer(player);
                     }
                 } else if (gamePlayer.getTeam() != GameTeam.SPECTATORS && otherGamePlayer.getTeam() != GameTeam.SPECTATORS) {
@@ -386,7 +386,7 @@ public class Game {
             }
             
             for (GamePlayer player : new ArrayList<>(this.players.values())) {
-                player.getNexusPlayer().getScoreboard().setTablistHandler(new GameTablistHandler(player.getNexusPlayer().getScoreboard(), plugin));
+                player.getScoreboard().setTablistHandler(new GameTablistHandler(player.getScoreboard(), plugin));
             }
             
             setState(TEAMS_ASSIGNED);
@@ -400,7 +400,7 @@ public class Game {
         setState(SETTING_UP);
         
         for (GamePlayer player : this.players.values()) {
-            player.getNexusPlayer().getScoreboard().setView(new DefaultGameBoard(player.getNexusPlayer().getScoreboard(), plugin));
+            player.getScoreboard().setView(new DefaultGameBoard(player.getScoreboard(), plugin));
         }
         
         new BukkitRunnable() {
@@ -563,7 +563,7 @@ public class Game {
             for (GamePlayer player : this.players.values()) {
                 if (player.getTeam() == GameTeam.TRIBUTES) {
                     tributes.add(player.getUniqueId());
-                    player.getNexusPlayer().getStats().change("sg_deathmatches_reached", 1, StatOperator.ADD);
+                    player.changeStat("sg_deathmatches_reached", 1, StatOperator.ADD);
                 } else {
                     spectators.add(player.getUniqueId());
                 }
@@ -660,20 +660,19 @@ public class Game {
         GamePlayer winner = null;
         for (GamePlayer player : this.players.values()) {
             if (player.getTeam() == GameTeam.TRIBUTES) {
-                player.getNexusPlayer().getStats().change("sg_games", 1, StatOperator.ADD);
+                player.changeStat("sg_games", 1, StatOperator.ADD);
                 if (winner == null) {
                     winner = player;
                 } else {
-                    winner = null; //More than one winner
+                    winner = null;
                     break;
                 }
             }
         }
         
         String winnerName;
-        NexusPlayer winnerPlayer = (winner != null) ? winner.getNexusPlayer() : null;
         if (winner != null) {
-            winnerName = winnerPlayer.getDisplayName();
+            winnerName = winner.getDisplayName();
         } else {
             winnerName = "&f&lNo one";
         }
@@ -681,10 +680,10 @@ public class Game {
         sendMessage("&6&l>> " + winnerName + " &a&lhas won Survival Games!");
         
         if (winner != null) {
-            winnerPlayer.getStats().change("sg_wins", 1, StatOperator.ADD);
-            winnerPlayer.getStats().change("sg_win_streak", 1, StatOperator.ADD);
+            winner.changeStat("sg_wins", 1, StatOperator.ADD);
+            winner.changeStat("sg_win_streak", 1, StatOperator.ADD);
             int winGain = 50;
-            int currentScore = winnerPlayer.getStats().getValue("sg_score").getAsInt();
+            int currentScore = winner.getStatValue("sg_score").getAsInt();
             if (currentScore < 100 && currentScore > 50) {
                 winGain *= 1.25;
             } else if (currentScore <= 50 && currentScore > 25) {
@@ -698,15 +697,15 @@ public class Game {
             } else if (currentScore >= 1000) {
                 winGain *= .5;
             }
-            winnerPlayer.getStats().change("sg_score", winGain, StatOperator.ADD);
+            winner.changeStat("sg_score", winGain, StatOperator.ADD);
             winner.sendMessage("&2&l>> &a+" + winGain + " Score!");
-            double multiplier = winnerPlayer.getRanks().get().getMultiplier();
-            Rank rank = winnerPlayer.getRanks().get();
+            double multiplier = winner.getRank().getMultiplier();
+            Rank rank = winner.getRank();
             String multiplierMessage = rank.getColor() + "&l * x" + MCUtils.formatNumber(multiplier) + " " + rank.getPrefix() + " Bonus";
             if (settings.isGiveXp()) {
                 double xp = 10;
                 xp *= multiplier;
-                winnerPlayer.getStats().change("xp", xp, StatOperator.ADD);
+                winner.changeStat("xp", xp, StatOperator.ADD);
                 String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(xp) + " &2&lXP&a&l!";
                 if (multiplier > 1) {
                     winner.sendMessage(baseMessage + multiplierMessage);
@@ -718,7 +717,7 @@ public class Game {
             if (settings.isGiveCredits()) {
                 double credits = 10;
                 credits *= multiplier;
-                winnerPlayer.getStats().change("credits", credits, StatOperator.ADD);
+                winner.changeStat("credits", credits, StatOperator.ADD);
                 String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(credits) + " &3&lCREDITS&a&l!";
                 if (multiplier > 1) {
                     winner.sendMessage(baseMessage + multiplierMessage);
@@ -729,21 +728,21 @@ public class Game {
             
             double passWinValue = new Random().nextDouble();
             if (passWinValue <= getSettings().getPassRewardChance()) {
-                winnerPlayer.getStats().change("sg_mutation_passes", 1, StatOperator.ADD);
-                winnerPlayer.sendMessage("&2&l>> &a&lYou won a mutation pass! Great job!");
+                winner.changeStat("sg_mutation_passes", 1, StatOperator.ADD);
+                winner.sendMessage("&2&l>> &a&lYou won a mutation pass! Great job!");
             } else {
-                winnerPlayer.sendMessage(MsgType.INFO + "You did not win a mutation pass this time.");
+                winner.sendMessage(MsgType.INFO + "You did not win a mutation pass this time.");
             }
             
             Bounty bounty = winner.getBounty();
             for (Type type : Type.values()) {
                 double amount = bounty.getAmount(type);
                 if (amount > 0) {
-                    sendMessage("&6&l>> For winning the game, " + winnerPlayer.getColoredName() + " &6&l has kept their &b&l" + NumberHelper.formatNumber(amount) + " " + StringHelper.capitalizeEveryWord(type.name()) + " &6&lbounty!");
+                    sendMessage("&6&l>> For winning the game, " + winner.getColoredName() + " &6&l has kept their &b&l" + NumberHelper.formatNumber(amount) + " " + StringHelper.capitalizeEveryWord(type.name()) + " &6&lbounty!");
                     if (type == Type.CREDIT) {
-                        winnerPlayer.getStats().change("credits", (int) amount, StatOperator.ADD);
+                        winner.changeStat("credits", (int) amount, StatOperator.ADD);
                     } else if (type == Type.SCORE) {
-                        winnerPlayer.getStats().change("sg_score", (int) amount, StatOperator.ADD);
+                        winner.changeStat("sg_score", (int) amount, StatOperator.ADD);
                     }
                 }
             }
@@ -752,13 +751,13 @@ public class Game {
         gameInfo.setGameStart(this.start);
         gameInfo.setGameEnd(this.end);
         if (winner != null) {
-            gameInfo.setWinner(winnerPlayer.getName());
+            gameInfo.setWinner(winner.getName());
         } else {
             gameInfo.setWinner("No one");
         }
         
         if (this.firstBlood != null) {
-            gameInfo.setFirstBlood(firstBlood.getNexusPlayer().getName());
+            gameInfo.setFirstBlood(firstBlood.getName());
         } else {
             gameInfo.setFirstBlood("No one");
         }
@@ -867,9 +866,7 @@ public class Game {
         gamePlayer.setDeathByMutation(killer != null && killer.isMutationKill());
         
         boolean vanished = deathInfo.getType() == com.thenexusreborn.survivalgames.game.death.DeathType.VANISH;
-        NexusPlayer nexusPlayer = gamePlayer.getNexusPlayer();
-        PlayerStats stats = nexusPlayer.getStats();
-        int score = stats.getValue("sg_score").getAsInt();
+        int score = gamePlayer.getStatValue("sg_score").getAsInt();
         int lost = (int) Math.ceil(score / 10D);
         if (score - lost < 0) {
             lost = 0;
@@ -877,13 +874,13 @@ public class Game {
         
         if (!vanished) {
             if (lost > 0) {
-                stats.change("sg_score", lost, StatOperator.SUBTRACT);
+                gamePlayer.changeStat("sg_score", lost, StatOperator.SUBTRACT);
             }
-            stats.change("sg_games", 1, StatOperator.ADD);
-            stats.change("sg_win_streak", 0, StatOperator.SET);
-            stats.change("sg_deaths", 1, StatOperator.ADD);
+            gamePlayer.changeStat("sg_games", 1, StatOperator.ADD);
+            gamePlayer.changeStat("sg_win_streak", 0, StatOperator.SET);
+            gamePlayer.changeStat("sg_deaths", 1, StatOperator.ADD);
             if (oldTeam == GameTeam.MUTATIONS) {
-                gamePlayer.getNexusPlayer().getStats().change("sg_mutation_deaths", 1, StatOperator.ADD);
+                gamePlayer.changeStat("sg_mutation_deaths", 1, StatOperator.ADD);
             }
         }
         
@@ -899,8 +896,7 @@ public class Game {
         double creditBounty = bounty.getAmount(Bounty.Type.CREDIT);
         if (playerKiller) {
             GamePlayer killerPlayer = getPlayer(killer.getKiller());
-            PlayerStats killerStats = killerPlayer.getNexusPlayer().getStats();
-            killerRank = killerPlayer.getNexusPlayer().getRanks().get();
+            killerRank = killerPlayer.getRank();
             scoreGain = lost;
             
             if (this.firstBlood == null) {
@@ -918,15 +914,15 @@ public class Game {
                 bounty.remove(Bounty.Type.SCORE);
             }
             
-            killerStats.change("sg_score", scoreGain, StatOperator.ADD);
+            killerPlayer.changeStat("sg_score", scoreGain, StatOperator.ADD);
             
             killerPlayer.setKillStreak(killerPlayer.getKillStreak() + 1);
             currentStreak = killerPlayer.getKillStreak();
             killerPlayer.setKills(killerPlayer.getKills() + 1);
-            personalBest = killerStats.getValue("sg_highest_kill_streak").getAsInt();
+            personalBest = killerPlayer.getStatValue("sg_highest_kill_streak").getAsInt();
             
             if (currentStreak > personalBest) {
-                killerStats.change("sg_highest_kill_streak", currentStreak, StatOperator.SET);
+                killerPlayer.changeStat("sg_highest_kill_streak", currentStreak, StatOperator.SET);
             }
             
             if (getSettings().isGiveXp()) {
@@ -934,7 +930,7 @@ public class Game {
                 if (getSettings().isMultiplier()) {
                     xpGain *= killerRank.getMultiplier();
                 }
-                killerStats.change("xp", xpGain, StatOperator.ADD);
+                killerPlayer.changeStat("xp", xpGain, StatOperator.ADD);
             }
             
             if (getSettings().isGiveCredits()) {
@@ -949,12 +945,12 @@ public class Game {
                     claimedCreditBounty = true;
                 }
                 
-                killerStats.change("credits", creditGain, StatOperator.ADD);
+                killerPlayer.changeStat("credits", creditGain, StatOperator.ADD);
             }
             
-            killerStats.change("sg_kills", 1, StatOperator.ADD);
+            killerPlayer.changeStat("sg_kills", 1, StatOperator.ADD);
             if (killer.isMutationKill()) {
-                killerStats.change("sg_mutation_kills", 1, StatOperator.ADD);
+                killerPlayer.changeStat("sg_mutation_kills", 1, StatOperator.ADD);
                 removeMutation(killerPlayer.getMutation());
                 killerPlayer.sendMessage(killerPlayer.getTeam().getLeaveMessage());
                 killerPlayer.setTeam(GameTeam.TRIBUTES);
@@ -973,7 +969,7 @@ public class Game {
                 
                 GamePlayer assisterPlayer = getPlayer(damager);
                 assisterPlayer.setAssists(assisterPlayer.getAssists() + 1);
-                assisterPlayer.getNexusPlayer().getStats().change("sg_assists", 1, StatOperator.ADD);
+                assisterPlayer.changeStat("sg_assists", 1, StatOperator.ADD);
                 assisters.add(assisterPlayer);
             }
         }
@@ -1012,7 +1008,7 @@ public class Game {
                     gp.sendMessage(gp.getTeam().getJoinMessage());
                 } else {
                     mutation.setTarget(killer.getKiller());
-                    gp.sendMessage("&6&l>> &cYour target died, your  new target is &a" + getPlayer(killer.getKiller()).getNexusPlayer().getName());
+                    gp.sendMessage("&6&l>> &cYour target died, your  new target is &a" + getPlayer(killer.getKiller()).getName());
                 }
             }
         }
@@ -1045,7 +1041,7 @@ public class Game {
         
         if (killerPlayer != null) {
             if (killer.isMutationKill()) {
-                sendMessage("&6&l>> " + killerPlayer.getNexusPlayer().getColoredName() + " &ahas taken revenge and is back in the game!");
+                sendMessage("&6&l>> " + killerPlayer.getColoredName() + " &ahas taken revenge and is back in the game!");
             }
             if (currentStreak > personalBest) {
                 if (!killerPlayer.isNewPersonalBestNotified()) {
@@ -1088,11 +1084,11 @@ public class Game {
         gamePlayer.sendMessage("&4&l>> &cYou lost " + lost + " Points for dying!");
         sendMessage("&6&l>> " + oldTeam.getRemainColor() + "&l" + oldTeamRemaining + " " + oldTeam.name().toLowerCase() + " remain.");
         if (claimedFirstBlood) {
-            sendMessage("&6&l>> &c&l" + firstBlood.getNexusPlayer().getName().toUpperCase() + " CLAIMED FIRST BLOOD!");
+            sendMessage("&6&l>> &c&l" + firstBlood.getName().toUpperCase() + " CLAIMED FIRST BLOOD!");
         }
         
         if (killerPlayer != null) {
-            String killerName = killerPlayer.getNexusPlayer().getColoredName();
+            String killerName = killerPlayer.getColoredName();
             String killerHealth = NumberHelper.formatNumber(killer.getHealth());
             gamePlayer.sendMessage("&4&l>> &cYour killer &8(" + killerName + "&8) &chad &4" + killerHealth + " HP &cremaining!");
         }
@@ -1101,11 +1097,11 @@ public class Game {
         gamePlayer.sendMessage(GameTeam.SPECTATORS.getJoinMessage());
         
         if (claimedScoreBounty) {
-            sendMessage("&6&l>> " + killerPlayer.getNexusPlayer().getColoredName() + " &6&lhas claimed the &b&l" + scoreBounty + " Score &6&lbounty on " + nexusPlayer.getColoredName());
+            sendMessage("&6&l>> " + killerPlayer.getColoredName() + " &6&lhas claimed the &b&l" + scoreBounty + " Score &6&lbounty on " + gamePlayer.getColoredName());
         }
         
         if (claimedCreditBounty && settings.isGiveCredits()) {
-            sendMessage("&6&l>> " + killerPlayer.getNexusPlayer().getColoredName() + " &6&lhas claimed the &b&l" + scoreBounty + " Credit &6&lbounty on " + nexusPlayer.getColoredName());
+            sendMessage("&6&l>> " + killerPlayer.getColoredName() + " &6&lhas claimed the &b&l" + scoreBounty + " Credit &6&lbounty on " + gamePlayer.getColoredName());
         }
         
         playSound(oldTeam.getDeathSound());
@@ -1144,9 +1140,9 @@ public class Game {
                 if (getSettings().isUnlimitedPasses()) {
                     passes = "Unlimited";
                 } else {
-                    passes = gamePlayer.getNexusPlayer().getStats().getValue("sg_mutation_passes").getAsInt() + "";
+                    passes = gamePlayer.getStatValue("sg_mutation_passes").getAsInt() + "";
                 }
-                mutateName = "&c&lTAKE REVENGE   &eTarget: " + killer.getNexusPlayer().getColoredName() + "   &ePasses: &b" + passes;
+                mutateName = "&c&lTAKE REVENGE   &eTarget: " + killer.getColoredName() + "   &ePasses: &b" + passes;
             }
         }
         ItemStack mutateItem = ItemBuilder.start(Material.ROTTEN_FLESH).displayName(mutateName).build();
@@ -1234,12 +1230,11 @@ public class Game {
     
     public void addMutation(Mutation mutation) {
         GamePlayer gamePlayer = getPlayer(mutation.getPlayer());
-        NexusPlayer nexusPlayer = gamePlayer.getNexusPlayer();
-        sendMessage("&6&l>> " + nexusPlayer.getColoredName() + " &6has &lMUTATED &6as a(n) &l" + mutation.getType().getDisplayName() + " &6and seeks revenge on &a" + Bukkit.getPlayer(mutation.getTarget()).getName() + "&6!");
+        sendMessage("&6&l>> " + gamePlayer.getColoredName() + " &6has &lMUTATED &6as a(n) &l" + mutation.getType().getDisplayName() + " &6and seeks revenge on &a" + Bukkit.getPlayer(mutation.getTarget()).getName() + "&6!");
         
         MapSpawn spawn = gameMap.getSpawns().get(new Random().nextInt(gameMap.getSpawns().size()));
         Location location = spawn.toLocation(this.gameMap.getWorld());
-        Player player = Bukkit.getPlayer(nexusPlayer.getUniqueId());
+        Player player = Bukkit.getPlayer(gamePlayer.getUniqueId());
         
         gamePlayer.sendMessage(gamePlayer.getTeam().getLeaveMessage());
         gamePlayer.setTeam(GameTeam.MUTATIONS);
@@ -1290,7 +1285,7 @@ public class Game {
     
     public GamePlayer getPlayer(String name) {
         for (GamePlayer gamePlayer : new ArrayList<>(this.players.values())) {
-            if (gamePlayer.getNexusPlayer().getName().equalsIgnoreCase(name)) {
+            if (gamePlayer.getName().equalsIgnoreCase(name)) {
                 return gamePlayer;
             }
         }
