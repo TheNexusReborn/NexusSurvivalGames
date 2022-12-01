@@ -1056,8 +1056,10 @@ public class Game {
             killerPlayer.sendMessage("&6&l>> &f&lCurrent Streak: &a" + currentStreak + "  &f&lPersonal Best: &a" + personalBest);
             killerPlayer.sendMessage("&2&l>> &a+" + scoreGain + " Score!" + (claimedScoreBounty ? " &e&lClaimed Bounty" : "") + (claimedFirstBlood ? " &c&lFirst Blood" : ""));
             double multiplier = killerRank.getMultiplier();
-            String multiplierMessage = killerRank.getColor() + "&l * x" + MCUtils.formatNumber(multiplier) + " " + killerRank.getPrefix() + " Bonus";
-            
+            String multiplierMessage = "";
+            if (multiplier > 1) {
+                multiplierMessage = killerRank.getColor() + "&l * x" + MCUtils.formatNumber(multiplier) + " " + killerRank.getPrefix() + " Bonus";
+            }
             if (settings.isGiveXp()) {
                 String xpMsg = "&2&l>> &a&l+" + xpGain + " &2&lXP&a&l!";
                 if (settings.isMultiplier()) {
