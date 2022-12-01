@@ -26,7 +26,7 @@ public class GamePlayer {
     private Bounty bounty;
     private CombatTag combatTag;
     private DamageInfo damageInfo;
-    private Map<Long, DeathInfo> newDeathInfos = new TreeMap<>();
+    private Map<Long, DeathInfo> deaths = new TreeMap<>();
     
     public GamePlayer(NexusPlayer nexusPlayer) {
         this.nexusPlayer = nexusPlayer;
@@ -207,12 +207,12 @@ public class GamePlayer {
         getCombatTag().setOther(other.getUniqueId());
     }
     
-    public void addDeathInfo(com.thenexusreborn.survivalgames.game.death.DeathInfo deathInfo) {
-        this.newDeathInfos.put(deathInfo.getTime(), deathInfo);
+    public void addDeathInfo(DeathInfo deathInfo) {
+        this.deaths.put(deathInfo.getTime(), deathInfo);
     }
     
-    public Map<Long, com.thenexusreborn.survivalgames.game.death.DeathInfo> getNewDeathInfos() {
-        return newDeathInfos;
+    public Map<Long, DeathInfo> getDeaths() {
+        return deaths;
     }
     
     public int getAssists() {
@@ -224,7 +224,7 @@ public class GamePlayer {
     }
 
     public boolean killedByPlayer() {
-        for (DeathInfo death : this.newDeathInfos.values()) {
+        for (DeathInfo death : this.deaths.values()) {
             if (death.getKiller() != null) {
                 if (death.getKiller().getType() == EntityType.PLAYER) {
                     return true;
@@ -235,7 +235,7 @@ public class GamePlayer {
     }
 
     public UUID getKiller() {
-        for (DeathInfo death : this.newDeathInfos.values()) {
+        for (DeathInfo death : this.deaths.values()) {
             if (death.getKiller() != null) {
                 if (death.getKiller().getType() == EntityType.PLAYER) {
                     return death.getKiller().getKiller();
