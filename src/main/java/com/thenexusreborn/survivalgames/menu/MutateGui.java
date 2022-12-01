@@ -111,7 +111,9 @@ public class MutateGui extends Menu {
                 
                 double passUseValue = new Random().nextDouble();
                 if (passUseValue <= game.getSettings().getPassUseChance()) {
-                    player.changeStat("sg_mutation_passes", 1, StatOperator.SUBTRACT);
+                    if (!game.getSettings().isUnlimitedPasses()) {
+                        player.changeStat("sg_mutation_passes", 1, StatOperator.SUBTRACT);
+                    }
                 } else {
                     player.sendMessage(MsgType.INFO + "&aYou got lucky and you did not use a pass for this mutation!");
                 }
