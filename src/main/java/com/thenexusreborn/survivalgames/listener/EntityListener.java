@@ -100,7 +100,7 @@ public class EntityListener implements Listener {
             } else if (e.getEntity() instanceof ItemFrame || e.getEntity() instanceof ArmorStand) {
                 e.setCancelled(true);
             } else if (e.getDamager() instanceof Projectile projectile) {
-                if (!(e.getDamager() instanceof Snowball || e.getDamager() instanceof Egg || e.getDamager() instanceof Arrow)) {
+                if (!(e.getDamager() instanceof Snowball || e.getDamager() instanceof Egg || e.getDamager() instanceof Arrow || e.getDamager() instanceof FishHook)) {
                     return;
                 }
                 
