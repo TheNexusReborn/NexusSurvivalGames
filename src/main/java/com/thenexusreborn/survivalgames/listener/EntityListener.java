@@ -29,7 +29,7 @@ public class EntityListener implements Listener {
     }
     
     @EventHandler
-    public void onEntityDamageByEntity(EntityDamageEvent e) {
+    public void onEntityDamage(EntityDamageEvent e) {
         if (plugin.getGame() != null) {
             Game game = plugin.getGame();
             if (!(e.getEntity() instanceof Player)) {

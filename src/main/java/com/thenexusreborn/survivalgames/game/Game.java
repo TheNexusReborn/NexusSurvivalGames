@@ -1251,6 +1251,7 @@ public class Game {
         player.getInventory().setArmorContents(null);
         player.setAllowFlight(false);
         player.setFlying(false);
+        player.spigot().setCollidesWithEntities(true);
         player.setSaturation(20);
         
         MutationType type = mutation.getType();
