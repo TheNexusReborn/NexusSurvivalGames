@@ -50,6 +50,6 @@ public final class CombatTag {
     }
     
     public boolean isInCombat() {
-        return this.other != null && System.currentTimeMillis() < this.timestamp + 5000;
+        return this.other != null && System.currentTimeMillis() < this.timestamp + 10000;
     }
 }

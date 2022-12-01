@@ -9,6 +9,7 @@ import com.thenexusreborn.survivalgames.game.GameTeam;
 
 import java.util.ArrayList;
 
+//TODO Use a Timer for combat tags
 public class CombatTagTask extends NexusTask<SurvivalGames> {
     public CombatTagTask(SurvivalGames plugin) {
         super(plugin, 5L, 0L, false);
@@ -31,7 +32,7 @@ public class CombatTagTask extends NexusTask<SurvivalGames> {
                 continue;
             }
             
-            if (combatTag.getTimestamp() + 5000 > System.currentTimeMillis()) {
+            if (combatTag.getTimestamp() + 10000 > System.currentTimeMillis()) {
                 continue;
             }
             
