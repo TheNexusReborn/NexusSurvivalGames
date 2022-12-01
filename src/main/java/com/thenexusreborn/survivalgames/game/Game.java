@@ -848,6 +848,7 @@ public class Game {
     
     public void killPlayer(GamePlayer gamePlayer, DeathInfo deathInfo) {
         GameTeam oldTeam = gamePlayer.getTeam();
+        gamePlayer.addDeathInfo(deathInfo);
         gamePlayer.setTeam(GameTeam.SPECTATORS);
         recalculateVisibility();
         Player player = Bukkit.getPlayer(gamePlayer.getUniqueId());
