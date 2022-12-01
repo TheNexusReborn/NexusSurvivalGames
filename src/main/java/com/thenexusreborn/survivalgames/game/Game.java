@@ -864,7 +864,6 @@ public class Game {
             giveSpectatorItems(player);
         }
         
-        gamePlayer.addDeathInfo(deathInfo);
         gamePlayer.setSpectatorByDeath(deathInfo.getType() != com.thenexusreborn.survivalgames.game.death.DeathType.LEAVE);
         KillerInfo killer = deathInfo.getKiller();
         gamePlayer.setDeathByMutation(killer != null && killer.isMutationKill());
