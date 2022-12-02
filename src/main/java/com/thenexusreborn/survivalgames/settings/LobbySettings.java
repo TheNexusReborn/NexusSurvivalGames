@@ -11,6 +11,7 @@ public class LobbySettings extends SGSettings {
     private int minPlayers = 4;
     private int maxGames = 10;
     private int timerLength = 30;
+    private int voteStartThreshold = 2;
     private boolean voteWeight = true;
     private boolean keepPreviousGameSettings = true;
     private boolean sounds = true;
@@ -82,6 +83,15 @@ public class LobbySettings extends SGSettings {
     
     public LobbySettings setSounds(boolean sounds) {
         this.sounds = sounds;
+        return this;
+    }
+    
+    public int getVoteStartThreshold() {
+        return voteStartThreshold;
+    }
+    
+    public LobbySettings setVoteStartThreshold(int voteStartThreshold) {
+        this.voteStartThreshold = voteStartThreshold;
         return this;
     }
     

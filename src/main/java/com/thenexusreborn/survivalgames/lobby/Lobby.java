@@ -626,9 +626,15 @@ public class Lobby {
     
     public void addStartVote(NexusPlayer player) {
         this.players.get(player.getUniqueId()).setVoteStart(true);
-        sendMessage("&6&l>> " + player.getRank().getColor() + player.getName() + " &ehas voted to start the lobby.");
+        sendMessage("&6&l>> " + player.getColoredName() + " &evoted to run the game early. &7&o(/votestart)");
+        int votes = getVoteStartCount();
+        int threshold = getLobbySettings().getVoteStartThreshold();
+        int neededVotes = Math.max(threshold - votes, 0);
+        sendMessage("&6&l>> &eVotes: &l" + votes + "/" + threshold + " &f(" + neededVotes + " Votes Needed)");
+        
         if (this.state == LobbyState.WAITING) {
-            if (getVoteStartCount() >= 2) {
+            if (votes >= threshold) {
+                sendMessage("&6&l>> &f&lThe game lobby has been started!");
                 this.startTimer();
             }
         }
