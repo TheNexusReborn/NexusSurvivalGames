@@ -24,6 +24,7 @@ public final class Items {
     public static final LootItem APPLE = new LootItem(Material.APPLE);
     public static final LootItem MELON = new LootItem(Material.MELON);
     public static final LootItem GOLDEN_MUNCHIE = new LootItem(Material.GOLDEN_APPLE, "Golden Munchie");
+    public static final LootItem COOKIE = new LootItem(Material.COOKIE);
     
     public static final LootItem LEATHER_HELMET = new LootItem(Material.LEATHER_HELMET);
     public static final LootItem LEATHER_CHESTPLATE = new LootItem(Material.LEATHER_CHESTPLATE);
