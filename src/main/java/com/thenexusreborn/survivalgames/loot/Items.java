@@ -55,8 +55,8 @@ public final class Items {
     public static final LootItem BOW = new LootItem(Material.BOW);
     
     public static final LootItem ARROW = new LootItem(Material.ARROW);
-    public static final LootItem EGG_OF_DOOM = new LootItem(Material.EGG, "Egg of Doom");
-    public static final LootItem SLOWBALL = new LootItem(Material.SNOW_BALL, "Slowball");
+    public static final LootItem EGG_OF_DOOM = new LootItem(Material.EGG, "Egg of Doom &8- &7Hunger and Confusion");
+    public static final LootItem SLOWBALL = new LootItem(Material.SNOW_BALL, "Slowball &8- &7Slowness");
     public static final LootItem TNT = new LootItem(Material.TNT, "TNT");
     public static final LootItem COBWEB = new LootItem(Material.WEB, "Cobweb");
     public static final LootItem XP_BOTTLE = new LootItem(Material.EXP_BOTTLE, "XP Bottle");
