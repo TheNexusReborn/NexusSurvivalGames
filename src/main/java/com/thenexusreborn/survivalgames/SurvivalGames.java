@@ -2,6 +2,7 @@ package com.thenexusreborn.survivalgames;
 
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.network.cmd.NetworkCommand;
+import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.registry.*;
 import com.thenexusreborn.api.server.Environment;
 import com.thenexusreborn.api.stats.StatType;
@@ -182,6 +183,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         getCommand("spectate").setExecutor(new SpectateCommand(this));
         getCommand("map").setExecutor(new MapCommand(this));
         getCommand("bounty").setExecutor(new BountyCmd(this));
+        getCommand("spectatorchat").setExecutor(nexusCore.getToggleCmdExecutor());
         
         getLogger().info("Registered commands");
         
@@ -234,6 +236,11 @@ public class SurvivalGames extends NexusSpigotPlugin {
         registry.register("sg_mutation_passes", "Mutation Passes", StatType.INTEGER, 0);
         registry.register("sg_sponsored_others", "Times Sponsored Others", StatType.INTEGER, 0);
         registry.register("sg_sponsors_received", "Times Sponsored By Others", StatType.INTEGER, 0);
+    }
+    
+    @Override
+    public void registerToggles(ToggleRegistry registry) {
+        registry.register("spectatorchat", Rank.HELPER, "View Spectator Chat", "Allows you to see the spectator chat", false);
     }
     
     public int getGamesPlayed() {

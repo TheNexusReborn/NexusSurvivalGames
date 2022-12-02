@@ -61,7 +61,7 @@ public class SGChatHandler implements ChatHandler {
             if (game.getState().ordinal() >= GameState.INGAME_GRACEPERIOD.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal()) {
                 if (game.getPlayer(player.getUniqueId()).getTeam() != GameTeam.TRIBUTES) {
                     for (GamePlayer p : game.getPlayers().values()) {
-                        if (p.getTeam() != GameTeam.TRIBUTES) {
+                        if (p.getTeam() != GameTeam.TRIBUTES || p.getToggleValue("spectatorchat")) {
                             p.sendMessage(format);
                             game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "deadchat", e.getPlayer().getName() + ":" + e.getMessage().replace("'", "''")));
                         }
