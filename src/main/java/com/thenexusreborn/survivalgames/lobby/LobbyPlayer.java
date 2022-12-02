@@ -51,11 +51,11 @@ public class LobbyPlayer {
     }
     
     public Rank getRank() {
-        return getPlayer().getRanks().get();
+        return getPlayer().getRank();
     }
     
     public boolean getToggleValue(String toggle) {
-        return getPlayer().getToggles().getValue(toggle);
+        return getPlayer().getToggleValue(toggle);
     }
     
     public UUID getUniqueId() {
@@ -71,6 +71,6 @@ public class LobbyPlayer {
     }
     
     public StatValue getStatValue(String statName) {
-        return getPlayer().getStats().getValue(statName);
+        return getPlayer().getStatValue(statName);
     }
 }

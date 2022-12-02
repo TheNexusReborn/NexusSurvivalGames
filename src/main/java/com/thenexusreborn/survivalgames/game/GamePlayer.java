@@ -36,11 +36,11 @@ public class GamePlayer {
     }
 
     public void changeStat(String statName, Object value, StatOperator operator) {
-        getNexusPlayer().getStats().change(statName, value, operator);
+        getNexusPlayer().changeStat(statName, value, operator);
     }
 
     public StatValue getStatValue(String statName) {
-        return getNexusPlayer().getStats().getValue(statName);
+        return getNexusPlayer().getStatValue(statName);
     }
 
     public String getColoredName() {
@@ -48,11 +48,11 @@ public class GamePlayer {
     }
 
     public Rank getRank() {
-        return getNexusPlayer().getRanks().get();
+        return getNexusPlayer().getRank();
     }
 
     public boolean getToggleValue(String toggle) {
-        return getNexusPlayer().getToggles().getValue(toggle);
+        return getNexusPlayer().getToggleValue(toggle);
     }
 
     public NexusScoreboard getScoreboard() {

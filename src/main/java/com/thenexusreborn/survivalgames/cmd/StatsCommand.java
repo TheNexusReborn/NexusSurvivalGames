@@ -66,7 +66,7 @@ public class StatsCommand implements CommandExecutor {
                     return;
                 }
 
-                sender.sendMessage(MCUtils.color("&6&l>> &aSurvival Games Stats for " + nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName()));
+                sender.sendMessage(MCUtils.color("&6&l>> &aSurvival Games Stats for " + nexusPlayer.getRank() + nexusPlayer.getName()));
                 for (Stat stat : nexusPlayer.getStats().findAll()) {
                     String name = stat.getName();
                     if (!name.startsWith("sg_")) {
@@ -79,10 +79,9 @@ public class StatsCommand implements CommandExecutor {
 
                     name = stat.getDisplayName();
                     try {
-                        sender.sendMessage(MCUtils.color("&6&l> &e" + name + "&7: &b" + new DecimalFormat(format).format(nexusPlayer.getStats().getValue(stat.getName()).get())));
+                        sender.sendMessage(MCUtils.color("&6&l> &e" + name + "&7: &b" + new DecimalFormat(format).format(nexusPlayer.getStatValue(stat.getName()).get())));
                     } catch (Exception e) {
-                        plugin.getLogger().info("Stat: " + stat.getName());
-                        plugin.getLogger().info("Stat Type: " + stat.getType().name());
+                        e.printStackTrace();
                     }
                 }
             }

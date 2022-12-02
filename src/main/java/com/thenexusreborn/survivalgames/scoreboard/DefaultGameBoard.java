@@ -63,13 +63,13 @@ public class DefaultGameBoard extends SpigotScoreboardView {
         createTeam(new TeamBuilder("watchingValue").entry("&fWatching: ").score(10).valueUpdater(playerCountUpdater));
         createTeam(new TeamBuilder("blank2").entry(ChatColor.DARK_BLUE.toString()).score(9));
         createTeam(new TeamBuilder("infoLabel").entry("&6&lINFO:").score(8));
-        createTeam(new TeamBuilder("scoreValue").entry("&fScore: ").score(7).valueUpdater((player, team) -> team.setSuffix("&e" + MCUtils.formatNumber(player.getStats().getValue("sg_score").getAsInt()))));
-        createTeam(new TeamBuilder("passesValue").entry("&fPasses: ").score(6).valueUpdater((player, team) -> team.setSuffix("&e" + MCUtils.formatNumber(player.getStats().getValue("sg_mutation_passes").getAsInt()))));
+        createTeam(new TeamBuilder("scoreValue").entry("&fScore: ").score(7).valueUpdater((player, team) -> team.setSuffix("&e" + MCUtils.formatNumber(player.getStatValue("sg_score").getAsInt()))));
+        createTeam(new TeamBuilder("passesValue").entry("&fPasses: ").score(6).valueUpdater((player, team) -> team.setSuffix("&e" + MCUtils.formatNumber(player.getStatValue("sg_mutation_passes").getAsInt()))));
         createTeam( new TeamBuilder("killstreakValue").entry("&fKS: ").score(5).valueUpdater((player, team) -> {
             Game game = plugin.getGame();
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
             int killStreak = gamePlayer.getKillStreak();
-            int hks = player.getStats().getValue("sg_highest_kill_streak").getAsInt();
+            int hks = player.getStatValue("sg_highest_kill_streak").getAsInt();
             team.setSuffix("&e" + killStreak + "/" + hks);
         }));
         createTeam(new TeamBuilder("blank3").entry(ChatColor.DARK_PURPLE.toString()).score(4));

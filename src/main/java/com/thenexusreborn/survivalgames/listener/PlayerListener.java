@@ -322,7 +322,7 @@ public class PlayerListener implements Listener {
                         }
                     } else if (block.getState() instanceof Sign) {
                         NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(player.getUniqueId());
-                        if (nexusPlayer.getToggles().getValue("vanish")) {
+                        if (nexusPlayer.getToggleValue("vanish")) {
                             nexusPlayer.sendMessage(MsgType.WARN + "You cannot vote for a map while in vanish.");
                             return;
                         }
@@ -362,7 +362,7 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onToggleChange(ToggleChangeEvent e) {
         NexusPlayer nexusPlayer = e.getNexusPlayer();
-        boolean incognito = nexusPlayer.getToggles().getValue("incognito");
+        boolean incognito = nexusPlayer.getToggleValue("incognito");
         Player player = Bukkit.getPlayer(nexusPlayer.getUniqueId());
         Toggle toggle = e.getToggle();
         Game game = plugin.getGame();
@@ -401,7 +401,7 @@ public class PlayerListener implements Listener {
         
         if (incognito) {
             for (NexusPlayer p : players) {
-                if (p.getRanks().get().ordinal() <= Rank.HELPER.ordinal() || p.getUniqueId().equals(e.getNexusPlayer().getUniqueId())) {
+                if (p.getRank().ordinal() <= Rank.HELPER.ordinal() || p.getUniqueId().equals(e.getNexusPlayer().getUniqueId())) {
                     p.sendMessage(message);
                 }
             }
@@ -650,8 +650,8 @@ public class PlayerListener implements Listener {
         NexusPlayer nexusPlayer = e.getNexusPlayer();
         if (plugin.getGame() == null) {
             if (plugin.getLobby().getPlayingCount() >= plugin.getLobby().getLobbySettings().getMaxPlayers()) {
-                boolean isStaff = nexusPlayer.getRanks().get().ordinal() <= Rank.HELPER.ordinal();
-                boolean isInVanish = nexusPlayer.getToggles().getValue("vanish");
+                boolean isStaff = nexusPlayer.getRank().ordinal() <= Rank.HELPER.ordinal();
+                boolean isInVanish = nexusPlayer.getToggleValue("vanish");
                 if (!(isStaff && isInVanish)) {
                     nexusPlayer.sendMessage("&cThe lobby is full.");
                     new BukkitRunnable() {

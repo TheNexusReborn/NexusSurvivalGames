@@ -158,20 +158,20 @@ public class Game {
         player.spigot().setCollidesWithEntities(false);
         teleportSpectator(player, this.gameMap.getCenter().toLocation(this.gameMap.getWorld()));
         
-        if (nexusPlayer.getToggles().getValue("vanish")) {
+        if (nexusPlayer.getToggleValue("vanish")) {
             for (GamePlayer gp : this.players.values()) {
                 if (gp.getRank().ordinal() <= Rank.HELPER.ordinal() || gp.getUniqueId().equals(nexusPlayer.getUniqueId())) {
-                    gp.sendMessage("&a&l>> " + nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName() + " &ejoined &e&overy silently&e.");
+                    gp.sendMessage("&a&l>> " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined &e&ovanished&e.");
                 }
             }
-        } else if (nexusPlayer.getToggles().getValue("incognito")) {
+        } else if (nexusPlayer.getToggleValue("incognito")) {
             for (GamePlayer gp : this.players.values()) {
                 if (gp.getRank().ordinal() <= Rank.HELPER.ordinal() || gp.getUniqueId().equals(nexusPlayer.getUniqueId())) {
-                    gp.sendMessage("&a&l>> " + nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName() + " &ejoined &e&osilently&e.");
+                    gp.sendMessage("&a&l>> " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined &e&osilently&e.");
                 }
             }
         } else {
-            sendMessage("&a&l>> &b" + nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName() + " &ejoined.");
+            sendMessage("&a&l>> &b" + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined.");
         }
         nexusPlayer.getScoreboard().setView(new DefaultGameBoard(nexusPlayer.getScoreboard(), plugin));
         nexusPlayer.getScoreboard().setTablistHandler(new GameTablistHandler(nexusPlayer.getScoreboard(), plugin));
@@ -193,20 +193,20 @@ public class Game {
         
         this.players.remove(nexusPlayer.getUniqueId());
         
-        if (nexusPlayer.getToggles().getValue("vanish")) {
+        if (nexusPlayer.getToggleValue("vanish")) {
             for (GamePlayer gp : this.players.values()) {
                 if (gp.getRank().ordinal() <= Rank.HELPER.ordinal()) {
-                    gp.sendMessage("&c&l<< " + nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName() + " &eleft &e&overy silently&e.");
+                    gp.sendMessage("&c&l<< " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft &e&ovanished&e.");
                 }
             }
-        } else if (nexusPlayer.getToggles().getValue("incognito")) {
+        } else if (nexusPlayer.getToggleValue("incognito")) {
             for (GamePlayer gp : this.players.values()) {
                 if (gp.getRank().ordinal() <= Rank.HELPER.ordinal()) {
-                    gp.sendMessage("&c&l<< " + nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName() + " &eleft &e&osilently&e.");
+                    gp.sendMessage("&c&l<< " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft &e&osilently&e.");
                 }
             }
         } else {
-            sendMessage("&c&l<< &b" + nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName() + " &eleft.");
+            sendMessage("&c&l<< &b" + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft.");
         }
     }
     
