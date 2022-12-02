@@ -20,7 +20,7 @@ public class SGChatHandler implements ChatHandler {
     @Override
     public boolean handleChat(NexusPlayer player, String chatColor, AsyncPlayerChatEvent e) {
         String format = "{score} {level} &r{displayName}&8: {message}";
-        String nameColor; 
+        String nameColor;
         String score = "&8<&3" + MCUtils.formatNumber(player.getStatValue("sg_score").getAsInt()) + "&8>";
         String level = "&8(&2&l" + player.getStatValue("level").getAsInt() + "&8)";
         String spectators = "&8[&cSpectators&8]";
@@ -40,14 +40,14 @@ public class SGChatHandler implements ChatHandler {
             }
         } else {
             if (player.getRank() != Rank.MEMBER) {
-                nameColor = "&f";   
+                nameColor = "&f";
             } else {
                 nameColor = Rank.MEMBER.getColor();
             }
         }
         
         String prefix = "";
-        if (player.getRank().ordinal() < Rank.MEMBER.ordinal()) {
+        if (player.getRank() != Rank.MEMBER) {
             prefix = player.getRank().getPrefix() + " ";
         }
         
@@ -60,21 +60,18 @@ public class SGChatHandler implements ChatHandler {
         
         if (game != null) {
             if (game.getState().ordinal() >= GameState.INGAME_GRACEPERIOD.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal()) {
-                if (game.getPlayer(player.getUniqueId()).getTeam() != GameTeam.TRIBUTES) {
+                if (game.getPlayer(player.getUniqueId()).getTeam() == GameTeam.SPECTATORS) {
                     for (GamePlayer p : game.getPlayers().values()) {
-                        if (p.getTeam() != GameTeam.TRIBUTES || p.getToggleValue("spectatorchat")) {
-                            if (p.getToggleValue("spectatorchat")) {
-                                format = StaffChat.PREFIX + " " + format;
-                                format = format.replace(score + " ", "");
-                                format = format.replace(level + " ", "");
-                                p.sendMessage(format);
-                            } else {
-                                p.sendMessage(format);
-                            }
-                            
-                            game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "deadchat", e.getPlayer().getName() + ":" + e.getMessage().replace("'", "''")));
+                        if (p.getTeam() == GameTeam.SPECTATORS) {
+                            p.sendMessage(format);
+                        } else if (p.getToggleValue("spectatorchat")) {
+                            String tmpFormat = StaffChat.PREFIX + " " + format;
+                            tmpFormat = tmpFormat.replace(score + " ", "");
+                            tmpFormat = tmpFormat.replace(level + " ", "");
+                            p.sendMessage(tmpFormat);
                         }
                     }
+                    game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "deadchat", e.getPlayer().getName() + ":" + e.getMessage().replace("'", "''")));
                 } else {
                     game.sendMessage(format);
                     game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "chat", e.getPlayer().getName() + ":" + e.getMessage().replace("'", "''")));
