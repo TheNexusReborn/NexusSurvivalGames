@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.game.tasks;
 
-import com.thenexusreborn.nexuscore.api.NexusTask;
+import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.game.GameState;
@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 
-public class EndermanWaterDamageTask extends NexusTask<SurvivalGames> {
+public class EndermanWaterDamageTask extends NexusThread<SurvivalGames> {
     
     public EndermanWaterDamageTask(SurvivalGames plugin) {
         super(plugin, 20L, 0L, false);

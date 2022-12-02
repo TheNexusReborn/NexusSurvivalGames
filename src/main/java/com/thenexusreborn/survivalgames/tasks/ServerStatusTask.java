@@ -2,12 +2,12 @@ package com.thenexusreborn.survivalgames.tasks;
 
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.server.ServerInfo;
-import com.thenexusreborn.nexuscore.api.NexusTask;
+import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 
-public class ServerStatusTask extends NexusTask<SurvivalGames> {
+public class ServerStatusTask extends NexusThread<SurvivalGames> {
     
     public ServerStatusTask(SurvivalGames plugin) {
         super(plugin, 20L, 1L, false);

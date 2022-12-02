@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.lobby.tasks;
 
-import com.thenexusreborn.nexuscore.api.NexusTask;
+import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.*;
@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Map.Entry;
 
-public class MapSignUpdateTask extends NexusTask<SurvivalGames> {
+public class MapSignUpdateTask extends NexusThread<SurvivalGames> {
     
     public MapSignUpdateTask(SurvivalGames plugin) {
         super(plugin, 20L, false);

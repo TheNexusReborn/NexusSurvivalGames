@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.lobby.tasks;
 
 import com.thenexusreborn.api.player.*;
-import com.thenexusreborn.nexuscore.api.NexusTask;
+import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.nexuscore.util.ServerProperties;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.*;
@@ -9,7 +9,7 @@ import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 
-public class LobbyTask extends NexusTask<SurvivalGames> {
+public class LobbyTask extends NexusThread<SurvivalGames> {
     
     public LobbyTask(SurvivalGames plugin) {
         super(plugin, 20L, false);
