@@ -1,22 +1,18 @@
 package com.thenexusreborn.survivalgames.lobby.tasks;
 
-import com.thenexusreborn.api.player.NexusPlayer;
+import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.*;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
-public class StatSignUpdateTask extends BukkitRunnable {
-    
-    private SurvivalGames plugin;
-    
+public class StatSignUpdateTask extends NexusThread<SurvivalGames> {
     public StatSignUpdateTask(SurvivalGames plugin) {
-        this.plugin = plugin;
+        super(plugin, 20L, false);
     }
     
-    public void run() {
+    public void onRun() {
         Lobby lobby = plugin.getLobby();
         if (lobby == null) {
             return;
@@ -35,19 +31,15 @@ public class StatSignUpdateTask extends BukkitRunnable {
         }
     
         for (StatSign statSign : lobby.getStatSigns()) {
-            for (NexusPlayer nexusPlayer : lobby.getPlayers()) {
-                Player player = Bukkit.getPlayer(nexusPlayer.getUniqueId());
+            for (LobbyPlayer lobbyPlayer : lobby.getPlayers()) {
+                Player player = Bukkit.getPlayer(lobbyPlayer.getUniqueId());
                 if (player.getWorld() != statSign.getLocation().getWorld()) {
                     continue;
                 }
                 
-                String[] lines = new String[] {MCUtils.color("&n" + statSign.getDisplayName()), "", nexusPlayer.getStats().getValue(statSign.getStat()).get().toString(), ""};
+                String[] lines = new String[] {MCUtils.color("&n" + statSign.getDisplayName()), "", lobbyPlayer.getStatValue(statSign.getStat()).get().toString(), ""};
                 player.sendSignChange(statSign.getLocation(), lines);
             }
         }
-    }
-    
-    public void start() {
-        runTaskTimer(plugin, 20L, 20L);
     }
 }

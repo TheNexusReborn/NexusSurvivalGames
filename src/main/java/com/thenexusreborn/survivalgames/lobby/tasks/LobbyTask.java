@@ -1,24 +1,22 @@
 package com.thenexusreborn.survivalgames.lobby.tasks;
 
 import com.thenexusreborn.api.player.*;
+import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.nexuscore.util.ServerProperties;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.*;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.*;
 import org.bukkit.entity.*;
-import org.bukkit.scheduler.BukkitRunnable;
 
-public class LobbyTask extends BukkitRunnable {
-    
-    private final SurvivalGames plugin;
+public class LobbyTask extends NexusThread<SurvivalGames> {
     
     public LobbyTask(SurvivalGames plugin) {
-        this.plugin = plugin;
+        super(plugin, 20L, false);
     }
     
     @Override
-    public void run() {
+    public void onRun() {
         if (plugin.getGame() != null) {
             return;
         }
@@ -31,7 +29,7 @@ public class LobbyTask extends BukkitRunnable {
         }
     
         Lobby lobby = plugin.getLobby();
-        for (NexusPlayer player : lobby.getPlayers()) {
+        for (LobbyPlayer player : lobby.getPlayers()) {
             SGUtils.updatePlayerHealthAndFood(Bukkit.getPlayer(player.getUniqueId()));
         }
         
@@ -48,20 +46,20 @@ public class LobbyTask extends BukkitRunnable {
             }
         }
         
-        for (NexusPlayer player : lobby.getPlayers()) {
+        for (LobbyPlayer player : lobby.getPlayers()) {
             Player bukkitPlayer = Bukkit.getPlayer(player.getUniqueId());
-            for (NexusPlayer other : lobby.getPlayers()) {
+            for (LobbyPlayer other : lobby.getPlayers()) {
                 Player otherBukkitPlayer = Bukkit.getPlayer(other.getUniqueId());
-                if (player.getToggles().getValue("vanish")) {
-                    if (other.getRanks().get().ordinal() > Rank.HELPER.ordinal()) {
+                if (player.getToggleValue("vanish")) {
+                    if (other.getRank().ordinal() > Rank.HELPER.ordinal()) {
                         otherBukkitPlayer.hidePlayer(bukkitPlayer);
                     }
                 } else {
                     otherBukkitPlayer.showPlayer(bukkitPlayer);
                 }
                 
-                if (other.getToggles().getValue("vanish")) {
-                    if (player.getRanks().get().ordinal() > Rank.HELPER.ordinal()) {
+                if (other.getToggleValue("vanish")) {
+                    if (player.getRank().ordinal() > Rank.HELPER.ordinal()) {
                         bukkitPlayer.hidePlayer(otherBukkitPlayer);
                     }
                 } else {

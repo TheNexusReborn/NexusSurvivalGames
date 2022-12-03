@@ -1,20 +1,19 @@
 package com.thenexusreborn.survivalgames.game.tasks;
 
+import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.*;
+import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.GamePlayer;
+import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.scheduler.BukkitRunnable;
 
-public class SpectatorUpdateTask extends BukkitRunnable {
-    
-    private SurvivalGames plugin;
-    
+public class SpectatorUpdateTask extends NexusThread<SurvivalGames> {
     public SpectatorUpdateTask(SurvivalGames plugin) {
-        this.plugin = plugin;
+        super(plugin, 20L, false);
     }
     
-    public void run() {
+    public void onRun() {
         Game game = plugin.getGame();
         if (game != null) {
             for (GamePlayer player : game.getPlayers().values()) {
@@ -23,9 +22,5 @@ public class SpectatorUpdateTask extends BukkitRunnable {
                 }
             }
         }
-    }
-    
-    public void start() {
-        runTaskTimer(plugin, 1L, 20L);
     }
 }

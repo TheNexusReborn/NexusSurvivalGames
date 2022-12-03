@@ -1,18 +1,16 @@
 package com.thenexusreborn.survivalgames.lobby.tasks;
 
+import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.lobby.*;
-import org.bukkit.scheduler.BukkitRunnable;
+import com.thenexusreborn.survivalgames.lobby.Lobby;
+import com.thenexusreborn.survivalgames.lobby.LobbyState;
 
-public class VoteStartMsgTask extends BukkitRunnable {
-    
-    private SurvivalGames plugin;
-    
+public class VoteStartMsgTask extends NexusThread<SurvivalGames> {
     public VoteStartMsgTask(SurvivalGames plugin) {
-        this.plugin = plugin;
+        super(plugin, 2400L, true);
     }
     
-    public void run() {
+    public void onRun() {
         if (plugin.getGame() != null) {
             return;
         }
@@ -33,9 +31,5 @@ public class VoteStartMsgTask extends BukkitRunnable {
         if (lobby.getPlayers().size() < lobby.getLobbySettings().getMinPlayers()) {
             lobby.sendMessage("&6&l>> &e&lDid you know that you can use &f&l/votestart &e&lto start a game early?");
         }
-    }
-    
-    public void start() {
-        runTaskTimerAsynchronously(plugin, 20L, 2400L);
     }
 }

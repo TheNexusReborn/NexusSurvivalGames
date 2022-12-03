@@ -1,25 +1,74 @@
 package com.thenexusreborn.survivalgames.game;
 
 import com.thenexusreborn.api.player.NexusPlayer;
+import com.thenexusreborn.api.player.Rank;
+import com.thenexusreborn.api.scoreboard.NexusScoreboard;
+import com.thenexusreborn.api.stats.StatOperator;
+import com.thenexusreborn.api.stats.StatValue;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.deathold.DeathInfo;
+import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
+import org.bukkit.entity.EntityType;
 
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.UUID;
 
 public class GamePlayer {
     private final NexusPlayer nexusPlayer;
     private GameTeam team;
-    private DeathInfo deathInfo;
     private boolean spectatorByDeath, newPersonalBestNotified = false;
     private TrackerInfo trackerInfo;
-    private int kills, killStreak;
+    private int kills, killStreak, assists;
     private boolean mutated;
     private Mutation mutation;
     private boolean deathByMutation;
+    private Bounty bounty;
+    private CombatTag combatTag;
+    private DamageInfo damageInfo;
+    private Map<Long, DeathInfo> deaths = new TreeMap<>();
     
     public GamePlayer(NexusPlayer nexusPlayer) {
         this.nexusPlayer = nexusPlayer;
+        this.bounty = new Bounty(nexusPlayer.getUniqueId());
+        this.combatTag = new CombatTag(nexusPlayer.getUniqueId());
+        this.damageInfo = new DamageInfo(nexusPlayer.getUniqueId());
+    }
+
+    public void changeStat(String statName, Object value, StatOperator operator) {
+        getNexusPlayer().changeStat(statName, value, operator);
+    }
+
+    public StatValue getStatValue(String statName) {
+        return getNexusPlayer().getStatValue(statName);
+    }
+
+    public String getColoredName() {
+        return getNexusPlayer().getColoredName();
+    }
+
+    public Rank getRank() {
+        return getNexusPlayer().getRank();
+    }
+
+    public boolean getToggleValue(String toggle) {
+        return getNexusPlayer().getToggleValue(toggle);
+    }
+
+    public NexusScoreboard getScoreboard() {
+        return getNexusPlayer().getScoreboard();
+    }
+
+    public String getDisplayName() {
+        return getNexusPlayer().getDisplayName();
+    }
+
+    public String getName() {
+        return getNexusPlayer().getName();
+    }
+
+    public void removeCredits(int credits) {
+        getNexusPlayer().removeCredits(credits);
     }
     
     public NexusPlayer getNexusPlayer() {
@@ -50,16 +99,8 @@ public class GamePlayer {
         return nexusPlayer.getUniqueId();
     }
     
-    public void setDeathInfo(DeathInfo deathInfo) {
-        this.deathInfo = deathInfo;
-    }
-    
     public void setSpectatorByDeath(boolean value) {
         this.spectatorByDeath = value;
-    }
-    
-    public DeathInfo getDeathInfo() {
-        return deathInfo;
     }
     
     public boolean isSpectatorByDeath() {
@@ -114,6 +155,18 @@ public class GamePlayer {
         return deathByMutation;
     }
     
+    public Bounty getBounty() {
+        return bounty;
+    }
+    
+    public CombatTag getCombatTag() {
+        return combatTag;
+    }
+    
+    public DamageInfo getDamageInfo() {
+        return damageInfo;
+    }
+    
     public boolean canMutate() {
         if (deathByMutation) {
             return false;
@@ -133,5 +186,62 @@ public class GamePlayer {
         }
         
         return game.getSettings().isAllowMutations();
+    }
+    
+    public void setCombat(GamePlayer other) {
+        if (other.getUniqueId() == this.getUniqueId()) {
+            return;
+        }
+
+        if (other.getTeam() == GameTeam.SPECTATORS) {
+            return;
+        }
+
+        if (getTeam() == GameTeam.SPECTATORS) {
+            return;
+        }
+
+        if (!getCombatTag().isInCombatWith(other.getUniqueId())) {
+            sendMessage("&6&l>> &cYou are now in combat with " + other.getNexusPlayer().getColoredName() + "&c!");
+        }
+        getCombatTag().setOther(other.getUniqueId());
+    }
+    
+    public void addDeathInfo(DeathInfo deathInfo) {
+        this.deaths.put(deathInfo.getTime(), deathInfo);
+    }
+    
+    public Map<Long, DeathInfo> getDeaths() {
+        return deaths;
+    }
+    
+    public int getAssists() {
+        return this.assists;
+    }
+    
+    public void setAssists(int amount) {
+        this.assists = amount;
+    }
+
+    public boolean killedByPlayer() {
+        for (DeathInfo death : this.deaths.values()) {
+            if (death.getKiller() != null) {
+                if (death.getKiller().getType() == EntityType.PLAYER) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public UUID getKiller() {
+        for (DeathInfo death : this.deaths.values()) {
+            if (death.getKiller() != null) {
+                if (death.getKiller().getType() == EntityType.PLAYER) {
+                    return death.getKiller().getKiller();
+                }
+            }
+        }
+        return null;
     }
 }

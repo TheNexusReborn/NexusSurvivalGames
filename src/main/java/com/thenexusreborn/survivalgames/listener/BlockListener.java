@@ -88,6 +88,7 @@ public class BlockListener implements Listener {
                 }
     
                 if (NO_DROPS.contains(e.getBlock().getType())) {
+                    e.setCancelled(true);
                     e.getBlock().setType(Material.AIR);
                 }
             } else {

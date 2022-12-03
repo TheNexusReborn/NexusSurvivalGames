@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.lobby.tasks;
 
-import com.thenexusreborn.api.player.NexusPlayer;
+import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.*;
@@ -8,19 +8,16 @@ import com.thenexusreborn.survivalgames.map.GameMap;
 import org.bukkit.*;
 import org.bukkit.block.*;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Map.Entry;
 
-public class MapSignUpdateTask extends BukkitRunnable {
-    
-    private SurvivalGames plugin;
+public class MapSignUpdateTask extends NexusThread<SurvivalGames> {
     
     public MapSignUpdateTask(SurvivalGames plugin) {
-        this.plugin = plugin;
+        super(plugin, 20L, false);
     }
     
-    public void run() {
+    public void onRun() {
         Lobby lobby = plugin.getLobby();
         if (lobby == null) {
             return;
@@ -55,7 +52,7 @@ public class MapSignUpdateTask extends BukkitRunnable {
             
             sign.setLine(3, MCUtils.color("&n" + votes + " Vote(s)"));
             
-            for (NexusPlayer player : lobby.getPlayers()) {
+            for (LobbyPlayer player : lobby.getPlayers()) {
                 Player bukkitPlayer = Bukkit.getPlayer(player.getUniqueId());
                 if (bukkitPlayer != null) {
                     World world = bukkitPlayer.getWorld();
@@ -63,7 +60,7 @@ public class MapSignUpdateTask extends BukkitRunnable {
                         if (!world.getName().equalsIgnoreCase(lobby.getSpawnpoint().getWorld().getName())) {
                             continue;
                         }
-                        if (lobby.getMapVotes().get(entry.getKey()).contains(player.getUniqueId())) {
+                        if (player.getMapVote() == entry.getKey()) {
                             sign.setLine(0, MCUtils.color("&n#" + entry.getKey()));
                             sign.setLine(2, MCUtils.color("&2&lVOTED!"));
                         } else {
@@ -75,9 +72,5 @@ public class MapSignUpdateTask extends BukkitRunnable {
                 }
             }
         }
-    }
-    
-    public void start() {
-        runTaskTimer(plugin, 20L, 20L);
     }
 }

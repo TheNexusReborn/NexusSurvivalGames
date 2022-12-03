@@ -3,24 +3,63 @@ PLAYER: '%playername% was killed by %killername% using %helditem%'
 PLAYER_PROJECTILE: '%playername% was shot by %killername% from %distance% blocks'
 ENTITY: '%playername% was killed by %entityname%'
 ENTITY_PROJECTILE: '%playername% was shot by %entityname% from %distance% blocks'
-SUFFOCATION: '%playername% died to suffocation'
-MELTING: '%playername% melted to death'
-FALL: '%playername% fell to death'
-LAVA: '%playername% roasted in lava'
-FIRE: '%playername% burned to death'
-DROWNING: '%playername% drowned to death'
-EXPLOSION: '%playername% exploded'
-VOID: '%playername% died in the void'
-LIGHTNING: '%playername% was struck by lightning'
-SUICIDE: '%playername% suicided'
-STARVATION: '%playername% starved to death'
-POISON: '%playername% was killed by magic'
-MAGIC: '%playername% was killed by magic'
-WITHER: '%playername% withered away'
-INCOGNITO: '%playername% suicided'
-FALLING_BLOCK: '%playername% died to a falling block'
-THORNS: '%playername% died to armor'
+SUFFOCATION:
+  normal: '%playername% suffocated in a wall'
+  player: '%playername% suffocated while fighting %killername%'
+MELTING:
+  normal: '%playername% melted to death'
+  player: '%playername% melted while fighting %killername%'
+FALL:
+  normal: '%playername% fell to death'
+  player: '%playername% was doomed to fall by %killername%'
+LAVA:
+  normal: '%playername% roasted in lava'
+  player: '%playername% was roasted in lava by %killername%'
+FIRE:
+  normal: '%playername% burned to death'
+  player: '%killername% burned %playername% to death'
+DROWNING:
+  normal: '%playername% drowned'
+  player: '%killername% drowned %playername%'
+EXPLOSION:
+  normal: '%playername% exploded'
+  player: '%playername% was exploded by %killername%'
+VOID:
+  normal: '%playername% died in the void'
+  player: '%playername% was thrown into the void by %killername%'
+LIGHTNING:
+  normal: '%playername% was struck by lightning'
+  player: '%playername% was struck by lightning while fighting %killername%'
+SUICIDE: '%playername% died'
+STARVATION:
+  normal: '%playername% starved to death'
+  player: '%playername% starved while fighting %killername%'
+POISON:
+  normal: '%playername% was killed by magic'
+  player: '%playername% was killed by magic while fighting %killername%'
+MAGIC:
+  normal: '%playername% was killed by magic'
+  player: '%playername% was killed by magic while fighting %killername%'
+WITHER:
+  normal: '%playername% withered away'
+  player: '%playername% withered away while fighting %killername%'
+INCOGNITO:
+  normal: '%playername% died'
+  player: '%playername% was killed by %killername% using %helditem%'
+FALLING_BLOCK:
+  normal: '%playername% died to a falling block'
+  player: '%playername% died to a falling block while fighting %killername%'
+THORNS:
+  normal: '%playername% was pricked to death'
+  player: '%playername% was pricked to death while fighting %killername%'
 CHEAT: '%playername% died trying to cheat'
-LEAVE: '%playername% had a heart attack'
-VANISH: '%playername% had a heart attack'
-SPECTATE: '%playername% had a heart attack'
+LEAVE:
+  normal: '%playername% died'
+  player: '%playername% was killed by %killername% using %helditem%'
+VANISH:
+  normal: '%playername% died'
+  player: '%playername% was killed by %killername% using %helditem%'
+SPECTATE: '%playername% decided to spectate'
+CACTUS:
+  normal: '%playername% was pricked to death'
+  player: '%playername% was pricked to death while fighting %killername%'

@@ -90,14 +90,13 @@ public class SGCommand implements CommandExecutor {
                 sender.sendMessage(MCUtils.color(MsgType.WARN + "The game had an error, you cannot modify it."));
                 return true;
             }
-            
+    
             switch (gameSubCommand) {
-                case "setup":
+                case "setup" -> {
                     if (game.getState() != GameState.UNDEFINED) {
                         sender.sendMessage(MCUtils.color(MsgType.WARN + "The game has already been setup."));
                         return true;
                     }
-                    
                     game.setup();
                     new BukkitRunnable() {
                         @Override
@@ -111,9 +110,8 @@ public class SGCommand implements CommandExecutor {
                             }
                         }
                     }.runTaskTimer(plugin, 1L, 1L);
-                    break;
-                case "assignstartingteams":
-                case "ast":
+                }
+                case "assignstartingteams", "ast" -> {
                     if (game.getState() == GameState.SETUP_COMPLETE) {
                         game.assignStartingTeams();
                         if (game.getState() == GameState.TEAMS_ASSIGNED) {
@@ -124,9 +122,8 @@ public class SGCommand implements CommandExecutor {
                     } else {
                         sender.sendMessage(MCUtils.color(MsgType.WARN + "The game is not yet setup. Please run the setup task before assigning teams."));
                     }
-                    break;
-                case "teleportplayers":
-                case "tpp":
+                }
+                case "teleportplayers", "tpp" -> {
                     if (game.getState() == GameState.TEAMS_ASSIGNED) {
                         game.teleportStart();
                         if (game.getState() == GameState.TELEPORT_START_DONE) {
@@ -137,9 +134,8 @@ public class SGCommand implements CommandExecutor {
                     } else {
                         sender.sendMessage(MCUtils.color(MsgType.WARN + "The teams have not be assigned yet. Please run the team assignment task."));
                     }
-                    break;
-                case "startwarmupcountdown":
-                case "swcd":
+                }
+                case "startwarmupcountdown", "swcd" -> {
                     if (game.getState() == GameState.TELEPORT_START_DONE) {
                         game.startWarmup();
                         if (game.getState() == GameState.WARMUP || game.getState() == GameState.WARMUP_DONE) {
@@ -150,8 +146,8 @@ public class SGCommand implements CommandExecutor {
                     } else {
                         sender.sendMessage(MCUtils.color(MsgType.WARN + "You must run the teleport players task before starting the countdown."));
                     }
-                    break;
-                case "start":
+                }
+                case "start" -> {
                     if (game.getState() == GameState.WARMUP_DONE || game.getState() == GameState.TELEPORT_START_DONE) {
                         game.startGame();
                     } else if (game.getState() == GameState.WARMUP) {
@@ -165,15 +161,13 @@ public class SGCommand implements CommandExecutor {
                         sender.sendMessage(MsgType.WARN + "You must run the teleport players task at the minimum before starting the game");
                         return true;
                     }
-                    
                     if (game.getState() == GameState.INGAME) {
                         sender.sendMessage(MCUtils.color(MsgType.INFO + "The game has been started."));
                     } else {
                         sender.sendMessage(MCUtils.color(MsgType.WARN + "There was a problem starting the game."));
                     }
-                    break;
-                case "startdeathmatchcountdown":
-                case "sdmcd":
+                }
+                case "startdeathmatchcountdown", "sdmcd" -> {
                     if (game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_GRACEPERIOD) {
                         game.startDeathmatchTimer();
                         if (game.getState() == GameState.INGAME_DEATHMATCH) {
@@ -184,9 +178,8 @@ public class SGCommand implements CommandExecutor {
                     } else {
                         sender.sendMessage(MCUtils.color(MsgType.WARN + "Invalid state. Please ensure that the game is in the INGAME state."));
                     }
-                    break;
-                case "teleportdeathmatch":
-                case "tpdm":
+                }
+                case "teleportdeathmatch", "tpdm" -> {
                     if (game.getState().ordinal() >= GameState.INGAME_GRACEPERIOD.ordinal() && game.getState().ordinal() <= GameState.INGAME_DEATHMATCH.ordinal()) {
                         game.teleportDeathmatch();
                         if (game.getState() == GameState.TELEPORT_DEATHMATCH_DONE) {
@@ -197,51 +190,47 @@ public class SGCommand implements CommandExecutor {
                     } else {
                         sender.sendMessage(MCUtils.color(MsgType.WARN + "Invalid game state. Must be ingame, ingame deathmatch."));
                     }
-                    break;
-                case "startdeathmatchwarmup":
-                case "sdmw":
+                }
+                case "startdeathmatchwarmup", "sdmw" -> {
                     if (game.getState() == GameState.TELEPORT_DEATHMATCH_DONE) {
                         game.startDeathmatchWarmup();
                         sender.sendMessage(MCUtils.color(MsgType.INFO + "You started the deathmatch warmup"));
                     } else {
                         sender.sendMessage(MCUtils.color(MsgType.WARN + "The players have not been teleported to the deathmatch, or the deathmatch has already started."));
                     }
-                    break;
-                case "startdeathmatch":
-                case "sdm":
+                }
+                case "startdeathmatch", "sdm" -> {
                     if (game.getState() == GameState.TELEPORT_DEATHMATCH_DONE || game.getState() == GameState.DEATHMATCH_WARMUP || game.getState() == GameState.DEATHMATCH_WARMUP_DONE) {
                         game.startDeathmatch();
                         sender.sendMessage(MCUtils.color(MsgType.INFO + "You started the deathmatch"));
                     } else {
                         sender.sendMessage(MCUtils.color(MsgType.WARN + "You must at least teleport players to the deathmatch, or it cannot have been started already."));
                     }
-                    break;
-                case "end":
+                }
+                case "end" -> {
                     if (game.getState() != GameState.ENDING && game.getState() != GameState.ENDED) {
                         game.end();
                         sender.sendMessage(MCUtils.color(MsgType.INFO + "You ended the game."));
                     } else {
                         sender.sendMessage(MCUtils.color(MsgType.WARN + "The game has already ended"));
                     }
-                    break;
-                case "restockchests":
-                case "rc":
+                }
+                case "restockchests", "rc" -> {
                     if (game.getState().ordinal() >= GameState.INGAME_GRACEPERIOD.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal()) {
                         game.restockChests();
                         game.sendMessage("&6&l>> &a&lALL CHESTS HAVE BEEN RESTOCKED");
                     } else {
                         sender.sendMessage(MCUtils.color(MsgType.WARN + "Invalid game state. Must be playing, playing deathmatch, deathmatch countdown or deathmatch countdown complete."));
                     }
-                    break;
-                case "nextgame":
-                case "ng":
+                }
+                case "nextgame", "ng" -> {
                     if (game.getState() == GameState.ENDING || game.getState() == GameState.ENDED) {
                         game.nextGame();
                         sender.sendMessage(MCUtils.color(MsgType.INFO + "Moved everyone to the next game"));
                     } else {
                         sender.sendMessage(MCUtils.color(MsgType.WARN + "You must end the game first before going to the next one."));
                     }
-                    break;
+                }
             }
         } else if (subCommand.equals("lobby") || subCommand.equals("l")) {
             if (!(args.length > 1)) {

@@ -1,23 +1,25 @@
 package com.thenexusreborn.survivalgames.game.tasks;
 
+import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.*;
-import org.bukkit.*;
+import com.thenexusreborn.survivalgames.game.GamePlayer;
+import com.thenexusreborn.survivalgames.game.GameState;
+import com.thenexusreborn.survivalgames.game.GameTeam;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 
-public class EndermanWaterDamageTask extends BukkitRunnable {
-    
-    private SurvivalGames plugin;
+public class EndermanWaterDamageTask extends NexusThread<SurvivalGames> {
     
     public EndermanWaterDamageTask(SurvivalGames plugin) {
-        this.plugin = plugin;
+        super(plugin, 20L, 0L, false);
     }
     
-    public void run() {
+    public void onRun() {
         if (plugin.getGame() == null) {
             return;
         }
@@ -42,9 +44,5 @@ public class EndermanWaterDamageTask extends BukkitRunnable {
                 player.damage(1);
             }
         }
-    }
-    
-    public void start() {
-        runTaskTimer(plugin, 20L, 20L);
     }
 }

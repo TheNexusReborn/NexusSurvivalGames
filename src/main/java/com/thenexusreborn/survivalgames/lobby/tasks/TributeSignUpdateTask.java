@@ -1,29 +1,26 @@
 package com.thenexusreborn.survivalgames.lobby.tasks;
 
 import com.mojang.authlib.GameProfile;
-import com.thenexusreborn.api.player.NexusPlayer;
+import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.*;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Skull;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.lang.reflect.Field;
 import java.util.*;
 
-public class TributeSignUpdateTask extends BukkitRunnable {
-    
-    private SurvivalGames plugin;
+public class TributeSignUpdateTask extends NexusThread<SurvivalGames> {
     
     private UUID randomUUID = UUID.randomUUID();
     
     public TributeSignUpdateTask(SurvivalGames plugin) {
-        this.plugin = plugin;
+        super(plugin, 20L, false);
     }
     
-    public void run() {
+    public void onRun() {
         Lobby lobby = plugin.getLobby();
         if (lobby == null) {
             return;
@@ -42,7 +39,7 @@ public class TributeSignUpdateTask extends BukkitRunnable {
             return;
         }
     
-        List<NexusPlayer> players = new ArrayList<>(lobby.getPlayers());
+        List<LobbyPlayer> players = lobby.getPlayers();
     
         for (TributeSign tributeSign : tributeSigns) {
             if (tributeSign.getHeadLocation() == null) {
@@ -70,17 +67,17 @@ public class TributeSignUpdateTask extends BukkitRunnable {
                 continue;
             }
             
-            NexusPlayer nexusPlayer = players.get(tributeSign.getIndex());
-            Player player = Bukkit.getPlayer(nexusPlayer.getUniqueId());
+            LobbyPlayer lobbyPlayer = players.get(tributeSign.getIndex());
+            Player player = Bukkit.getPlayer(lobbyPlayer.getUniqueId());
             String name;
-            if (nexusPlayer.getName().length() <= 14) {
-                name = MCUtils.color(nexusPlayer.getRanks().get().getColor() + nexusPlayer.getName());
+            if (lobbyPlayer.getName().length() <= 14) {
+                name = MCUtils.color(lobbyPlayer.getRank().getColor() + lobbyPlayer.getName());
             } else {
-                name = nexusPlayer.getName();
+                name = lobbyPlayer.getName();
             }
-            int score = nexusPlayer.getStats().getValue("sg_score").getAsInt();
-            int kills = nexusPlayer.getStats().getValue("sg_kills").getAsInt();
-            int wins = nexusPlayer.getStats().getValue("sg_wins").getAsInt();
+            int score = lobbyPlayer.getStatValue("sg_score").getAsInt();
+            int kills = lobbyPlayer.getStatValue("sg_kills").getAsInt();
+            int wins = lobbyPlayer.getStatValue("sg_wins").getAsInt();
             skull.setOwner(player.getName());
             skull.update();
     
@@ -92,9 +89,5 @@ public class TributeSignUpdateTask extends BukkitRunnable {
                 }
             }
         }
-    }
-    
-    public void start() {
-        runTaskTimer(plugin, 20L, 20L);
     }
 }

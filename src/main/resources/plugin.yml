@@ -13,3 +13,6 @@ commands:
     aliases: [sg]
   spectate:
   map:
+  bounty:
+  spectatorchat:
+    aliases: [specchat]

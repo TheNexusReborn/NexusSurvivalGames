@@ -1,8 +1,8 @@
 package com.thenexusreborn.survivalgames;
 
 import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.api.maven.MavenLibrary;
 import com.thenexusreborn.api.network.cmd.NetworkCommand;
+import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.registry.*;
 import com.thenexusreborn.api.server.Environment;
 import com.thenexusreborn.api.stats.StatType;
@@ -28,7 +28,6 @@ import java.io.File;
 import java.sql.*;
 import java.util.*;
 
-@MavenLibrary(groupId = "mysql", artifactId = "mysql-connector-java", version = "8.0.30")
 public class SurvivalGames extends NexusSpigotPlugin {
     
     public static final String MAP_URL = "https://starmediadev.com/files/nexusreborn/sgmaps/";
@@ -66,7 +65,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
     @Override
     public void onEnable() {
         getLogger().info("Loading NexusSurvivalGames v" + getDescription().getVersion());
-        //LibraryLoader.loadAll(SurvivalGames.class, (URLClassLoader) getClassLoader());
         try {
             Driver mysqlDriver = new com.mysql.cj.jdbc.Driver();
             DriverManager.registerDriver(mysqlDriver);
@@ -79,12 +77,13 @@ public class SurvivalGames extends NexusSpigotPlugin {
         saveDefaultConfig();
         
         deathMessagesFile = new File(getDataFolder(), "deathmessages.yml");
+        
         if (!deathMessagesFile.exists()) {
             saveResource("deathmessages.yml", false);
         }
-        
+
         deathMessagesConfig = YamlConfiguration.loadConfiguration(deathMessagesFile);
-        
+    
         getLogger().info("Loading Game and Lobby Settings");
         try {
             for (GameSettings gameSettings : NexusAPI.getApi().getPrimaryDatabase().get(GameSettings.class)) {
@@ -183,15 +182,17 @@ public class SurvivalGames extends NexusSpigotPlugin {
         getCommand("survivalgames").setExecutor(new SGCommand(this));
         getCommand("spectate").setExecutor(new SpectateCommand(this));
         getCommand("map").setExecutor(new MapCommand(this));
+        getCommand("bounty").setExecutor(new BountyCmd(this));
+        getCommand("spectatorchat").setExecutor(nexusCore.getToggleCmdExecutor());
         
         getLogger().info("Registered commands");
         
-        new GameSetupTask(this).runTaskTimer(this, 1L, 1L);
-        new TimerCountdownCheck(this).runTaskTimer(this, 1L, 1L);
-        new DeathmatchSetupTask(this).runTaskTimer(this, 1L, 1L);
-        new GameWorldTask(this).runTaskTimer(this, 1L, 20L);
-        new LobbyTask(this).runTaskTimer(this, 1L, 20L);
-        new PlayerTrackerTask().start();
+        new GameSetupTask(this).start();
+        new TimerCountdownCheck(this).start();
+        new DeathmatchSetupTask(this).start();
+        new GameWorldTask(this).start();
+        new LobbyTask(this).start();
+        new PlayerTrackerTask(this).start();
         new MapSignUpdateTask(this).start();
         new MapChatOptionsMsgTask(this).start();
         new VoteStartMsgTask(this).start();
@@ -201,6 +202,8 @@ public class SurvivalGames extends NexusSpigotPlugin {
         new ChickenMutationTask(this).start();
         new SpectatorUpdateTask(this).start();
         new ServerStatusTask(this).start();
+        new CombatTagTask(this).start();
+        new DamagersTask(this).start();
         
         getLogger().info("Registered Tasks");
         
@@ -233,6 +236,11 @@ public class SurvivalGames extends NexusSpigotPlugin {
         registry.register("sg_mutation_passes", "Mutation Passes", StatType.INTEGER, 0);
         registry.register("sg_sponsored_others", "Times Sponsored Others", StatType.INTEGER, 0);
         registry.register("sg_sponsors_received", "Times Sponsored By Others", StatType.INTEGER, 0);
+    }
+    
+    @Override
+    public void registerToggles(ToggleRegistry registry) {
+        registry.register("spectatorchat", Rank.HELPER, "View Spectator Chat", "Allows you to see the spectator chat", false);
     }
     
     public int getGamesPlayed() {

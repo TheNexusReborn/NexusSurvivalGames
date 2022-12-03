@@ -68,7 +68,7 @@ public class GameActionBar implements IActionBar {
         if (player.getTeam() == GameTeam.MUTATIONS) {
             Mutation mutation = player.getMutation();
             GamePlayer target = game.getPlayer(mutation.getTarget());
-            return "&c&lSEEKING REVENGE ON &a" + target.getNexusPlayer().getName();
+            return "&c&lSEEKING REVENGE ON &a" + target.getName();
         }
         
         if (game.getState() == GameState.INGAME_GRACEPERIOD) {
