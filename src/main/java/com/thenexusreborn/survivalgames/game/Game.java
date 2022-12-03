@@ -1,6 +1,7 @@
 package com.thenexusreborn.survivalgames.game;
 
 import com.google.common.io.*;
+import com.starmediadev.starlib.TimeUnit;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.gamearchive.*;
 import com.thenexusreborn.api.helper.*;
@@ -36,6 +37,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.stream.Stream;
 
 import static com.thenexusreborn.survivalgames.game.GameState.*;
 
@@ -187,7 +189,7 @@ public class Game {
         EnumSet<GameState> ignoreStates = EnumSet.of(UNDEFINED, SETTING_UP, SETUP_COMPLETE, ASSIGN_TEAMS, TEAMS_ASSIGNED, TELEPORT_START, TELEPORT_START_DONE, ERROR, ENDING, ENDED);
         if (!ignoreStates.contains(this.state)) {
             if (gamePlayer.getTeam() == GameTeam.TRIBUTES || gamePlayer.getTeam() == GameTeam.MUTATIONS) {
-                killPlayer(gamePlayer, new DeathInfo(plugin.getGame(), System.currentTimeMillis(), gamePlayer, com.thenexusreborn.survivalgames.game.death.DeathType.SUICIDE));
+                killPlayer(gamePlayer, new DeathInfo(plugin.getGame(), System.currentTimeMillis(), gamePlayer, DeathType.SUICIDE));
             }
         }
         
@@ -483,19 +485,19 @@ public class Game {
     
     public void startWarmup() {
         setState(WARMUP);
-        this.timer = new Timer(new CountdownTimerCallback(this)).run((settings.getWarmupLength() * 1000L) + 50L);
+        this.timer = new Timer(new CountdownTimerCallback(this)).run(TimeUnit.SECONDS.toMilliseconds(settings.getWarmupLength()) + 50L);
     }
     
     public void startGame() {
-        this.timer = new Timer(new GameTimerCallback(this)).run(((settings.getGameLength() * 60000L) + 50));
+        this.timer = new Timer(new GameTimerCallback(this)).run(TimeUnit.MINUTES.toMilliseconds(settings.getGameLength()) + 50);
         this.start = System.currentTimeMillis();
         if (this.settings.isGracePeriod()) {
-            this.graceperiodTimer = new Timer(new GraceperiodCountdownCallback(this)).run((settings.getGracePeriodLength() * 1000L) + 50L);
+            this.graceperiodTimer = new Timer(new GraceperiodCountdownCallback(this)).run(TimeUnit.SECONDS.toMilliseconds(settings.getGracePeriodLength()) + 50L);
             setState(INGAME_GRACEPERIOD);
         } else {
             setState(INGAME);
         }
-        this.restockTimer = new Timer(new RestockTimerCallback(this)).run(600050L);
+        this.restockTimer = new Timer(new RestockTimerCallback(this)).run(TimeUnit.MINUTES.toMilliseconds(settings.getGameLength() / 2) + 50);
         sendMessage("&6&l>> &a&lMAY THE ODDS BE EVER IN YOUR FAVOR.");
         sendMessage("&6&l>> &c&lCLICKING MORE THAN 16 CPS WILL LIKELY RESULT IN A BAN.");
         if (this.settings.isTeamingAllowed()) {
@@ -515,7 +517,7 @@ public class Game {
             int secondsLeft = this.timer.getSecondsLeft();
             int minutesLeft = secondsLeft / 60;
             if (minutesLeft > 10) {
-                this.restockTimer = new Timer(new RestockTimerCallback(this)).run(600050L);
+                this.restockTimer = new Timer(new RestockTimerCallback(this)).run(TimeUnit.MINUTES.toMilliseconds(settings.getGameLength() / 2) + 50);
             }
         }
     }
@@ -530,10 +532,6 @@ public class Game {
     
     public Timer getTimer() {
         return this.timer;
-    }
-    
-    public boolean hasPlayer(UUID uniqueId) {
-        return this.players.containsKey(uniqueId);
     }
     
     public void playSound(Sound sound) {
@@ -625,8 +623,7 @@ public class Game {
         worldBorder.setSize(100);
         worldBorder.setSize(10, 300);
         
-        long length = (settings.getDeathmatchLength() * (60000L)) + 50;
-        this.timer = new Timer(new GameEndTimerCallback(this)).run(length);
+        this.timer = new Timer(new GameEndTimerCallback(this)).run(TimeUnit.MINUTES.toMilliseconds(settings.getDeathmatchLength()) + 50);
     }
     
     public void deathmatchWarmupDone() {
@@ -775,7 +772,7 @@ public class Game {
                 sendMessage("&6&l>> &aThis game has been archived!");
                 sendMessage("&6&l>> &aGame ID: &b" + gameInfo.getId() + " &7&oCustom Website Coming Soon.");
                 
-                if ((gameInfo.getId() % 1000) == 0) {
+                if (gameInfo.getId() % 1000 == 0) {
                     for (String p : gameInfo.getPlayers()) {
                         NexusAPI.getApi().getThreadFactory().runAsync(() -> {
                             NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(p);
@@ -801,7 +798,7 @@ public class Game {
             }
         });
         
-        this.timer = new Timer(new NextGameTimerCallback(this)).run(10050L);
+        this.timer = new Timer(new NextGameTimerCallback(this)).run(TimeUnit.SECONDS.toMilliseconds(settings.getNextGameStart()));
     }
     
     public void resetPlayer(Player player) {
@@ -857,18 +854,18 @@ public class Game {
         this.gameInfo.getActions().add(new GameAction(System.currentTimeMillis(), "death", strippedDeathMessage));
         if (player != null) {
             resetPlayer(player);
-            player.setAllowFlight(true);
-            player.setFlying(true);
             player.setGameMode(GameTeam.SPECTATORS.getGameMode());
             player.spigot().setCollidesWithEntities(false);
             giveSpectatorItems(player);
+            player.setAllowFlight(true);
+            player.setFlying(true);
         }
         
-        gamePlayer.setSpectatorByDeath(deathInfo.getType() != com.thenexusreborn.survivalgames.game.death.DeathType.LEAVE);
+        gamePlayer.setSpectatorByDeath(deathInfo.getType() != DeathType.LEAVE);
         KillerInfo killer = deathInfo.getKiller();
         gamePlayer.setDeathByMutation(killer != null && killer.isMutationKill());
         
-        boolean vanished = deathInfo.getType() == com.thenexusreborn.survivalgames.game.death.DeathType.VANISH;
+        boolean vanished = deathInfo.getType() == DeathType.VANISH;
         int score = gamePlayer.getStatValue("sg_score").getAsInt();
         int lost = (int) Math.ceil(score / 10D);
         if (score - lost < 0) {
@@ -1117,7 +1114,7 @@ public class Game {
                     cancel();
                     return;
                 }
-                if (state == INGAME || state == INGAME_GRACEPERIOD || state == DEATHMATCH || state == INGAME_DEATHMATCH || state == WARMUP) {
+                if (Stream.of(INGAME, INGAME_GRACEPERIOD, DEATHMATCH, INGAME_DEATHMATCH, WARMUP).anyMatch(gameState -> state == gameState)) {
                     checkGameEnd();
                 }
             }
@@ -1137,7 +1134,7 @@ public class Game {
         } else if (gamePlayer.hasMutated()) {
             mutateName = "&cCan't mutate again.";
         } else {
-            if (!(gamePlayer.killedByPlayer()) || gamePlayer.deathByMutation()) {
+            if (!gamePlayer.killedByPlayer() || gamePlayer.deathByMutation()) {
                 mutateName = "&cCannot mutate.";
             } else {
                 GamePlayer killer = getPlayer(gamePlayer.getKiller());
@@ -1165,7 +1162,7 @@ public class Game {
     }
     
     public void checkGameEnd() {
-        if (this.state == INGAME || this.state == INGAME_DEATHMATCH || this.state == DEATHMATCH) {
+        if (Stream.of(INGAME, INGAME_DEATHMATCH, DEATHMATCH).anyMatch(gameState -> this.state == gameState)) {
             int totalTributes = 0;
             for (GamePlayer player : this.players.values()) {
                 if (player.getTeam() == GameTeam.TRIBUTES) {
@@ -1207,7 +1204,7 @@ public class Game {
         
         sendMessage("&6&l>> &4&lTHE DEATHMATCH COUNTDOWN HAS STARTED");
         
-        this.timer = new Timer(new DeathmatchPlayingCallback(this)).run(settings.getDeathmatchTimerLength() * 60000L + 50);
+        this.timer = new Timer(new DeathmatchPlayingCallback(this)).run(TimeUnit.MINUTES.toMilliseconds(settings.getDeathmatchTimerLength()) + 50);
     }
     
     public boolean isLootedChest(Block block) {
@@ -1216,10 +1213,6 @@ public class Game {
     
     public void addLootedChest(Location location) {
         this.lootedChests.add(location);
-    }
-    
-    public List<Location> getLootedChests() {
-        return this.lootedChests;
     }
     
     public void endGracePeriod() {

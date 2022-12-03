@@ -10,7 +10,7 @@ public class GameSettings extends SGSettings {
     private int maxPlayers = 24;
     private int maxHealth = 20;
     private int gracePeriodLength = 60;
-    private int gameLength = 20;
+    private int gameLength = 10;
     private int deathmatchLength = 5;
     private int warmupLength = 30;
     private int deathmatchThreshold = 2; //Default: 4

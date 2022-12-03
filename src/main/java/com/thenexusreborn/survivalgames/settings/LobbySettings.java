@@ -10,7 +10,7 @@ public class LobbySettings extends SGSettings {
     private int maxPlayers = 24;
     private int minPlayers = 4;
     private int maxGames = 10;
-    private int timerLength = 30;
+    private int timerLength = 10; //Default 30
     private int voteStartThreshold = 2;
     private boolean voteWeight = true;
     private boolean keepPreviousGameSettings = true;
