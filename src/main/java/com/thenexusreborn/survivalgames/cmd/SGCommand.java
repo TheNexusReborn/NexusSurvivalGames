@@ -1,9 +1,9 @@
 package com.thenexusreborn.survivalgames.cmd;
 
+import com.starmediadev.starlib.Operator;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.stats.*;
-import com.thenexusreborn.api.util.Operator;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.*;
