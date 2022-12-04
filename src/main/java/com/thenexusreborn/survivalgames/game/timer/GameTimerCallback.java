@@ -1,7 +1,6 @@
 package com.thenexusreborn.survivalgames.game.timer;
 
 import com.thenexusreborn.nexuscore.util.ReturnableCallback;
-import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.nexuscore.util.timer.TimerSnapshot;
 import com.thenexusreborn.survivalgames.ControlType;
 import com.thenexusreborn.survivalgames.game.*;
@@ -33,11 +32,9 @@ public class GameTimerCallback implements ReturnableCallback<TimerSnapshot, Bool
         int remainingSeconds = timerSnapshot.getSecondsLeft();
         int remainingMinutes = (int) Math.ceil(remainingSeconds / 60D);
         
-        boolean restockChests = (remainingMinutes % 10) == 0;
-        
         if (GAME_ANNOUNCE_MINUTES.contains(remainingMinutes)) {
             if (!this.announcedMinutes.contains(remainingMinutes)) {
-                game.sendMessage("&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b" + Timer.formatTime(remainingSeconds) + "&e.");
+                game.sendMessage("&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b" + Game.TIME_FORMAT.format(timerSnapshot.getTimeLeft()) + "&e.");
                 if (game.getSettings().isSounds()) {
                     game.playSound(Sound.CLICK);
                 }
@@ -47,7 +44,7 @@ public class GameTimerCallback implements ReturnableCallback<TimerSnapshot, Bool
         
         if (DEATHMATCH_START_COUNTDOWN_ANNOUNCE.contains(remainingSeconds)) {
             if (!this.announcedSeconds.contains(remainingSeconds)) {
-                game.sendMessage("&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b" + Timer.formatTime(remainingSeconds) + "&e.");
+                game.sendMessage("&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b" + Game.TIME_FORMAT.format(timerSnapshot.getTimeLeft()) + "&e.");
                 if (game.getSettings().isSounds()) {
                     game.playSound(Sound.CLICK);
                 }

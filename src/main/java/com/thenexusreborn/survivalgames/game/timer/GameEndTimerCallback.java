@@ -30,11 +30,11 @@ public class GameEndTimerCallback implements ReturnableCallback<TimerSnapshot, B
         }
         
         int remainingSeconds = timerSnapshot.getSecondsLeft();
-        int remainingMinutes = (int) Math.ceil((remainingSeconds / 60.0));
+        int remainingMinutes = (int) Math.ceil(remainingSeconds / 60.0);
         
         if (MINUTES_ANNOUCNE.contains(remainingMinutes)) {
             if (!announcedMinutes.contains(remainingMinutes)) {
-                game.sendMessage("&6&l>> &eThe game &c&lENDS &ein &b" + Timer.formatTime(remainingSeconds) + "&e.");
+                game.sendMessage("&6&l>> &eThe game &c&lENDS &ein &b" + Game.TIME_FORMAT.format(timerSnapshot.getTimeLeft()) + "&e.");
                 if (game.getSettings().isSounds()) {
                     game.playSound(Sound.CLICK);
                 }
@@ -44,7 +44,7 @@ public class GameEndTimerCallback implements ReturnableCallback<TimerSnapshot, B
         
         if (SECONDS_ANNOUNCE.contains(remainingSeconds)) {
             if (!announcedSeconds.contains(remainingSeconds)) {
-                game.sendMessage("&eThe &c&lGAME &eends in &b" + Timer.formatTime(remainingSeconds) + ".");
+                game.sendMessage("&eThe &c&lGAME &eends in &b" + Game.TIME_FORMAT.format(timerSnapshot.getTimeLeft()) + ".");
                 if (game.getSettings().isSounds()) {
                     game.playSound(Sound.CLICK);
                 }

@@ -72,19 +72,19 @@ public class GameActionBar implements IActionBar {
         }
         
         if (game.getState() == GameState.INGAME_GRACEPERIOD) {
-            return "&f&lGrace Period ends in &e" + Timer.formatTimeShort(game.getGraceperiodTimer().getSecondsLeft());
+            return "&f&lGrace Period ends in &e" + Game.SHORT_TIME_FORMAT.format(game.getGraceperiodTimer().getTimeLeft());
         }
         
         if (game.getState() == GameState.INGAME) {
             if (game.getRestockTimer() != null) {
-                return "&f&lChests restock in &e" + Timer.formatTime(game.getRestockTimer().getSecondsLeft());
+                return "&f&lChests restock in &e" + Game.TIME_FORMAT.format(game.getRestockTimer().getTimeLeft());
             } else {
-                return "&f&lDeathmatch in &e" + Timer.formatTime(game.getTimer().getSecondsLeft());
+                return "&f&lDeathmatch in &e" + Game.TIME_FORMAT.format(game.getTimer().getTimeLeft());
             }
         }
         
         if (game.getState() == GameState.INGAME_DEATHMATCH) {
-            return "&f&lDeathmatch in &e" + Timer.formatTime(game.getTimer().getSecondsLeft());
+            return "&f&lDeathmatch in &e" + Game.TIME_FORMAT.format(game.getTimer().getTimeLeft());
         }
         
         if (game.getState() == GameState.TELEPORT_DEATHMATCH) {
@@ -96,7 +96,7 @@ public class GameActionBar implements IActionBar {
         }
         
         if (game.getState() == GameState.DEATHMATCH_WARMUP) {
-            return "&f&lYou have &e" + Timer.formatTime(game.getTimer().getSecondsLeft());
+            return "&f&lYou have &e" + Game.TIME_FORMAT.format(game.getTimer().getTimeLeft());
         }
         
         if (game.getState() == GameState.DEATHMATCH_WARMUP_DONE) {
@@ -104,7 +104,7 @@ public class GameActionBar implements IActionBar {
         }
         
         if (game.getState() == GameState.DEATHMATCH) {
-            return "&f&lYou have &e" + Timer.formatTime(game.getTimer().getSecondsLeft());
+            return "&f&lYou have &e" + Game.TIME_FORMAT.format(game.getTimer().getTimeLeft());
         }
         
         if (game.getState() == GameState.ENDING) {

@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames.lobby;
 
+import com.starmediadev.starlib.TimeUnit;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.nexuscore.scoreboard.impl.RankTablistHandler;
@@ -276,7 +277,7 @@ public class Lobby {
     
     public void startTimer() {
         this.state = LobbyState.COUNTDOWN;
-        this.timer = new Timer(new LobbyTimerCallback(this)).run((lobbySettings.getTimerLength() * 1000L) + 50);
+        this.timer = new Timer(new LobbyTimerCallback(this)).run(TimeUnit.SECONDS.toMilliseconds(lobbySettings.getTimerLength()) + 50);
     }
     
     private int getVoteCount(int position, UUID uuid) {

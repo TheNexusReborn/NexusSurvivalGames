@@ -29,7 +29,7 @@ public class DeathmatchPlayingCallback implements ReturnableCallback<TimerSnapsh
         int remainingSeconds = timerSnapshot.getSecondsLeft();
         if (ANNOUNCE.contains(remainingSeconds)) {
             if (!announced.contains(remainingSeconds)) {
-                game.sendMessage("&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b" + Timer.formatTime(remainingSeconds) + "&e.");
+                game.sendMessage("&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b" + Game.TIME_FORMAT.format(timerSnapshot.getTimeLeft()) + "&e.");
                 if (game.getSettings().isSounds()) {
                     game.playSound(Sound.CLICK);
                 }

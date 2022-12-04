@@ -4,6 +4,7 @@ import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.IActionBar;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.*;
+import com.thenexusreborn.survivalgames.game.Game;
 
 public class LobbyActionBar implements IActionBar {
     
@@ -29,7 +30,7 @@ public class LobbyActionBar implements IActionBar {
         }
         
         if (lobby.getState() == LobbyState.COUNTDOWN && lobby.getTimer() != null) {
-            return "&f&lVoting closes in &e&l" + Timer.formatTimeShort(lobby.getTimer().getSecondsLeft());
+            return "&f&lVoting closes in &e&l" + Game.SHORT_TIME_FORMAT.format(lobby.getTimer().getTimeLeft());
         }
         
         return "";

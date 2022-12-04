@@ -82,7 +82,7 @@ public class CountdownTimerCallback implements ReturnableCallback<TimerSnapshot,
         
         if (ANNOUNCE_SECONDS.contains(remainingSeconds)) {
             if (!this.announced.contains(remainingSeconds)) {
-                game.sendMessage("&6&l>> &eThe game begins in &b" + Timer.formatTime(remainingSeconds) + "&e.");
+                game.sendMessage("&6&l>> &eThe game begins in &b" + Game.TIME_FORMAT.format(timerSnapshot.getTimeLeft()) + "&e.");
                 if (game.getSettings().isSounds()) {
                     game.playSound(Sound.CLICK);
                 }

@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.game;
 
 import com.google.common.io.*;
-import com.starmediadev.starlib.TimeUnit;
+import com.starmediadev.starlib.*;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.gamearchive.*;
 import com.thenexusreborn.api.helper.*;
@@ -44,6 +44,9 @@ import static com.thenexusreborn.survivalgames.game.GameState.*;
 public class Game {
     private static final SurvivalGames plugin = SurvivalGames.getPlugin(SurvivalGames.class);
     private static ControlType controlType = ControlType.MANUAL;
+    public static final TimeFormat SHORT_TIME_FORMAT = new TimeFormat("%*00h %%*#0m %%*#0s%");
+    public static final TimeFormat TIME_FORMAT = new TimeFormat("%*00h %%#0m %%#0s%");
+    public static final TimeFormat LONG_TIME_FORMAT = new TimeFormat("%*00h %%00m %%00s%");
     
     private final GameMap gameMap;
     private final GameSettings settings;
@@ -596,7 +599,7 @@ public class Game {
             }
         }
         
-        this.timer = new Timer(new DeathmatchCountdownCallback(this)).run(10050);
+        this.timer = new Timer(new DeathmatchCountdownCallback(this)).run(10050); //TODO Add a setting for this
     }
     
     public void startDeathmatch() {
