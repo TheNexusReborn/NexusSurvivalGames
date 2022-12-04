@@ -1,4 +1,4 @@
-package com.thenexusreborn.survivalgames.game.tasks;
+package com.thenexusreborn.survivalgames.threads.game;
 
 import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -9,9 +9,9 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 
-public class DamagersTask extends NexusThread<SurvivalGames> {
+public class DamagersThread extends NexusThread<SurvivalGames> {
     
-    public DamagersTask(SurvivalGames plugin) {
+    public DamagersThread(SurvivalGames plugin) {
         super(plugin, 10L, 0L, false);
     }
     

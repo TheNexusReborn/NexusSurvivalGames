@@ -1,4 +1,4 @@
-package com.thenexusreborn.survivalgames.game.tasks;
+package com.thenexusreborn.survivalgames.threads.game;
 
 import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -13,11 +13,11 @@ import org.bukkit.entity.Egg;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class ChickenMutationTask extends NexusThread<SurvivalGames> {
+public class ChickenMutationThread extends NexusThread<SurvivalGames> {
     
     private int eggGain = 19;
     
-    public ChickenMutationTask(SurvivalGames plugin) {
+    public ChickenMutationThread(SurvivalGames plugin) {
         super(plugin, 1L, 0L, false);
     }
     

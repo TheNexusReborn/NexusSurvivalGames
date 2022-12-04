@@ -1,4 +1,4 @@
-package com.thenexusreborn.survivalgames.lobby.tasks;
+package com.thenexusreborn.survivalgames.threads.lobby;
 
 import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.nexuscore.api.NexusThread;
@@ -9,9 +9,9 @@ import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 
-public class LobbyTask extends NexusThread<SurvivalGames> {
+public class LobbyThread extends NexusThread<SurvivalGames> {
     
-    public LobbyTask(SurvivalGames plugin) {
+    public LobbyThread(SurvivalGames plugin) {
         super(plugin, 20L, false);
     }
     

@@ -1,4 +1,4 @@
-package com.thenexusreborn.survivalgames.lobby.tasks;
+package com.thenexusreborn.survivalgames.threads.lobby;
 
 import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.ControlType;
@@ -6,9 +6,9 @@ import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
 
-public class TimerCountdownCheck extends NexusThread<SurvivalGames> {
+public class TimerCountdownCheckThread extends NexusThread<SurvivalGames> {
     
-    public TimerCountdownCheck(SurvivalGames plugin) {
+    public TimerCountdownCheckThread(SurvivalGames plugin) {
         super(plugin, 1L, false);
     }
     

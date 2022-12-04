@@ -1,4 +1,4 @@
-package com.thenexusreborn.survivalgames.game.tasks;
+package com.thenexusreborn.survivalgames.threads.game;
 
 import com.thenexusreborn.api.helper.NumberHelper;
 import com.thenexusreborn.nexuscore.api.NexusThread;
@@ -11,9 +11,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
-public class PlayerTrackerTask extends NexusThread<SurvivalGames> {
+public class PlayerTrackerThread extends NexusThread<SurvivalGames> {
 
-    public PlayerTrackerTask(SurvivalGames plugin) {
+    public PlayerTrackerThread(SurvivalGames plugin) {
         super(plugin, 2L, true);
     }
 

@@ -1,4 +1,4 @@
-package com.thenexusreborn.survivalgames.game.tasks;
+package com.thenexusreborn.survivalgames.threads.game;
 
 import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -10,8 +10,8 @@ import com.thenexusreborn.survivalgames.game.GameTeam;
 import java.util.ArrayList;
 
 //TODO Use a Timer for combat tags
-public class CombatTagTask extends NexusThread<SurvivalGames> {
-    public CombatTagTask(SurvivalGames plugin) {
+public class CombatTagThread extends NexusThread<SurvivalGames> {
+    public CombatTagThread(SurvivalGames plugin) {
         super(plugin, 5L, 0L, false);
     }
     

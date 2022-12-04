@@ -1,4 +1,4 @@
-package com.thenexusreborn.survivalgames.lobby.tasks;
+package com.thenexusreborn.survivalgames.threads.lobby;
 
 import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.nexuscore.util.MCUtils;
@@ -7,8 +7,8 @@ import com.thenexusreborn.survivalgames.lobby.*;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-public class StatSignUpdateTask extends NexusThread<SurvivalGames> {
-    public StatSignUpdateTask(SurvivalGames plugin) {
+public class StatSignUpdateThread extends NexusThread<SurvivalGames> {
+    public StatSignUpdateThread(SurvivalGames plugin) {
         super(plugin, 20L, false);
     }
     

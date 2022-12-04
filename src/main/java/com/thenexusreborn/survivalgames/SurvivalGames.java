@@ -15,12 +15,13 @@ import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.tasks.*;
 import com.thenexusreborn.survivalgames.listener.*;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
-import com.thenexusreborn.survivalgames.lobby.tasks.*;
 import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.map.*;
 import com.thenexusreborn.survivalgames.mutations.*;
 import com.thenexusreborn.survivalgames.settings.*;
-import com.thenexusreborn.survivalgames.tasks.ServerStatusTask;
+import com.thenexusreborn.survivalgames.threads.*;
+import com.thenexusreborn.survivalgames.threads.lobby.*;
+import com.thenexusreborn.survivalgames.threads.game.*;
 import org.bukkit.*;
 import org.bukkit.configuration.file.*;
 
@@ -187,23 +188,23 @@ public class SurvivalGames extends NexusSpigotPlugin {
         
         getLogger().info("Registered commands");
         
-        new GameSetupTask(this).start();
-        new TimerCountdownCheck(this).start();
-        new DeathmatchSetupTask(this).start();
-        new GameWorldTask(this).start();
-        new LobbyTask(this).start();
-        new PlayerTrackerTask(this).start();
-        new MapSignUpdateTask(this).start();
-        new MapChatOptionsMsgTask(this).start();
-        new VoteStartMsgTask(this).start();
-        new StatSignUpdateTask(this).start();
-        new TributeSignUpdateTask(this).start();
-        new EndermanWaterDamageTask(this).start();
-        new ChickenMutationTask(this).start();
-        new SpectatorUpdateTask(this).start();
-        new ServerStatusTask(this).start();
-        new CombatTagTask(this).start();
-        new DamagersTask(this).start();
+        new GameSetupThread(this).start();
+        new TimerCountdownCheckThread(this).start();
+        new DeathmatchSetupThread(this).start();
+        new GameWorldThread(this).start();
+        new LobbyThread(this).start();
+        new PlayerTrackerThread(this).start();
+        new MapSignUpdateThread(this).start();
+        new MapChatOptionsMsgThread(this).start();
+        new VoteStartMsgThread(this).start();
+        new StatSignUpdateThread(this).start();
+        new TributeSignUpdateThread(this).start();
+        new EndermanWaterDamageThread(this).start();
+        new ChickenMutationThread(this).start();
+        new SpectatorUpdateThread(this).start();
+        new ServerStatusThread(this).start();
+        new CombatTagThread(this).start();
+        new DamagersThread(this).start();
         
         getLogger().info("Registered Tasks");
         

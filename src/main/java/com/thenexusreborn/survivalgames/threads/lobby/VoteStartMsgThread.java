@@ -1,12 +1,12 @@
-package com.thenexusreborn.survivalgames.lobby.tasks;
+package com.thenexusreborn.survivalgames.threads.lobby;
 
 import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
 
-public class VoteStartMsgTask extends NexusThread<SurvivalGames> {
-    public VoteStartMsgTask(SurvivalGames plugin) {
+public class VoteStartMsgThread extends NexusThread<SurvivalGames> {
+    public VoteStartMsgThread(SurvivalGames plugin) {
         super(plugin, 2400L, true);
     }
     

@@ -1,4 +1,4 @@
-package com.thenexusreborn.survivalgames.lobby.tasks;
+package com.thenexusreborn.survivalgames.threads.lobby;
 
 import com.mojang.authlib.GameProfile;
 import com.thenexusreborn.nexuscore.api.NexusThread;
@@ -12,11 +12,11 @@ import org.bukkit.entity.Player;
 import java.lang.reflect.Field;
 import java.util.*;
 
-public class TributeSignUpdateTask extends NexusThread<SurvivalGames> {
+public class TributeSignUpdateThread extends NexusThread<SurvivalGames> {
     
     private UUID randomUUID = UUID.randomUUID();
     
-    public TributeSignUpdateTask(SurvivalGames plugin) {
+    public TributeSignUpdateThread(SurvivalGames plugin) {
         super(plugin, 20L, false);
     }
     
