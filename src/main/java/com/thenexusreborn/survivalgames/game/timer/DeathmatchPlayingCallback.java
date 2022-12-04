@@ -1,7 +1,6 @@
 package com.thenexusreborn.survivalgames.game.timer;
 
 import com.thenexusreborn.nexuscore.util.ReturnableCallback;
-import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.nexuscore.util.timer.TimerSnapshot;
 import com.thenexusreborn.survivalgames.ControlType;
 import com.thenexusreborn.survivalgames.game.*;
@@ -29,7 +28,7 @@ public class DeathmatchPlayingCallback implements ReturnableCallback<TimerSnapsh
         int remainingSeconds = timerSnapshot.getSecondsLeft();
         if (ANNOUNCE.contains(remainingSeconds)) {
             if (!announced.contains(remainingSeconds)) {
-                game.sendMessage("&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b" + Game.TIME_FORMAT.format(timerSnapshot.getTimeLeft()) + "&e.");
+                game.sendMessage("&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b" + Game.LONG_TIME_FORMAT.format(timerSnapshot.getTimeLeft()) + "&e.");
                 if (game.getSettings().isSounds()) {
                     game.playSound(Sound.CLICK);
                 }

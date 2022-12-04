@@ -1,7 +1,6 @@
 package com.thenexusreborn.survivalgames.game.timer;
 
 import com.thenexusreborn.nexuscore.util.ReturnableCallback;
-import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.nexuscore.util.timer.TimerSnapshot;
 import com.thenexusreborn.survivalgames.ControlType;
 import com.thenexusreborn.survivalgames.game.*;
@@ -34,7 +33,7 @@ public class GameEndTimerCallback implements ReturnableCallback<TimerSnapshot, B
         
         if (MINUTES_ANNOUCNE.contains(remainingMinutes)) {
             if (!announcedMinutes.contains(remainingMinutes)) {
-                game.sendMessage("&6&l>> &eThe game &c&lENDS &ein &b" + Game.TIME_FORMAT.format(timerSnapshot.getTimeLeft()) + "&e.");
+                game.sendMessage("&6&l>> &eThe game &c&lENDS &ein &b" + Game.LONG_TIME_FORMAT.format(timerSnapshot.getTimeLeft()) + "&e.");
                 if (game.getSettings().isSounds()) {
                     game.playSound(Sound.CLICK);
                 }
@@ -44,7 +43,7 @@ public class GameEndTimerCallback implements ReturnableCallback<TimerSnapshot, B
         
         if (SECONDS_ANNOUNCE.contains(remainingSeconds)) {
             if (!announcedSeconds.contains(remainingSeconds)) {
-                game.sendMessage("&eThe &c&lGAME &eends in &b" + Game.TIME_FORMAT.format(timerSnapshot.getTimeLeft()) + ".");
+                game.sendMessage("&eThe &c&lGAME &eends in &b" + Game.LONG_TIME_FORMAT.format(timerSnapshot.getTimeLeft()) + ".");
                 if (game.getSettings().isSounds()) {
                     game.playSound(Sound.CLICK);
                 }

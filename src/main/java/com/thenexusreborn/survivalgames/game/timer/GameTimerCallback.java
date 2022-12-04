@@ -34,7 +34,7 @@ public class GameTimerCallback implements ReturnableCallback<TimerSnapshot, Bool
         
         if (GAME_ANNOUNCE_MINUTES.contains(remainingMinutes)) {
             if (!this.announcedMinutes.contains(remainingMinutes)) {
-                game.sendMessage("&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b" + Game.TIME_FORMAT.format(timerSnapshot.getTimeLeft()) + "&e.");
+                game.sendMessage("&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b" + Game.LONG_TIME_FORMAT.format(timerSnapshot.getTimeLeft()) + "&e.");
                 if (game.getSettings().isSounds()) {
                     game.playSound(Sound.CLICK);
                 }
@@ -44,7 +44,7 @@ public class GameTimerCallback implements ReturnableCallback<TimerSnapshot, Bool
         
         if (DEATHMATCH_START_COUNTDOWN_ANNOUNCE.contains(remainingSeconds)) {
             if (!this.announcedSeconds.contains(remainingSeconds)) {
-                game.sendMessage("&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b" + Game.TIME_FORMAT.format(timerSnapshot.getTimeLeft()) + "&e.");
+                game.sendMessage("&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b" + Game.LONG_TIME_FORMAT.format(timerSnapshot.getTimeLeft()) + "&e.");
                 if (game.getSettings().isSounds()) {
                     game.playSound(Sound.CLICK);
                 }

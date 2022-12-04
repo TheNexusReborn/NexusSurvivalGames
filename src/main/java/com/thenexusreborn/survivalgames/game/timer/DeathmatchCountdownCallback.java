@@ -35,7 +35,7 @@ public class DeathmatchCountdownCallback implements ReturnableCallback<TimerSnap
         
         if (ANNOUNCE_SECONDS.contains(remainingSeconds)) {
             if (!this.announced.contains(remainingSeconds)) {
-                game.sendMessage("&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b" + Game.TIME_FORMAT.format(timerSnapshot.getTimeLeft()) + "&e.");
+                game.sendMessage("&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b" + Game.LONG_TIME_FORMAT.format(timerSnapshot.getTimeLeft()) + "&e.");
                 if (game.getSettings().isSounds()) {
                     game.playSound(Sound.ENDERDRAGON_HIT);
                 }
