@@ -8,29 +8,29 @@ import java.util.*;
 
 public class LootEntry {
     protected final int maxAmount;
-    protected final Rarity rarity;
+    protected final int weight;
     protected final LootItem item;
     
-    public LootEntry(LootItem item, int maxAmount, Rarity rarity) {
+    public LootEntry(LootItem item, int maxAmount, int weight) {
         this.item = item;
         this.maxAmount = maxAmount;
-        this.rarity = rarity;
+        this.weight = weight;
     }
     
-    public LootEntry(LootItem item, Rarity rarity) {
-        this(item, 1, rarity);
+    public LootEntry(LootItem item, int weight) {
+        this(item, 1, weight);
     }
     
-    public LootEntry(Material material, String name, Rarity rarity, int maxAmount, List<String> lore) {
-        this(new LootItem(material, name, lore), maxAmount, rarity);
+    public LootEntry(Material material, String name, int weight, int maxAmount, List<String> lore) {
+        this(new LootItem(material, name, lore), maxAmount, weight);
     }
     
-    public LootEntry(Material material, String name, Rarity rarity) {
-        this(material, name, rarity, 1, new ArrayList<>());
+    public LootEntry(Material material, String name, int weight) {
+        this(material, name, weight, 1, new ArrayList<>());
     }
     
-    public LootEntry(Material material, Rarity rarity) {
-        this(material, MaterialNames.getDefaultName(material), rarity);
+    public LootEntry(Material material, int weight) {
+        this(material, MaterialNames.getDefaultName(material), weight);
     }
     
     public int getMaxAmount() {
@@ -45,8 +45,8 @@ public class LootEntry {
         return item.getName();
     }
     
-    public Rarity getRarity() {
-        return rarity;
+    public int getWeight() {
+        return weight;
     }
     
     public List<String> getLore() {

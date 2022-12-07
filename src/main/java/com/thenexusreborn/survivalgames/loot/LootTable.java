@@ -1,7 +1,6 @@
 package com.thenexusreborn.survivalgames.loot;
 
 import com.starmediadev.starlib.Range;
-import com.thenexusreborn.api.helper.NumberHelper;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
@@ -11,7 +10,7 @@ public class LootTable {
     private final String name;
     private final List<LootCategory> categories;
     
-    private Set<Range<LootCategory>> categoryProbabilities = new HashSet<>();
+    private final Set<Range<LootCategory>> categoryProbabilities = new HashSet<>();
     private int categoryTotal, maxPossibleItems;
     
     public LootTable(String name, List<LootCategory> categories) {
@@ -20,15 +19,15 @@ public class LootTable {
     }
     
     public void generateNewProbabilities(Random random) {
-        int lastMax = -1;
+        int index = 0;
         for (LootCategory category : this.categories) {
             category.generateNewProbabilities(random);
-            Rarity rarity = category.getRarity();
-            int max = lastMax + NumberHelper.randomInRange(random, rarity.getMin(), rarity.getMax());
-            categoryProbabilities.add(new Range<>(lastMax + 1, max, category));
-            lastMax = max;
+            int min = index;
+            index += category.getWeight();
+            categoryProbabilities.add(new Range<>(min, index, category));
+            index++;
         }
-        this.categoryTotal = lastMax;
+        this.categoryTotal = index;
     }
     
     public List<ItemStack> generateLoot(int minAmount, int maxAmount) {

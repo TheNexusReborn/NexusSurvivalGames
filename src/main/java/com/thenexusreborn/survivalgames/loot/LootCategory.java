@@ -1,41 +1,55 @@
 package com.thenexusreborn.survivalgames.loot;
 
 import com.starmediadev.starlib.Range;
-import com.thenexusreborn.api.helper.NumberHelper;
 import org.bukkit.Material;
 
 import java.util.*;
 
 public class LootCategory {
     private final String name;
-    private final Rarity rarity;
+    private final int weight;
     private final List<LootEntry> entries;
     private final int maxAmountPerChest;
     
-    private Set<Range<LootEntry>> entryProbabilities = new HashSet<>();
+    private final Set<Range<LootEntry>> entryProbabilities = new HashSet<>();
     private int entryTotal;
     
-    public LootCategory(String name, Rarity rarity, int maxAmountPerChest, List<LootEntry> entries) {
+    public LootCategory(String name, int weight, int maxAmountPerChest, List<LootEntry> entries) {
         this.name = name;
-        this.rarity = rarity;
+        this.weight = weight;
         this.entries = entries;
         this.maxAmountPerChest = maxAmountPerChest;
     }
     
+    public LootCategory(String name, int weight, int maxAmountPerChest) {
+        this(name, weight, maxAmountPerChest, new ArrayList<>());
+    }
+    
+    public LootCategory(String name, int weight) {
+        this(name, weight, 2);
+    }
+    
+    @Deprecated
     public LootCategory(String name, Rarity rarity, int maxAmountPerChest) {
-        this(name, rarity, maxAmountPerChest, new ArrayList<>());
+        this(name, rarity.getMax(), maxAmountPerChest, new ArrayList<>());
     }
     
+    @Deprecated
     public LootCategory(String name, Rarity rarity) {
-        this(name, rarity, 2);
+        this(name, rarity.getMax());
     }
     
-    public void addEntries(Rarity rarity, LootItem... items) {
+    public void addEntries(int weight, LootItem... items) {
         if (items != null) {
             for (LootItem item : items) {
-                this.entries.add(new LootEntry(item, rarity));
+                this.entries.add(new LootEntry(item, weight));
             }
         }
+    }
+    
+    @Deprecated
+    public void addEntries(Rarity rarity, LootItem... items) {
+        addEntries(rarity.getMax(), items);
     }
     
     public LootEntry getEntry(String name) {
@@ -58,12 +72,13 @@ public class LootCategory {
         return null;
     }
     
-    public void addEntry(LootItem item, Rarity rarity) {
+    public void addEntry(int rarity, LootItem item) {
         this.entries.add(new LootEntry(item, rarity));
     }
     
+    @Deprecated
     public void addEntry(Rarity rarity, LootItem item) {
-        this.entries.add(new LootEntry(item, rarity));
+        addEntry(rarity.getMax(), item);
     }
     
     public void addEntry(LootEntry lootEntry) {
@@ -74,8 +89,8 @@ public class LootCategory {
         return name;
     }
     
-    public Rarity getRarity() {
-        return rarity;
+    public int getWeight() {
+        return weight;
     }
     
     public List<LootEntry> getEntries() {
@@ -87,14 +102,14 @@ public class LootCategory {
     }
     
     public void generateNewProbabilities(Random random) {
-        int lastMax = -1;
-        for (LootEntry category : this.entries) {
-            Rarity rarity = category.getRarity();
-            int max = lastMax + NumberHelper.randomInRange(random, rarity.getMin(), rarity.getMax());
-            entryProbabilities.add(new Range<>(lastMax + 1, max, category));
-            lastMax = max;
+        int index = 0;
+        for (LootEntry entry : this.entries) {
+            int min = index;
+            index += entry.getWeight();
+            entryProbabilities.add(new Range<>(min, index, entry));
+            index++;
         }
-        this.entryTotal = lastMax;
+        this.entryTotal = index;
     }
     
     public LootEntry generateLoot(Random random) {
