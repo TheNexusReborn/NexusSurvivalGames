@@ -1,18 +1,15 @@
 package com.thenexusreborn.survivalgames.game;
 
-import com.thenexusreborn.api.player.NexusPlayer;
-import com.thenexusreborn.api.player.Rank;
+import com.thenexusreborn.api.frameworks.value.Value;
+import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.stats.StatOperator;
-import com.thenexusreborn.api.stats.StatValue;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
 import org.bukkit.entity.EntityType;
 
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.UUID;
+import java.util.*;
 
 public class GamePlayer {
     private final NexusPlayer nexusPlayer;
@@ -39,7 +36,7 @@ public class GamePlayer {
         getNexusPlayer().changeStat(statName, value, operator);
     }
 
-    public StatValue getStatValue(String statName) {
+    public Value getStatValue(String statName) {
         return getNexusPlayer().getStatValue(statName);
     }
 

@@ -1,9 +1,9 @@
 package com.thenexusreborn.survivalgames.lobby;
 
+import com.thenexusreborn.api.frameworks.value.Value;
 import com.thenexusreborn.api.player.*;
-import com.thenexusreborn.api.stats.StatValue;
 
-import java.util.*;
+import java.util.UUID;
 
 public class LobbyPlayer {
     private final NexusPlayer player;
@@ -70,7 +70,7 @@ public class LobbyPlayer {
         this.player.setActionBar(actionBar);
     }
     
-    public StatValue getStatValue(String statName) {
+    public Value getStatValue(String statName) {
         return getPlayer().getStatValue(statName);
     }
 }
