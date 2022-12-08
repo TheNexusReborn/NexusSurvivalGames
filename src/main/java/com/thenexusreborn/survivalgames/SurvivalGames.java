@@ -17,7 +17,10 @@ import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.map.*;
 import com.thenexusreborn.survivalgames.mutations.*;
+import com.thenexusreborn.survivalgames.newsettings.*;
+import com.thenexusreborn.survivalgames.newsettings.object.impl.*;
 import com.thenexusreborn.survivalgames.settings.*;
+import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.threads.*;
 import com.thenexusreborn.survivalgames.threads.lobby.*;
 import com.thenexusreborn.survivalgames.threads.game.*;
@@ -41,10 +44,10 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
     private Game game;
     
-    private int gamesPlayed = 0;
+    private int gamesPlayed;
     
     private SGChatHandler chatHandler;
-    private boolean restart = false;
+    private boolean restart;
     
     private final Map<String, LobbySettings> lobbySettings = new HashMap<>();
     private final Map<String, GameSettings> gameSettings = new HashMap<>();
@@ -54,6 +57,8 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
     private File deathMessagesFile;
     private FileConfiguration deathMessagesConfig;
+    
+    private final SettingRegistry settingRegistry = new SettingRegistry();
 
     @Override
     public void onLoad() {
@@ -349,8 +354,8 @@ public class SurvivalGames extends NexusSpigotPlugin {
     public void registerDatabases(DatabaseRegistry registry) {
         for (Database database : registry.getObjects()) {
             if (database.isPrimary()) {
-                database.registerClass(GameSettings.class);
-                database.registerClass(LobbySettings.class);
+                database.registerClass(GameSetting.class);
+                database.registerClass(LobbySetting.class);
                 database.registerClass(UnlockedMutation.class);
             }
         }
@@ -374,5 +379,9 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
     public FileConfiguration getDeathMessagesConfig() {
         return deathMessagesConfig;
+    }
+    
+    public SettingRegistry getSettingRegistry() {
+        return settingRegistry;
     }
 }
