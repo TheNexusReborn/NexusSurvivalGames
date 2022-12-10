@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.newsettings.object;
 
 import com.thenexusreborn.api.frameworks.value.Value;
-import com.thenexusreborn.api.storage.annotations.ColumnInfo;
+import com.thenexusreborn.api.storage.annotations.*;
 import com.thenexusreborn.api.storage.objects.SqlCodec;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 
@@ -41,6 +41,7 @@ public abstract class Setting {
         return value;
     }
     
+    @TableInfo("sgsettinginfo")
     public static class Info {
         private long id;
         private String name, displayName, description, type;
@@ -83,12 +84,12 @@ public abstract class Setting {
                 return false;
             }
             Info info = (Info) o;
-            return Objects.equals(name, info.name);
+            return Objects.equals(type + "_" + name, info.type + "_" + info.name);
         }
     
         @Override
         public int hashCode() {
-            return Objects.hash(name);
+            return Objects.hash(type + "_" + name);
         }
     }
     
