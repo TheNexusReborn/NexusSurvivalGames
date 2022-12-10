@@ -2,21 +2,20 @@ package com.thenexusreborn.survivalgames.settings;
 
 import com.thenexusreborn.api.storage.annotations.*;
 import com.thenexusreborn.api.helper.ReflectionHelper;
+import com.thenexusreborn.survivalgames.newsettings.collection.SettingList;
+import com.thenexusreborn.survivalgames.newsettings.object.impl.LobbySetting;
 
 import java.lang.reflect.Field;
 
 @TableInfo("sglobbysettings")
-public class LobbySettings extends SGSettings {
-    private int maxPlayers = 24;
-    private int minPlayers = 4;
-    private int maxGames = 10;
-    private int timerLength = 10; //Default 30
+public class LobbySettings extends SettingList<LobbySetting> {
     private int voteStartThreshold = 2;
     private boolean voteWeight = true;
     private boolean keepPreviousGameSettings = true;
     private boolean sounds = true;
     
-    private LobbySettings() {
+    public LobbySettings() {
+        super("lobby");
     }
     
     public LobbySettings(String type) {
@@ -24,38 +23,38 @@ public class LobbySettings extends SGSettings {
     }
     
     public int getMaxPlayers() {
-        return maxPlayers;
+        return get("max_players").getValue().getAsInt();
     }
     
     public LobbySettings setMaxPlayers(int maxPlayers) {
-        this.maxPlayers = maxPlayers;
+        get("max_players").getValue().set(maxPlayers);
         return this;
     }
     
     public int getMinPlayers() {
-        return minPlayers;
+        return get("min_players").getValue().getAsInt();
     }
     
     public LobbySettings setMinPlayers(int minPlayers) {
-        this.minPlayers = minPlayers;
+        get("min_players").getValue().set(minPlayers);
         return this;
     }
     
     public int getMaxGames() {
-        return maxGames;
+        return get("max_games").getValue().getAsInt();
     }
     
     public LobbySettings setMaxGames(int maxGames) {
-        this.maxGames = maxGames;
+        get("max_games").getValue().set(maxGames);
         return this;
     }
     
     public int getTimerLength() {
-        return timerLength;
+        return get("timer_length").getValue().getAsInt();
     }
     
     public LobbySettings setTimerLength(int timerLength) {
-        this.timerLength = timerLength;
+        get("timer_length").getValue().set(timerLength);
         return this;
     }
     
@@ -93,21 +92,6 @@ public class LobbySettings extends SGSettings {
     public LobbySettings setVoteStartThreshold(int voteStartThreshold) {
         this.voteStartThreshold = voteStartThreshold;
         return this;
-    }
-    
-    @Override
-    public String toString() {
-        return "LobbySettings{" +
-                "maxPlayers=" + maxPlayers +
-                ", minPlayers=" + minPlayers +
-                ", maxGames=" + maxGames +
-                ", timerLength=" + timerLength +
-                ", voteWeight=" + voteWeight +
-                ", keepPreviousGameSettings=" + keepPreviousGameSettings +
-                ", sounds=" + sounds +
-                ", id=" + id +
-                ", type='" + type + '\'' +
-                '}';
     }
     
     @Override

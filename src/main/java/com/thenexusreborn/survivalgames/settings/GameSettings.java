@@ -2,11 +2,13 @@ package com.thenexusreborn.survivalgames.settings;
 
 import com.thenexusreborn.api.storage.annotations.*;
 import com.thenexusreborn.api.helper.ReflectionHelper;
+import com.thenexusreborn.survivalgames.newsettings.collection.SettingList;
+import com.thenexusreborn.survivalgames.newsettings.object.impl.GameSetting;
 
 import java.lang.reflect.Field;
 
 @TableInfo("sggamesettings")
-public class GameSettings extends SGSettings {
+public class GameSettings extends SettingList<GameSetting> {
     private int maxPlayers = 24;
     private int maxHealth = 20;
     private int gracePeriodLength = 60;
@@ -37,7 +39,8 @@ public class GameSettings extends SGSettings {
     private Time time = Time.NOON;
     private Weather weather = Weather.CLEAR;
     
-    private GameSettings() {
+    public GameSettings() {
+        super("game");
     }
     
     public GameSettings(String type) {
