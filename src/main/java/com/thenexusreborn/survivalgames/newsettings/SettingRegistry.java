@@ -11,6 +11,10 @@ public class SettingRegistry extends Registry<Setting.Info> {
         register(new Info(name, displayName, description, type, defaultValue));
     }
     
+    public void register(String name, String displayName, String description, String type, Value defaultValue, Value minValue, Value maxValue) {
+        register(new Info(name, displayName, description, type, defaultValue, minValue, maxValue));
+    }
+    
     @Override
     public Setting.Info get(String str) {
         for (Info info : this.getObjects()) {

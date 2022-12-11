@@ -6,6 +6,11 @@ import com.thenexusreborn.survivalgames.newsettings.object.Setting;
 
 @TableInfo("sglobbysettings")
 public class LobbySetting extends Setting {
+    
+    private LobbySetting() {
+        super();
+    }
+    
     public LobbySetting(Info info, String category, Value value) {
         super(info, category, value);
     }

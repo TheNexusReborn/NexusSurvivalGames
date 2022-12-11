@@ -372,7 +372,7 @@ public class Game {
                         spectators.offer(player.getUniqueId());
                     }
                 } else {
-                    if (tributes.size() >= settings.getMaxPlayers()) {
+                    if (tributes.size() >= gameMap.getSpawns().size()) {
                         player.setTeam(GameTeam.SPECTATORS);
                         spectators.offer(uuid);
                     } else {
@@ -505,9 +505,9 @@ public class Game {
         sendMessage("&6&l>> &a&lMAY THE ODDS BE EVER IN YOUR FAVOR.");
         sendMessage("&6&l>> &c&lCLICKING MORE THAN 16 CPS WILL LIKELY RESULT IN A BAN.");
         if (this.settings.isTeamingAllowed()) {
-            sendMessage("&6&l>> &d&lTHERE IS A MAXIUMUM OF 2 PLAYER TEAMS.");
+            sendMessage("&6&l>> &d&lTHERE IS A MAXIUMUM OF " + this.settings.getMaxTeamAmount() + " PLAYER TEAMS.");
         } else {
-            sendMessage("&6&l>> &d&lTEAMING IS NOT ALLOWED.");
+            sendMessage("&6&l>> &d&lTEAMING IS NOT ALLOWED IN THIS GAME.");
         }
     }
     
@@ -1208,7 +1208,7 @@ public class Game {
         
         sendMessage("&6&l>> &4&lTHE DEATHMATCH COUNTDOWN HAS STARTED");
         
-        this.timer = new Timer(new DeathmatchPlayingCallback(this)).run(TimeUnit.MINUTES.toMilliseconds(settings.getDeathmatchTimerLength()) + 50);
+        this.timer = new Timer(new DeathmatchPlayingCallback(this)).run(TimeUnit.SECONDS.toMilliseconds(settings.getDeathmatchTimerLength()) + 50);
     }
     
     public boolean isLootedChest(Block block) {

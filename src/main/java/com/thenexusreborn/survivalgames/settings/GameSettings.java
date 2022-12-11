@@ -1,44 +1,11 @@
 package com.thenexusreborn.survivalgames.settings;
 
-import com.thenexusreborn.api.storage.annotations.*;
-import com.thenexusreborn.api.helper.ReflectionHelper;
+import com.thenexusreborn.api.storage.annotations.TableInfo;
 import com.thenexusreborn.survivalgames.newsettings.collection.SettingList;
 import com.thenexusreborn.survivalgames.newsettings.object.impl.GameSetting;
 
-import java.lang.reflect.Field;
-
 @TableInfo("sggamesettings")
 public class GameSettings extends SettingList<GameSetting> {
-    private int maxPlayers = 24;
-    private int maxHealth = 20;
-    private int gracePeriodLength = 60;
-    private int gameLength = 10;
-    private int deathmatchLength = 5;
-    private int warmupLength = 30;
-    private int deathmatchThreshold = 2; //Default: 4
-    private int nextGameStart = 10;
-    private int deathmatchTimerLength = 1;
-    private int mutationSpawnDelay = 10;
-    private double passRewardChance = 0.75;
-    private double passUseChance = 0.99;
-    private boolean teamingAllowed = true;
-    private boolean allowMutations = true;
-    private boolean regeneration = true;
-    private boolean gracePeriod = false;
-    private boolean unlimitedPasses = true; //Default: false
-    private boolean timeProgression = false;
-    private boolean weatherProgression = false;
-    private boolean multiplier = true;
-    private boolean sounds = true;
-    private boolean giveCredits = true;
-    private boolean giveXp = true;
-    private boolean useNewLoot = true;
-    private boolean allowEnderchests = true;
-    private boolean useAllMutations = true; //Default: false
-    private ColorMode colorMode = ColorMode.RANK;
-    private Time time = Time.NOON;
-    private Weather weather = Weather.CLEAR;
-    
     public GameSettings() {
         super("game");
     }
@@ -47,313 +14,124 @@ public class GameSettings extends SettingList<GameSetting> {
         super(type);
     }
     
-    public GameSettings setTeamingAllowed(boolean value) {
-        this.teamingAllowed = value;
-        return this;
-    }
-    
     public boolean isTeamingAllowed() {
-        return teamingAllowed;
+        return getValue("allow_teaming").getAsBoolean();
     }
     
-    public int getMaxPlayers() {
-        return maxPlayers;
+    public int getMaxTeamAmount() {
+        return getValue("max_team_amount").getAsInt();
     }
     
     public int getDeathmatchTimerLength() {
-        return deathmatchTimerLength;
-    }
-    
-    public GameSettings setDeathmatchTimerLength(int deathmatchTimerLength) {
-        this.deathmatchTimerLength = deathmatchTimerLength;
-        return this;
-    }
-    
-    public GameSettings setMaxPlayers(int maxPlayers) {
-        this.maxPlayers = maxPlayers;
-        return this;
+        return getValue("deathmatch_countdown_length").getAsInt();
     }
     
     public int getMaxHealth() {
-        return maxHealth;
-    }
-    
-    public GameSettings setMaxHealth(int maxHealth) {
-        this.maxHealth = maxHealth;
-        return this;
+        return getValue("max_health").getAsInt();
     }
     
     public int getGracePeriodLength() {
-        return gracePeriodLength;
-    }
-    
-    public GameSettings setGracePeriodLength(int gracePeriodLength) {
-        this.gracePeriodLength = gracePeriodLength;
-        return this;
+        return getValue("grace_period_length").getAsInt();
     }
     
     public int getGameLength() {
-        return gameLength;
-    }
-    
-    public GameSettings setGameLength(int gameLength) {
-        this.gameLength = gameLength;
-        return this;
+        return getValue("game_length").getAsInt();
     }
     
     public int getDeathmatchLength() {
-        return deathmatchLength;
-    }
-    
-    public GameSettings setDeathmatchLength(int deathmatchLength) {
-        this.deathmatchLength = deathmatchLength;
-        return this;
+        return getValue("deathmatch_length").getAsInt();
     }
     
     public int getWarmupLength() {
-        return warmupLength;
-    }
-    
-    public GameSettings setWarmupLength(int warmupLength) {
-        this.warmupLength = warmupLength;
-        return this;
+        return getValue("warmup_length").getAsInt();
     }
     
     public int getDeathmatchThreshold() {
-        return deathmatchThreshold;
-    }
-    
-    public GameSettings setDeathmatchThreshold(int deathmatchThreshold) {
-        this.deathmatchThreshold = deathmatchThreshold;
-        return this;
+        return getValue("deathmatch_threshold").getAsInt();
     }
     
     public int getNextGameStart() {
-        return nextGameStart;
-    }
-    
-    public GameSettings setNextGameStart(int nextGameStart) {
-        this.nextGameStart = nextGameStart;
-        return this;
+        return getValue("next_game_timer_length").getAsInt();
     }
     
     public boolean isAllowMutations() {
-        return allowMutations;
-    }
-    
-    public GameSettings setAllowMutations(boolean allowMutations) {
-        this.allowMutations = allowMutations;
-        return this;
+        return getValue("mutations_enabled").getAsBoolean();
     }
     
     public boolean isRegeneration() {
-        return regeneration;
-    }
-    
-    public GameSettings setRegeneration(boolean regeneration) {
-        this.regeneration = regeneration;
-        return this;
+        return getValue("regeneration").getAsBoolean();
     }
     
     public boolean isGracePeriod() {
-        return gracePeriod;
-    }
-    
-    public GameSettings setGracePeriod(boolean gracePeriod) {
-        this.gracePeriod = gracePeriod;
-        return this;
+        return getValue("grace_period").getAsBoolean();
     }
     
     public boolean isUnlimitedPasses() {
-        return unlimitedPasses;
-    }
-    
-    public GameSettings setUnlimitedPasses(boolean unlimitedPasses) {
-        this.unlimitedPasses = unlimitedPasses;
-        return this;
+        return getValue("unlimited_mutation_passes").getAsBoolean();
     }
     
     public boolean isTimeProgression() {
-        return timeProgression;
-    }
-    
-    public GameSettings setTimeProgression(boolean timeProgression) {
-        this.timeProgression = timeProgression;
-        return this;
+        return getValue("time_progression").getAsBoolean();
     }
     
     public boolean isWeatherProgression() {
-        return weatherProgression;
-    }
-    
-    public GameSettings setWeatherProgression(boolean weatherProgression) {
-        this.weatherProgression = weatherProgression;
-        return this;
+        return getValue("weather_progression").getAsBoolean();
     }
     
     public boolean isMultiplier() {
-        return multiplier;
-    }
-    
-    public GameSettings setMultiplier(boolean multiplier) {
-        this.multiplier = multiplier;
-        return this;
+        return getValue("apply_multipliers").getAsBoolean();
     }
     
     public Time getTime() {
-        return time;
-    }
-    
-    public GameSettings setTime(Time time) {
-        this.time = time;
-        return this;
+        return getValue("world_time").getAsEnum(Time.class);
     }
     
     public Weather getWeather() {
-        return weather;
-    }
-    
-    public GameSettings setWeather(Weather weather) {
-        this.weather = weather;
-        return this;
+        return getValue("world_weather").getAsEnum(Weather.class);
     }
     
     public boolean isSounds() {
-        return sounds;
-    }
-    
-    public GameSettings setSounds(boolean sounds) {
-        this.sounds = sounds;
-        return this;
+        return getValue("sounds").getAsBoolean();
     }
     
     public ColorMode getColorMode() {
-        return colorMode;
-    }
-    
-    public GameSettings setColorMode(ColorMode colorMode) {
-        this.colorMode = colorMode;
-        return this;
-    }
-    
-    public GameSettings setGiveCredits(boolean giveCredits) {
-        this.giveCredits = giveCredits;
-        return this;
+        return getValue("color_mode").getAsEnum(ColorMode.class);
     }
     
     public boolean isGiveCredits() {
-        return giveCredits;
+        return getValue("give_credits").getAsBoolean();
     }
     
     public boolean isGiveXp() {
-        return giveXp;
-    }
-    
-    public GameSettings setGiveXp(boolean giveXp) {
-        this.giveXp = giveXp;
-        return this;
+        return getValue("give_network_xp").getAsBoolean();
     }
     
     public boolean isUseNewLoot() {
-        return useNewLoot;
-    }
-    
-    public GameSettings setUseNewLoot(boolean useNewLoot) {
-        this.useNewLoot = useNewLoot;
-        return this;
+        return getValue("use_tiered_loot").getAsBoolean();
     }
     
     public boolean isAllowEnderchests() {
-        return allowEnderchests;
-    }
-    
-    public void setAllowEnderchests(boolean allowEnderchests) {
-        this.allowEnderchests = allowEnderchests;
-    }
-    
-    public GameSettings setMutationSpawnDelay(int mutationSpawnDelay) {
-        this.mutationSpawnDelay = mutationSpawnDelay;
-        return this;
-    }
-    
-    public GameSettings setPassRewardChance(double passRewardChance) {
-        this.passRewardChance = passRewardChance;
-        return this;
-    }
-    
-    public GameSettings setPassUseChance(double passUseChance) {
-        this.passUseChance = passUseChance;
-        return this;
+        return getValue("enderchests_enabled").getAsBoolean();
     }
     
     public int getMutationSpawnDelay() {
-        return mutationSpawnDelay;
+        return getValue("mutation_spawn_delay").getAsInt();
     }
     
     public double getPassRewardChance() {
-        return passRewardChance;
+        return getValue("pass_award_chance").getAsDouble();
     }
     
     public double getPassUseChance() {
-        return passUseChance;
+        return getValue("pass_use_chance").getAsDouble();
     }
     
     public boolean isUseAllMutations() {
-        return useAllMutations;
-    }
-    
-    public void setUseAllMutations(boolean useAllMutations) {
-        this.useAllMutations = useAllMutations;
-    }
-    
-    @Override
-    public String toString() {
-        return "GameSettings{" +
-                "maxPlayers=" + maxPlayers +
-                ", maxHealth=" + maxHealth +
-                ", gracePeriodLength=" + gracePeriodLength +
-                ", gameLength=" + gameLength +
-                ", deathmatchLength=" + deathmatchLength +
-                ", warmupLength=" + warmupLength +
-                ", deathmatchThreshold=" + deathmatchThreshold +
-                ", nextGameStart=" + nextGameStart +
-                ", deathmatchTimerLength=" + deathmatchTimerLength +
-                ", mutationSpawnDelay=" + mutationSpawnDelay +
-                ", passRewardChance=" + passRewardChance +
-                ", passUseChance=" + passUseChance +
-                ", teamingAllowed=" + teamingAllowed +
-                ", allowMutations=" + allowMutations +
-                ", regeneration=" + regeneration +
-                ", gracePeriod=" + gracePeriod +
-                ", unlimitedPasses=" + unlimitedPasses +
-                ", timeProgression=" + timeProgression +
-                ", weatherProgression=" + weatherProgression +
-                ", multiplier=" + multiplier +
-                ", sounds=" + sounds +
-                ", giveCredits=" + giveCredits +
-                ", giveXp=" + giveXp +
-                ", useNewLoot=" + useNewLoot +
-                ", allowEnderchests=" + allowEnderchests +
-                ", useAllMutations=" + useAllMutations +
-                ", colorMode=" + colorMode +
-                ", time=" + time +
-                ", weather=" + weather +
-                '}';
+        return getValue("use_all_mutation_types").getAsBoolean();
     }
     
     @Override
     public GameSettings clone() {
-        GameSettings settings = new GameSettings();
-    
-        for (Field field : ReflectionHelper.getClassFields(getClass())) {
-            field.setAccessible(true);
-            try {
-                field.set(settings, field.get(this));
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-    
-        return settings;
+        return (GameSettings) super.clone();
     }
 }

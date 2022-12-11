@@ -10,7 +10,6 @@ import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.lobby.*;
 import com.thenexusreborn.survivalgames.map.*;
-import com.thenexusreborn.survivalgames.settings.*;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.*;
 import org.bukkit.block.*;
@@ -18,9 +17,9 @@ import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.lang.reflect.Field;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.stream.Stream;
 
 public class SGCommand implements CommandExecutor {
     
@@ -54,7 +53,7 @@ public class SGCommand implements CommandExecutor {
             
             String gameSubCommand = args[1].toLowerCase();
             
-            if (gameSubCommand.equals("automatic") || gameSubCommand.equals("auto") || gameSubCommand.equals("manual") || gameSubCommand.equals("mnl")) {
+            if (List.of("automatic", "auto", "manual", "mnl").contains(gameSubCommand)) {
                 ControlType controlType = null;
                 try {
                     controlType = ControlType.valueOf(gameSubCommand.toUpperCase());
@@ -200,7 +199,7 @@ public class SGCommand implements CommandExecutor {
                     }
                 }
                 case "startdeathmatch", "sdm" -> {
-                    if (game.getState() == GameState.TELEPORT_DEATHMATCH_DONE || game.getState() == GameState.DEATHMATCH_WARMUP || game.getState() == GameState.DEATHMATCH_WARMUP_DONE) {
+                    if (Stream.of(GameState.TELEPORT_DEATHMATCH_DONE, GameState.DEATHMATCH_WARMUP, GameState.DEATHMATCH_WARMUP_DONE).anyMatch(gameState -> game.getState() == gameState)) {
                         game.startDeathmatch();
                         sender.sendMessage(MCUtils.color(MsgType.INFO + "You started the deathmatch"));
                     } else {
@@ -453,7 +452,7 @@ public class SGCommand implements CommandExecutor {
                         return true;
                     }
                     
-                    if (!(targetBlock.getType() == Material.SIGN || targetBlock.getType() == Material.WALL_SIGN || targetBlock.getType() == Material.SKULL)) {
+                    if (Stream.of(Material.SIGN, Material.WALL_SIGN, Material.SKULL).noneMatch(material -> targetBlock.getType() == material)) {
                         player.sendMessage("&cYou are not looking at a sign or a head.");
                         return true;
                     }
@@ -553,136 +552,10 @@ public class SGCommand implements CommandExecutor {
                     sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the lobby spawnpoint to your location."));
                 }
             }
-        } else if (subCommand.equals("settings") || subCommand.equals("setting") || subCommand.equals("s")) {
-            if (!(args.length > 3)) {
-                sender.sendMessage(MCUtils.color(MsgType.WARN + "Usage: /" + label + " " + args[0] + " <type> <name | save> <value | savename>"));
-                return true;
-            }
-            // /sg settings <type> <save> <name>
-            String type = args[1];
-            
-            if (!(type.equalsIgnoreCase("game") || type.equalsIgnoreCase("lobby"))) {
-                sender.sendMessage(MCUtils.color(MsgType.WARN + "Invalid setting type. Can only be game or lobby"));
-                return true;
-            }
-            
-            if (args[2].equalsIgnoreCase("save")) {
-                String saveName = args[3];
-                SGSettings settings;
-                if (type.equalsIgnoreCase("lobby")) {
-                    settings = plugin.getLobby().getLobbySettings();
-                } else {
-                    if (game == null) {
-                        settings = plugin.getLobby().getGameSettings();
-                    } else {
-                        settings = game.getSettings();
-                    }
-                }
-                
-                settings.setId(0);
-                settings.setType(args[3].toLowerCase());
-                NexusAPI.getApi().getPrimaryDatabase().push(settings);
-                if (settings.getId() > 0) {
-                    sender.sendMessage(MCUtils.color(MsgType.INFO + "Successfully saved the settings with the name &b" + settings.getType()));
-                    if (type.equalsIgnoreCase("lobby")) {
-                        plugin.addLobbySettings((LobbySettings) settings);
-                    } else {
-                        if (type.equalsIgnoreCase("game")) {
-                            plugin.addGameSettings((GameSettings) settings);
-                        }
-                    }
-                } else {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "There was a problem saving the settings, report to Firestar311"));
-                }
-                return true;
-            }
-            
-            String settingName = args[2];
-            String rawValue = args[3];
-            
-            Field settingField = null;
-            if (type.equalsIgnoreCase("game")) {
-                for (Field field : GameSettings.class.getDeclaredFields()) {
-                    if (field.getName().equalsIgnoreCase(settingName)) {
-                        settingField = field;
-                        break;
-                    }
-                }
-            } else if (type.equalsIgnoreCase("lobby")) {
-                for (Field field : LobbySettings.class.getDeclaredFields()) {
-                    if (field.getName().equalsIgnoreCase(settingName)) {
-                        settingField = field;
-                        break;
-                    }
-                }
-            }
-            
-            if (settingField == null) {
-                sender.sendMessage(MCUtils.color(MsgType.WARN + "A setting with that name does not exist."));
-                return true;
-            }
-            
-            Object value;
-            if (settingField.getType().equals(int.class)) {
-                try {
-                    value = Integer.parseInt(rawValue);
-                } catch (NumberFormatException e) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid number for that setting."));
-                    return true;
-                }
-            } else if (settingField.getType().equals(boolean.class)) {
-                if (rawValue.equalsIgnoreCase("true") || rawValue.equalsIgnoreCase("yes")) {
-                    value = true;
-                } else if (rawValue.equalsIgnoreCase("false") || rawValue.equalsIgnoreCase("no")) {
-                    value = false;
-                } else {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "Invalid value, only true, false, yes and no are accepted for that setting"));
-                    return true;
-                }
-            } else if (settingField.getType().equals(Time.class)) {
-                try {
-                    value = Time.valueOf(rawValue.toUpperCase());
-                } catch (Exception e) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid time value"));
-                    return true;
-                }
-            } else if (settingField.getType().equals(Weather.class)) {
-                try {
-                    value = Weather.valueOf(rawValue.toUpperCase());
-                } catch (Exception e) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid weather value"));
-                    return true;
-                }
-            } else if (settingField.getType().equals(ColorMode.class)) {
-                try {
-                    value = ColorMode.valueOf(rawValue.toUpperCase());
-                } catch (Exception e) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid color mode value."));
-                    return true;
-                }
-            } else {
-                sender.sendMessage(MCUtils.color(MsgType.WARN + "Unhandled setting type: " + settingField.getType().getName() + ". This is a BUG"));
-                return true;
-            }
-            
-            try {
-                settingField.setAccessible(true);
-                Object object = null;
-                if (type.equalsIgnoreCase("game")) {
-                    if (game == null) {
-                        object = plugin.getLobby().getGameSettings();
-                    } else {
-                        object = game.getSettings();
-                    }
-                } else if (type.equalsIgnoreCase("lobby")) {
-                    object = plugin.getLobby().getLobbySettings();
-                }
-                settingField.set(object, value);
-                sender.sendMessage(MCUtils.color("&6&l>> &eYou set the &b" + type.toLowerCase() + " &esetting &b" + settingField.getName() + " &eto &b" + value));
-            } catch (Exception e) {
-                sender.sendMessage(MCUtils.color(MsgType.WARN + "Error while setting the value. Please report with the following message."));
-                sender.sendMessage(MCUtils.color(MsgType.WARN + "" + e.getClass().getName() + ": " + e.getMessage()));
-            }
+        } else if (List.of("settings", "setting", "s").contains(subCommand)) {
+            sender.sendMessage(MCUtils.color("&cThis command is undergoing reworking"));
+            return true;
+            //TODO Rework this after settings are done
         } else if (subCommand.equals("map") || subCommand.equals("m")) {
             if (!(args.length > 1)) {
                 sender.sendMessage(MCUtils.color(MsgType.WARN + "You must provide a sub command."));
@@ -990,7 +863,7 @@ public class SGCommand implements CommandExecutor {
                         sender.sendMessage(MsgType.WARN + "You provided an invalid integer value.");
                         return true;
                     }
-                    long milliseconds = (seconds * 1000L) + 50;
+                    long milliseconds = seconds * 1000L + 50;
                     if (operator == null) {
                         timer.setLength(milliseconds);
                     } else {
