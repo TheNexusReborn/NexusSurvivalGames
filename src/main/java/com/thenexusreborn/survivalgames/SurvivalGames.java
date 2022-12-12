@@ -6,7 +6,6 @@ import com.thenexusreborn.api.frameworks.value.Value.Type;
 import com.thenexusreborn.api.network.cmd.NetworkCommand;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.registry.*;
-import com.thenexusreborn.api.server.Environment;
 import com.thenexusreborn.api.stats.StatType;
 import com.thenexusreborn.api.storage.objects.Database;
 import com.thenexusreborn.nexuscore.NexusCore;
@@ -112,49 +111,59 @@ public class SurvivalGames extends NexusSpigotPlugin {
         }
         
         database.flush();
-
-//        try {
-//            for (GameSettings gameSettings : NexusAPI.getApi().getPrimaryDatabase().get(GameSettings.class)) {
-//                addGameSettings(gameSettings);
-//            }
-//            
-//            for (LobbySettings lobbySettings : NexusAPI.getApi().getPrimaryDatabase().get(LobbySettings.class)) {
-//                addLobbySettings(lobbySettings);
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//            getServer().getPluginManager().disablePlugin(this);
-//            return;
-//        }
         
-//        if (!this.lobbySettings.containsKey("default")) {
-//            LobbySettings lobbySettings = new LobbySettings("default");
-//            NexusAPI.getApi().getPrimaryDatabase().push(lobbySettings);
-//            addLobbySettings(lobbySettings);
-//        }
-//        if (!this.gameSettings.containsKey("default")) {
-//            GameSettings gameSettings = new GameSettings("default");
-//            NexusAPI.getApi().getPrimaryDatabase().push(gameSettings);
-//            addGameSettings(gameSettings);
-//        }
-//        
-//        if (NexusAPI.getApi().getEnvironment() == Environment.DEVELOPMENT) {
-//            LobbySettings devLobbySettings = getLobbySettings("dev");
-//            if (devLobbySettings == null) {
-//                devLobbySettings = new LobbySettings("dev");
-//                devLobbySettings.setTimerLength(10);
-//                NexusAPI.getApi().getPrimaryDatabase().push(devLobbySettings);
-//                addLobbySettings(devLobbySettings);
-//            }
-//            
-//            GameSettings devGameSettings = getGameSettings("dev");
-//            if (devGameSettings == null) {
-//                devGameSettings = new GameSettings("dev");
-//                devGameSettings.setWarmupLength(10);
-//                NexusAPI.getApi().getPrimaryDatabase().push(devGameSettings);
-//                addGameSettings(devGameSettings);
-//            }
-//        }
+        try {
+            List<LobbySetting> lobbySettings = database.get(LobbySetting.class);
+    
+            for (LobbySetting lobbySetting : lobbySettings) {
+                if (this.lobbySettings.containsKey(lobbySetting.getCategory())) {
+                    this.lobbySettings.get(lobbySetting.getCategory()).add(lobbySetting);
+                } else {
+                    LobbySettings ls = new LobbySettings();
+                    ls.add(lobbySetting);
+                    this.lobbySettings.put(lobbySetting.getCategory(), ls);
+                }
+            }
+    
+            List<GameSetting> gameSettings = database.get(GameSetting.class);
+    
+            for (GameSetting gameSetting : gameSettings) {
+                if (this.gameSettings.containsKey(gameSetting.getCategory())) {
+                    this.gameSettings.get(gameSetting.getCategory()).add(gameSetting);
+                } else {
+                    GameSettings gs = new GameSettings();
+                    gs.add(gameSetting);
+                    this.gameSettings.put(gameSetting.getCategory(), gs);
+                }
+            }
+            
+            if (!this.lobbySettings.containsKey("default")) {
+                this.lobbySettings.put("default", new LobbySettings());
+            }
+            
+            if (!this.gameSettings.containsKey("default")) {
+                this.gameSettings.put("default", new GameSettings());
+            }
+    
+            for (Info info : this.settingRegistry.getObjects()) {
+                if (info.getType().equalsIgnoreCase("game")) {
+                    this.gameSettings.forEach((category, settings) -> {
+                        if (!settings.contains(info.getName())) {
+                            settings.add(new GameSetting(info, "game", info.getDefaultValue()));
+                        }
+                    });
+                } else if (info.getType().equalsIgnoreCase("lobby")) {
+                    this.lobbySettings.forEach((category, settings) -> {
+                        if (!settings.contains(info.getName())) {
+                            settings.add(new LobbySetting(info, "lobby", info.getDefaultValue()));
+                        }
+                    });
+                }
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         
         getLogger().info("Settings Loaded");
         
@@ -165,11 +174,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
         
         lobby.setControlType(ControlType.AUTOMATIC);
         Game.setControlType(ControlType.AUTOMATIC);
-        
-        if (NexusAPI.getApi().getEnvironment() == Environment.DEVELOPMENT) {
-            lobby.setLobbySettings(getLobbySettings("dev"));
-            lobby.setGameSettings(getGameSettings("dev"));
-        }
         
         if (this.getConfig().contains("spawnpoint")) {
             String worldName = this.getConfig().getString("spawnpoint.world");
@@ -412,14 +416,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
         }
         return null;
     }
-    
-//    public void addLobbySettings(LobbySettings settings) {
-//        //this.lobbySettings.put(settings.getType().toLowerCase(), settings);
-//    }
-//    
-//    public void addGameSettings(GameSettings settings) {
-//        //this.gameSettings.put(settings.getType().toLowerCase(), settings);
-//    }
 
     @Override
     public void registerNetworkCommands(NetworkCommandRegistry registry) {

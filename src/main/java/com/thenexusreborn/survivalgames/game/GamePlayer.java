@@ -3,7 +3,7 @@ package com.thenexusreborn.survivalgames.game;
 import com.thenexusreborn.api.frameworks.value.Value;
 import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
-import com.thenexusreborn.api.stats.StatOperator;
+import com.thenexusreborn.api.stats.*;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
@@ -32,8 +32,8 @@ public class GamePlayer {
         this.damageInfo = new DamageInfo(nexusPlayer.getUniqueId());
     }
 
-    public void changeStat(String statName, Object value, StatOperator operator) {
-        getNexusPlayer().changeStat(statName, value, operator);
+    public StatChange changeStat(String statName, Object value, StatOperator operator) {
+        return getNexusPlayer().changeStat(statName, value, operator).push(); //TODO Change how this works eventually
     }
 
     public Value getStatValue(String statName) {

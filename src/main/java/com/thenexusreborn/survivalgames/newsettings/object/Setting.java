@@ -112,6 +112,10 @@ public abstract class Setting implements Cloneable {
             return maxvalue;
         }
     
+        public String getType() {
+            return type;
+        }
+    
         @Override
         public boolean equals(Object o) {
             if (this == o) {

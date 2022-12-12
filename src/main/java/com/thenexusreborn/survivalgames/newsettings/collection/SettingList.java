@@ -41,4 +41,8 @@ public class SettingList<T extends Setting> implements Cloneable {
             return null;
         }
     }
+    
+    public boolean contains(String name) {
+        return this.settingsMap.containsKey(name);
+    }
 }
