@@ -25,7 +25,7 @@ import com.thenexusreborn.survivalgames.loot.Items;
 import com.thenexusreborn.survivalgames.map.*;
 import com.thenexusreborn.survivalgames.mutations.*;
 import com.thenexusreborn.survivalgames.scoreboard.*;
-import com.thenexusreborn.survivalgames.settings.GameSettings;
+import com.thenexusreborn.survivalgames.newsettings.GameSettings;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -34,7 +34,6 @@ import org.bukkit.inventory.*;
 import org.bukkit.potion.*;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.lang.reflect.Field;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
@@ -82,16 +81,17 @@ public class Game {
         }
         gameInfo.setPlayerCount(tributeCount);
         gameInfo.setPlayers(playerNames.toArray(new String[0]));
-        StringBuilder sb = new StringBuilder();
-        for (Field field : this.settings.getClass().getDeclaredFields()) {
-            field.setAccessible(true);
-            try {
-                sb.append(field.getName()).append("=").append(field.get(this.settings).toString()).append(",");
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        gameInfo.setSettings(sb.substring(0, sb.length() - 1));
+        //TODO Parse settings, or just get rid of the settings from the GameInfo
+//        StringBuilder sb = new StringBuilder();
+//        for (Field field : this.settings.getClass().getDeclaredFields()) {
+//            field.setAccessible(true);
+//            try {
+//                sb.append(field.getName()).append("=").append(field.get(this.settings).toString()).append(",");
+//            } catch (IllegalAccessException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        gameInfo.setSettings(sb.substring(0, sb.length() - 1));
     }
     
     protected void setState(GameState state) {

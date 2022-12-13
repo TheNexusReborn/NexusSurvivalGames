@@ -1,8 +1,9 @@
-package com.thenexusreborn.survivalgames.settings;
+package com.thenexusreborn.survivalgames.newsettings;
 
 import com.thenexusreborn.api.storage.annotations.TableInfo;
 import com.thenexusreborn.survivalgames.newsettings.collection.SettingList;
 import com.thenexusreborn.survivalgames.newsettings.object.impl.GameSetting;
+import com.thenexusreborn.survivalgames.settings.*;
 
 @TableInfo("sggamesettings")
 public class GameSettings extends SettingList<GameSetting> {

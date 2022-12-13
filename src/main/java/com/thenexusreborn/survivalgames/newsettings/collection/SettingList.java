@@ -14,11 +14,11 @@ public class SettingList<T extends Setting> implements Cloneable {
     }
     
     public void add(T object) {
-        settingsMap.put(object.getInfo().getName(), object);
+        settingsMap.put(object.getInfo().getName().toLowerCase(), object);
     }
     
     public T get(String name) {
-        return settingsMap.get(name);
+        return settingsMap.get(name.toLowerCase());
     }
     
     public void setValue(String name, Object value) {

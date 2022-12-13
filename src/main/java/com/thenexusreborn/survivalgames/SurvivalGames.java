@@ -272,7 +272,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         createGameSetting("pass_award_chance", "Pass Award Chance", "The chance to get a mutation pass on a win", Type.DOUBLE, 0.75);
         createGameSetting("pass_use_chance", "Pass Use Chance", "The chance for a mutation pass to be used", Type.DOUBLE, 0.99);
         createGameSetting("allow_teaming", "Allow Teaming", "This controls the Teaming message at the start of the game", Type.BOOLEAN, true);
-        createGameSetting("max_team_Amount", "Maximum Team Amount", "The maximum number in a team. This only controls the message at the start of the game", Type.INTEGER, 2);
+        createGameSetting("max_team_amount", "Maximum Team Amount", "The maximum number in a team. This only controls the message at the start of the game", Type.INTEGER, 2);
         createGameSetting("mutations_enabled", "Mutations Enabled", "This controls if mutations are enabled.", Type.BOOLEAN, true);
         createGameSetting("regeneration", "Regeneration", "This controls if regeneration is enabled. True means enabled and false means disabled", Type.BOOLEAN, true);
         createGameSetting("grace_period", "Grace Period", "This controls if the grace period is enabled or not.", Type.BOOLEAN, false);
