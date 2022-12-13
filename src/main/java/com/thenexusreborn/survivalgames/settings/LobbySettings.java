@@ -1,8 +1,8 @@
-package com.thenexusreborn.survivalgames.newsettings;
+package com.thenexusreborn.survivalgames.settings;
 
 import com.thenexusreborn.api.storage.annotations.TableInfo;
-import com.thenexusreborn.survivalgames.newsettings.collection.SettingList;
-import com.thenexusreborn.survivalgames.newsettings.object.impl.LobbySetting;
+import com.thenexusreborn.survivalgames.settings.collection.SettingList;
+import com.thenexusreborn.survivalgames.settings.object.impl.LobbySetting;
 
 @TableInfo("sglobbysettings")
 public class LobbySettings extends SettingList<LobbySetting> {

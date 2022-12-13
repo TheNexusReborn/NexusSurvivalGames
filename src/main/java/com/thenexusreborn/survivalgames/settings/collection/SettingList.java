@@ -1,7 +1,7 @@
-package com.thenexusreborn.survivalgames.newsettings.collection;
+package com.thenexusreborn.survivalgames.settings.collection;
 
 import com.thenexusreborn.api.frameworks.value.Value;
-import com.thenexusreborn.survivalgames.newsettings.object.Setting;
+import com.thenexusreborn.survivalgames.settings.object.Setting;
 
 import java.util.*;
 

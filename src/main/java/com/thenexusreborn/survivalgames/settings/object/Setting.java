@@ -1,4 +1,4 @@
-package com.thenexusreborn.survivalgames.newsettings.object;
+package com.thenexusreborn.survivalgames.settings.object;
 
 import com.thenexusreborn.api.frameworks.value.*;
 import com.thenexusreborn.api.storage.annotations.*;

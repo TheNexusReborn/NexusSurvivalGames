@@ -25,7 +25,7 @@ import com.thenexusreborn.survivalgames.loot.Items;
 import com.thenexusreborn.survivalgames.map.*;
 import com.thenexusreborn.survivalgames.mutations.*;
 import com.thenexusreborn.survivalgames.scoreboard.*;
-import com.thenexusreborn.survivalgames.newsettings.GameSettings;
+import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;

@@ -4,7 +4,7 @@ import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GameState;
-import com.thenexusreborn.survivalgames.settings.Weather;
+import com.thenexusreborn.survivalgames.settings.object.enums.Weather;
 import org.bukkit.World;
 
 public class GameWorldThread extends NexusThread<SurvivalGames> {
