@@ -21,8 +21,8 @@ import com.thenexusreborn.survivalgames.mutations.*;
 import com.thenexusreborn.survivalgames.settings.*;
 import com.thenexusreborn.survivalgames.settings.object.Setting;
 import com.thenexusreborn.survivalgames.settings.object.Setting.Info;
-import com.thenexusreborn.survivalgames.settings.object.enums.*;
 import com.thenexusreborn.survivalgames.settings.object.enums.Time;
+import com.thenexusreborn.survivalgames.settings.object.enums.*;
 import com.thenexusreborn.survivalgames.settings.object.impl.*;
 import com.thenexusreborn.survivalgames.threads.ServerStatusThread;
 import com.thenexusreborn.survivalgames.threads.game.*;
@@ -33,6 +33,7 @@ import org.bukkit.configuration.file.*;
 import java.io.File;
 import java.sql.*;
 import java.util.*;
+import java.util.stream.Stream;
 
 public class SurvivalGames extends NexusSpigotPlugin {
     
@@ -61,7 +62,8 @@ public class SurvivalGames extends NexusSpigotPlugin {
     private File deathMessagesFile;
     private FileConfiguration deathMessagesConfig;
     
-    private final SettingRegistry settingRegistry = new SettingRegistry();
+    private final SettingRegistry lobbySettingRegistry = new SettingRegistry();
+    private final SettingRegistry gameSettingRegistry = new SettingRegistry();
 
     @Override
     public void onLoad() {
@@ -97,7 +99,13 @@ public class SurvivalGames extends NexusSpigotPlugin {
         Database database = NexusAPI.getApi().getPrimaryDatabase();
         try {
             List<Info> settingInfos = database.get(Info.class);
-            settingRegistry.registerAll(settingInfos);
+            settingInfos.forEach(settingInfo -> {
+                if (settingInfo.getType().equalsIgnoreCase("lobby")) {
+                    lobbySettingRegistry.register(settingInfo);
+                } else if (settingInfo.getType().equalsIgnoreCase("game")) {
+                    gameSettingRegistry.register(settingInfo);
+                }
+            });
         } catch (SQLException e) {
             e.printStackTrace();
             getServer().getPluginManager().disablePlugin(this);
@@ -105,36 +113,29 @@ public class SurvivalGames extends NexusSpigotPlugin {
         }
         
         registerDefaultSettings();
-    
-        for (Info settingInfo : this.settingRegistry.getObjects()) {
-            database.queue(settingInfo);
-        }
         
+        Set<Setting.Info> allSettingInfos = new HashSet<>();
+        allSettingInfos.addAll(gameSettingRegistry.getObjects());
+        allSettingInfos.addAll(lobbySettingRegistry.getObjects());
+        
+        allSettingInfos.forEach(database::queue);
         database.flush();
         
         try {
             List<LobbySetting> lobbySettings = database.get(LobbySetting.class);
-    
             for (LobbySetting lobbySetting : lobbySettings) {
-                if (this.lobbySettings.containsKey(lobbySetting.getCategory())) {
-                    this.lobbySettings.get(lobbySetting.getCategory()).add(lobbySetting);
-                } else {
-                    LobbySettings ls = new LobbySettings();
-                    ls.add(lobbySetting);
-                    this.lobbySettings.put(lobbySetting.getCategory(), ls);
+                if (!this.lobbySettings.containsKey(lobbySetting.getCategory())) {
+                    this.lobbySettings.put(lobbySetting.getCategory(), new LobbySettings());
                 }
+                this.lobbySettings.get(lobbySetting.getCategory()).add(lobbySetting);
             }
     
             List<GameSetting> gameSettings = database.get(GameSetting.class);
-    
             for (GameSetting gameSetting : gameSettings) {
-                if (this.gameSettings.containsKey(gameSetting.getCategory())) {
-                    this.gameSettings.get(gameSetting.getCategory()).add(gameSetting);
-                } else {
-                    GameSettings gs = new GameSettings();
-                    gs.add(gameSetting);
-                    this.gameSettings.put(gameSetting.getCategory(), gs);
+                if (!this.gameSettings.containsKey(gameSetting.getCategory())) {
+                    this.gameSettings.put(gameSetting.getCategory(), new GameSettings());
                 }
+                this.gameSettings.get(gameSetting.getCategory()).add(gameSetting);
             }
             
             if (!this.lobbySettings.containsKey("default")) {
@@ -144,23 +145,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
             if (!this.gameSettings.containsKey("default")) {
                 this.gameSettings.put("default", new GameSettings());
             }
-    
-            for (Info info : this.settingRegistry.getObjects()) {
-                if (info.getType().equalsIgnoreCase("game")) {
-                    this.gameSettings.forEach((category, settings) -> {
-                        if (!settings.contains(info.getName())) {
-                            settings.add(new GameSetting(info, "game", info.getDefaultValue()));
-                        }
-                    });
-                } else if (info.getType().equalsIgnoreCase("lobby")) {
-                    this.lobbySettings.forEach((category, settings) -> {
-                        if (!settings.contains(info.getName())) {
-                            settings.add(new LobbySetting(info, "lobby", info.getDefaultValue()));
-                        }
-                    });
-                }
-            }
-            
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -293,19 +277,19 @@ public class SurvivalGames extends NexusSpigotPlugin {
     }   
     
     private void createLobbySetting(String name, String displayName, String description, Value.Type valueType, Object valueDefault) {
-        settingRegistry.register(name, displayName, description, "lobby", new Value(valueType, valueDefault));
+        lobbySettingRegistry.register(name, displayName, description, "lobby", new Value(valueType, valueDefault));
     }
     
     private void createLobbySetting(String name, String displayName, String description, Value.Type valueType, Object valueDefault, Object minValue, Object maxValue) {
-        settingRegistry.register(name, displayName, description, "lobby", new Value(valueType, valueDefault), new Value(valueType, minValue), new Value(valueType, maxValue));
+        lobbySettingRegistry.register(name, displayName, description, "lobby", new Value(valueType, valueDefault), new Value(valueType, minValue), new Value(valueType, maxValue));
     }
     
     private void createGameSetting(String name, String displayName, String description, Value.Type valueType, Object valueDefault) {
-        settingRegistry.register(name, displayName, description, "game", new Value(valueType, valueDefault));
+        gameSettingRegistry.register(name, displayName, description, "game", new Value(valueType, valueDefault));
     }
     
     private void createGameSetting(String name, String displayName, String description, Value.Type valueType, Object valueDefault, Object minValue, Object maxValue) {
-        settingRegistry.register(name, displayName, description, "game", new Value(valueType, valueDefault), new Value(valueType, minValue), new Value(valueType, maxValue));
+        gameSettingRegistry.register(name, displayName, description, "game", new Value(valueType, valueDefault), new Value(valueType, minValue), new Value(valueType, maxValue));
     }
     
     @Override
@@ -459,7 +443,11 @@ public class SurvivalGames extends NexusSpigotPlugin {
         return deathMessagesConfig;
     }
     
-    public SettingRegistry getSettingRegistry() {
-        return settingRegistry;
+    public SettingRegistry getLobbySettingRegistry() {
+        return lobbySettingRegistry;
+    }
+    
+    public SettingRegistry getGameSettingRegistry() {
+        return gameSettingRegistry;
     }
 }

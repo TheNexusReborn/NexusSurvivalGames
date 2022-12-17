@@ -5,7 +5,7 @@ import com.thenexusreborn.survivalgames.settings.object.Setting;
 
 import java.util.*;
 
-public class SettingList<T extends Setting> implements Cloneable {
+public abstract class SettingList<T extends Setting> implements Cloneable {
     private String category;
     private Map<String, T> settingsMap = new HashMap<>();
     
@@ -13,16 +13,26 @@ public class SettingList<T extends Setting> implements Cloneable {
         this.category = category;
     }
     
+    public abstract T createSetting(String name);
+    
     public void add(T object) {
         settingsMap.put(object.getInfo().getName().toLowerCase(), object);
     }
     
     public T get(String name) {
+        if (!settingsMap.containsKey(name)) {
+            return createSetting(name);
+        }
+        
         return settingsMap.get(name.toLowerCase());
     }
     
     public void setValue(String name, Object value) {
-        get(name).getValue().set(value);
+        T setting = get(name);
+        if (!settingsMap.containsKey(name)) {
+            add(setting);
+        }
+        setting.getValue().set(value);
     }
     
     public Value getValue(String name) {
@@ -44,5 +54,9 @@ public class SettingList<T extends Setting> implements Cloneable {
     
     public boolean contains(String name) {
         return this.settingsMap.containsKey(name);
+    }
+    
+    public String getCategory() {
+        return category;
     }
 }

@@ -1,9 +1,11 @@
 package com.thenexusreborn.survivalgames.settings;
 
 import com.thenexusreborn.api.storage.annotations.TableInfo;
+import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.settings.collection.SettingList;
+import com.thenexusreborn.survivalgames.settings.object.Setting;
 import com.thenexusreborn.survivalgames.settings.object.enums.*;
-import com.thenexusreborn.survivalgames.settings.object.impl.GameSetting;
+import com.thenexusreborn.survivalgames.settings.object.impl.*;
 
 @TableInfo("sggamesettings")
 public class GameSettings extends SettingList<GameSetting> {
@@ -13,6 +15,12 @@ public class GameSettings extends SettingList<GameSetting> {
     
     public GameSettings(String type) {
         super(type);
+    }
+    
+    @Override
+    public GameSetting createSetting(String name) {
+        Setting.Info info = SurvivalGames.getPlugin(SurvivalGames.class).getGameSettingRegistry().get(name);
+        return new GameSetting(info, getCategory(), info.getDefaultValue());
     }
     
     public boolean isTeamingAllowed() {

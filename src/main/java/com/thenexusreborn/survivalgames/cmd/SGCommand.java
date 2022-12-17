@@ -2,6 +2,7 @@ package com.thenexusreborn.survivalgames.cmd;
 
 import com.starmediadev.starlib.Operator;
 import com.thenexusreborn.api.NexusAPI;
+import com.thenexusreborn.api.frameworks.value.*;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.stats.*;
 import com.thenexusreborn.nexuscore.util.*;
@@ -10,6 +11,9 @@ import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.lobby.*;
 import com.thenexusreborn.survivalgames.map.*;
+import com.thenexusreborn.survivalgames.settings.SettingRegistry;
+import com.thenexusreborn.survivalgames.settings.collection.SettingList;
+import com.thenexusreborn.survivalgames.settings.object.Setting;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.*;
 import org.bukkit.block.*;
@@ -89,7 +93,7 @@ public class SGCommand implements CommandExecutor {
                 sender.sendMessage(MCUtils.color(MsgType.WARN + "The game had an error, you cannot modify it."));
                 return true;
             }
-    
+            
             switch (gameSubCommand) {
                 case "setup" -> {
                     if (game.getState() != GameState.UNDEFINED) {
@@ -553,9 +557,73 @@ public class SGCommand implements CommandExecutor {
                 }
             }
         } else if (List.of("settings", "setting", "s").contains(subCommand)) {
-            sender.sendMessage(MCUtils.color("&cThis command is undergoing reworking"));
-            return true;
-            //TODO Rework this after settings are done
+            if (!(args.length > 3)) {
+                sender.sendMessage(MCUtils.color(MsgType.WARN + "Usage: /" + label + " " + args[0] + " <type> <name | save> <value | savename>"));
+                return true;
+            }
+            
+            String type = switch (args[1].toLowerCase()) {
+                case "game", "g" -> "game";
+                case "lobby", "l" -> "lobby";
+                default -> null;
+            };
+            
+            if (type == null) {
+                sender.sendMessage(MCUtils.color(MsgType.WARN + "Invalid setting type. Can only be game (g) or lobby (l)"));
+                return true;
+            }
+            
+            SettingRegistry registry = switch (type) {
+                case "game" -> plugin.getGameSettingRegistry();
+                case "lobby" -> plugin.getLobbySettingRegistry();
+                default -> null;
+            };
+            
+            if (args[2].equalsIgnoreCase("save")) {
+                sender.sendMessage(MCUtils.color(MsgType.WARN + "This functionality is temporarily disabled."));
+                return true;
+            }
+            
+            String settingName = args[2].toLowerCase();
+            Setting.Info settingInfo = registry.get(settingName);
+            
+            if (settingInfo == null) {
+                sender.sendMessage(MCUtils.color(MsgType.WARN + "A setting with that name does not exist."));
+                return true;
+            }
+    
+            Value value;
+            try {
+                value = new ValueCodec().decode(settingInfo.getDefaultValue().getType() + ":" + args[3]);
+            } catch (Exception e) {
+                sender.sendMessage(MCUtils.color(MsgType.WARN + "There was an error parsing the value: " + e.getMessage()));
+                return true;
+            }
+            
+            if (value == null) {
+                sender.sendMessage(MCUtils.color(MsgType.WARN + "There was a problem parsing the value."));
+                return true;
+            }
+    
+            SettingList<?> settingList = null;
+            if (type.equalsIgnoreCase("game")) {
+                if (game == null) {
+                    settingList = plugin.getLobby().getGameSettings();
+                } else {
+                    settingList = plugin.getGame().getSettings();
+                }
+            } else {
+                settingList = plugin.getLobby().getLobbySettings();
+            }
+            
+            settingList.setValue(settingName, value.get());
+            Object settingValue = settingList.get(settingName).getValue().get();
+            if (!Objects.equals(value.get(), settingValue)) {
+                sender.sendMessage(MCUtils.color(MsgType.WARN + "The actual setting value is not equal to the new value. Please report to Firestar311."));
+                return true;
+            }
+            
+            sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the &b" + type.toLowerCase() + " &esetting &b" + settingName + " &eto &b" + value.get()));
         } else if (subCommand.equals("map") || subCommand.equals("m")) {
             if (!(args.length > 1)) {
                 sender.sendMessage(MCUtils.color(MsgType.WARN + "You must provide a sub command."));

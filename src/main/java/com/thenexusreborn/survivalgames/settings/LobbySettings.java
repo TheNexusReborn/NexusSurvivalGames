@@ -1,7 +1,9 @@
 package com.thenexusreborn.survivalgames.settings;
 
 import com.thenexusreborn.api.storage.annotations.TableInfo;
+import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.settings.collection.SettingList;
+import com.thenexusreborn.survivalgames.settings.object.Setting;
 import com.thenexusreborn.survivalgames.settings.object.impl.LobbySetting;
 
 @TableInfo("sglobbysettings")
@@ -12,6 +14,12 @@ public class LobbySettings extends SettingList<LobbySetting> {
     
     public LobbySettings(String type) {
         super(type);
+    }
+    
+    @Override
+    public LobbySetting createSetting(String name) {
+        Setting.Info info = SurvivalGames.getPlugin(SurvivalGames.class).getLobbySettingRegistry().get(name);
+        return new LobbySetting(info, getCategory(), info.getDefaultValue());
     }
     
     public int getMaxPlayers() {

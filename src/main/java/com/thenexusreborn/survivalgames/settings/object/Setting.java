@@ -4,7 +4,6 @@ import com.thenexusreborn.api.frameworks.value.*;
 import com.thenexusreborn.api.storage.annotations.*;
 import com.thenexusreborn.api.storage.objects.SqlCodec;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-
 import java.util.Objects;
 
 public abstract class Setting implements Cloneable {
@@ -41,6 +40,9 @@ public abstract class Setting implements Cloneable {
     }
     
     public Value getValue() {
+        if (this.value == null || this.value.get() == null) {
+            return this.info.getDefaultValue();
+        }
         return value;
     }
     
@@ -136,11 +138,18 @@ public abstract class Setting implements Cloneable {
     
     public static class InfoCodec implements SqlCodec<Info> {
         public String encode(Object object) {
-            return ((Info) object).getName();
+            Info info = (Info) object;
+            return info.getType() + ":" + info.getName();
         }
     
         public Info decode(String encoded) {
-            return SurvivalGames.getPlugin(SurvivalGames.class).getSettingRegistry().get(encoded);
+            String[] split = encoded.split(":");
+            SurvivalGames plugin = SurvivalGames.getPlugin(SurvivalGames.class);
+            return switch (split[0]) {
+                case "lobby" -> plugin.getLobbySettingRegistry().get(split[1]);
+                case "game" -> plugin.getGameSettingRegistry().get(split[1]);
+                default -> null;
+            };
         }
     }
 }
