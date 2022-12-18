@@ -3,6 +3,7 @@ package com.thenexusreborn.survivalgames.cmd;
 import com.starmediadev.starlib.Operator;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.frameworks.value.*;
+import com.thenexusreborn.api.frameworks.value.Value.Type;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.stats.*;
 import com.thenexusreborn.nexuscore.util.*;
@@ -605,7 +606,35 @@ public class SGCommand implements CommandExecutor {
                 return true;
             }
     
-            SettingList<?> settingList = null;
+            Value minValue = settingInfo.getMinValue();
+            Value maxValue = settingInfo.getMaxValue();
+            if (minValue != null && maxValue != null) {
+                if (List.of(Type.INTEGER, Type.DOUBLE, Type.LONG).contains(value.getType())) {
+                    boolean lowerInBounds, upperInBounds;
+                    if (value.getType() == Type.INTEGER) {
+                        lowerInBounds = value.getAsInt() >= minValue.getAsInt();
+                        upperInBounds = value.getAsInt() <= maxValue.getAsInt();
+                    } else if (value.getType() == Type.DOUBLE) {
+                        lowerInBounds = value.getAsDouble() >= minValue.getAsDouble();
+                        upperInBounds = value.getAsDouble() <= maxValue.getAsDouble();
+                    } else {
+                        lowerInBounds = value.getAsLong() >= minValue.getAsLong();
+                        upperInBounds = value.getAsLong() <= maxValue.getAsLong();
+                    }
+                    
+                    if (!lowerInBounds) {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "The value you provided is less than the minimum allowed value. Min: " + minValue.get()));
+                        return true;
+                    }
+                    
+                    if (!upperInBounds) {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "The value you provided is greater than the maximum allowed value. Max: " + maxValue.get()));
+                        return true;
+                    }
+                }
+            }
+    
+            SettingList<?> settingList;
             if (type.equalsIgnoreCase("game")) {
                 if (game == null) {
                     settingList = plugin.getLobby().getGameSettings();

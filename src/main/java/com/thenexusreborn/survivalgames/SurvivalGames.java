@@ -33,7 +33,6 @@ import org.bukkit.configuration.file.*;
 import java.io.File;
 import java.sql.*;
 import java.util.*;
-import java.util.stream.Stream;
 
 public class SurvivalGames extends NexusSpigotPlugin {
     
@@ -235,26 +234,26 @@ public class SurvivalGames extends NexusSpigotPlugin {
     }
     
     private void registerDefaultSettings() {
-        createLobbySetting("max_players", "Maximum Players", "The maximum number of players allowed", Type.INTEGER, 24);
-        createLobbySetting("min_players", "Minimum Players", "The minimum number of players needed to auto-start", Type.INTEGER, 4);
-        createLobbySetting("max_games", "Maximum Games", "The number of games before auto-restart", Type.INTEGER, 10);
+        createLobbySetting("max_players", "Maximum Players", "The maximum number of players allowed", Type.INTEGER, 24, 2, 24);
+        createLobbySetting("min_players", "Minimum Players", "The minimum number of players needed to auto-start", Type.INTEGER, 4, 2, 24);
+        createLobbySetting("max_games", "Maximum Games", "The number of games before auto-restart", Type.INTEGER, 10, 1, 20);
         createLobbySetting("timer_length", "Countdown Timer Length", "The amount of seconds for the countdown timer", Type.INTEGER, 10); //Actual Default is 45
         createLobbySetting("allow_vote_weight", "Allow Vote Weight", "Whether or not if vote weights are counted", Type.BOOLEAN, true);
-        createLobbySetting("vote_start_threshold", "Vote Start Threshold", "The minimum number of vote starts required", Type.INTEGER, 2);
+        createLobbySetting("vote_start_threshold", "Vote Start Threshold", "The minimum number of vote starts required", Type.INTEGER, 2, 2, 24);
         createLobbySetting("keep_previous_game_settings", "Keep Previous Game Settings", "Whether or not to keep the settings from the previous game or go back to defaults", Type.BOOLEAN, true);
         createLobbySetting("sounds", "Sounds", "Whether or not to play custom sounds", Type.BOOLEAN, true);
         
-        createGameSetting("max_health", "Maximum Health", "The default maximum health of the tributes", Type.INTEGER, 20);
+        createGameSetting("max_health", "Maximum Health", "The default maximum health of the tributes", Type.INTEGER, 20, 1, Integer.MAX_VALUE);
         createGameSetting("grace_period_length", "Grace Period Length", "The time in seconds for how long the grace period lasts. Due note that the graceperiod setting must also be true", Type.INTEGER, 60);
         createGameSetting("game_length", "Game Length", "The time in minutes for how long the game lasts. This does not include deathmatch", Type.INTEGER, 10); //Actual default is 20
         createGameSetting("deathmatch_length", "Deathmatch Length", "The time in minutes for how long the deathmatch lasts", Type.INTEGER, 5);
         createGameSetting("warmup_length", "Warmup Length", "The time in seconds for how long the starting warmup lasts", Type.INTEGER, 10); //Actual Default is 30
-        createGameSetting("deathmatch_threshold", "Deathmatch Threshold", "The amount of tributes remaining to start the deathmatch countdown", Type.INTEGER, 2); //Actual Default is 4
+        createGameSetting("deathmatch_threshold", "Deathmatch Threshold", "The amount of tributes remaining to start the deathmatch countdown", Type.INTEGER, 2, 2, 24); //Actual Default is 4
         createGameSetting("next_game_timer_length", "Next Game Timer Length", "The time in seconds to start the next game (or auto-restart)", Type.INTEGER, 10);
         createGameSetting("deathmatch_countdown_length", "Deathmatch Countdown Length", "The time in seconds for the deathmatch countdown. This refers to either the threshold being triggered or the end of the game length", Type.INTEGER, 60);
         createGameSetting("mutation_spawn_delay", "Mutation Spawn Delay", "The time in seconds it takes before a mutation spawns.", Type.INTEGER, 10); //This is probably 15 with the Skills system that then can be lowered to 10
-        createGameSetting("pass_award_chance", "Pass Award Chance", "The chance to get a mutation pass on a win", Type.DOUBLE, 0.75);
-        createGameSetting("pass_use_chance", "Pass Use Chance", "The chance for a mutation pass to be used", Type.DOUBLE, 0.99);
+        createGameSetting("pass_award_chance", "Pass Award Chance", "The chance to get a mutation pass on a win", Type.DOUBLE, 0.75, 0, 1.0);
+        createGameSetting("pass_use_chance", "Pass Use Chance", "The chance for a mutation pass to be used", Type.DOUBLE, 0.99, 0, 1.0);
         createGameSetting("allow_teaming", "Allow Teaming", "This controls the Teaming message at the start of the game", Type.BOOLEAN, true);
         createGameSetting("max_team_amount", "Maximum Team Amount", "The maximum number in a team. This only controls the message at the start of the game", Type.INTEGER, 2);
         createGameSetting("mutations_enabled", "Mutations Enabled", "This controls if mutations are enabled.", Type.BOOLEAN, true);
@@ -274,12 +273,13 @@ public class SurvivalGames extends NexusSpigotPlugin {
         createGameSetting("color_mode", "Color Mode", "Controls what colors are displayed in death messages", Type.ENUM, ColorMode.RANK);
         createGameSetting("world_time", "World Time", "Controls the starting world time", Type.ENUM, Time.NOON);
         createGameSetting("world_weather", "World Weather", "Controls the starting world weather", Type.ENUM, Weather.CLEAR);
-    }   
+    }
     
     private void createLobbySetting(String name, String displayName, String description, Value.Type valueType, Object valueDefault) {
         lobbySettingRegistry.register(name, displayName, description, "lobby", new Value(valueType, valueDefault));
     }
     
+    @SuppressWarnings("SameParameterValue")
     private void createLobbySetting(String name, String displayName, String description, Value.Type valueType, Object valueDefault, Object minValue, Object maxValue) {
         lobbySettingRegistry.register(name, displayName, description, "lobby", new Value(valueType, valueDefault), new Value(valueType, minValue), new Value(valueType, maxValue));
     }

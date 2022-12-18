@@ -64,7 +64,7 @@ public abstract class Setting implements Cloneable {
         private long id;
         private String name, displayName, description, type;
         @ColumnInfo(type = "varchar(1000)", codec = ValueCodec.class)
-        private Value defaultValue, minValue, maxvalue;
+        private Value defaultValue, minValue, maxValue;
         
         private Info() {}
     
@@ -76,13 +76,13 @@ public abstract class Setting implements Cloneable {
             this.type = type;
         }
     
-        public Info(String name, String displayName, String description, String type, Value defaultValue, Value minValue, Value maxvalue) {
+        public Info(String name, String displayName, String description, String type, Value defaultValue, Value minValue, Value maxValue) {
             this.name = name;
             this.displayName = displayName;
             this.description = description;
             this.defaultValue = defaultValue;
             this.minValue = minValue;
-            this.maxvalue = maxvalue;
+            this.maxValue = maxValue;
             this.type = type;
         }
     
@@ -110,8 +110,8 @@ public abstract class Setting implements Cloneable {
             return minValue;
         }
     
-        public Value getMaxvalue() {
-            return maxvalue;
+        public Value getMaxValue() {
+            return maxValue;
         }
     
         public String getType() {
