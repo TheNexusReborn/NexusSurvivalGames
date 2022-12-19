@@ -648,7 +648,7 @@ public class Lobby {
     public void removeStartVote(UUID uuid) {
         this.players.get(uuid).setVoteStart(false);
         
-        if (getVoteStartCount() <= 1) {
+        if (getVoteStartCount() < getLobbySettings().getVoteStartThreshold()) {
             if (this.timer != null) {
                 sendMessage("&6&l>> &eNot enough votes to start.");
                 this.timer.cancel();
