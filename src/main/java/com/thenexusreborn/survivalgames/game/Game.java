@@ -330,7 +330,7 @@ public class Game {
                 p.getInventory().setArmorContents(null);
                 p.setFlying(false);
                 p.setAllowFlight(false);
-                p.setSaturation(5.0F);
+                p.setSaturation(settings.getStartingSaturation());
                 if (player.getTeam() == GameTeam.TRIBUTES) {
                     tributes.add(player.getUniqueId());
                 } else if (player.getTeam() == GameTeam.SPECTATORS) {
@@ -600,7 +600,7 @@ public class Game {
             }
         }
         
-        this.timer = new Timer(new DeathmatchCountdownCallback(this)).run(10050); //TODO Add a setting for this
+        this.timer = new Timer(new DeathmatchCountdownCallback(this)).run(TimeUnit.SECONDS.toMilliseconds(settings.getDeathmatchTimerLength()) + 50L); //TODO Add a setting for this
     }
     
     public void startDeathmatch() {
@@ -871,7 +871,7 @@ public class Game {
         
         boolean vanished = deathInfo.getType() == DeathType.VANISH;
         int score = gamePlayer.getStatValue("sg_score").getAsInt();
-        int lost = (int) Math.ceil(score / 10D);
+        int lost = (int) Math.ceil(score / settings.getScoreDivisor());
         if (score - lost < 0) {
             lost = 0;
         }
@@ -909,7 +909,7 @@ public class Game {
             }
             
             if (claimedFirstBlood) {
-                scoreGain = (int) (scoreGain * 1.25);
+                scoreGain = (int) (scoreGain * settings.getFirstBloodMultiplier());
             }
             
             if (scoreBounty > 0) {
@@ -1276,8 +1276,8 @@ public class Game {
         DisguiseAPI.undisguiseToAll(player);
         player.getInventory().clear();
         player.getInventory().setArmorContents(null);
-        player.setMaxHealth(20);
-        player.setHealth(20);
+        player.setMaxHealth(settings.getMaxHealth());
+        player.setHealth(settings.getMaxHealth());
         player.setExp(0);
         player.setLevel(0);
         player.spigot().setCollidesWithEntities(true);

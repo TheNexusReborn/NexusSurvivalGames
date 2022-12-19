@@ -139,6 +139,18 @@ public class GameSettings extends SettingList<GameSetting> {
         return getValue("use_all_mutation_types").getAsBoolean();
     }
     
+    public float getStartingSaturation() {
+        return (float) getValue("starting_saturation").getAsDouble();
+    }
+    
+    public double getScoreDivisor() {
+        return getValue("score_divisor").getAsDouble();
+    }
+    
+    public double getFirstBloodMultiplier() {
+        return getValue("first_blood_multiplier").getAsDouble();
+    }
+    
     @Override
     public GameSettings clone() {
         return (GameSettings) super.clone();

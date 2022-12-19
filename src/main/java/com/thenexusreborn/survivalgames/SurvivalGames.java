@@ -243,7 +243,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         createLobbySetting("keep_previous_game_settings", "Keep Previous Game Settings", "Whether or not to keep the settings from the previous game or go back to defaults", Type.BOOLEAN, true);
         createLobbySetting("sounds", "Sounds", "Whether or not to play custom sounds", Type.BOOLEAN, true);
         
-        createGameSetting("max_health", "Maximum Health", "The default maximum health of the tributes", Type.INTEGER, 20, 1, Integer.MAX_VALUE);
+        createGameSetting("max_health", "Maximum Health", "The default maximum health of the tributes", Type.INTEGER, 20, 1, null);
         createGameSetting("grace_period_length", "Grace Period Length", "The time in seconds for how long the grace period lasts. Due note that the graceperiod setting must also be true", Type.INTEGER, 60);
         createGameSetting("game_length", "Game Length", "The time in minutes for how long the game lasts. This does not include deathmatch", Type.INTEGER, 10); //Actual default is 20
         createGameSetting("deathmatch_length", "Deathmatch Length", "The time in minutes for how long the deathmatch lasts", Type.INTEGER, 5);
@@ -273,6 +273,12 @@ public class SurvivalGames extends NexusSpigotPlugin {
         createGameSetting("color_mode", "Color Mode", "Controls what colors are displayed in death messages", Type.ENUM, ColorMode.RANK);
         createGameSetting("world_time", "World Time", "Controls the starting world time", Type.ENUM, Time.NOON);
         createGameSetting("world_weather", "World Weather", "Controls the starting world weather", Type.ENUM, Weather.CLEAR);
+        createGameSetting("starting_saturation", "Starting Saturation", "The saturation for players at the start", Type.DOUBLE, 5.0, 0.0, 20.0);
+        createGameSetting("score_divisor", "Score Divisor", "The number that the score from the dead player is divided by", Type.DOUBLE, 10.0, 1.0, null);
+        createGameSetting("first_blood_multiplier", "First Blood Multiplier", "The multiplier to apply to the score when someone claims first blood.", Type.DOUBLE, 1.25, 1, null);
+        
+        
+        
     }
     
     private void createLobbySetting(String name, String displayName, String description, Value.Type valueType, Object valueDefault) {
