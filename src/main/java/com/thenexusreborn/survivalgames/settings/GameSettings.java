@@ -159,6 +159,10 @@ public class GameSettings extends SettingList<GameSetting> {
         return getValue("earn_nexites").getAsBoolean();
     }
     
+    public boolean isAllowAssists() {
+        return getValue("allow_assists").getAsBoolean();
+    }
+    
     @Override
     public GameSettings clone() {
         return (GameSettings) super.clone();

@@ -54,6 +54,14 @@ public class LobbySettings extends SettingList<LobbySetting> {
         return getValue("vote_start_threshold").getAsInt();
     }
     
+    public boolean isAllowVoteStart() {
+        return getValue("allow_vote_start").getAsBoolean();
+    }
+    
+    public int getVoteStartAvailableThreshold() {
+        return getValue("vote_start_available_threshold").getAsInt();
+    }
+    
     @Override
     public LobbySettings clone() {
         return (LobbySettings) super.clone();

@@ -242,6 +242,9 @@ public class SurvivalGames extends NexusSpigotPlugin {
         createLobbySetting("vote_start_threshold", "Vote Start Threshold", "The minimum number of vote starts required", Type.INTEGER, 2, 2, 24);
         createLobbySetting("keep_previous_game_settings", "Keep Previous Game Settings", "Whether or not to keep the settings from the previous game or go back to defaults", Type.BOOLEAN, true);
         createLobbySetting("sounds", "Sounds", "Whether or not to play custom sounds", Type.BOOLEAN, true);
+        createLobbySetting("allow_vote_start", "Allow Vote Start", "Whether or not Vote Start is allowed.", Type.BOOLEAN, true);
+        createLobbySetting("vote_start_available_threshold", "Vote Start Available Threshold", "The amount of players that has to be equal to or under to allow voting to start.", Type.INTEGER, 4);
+        
         
         createGameSetting("max_health", "Maximum Health", "The default maximum health of the tributes", Type.INTEGER, 20, 1, 1024);
         createGameSetting("grace_period_length", "Grace Period Length", "The time in seconds for how long the grace period lasts. Due note that the graceperiod setting must also be true", Type.INTEGER, 60);
@@ -277,6 +280,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         createGameSetting("first_blood_multiplier", "First Blood Multiplier", "The multiplier to apply to the score when someone claims first blood.", Type.DOUBLE, 1.25, 1, 100);
         createGameSetting("max_mutation_amount", "Maximum Mutation Amount", "The maximum amount of times that players can mutate per game", Type.INTEGER, 1);
         createGameSetting("earn_nexites", "Earn Nexites", "Controls if Nexites are earned on certain actions", Type.BOOLEAN, false);
+        createGameSetting("allow_assists", "Allow Assists", "Controls if assists are counted.", Type.BOOLEAN, true);
         
     }
     

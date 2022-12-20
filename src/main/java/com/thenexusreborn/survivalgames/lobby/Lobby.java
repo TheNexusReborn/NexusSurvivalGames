@@ -633,12 +633,24 @@ public class Lobby {
         int neededVotes = Math.max(threshold - votes, 0);
         sendMessage("&6&l>> &eVotes: &l" + votes + "/" + threshold + " &f(" + neededVotes + " Votes Needed)");
         
-        if (this.state == LobbyState.WAITING) {
-            if (votes >= threshold) {
-                sendMessage("&6&l>> &f&lThe game lobby has been started!");
-                this.startTimer();
-            }
+        if (this.state != LobbyState.WAITING) {
+            return;
         }
+        
+        if (votes < threshold) {
+            return;
+        }
+        
+        if (!getLobbySettings().isAllowVoteStart()) {
+            return;
+        }
+        
+        if (getPlayingCount() > getLobbySettings().getVoteStartAvailableThreshold()) {
+            return;
+        }
+        
+        sendMessage("&6&l>> &f&lThe game lobby has been started!");
+        this.startTimer();
     }
     
     public boolean hasVotedToStart(NexusPlayer player) {

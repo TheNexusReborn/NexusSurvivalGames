@@ -972,16 +972,18 @@ public class Game {
         
         List<UUID> damagers = gamePlayer.getDamageInfo().getDamagers();
         List<GamePlayer> assisters = new ArrayList<>();
-        if (!damagers.isEmpty()) {
-            for (UUID damager : damagers) {
-                if (killer != null && killer.getKiller().equals(damager)) {
-                    continue;
+        if (settings.isAllowAssists()) {
+            if (!damagers.isEmpty()) {
+                for (UUID damager : damagers) {
+                    if (killer != null && killer.getKiller().equals(damager)) {
+                        continue;
+                    }
+            
+                    GamePlayer assisterPlayer = getPlayer(damager);
+                    assisterPlayer.setAssists(assisterPlayer.getAssists() + 1);
+                    assisterPlayer.changeStat("sg_assists", 1, StatOperator.ADD);
+                    assisters.add(assisterPlayer);
                 }
-                
-                GamePlayer assisterPlayer = getPlayer(damager);
-                assisterPlayer.setAssists(assisterPlayer.getAssists() + 1);
-                assisterPlayer.changeStat("sg_assists", 1, StatOperator.ADD);
-                assisters.add(assisterPlayer);
             }
         }
         
