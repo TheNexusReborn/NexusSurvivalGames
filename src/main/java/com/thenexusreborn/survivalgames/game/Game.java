@@ -1312,4 +1312,14 @@ public class Game {
         }
         return null;
     }
+    
+    public int getTeamCount(GameTeam gameTeam) {
+        int amount = 0;
+        for (GamePlayer gamePlayer : new ArrayList<>(this.players.values())) {
+            if (gamePlayer.getTeam() == gameTeam) {
+                amount++;
+            }
+        }
+        return amount;
+    }
 }

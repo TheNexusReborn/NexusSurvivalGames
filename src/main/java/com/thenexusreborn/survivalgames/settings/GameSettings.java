@@ -163,6 +163,10 @@ public class GameSettings extends SettingList<GameSetting> {
         return getValue("allow_assists").getAsBoolean();
     }
     
+    public int getMaxMutationsAllowed() {
+        return getValue("max_mutations_allowed").getAsInt();
+    }
+    
     @Override
     public GameSettings clone() {
         return (GameSettings) super.clone();

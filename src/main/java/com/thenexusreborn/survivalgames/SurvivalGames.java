@@ -281,6 +281,15 @@ public class SurvivalGames extends NexusSpigotPlugin {
         createGameSetting("max_mutation_amount", "Maximum Mutation Amount", "The maximum amount of times that players can mutate per game", Type.INTEGER, 1);
         createGameSetting("earn_nexites", "Earn Nexites", "Controls if Nexites are earned on certain actions", Type.BOOLEAN, false);
         createGameSetting("allow_assists", "Allow Assists", "Controls if assists are counted.", Type.BOOLEAN, true);
+        createGameSetting("max_mutations_allowed", "Maximum Mutations Allowed", "The maximum amount of mutations allowed to be in a single game", Type.INTEGER, 10, 0, 20);
+        
+        
+        
+        
+        
+        
+        
+        
         
     }
     
