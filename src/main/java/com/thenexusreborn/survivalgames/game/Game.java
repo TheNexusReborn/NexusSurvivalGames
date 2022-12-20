@@ -892,7 +892,7 @@ public class Game {
         
         boolean claimedFirstBlood = false;
         
-        int scoreGain = 0, currentStreak = 0, personalBest = 0, xpGain = 0, creditGain = 0;
+        int scoreGain = 0, currentStreak = 0, personalBest = 0, xpGain = 0, creditGain = 0, nexiteGain = 0;
         Rank killerRank = null;
         boolean claimedScoreBounty = false, claimedCreditBounty = false;
         Bounty bounty = gamePlayer.getBounty();
@@ -952,6 +952,13 @@ public class Game {
                 killerPlayer.changeStat("credits", creditGain, StatOperator.ADD);
             }
             
+            if (getSettings().isEarnNexites()) {
+                nexiteGain = 2;
+                if (getSettings().isMultiplier() && killerRank.isNexiteBoost()) {
+                    nexiteGain *= killerRank.getMultiplier();
+                }
+            }
+            
             killerPlayer.changeStat("sg_kills", 1, StatOperator.ADD);
             if (killer.isMutationKill()) {
                 killerPlayer.changeStat("sg_mutation_kills", 1, StatOperator.ADD);
@@ -1001,7 +1008,7 @@ public class Game {
                 }
                 
                 if (!playerKiller) {
-                    gp.sendMessage("&6&l>> &cYour killer died without a killer, you have been set back as a spectator.");
+                    gp.sendMessage("&6&l>> &cYour target died without a killer, you have been set back as a spectator.");
                     removeMutation(mutation);
                     gp.sendMessage(gp.getTeam().getLeaveMessage());
                     gp.setTeam(GameTeam.SPECTATORS);
@@ -1012,7 +1019,7 @@ public class Game {
                     gp.sendMessage(gp.getTeam().getJoinMessage());
                 } else {
                     mutation.setTarget(killer.getKiller());
-                    gp.sendMessage("&6&l>> &cYour target died, your  new target is &a" + getPlayer(killer.getKiller()).getName());
+                    gp.sendMessage("&6&l>> &cYour target died, your new target is &a" + getPlayer(killer.getKiller()).getName());
                 }
             }
         }
@@ -1080,6 +1087,15 @@ public class Game {
                 }
                 
                 killerPlayer.sendMessage(creditsMsg);
+            }
+            
+            if (settings.isEarnNexites()) {
+                String nexiteMsg = "&2&l>> &a&l" + nexiteGain + " &9&lNEXITES&a&l!";
+                if (settings.isMultiplier() && killerRank.isNexiteBoost()) {
+                    nexiteMsg += multiplierMessage;
+                }
+                
+                killerPlayer.sendMessage(nexiteMsg);
             }
         }
         

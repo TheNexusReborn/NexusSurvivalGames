@@ -108,11 +108,11 @@ public class GameSettings extends SettingList<GameSetting> {
     }
     
     public boolean isGiveCredits() {
-        return getValue("give_credits").getAsBoolean();
+        return getValue("earn_credits").getAsBoolean();
     }
     
     public boolean isGiveXp() {
-        return getValue("give_network_xp").getAsBoolean();
+        return getValue("earn_network_xp").getAsBoolean();
     }
     
     public boolean isUseNewLoot() {
@@ -153,6 +153,10 @@ public class GameSettings extends SettingList<GameSetting> {
     
     public int getMaxMutationAmount() {
         return getValue("max_mutation_amount").getAsInt();
+    }
+    
+    public boolean isEarnNexites() {
+        return getValue("earn_nexites").getAsBoolean();
     }
     
     @Override

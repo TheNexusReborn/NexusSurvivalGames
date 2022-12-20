@@ -264,8 +264,8 @@ public class SurvivalGames extends NexusSpigotPlugin {
         createGameSetting("weather_progression", "Weather Progression", "This controls if weather is progressed in the world. True means it does, and false means it does not.", Type.BOOLEAN, false);
         createGameSetting("apply_multipliers", "Apply Multipliers", "This controls if rank based multipliers are to be applied.", Type.BOOLEAN, true);
         createGameSetting("sounds", "Sounds", "Whether or not to play custom sounds", Type.BOOLEAN, true);
-        createGameSetting("give_credits", "Give Credits", "Controls if Credits are given on certain actions", Type.BOOLEAN, true);
-        createGameSetting("give_network_xp", "Give XP", "Controls if Network XP is given on certain actions", Type.BOOLEAN, true);
+        createGameSetting("earn_credits", "Earn Credits", "Controls if Credits are earned on certain actions", Type.BOOLEAN, true);
+        createGameSetting("earn_network_xp", "Earn XP", "Controls if Network XP is earned on certain actions", Type.BOOLEAN, true);
         createGameSetting("use_tiered_loot", "Use Tiered Loot", "Controls if tiered loot is to be used.", Type.BOOLEAN, true);
         createGameSetting("enderchests_enabled", "Enderchests Enabled", "Controls if Ender Chests produce loot. These follow the default tiering rules", Type.BOOLEAN, true);
         createGameSetting("use_all_mutation_types", "Use All Mutation Types", "Controls if all mutation types are unlocked or not", Type.BOOLEAN, true); //Actual Default is false
@@ -276,7 +276,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         createGameSetting("score_divisor", "Score Divisor", "The number that the score from the dead player is divided by", Type.DOUBLE, 10.0, 1.0, 100);
         createGameSetting("first_blood_multiplier", "First Blood Multiplier", "The multiplier to apply to the score when someone claims first blood.", Type.DOUBLE, 1.25, 1, 100);
         createGameSetting("max_mutation_amount", "Maximum Mutation Amount", "The maximum amount of times that players can mutate per game", Type.INTEGER, 1);
-        
+        createGameSetting("earn_nexites", "Earn Nexites", "Controls if Nexites are earned on certain actions", Type.BOOLEAN, false);
         
     }
     
