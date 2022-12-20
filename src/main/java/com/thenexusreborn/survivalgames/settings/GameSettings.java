@@ -151,6 +151,10 @@ public class GameSettings extends SettingList<GameSetting> {
         return getValue("first_blood_multiplier").getAsDouble();
     }
     
+    public int getMaxMutationAmount() {
+        return getValue("max_mutation_amount").getAsInt();
+    }
+    
     @Override
     public GameSettings clone() {
         return (GameSettings) super.clone();

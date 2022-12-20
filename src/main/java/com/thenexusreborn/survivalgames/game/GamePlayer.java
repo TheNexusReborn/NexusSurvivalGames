@@ -164,6 +164,16 @@ public class GamePlayer {
         return damageInfo;
     }
     
+    public int getTotalTimesMutated() {
+        int totalMutations = 0;
+        for (DeathInfo deathInfo : new ArrayList<>(deaths.values())) {
+            if (deathInfo.getTeam() == GameTeam.MUTATIONS) {
+                totalMutations++;
+            }
+        }
+        return totalMutations;
+    }
+    
     public boolean canMutate() {
         if (deathByMutation) {
             return false;
@@ -179,6 +189,10 @@ public class GamePlayer {
         }
         
         if (!(game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_DEATHMATCH)) {
+            return false;
+        }
+        
+        if (getTotalTimesMutated() >= game.getSettings().getMaxMutationAmount()) {
             return false;
         }
         

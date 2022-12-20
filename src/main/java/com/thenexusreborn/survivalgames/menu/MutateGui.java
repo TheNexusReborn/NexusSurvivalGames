@@ -11,6 +11,7 @@ import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.game.GameTeam;
+import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
 import com.thenexusreborn.survivalgames.mutations.MutationType;
 import com.thenexusreborn.survivalgames.mutations.PlayerMutations;
@@ -106,6 +107,11 @@ public class MutateGui extends Menu {
                 
                 if (passes <= 0 && !game.getSettings().isUnlimitedPasses()) {
                     player.sendMessage(MsgType.WARN + "You do not have any mutation passes.");
+                    return;
+                }
+                
+                if (player.getTotalTimesMutated() >= game.getSettings().getMaxMutationAmount()) {
+                    player.sendMessage(MsgType.WARN + "You cannot mutate more than " + game.getSettings().getMaxMutationAmount() + " times in this game.");
                     return;
                 }
                 

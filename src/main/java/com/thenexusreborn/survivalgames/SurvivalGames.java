@@ -260,7 +260,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
         createGameSetting("regeneration", "Regeneration", "This controls if regeneration is enabled. True means enabled and false means disabled", Type.BOOLEAN, true);
         createGameSetting("grace_period", "Grace Period", "This controls if the grace period is enabled or not.", Type.BOOLEAN, false);
         createGameSetting("unlimited_mutation_passes", "Unlimited Mutation Passes", "This controls if players need a mutation pass to mutate. This does not allow more than the max mutations per game though.", Type.BOOLEAN, false);
-        //TODO Create a game setting for maximum mutations allowed with a default of one
         createGameSetting("time_progression", "Time Progression", "This controls if time is progressed in the world. True means it does, and false means it does not.", Type.BOOLEAN, false);
         createGameSetting("weather_progression", "Weather Progression", "This controls if weather is progressed in the world. True means it does, and false means it does not.", Type.BOOLEAN, false);
         createGameSetting("apply_multipliers", "Apply Multipliers", "This controls if rank based multipliers are to be applied.", Type.BOOLEAN, true);
@@ -276,7 +275,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         createGameSetting("starting_saturation", "Starting Saturation", "The saturation for players at the start", Type.DOUBLE, 5.0, 0.0, 20.0);
         createGameSetting("score_divisor", "Score Divisor", "The number that the score from the dead player is divided by", Type.DOUBLE, 10.0, 1.0, 100);
         createGameSetting("first_blood_multiplier", "First Blood Multiplier", "The multiplier to apply to the score when someone claims first blood.", Type.DOUBLE, 1.25, 1, 100);
-        
+        createGameSetting("max_mutation_amount", "Maximum Mutation Amount", "The maximum amount of times that players can mutate per game", Type.INTEGER, 1);
         
         
     }
