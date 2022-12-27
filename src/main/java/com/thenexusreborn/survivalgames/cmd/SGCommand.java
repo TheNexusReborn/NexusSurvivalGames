@@ -677,7 +677,7 @@ public class SGCommand implements CommandExecutor {
                     return true;
                 }
                 
-                String url = args[2];
+                String url = args[2].replace("{url}", SurvivalGames.MAP_URL);
                 String mapName = SGUtils.getMapNameFromCommand(args, 3);
                 if (plugin.getMapManager().getMap(mapName) != null) {
                     sender.sendMessage(MCUtils.color(MsgType.WARN + "A map with that name already exists."));
