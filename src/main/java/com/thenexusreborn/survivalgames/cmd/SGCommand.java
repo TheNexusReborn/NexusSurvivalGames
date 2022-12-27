@@ -15,7 +15,10 @@ import com.thenexusreborn.survivalgames.map.*;
 import com.thenexusreborn.survivalgames.settings.SettingRegistry;
 import com.thenexusreborn.survivalgames.settings.collection.SettingList;
 import com.thenexusreborn.survivalgames.settings.object.Setting;
+import com.thenexusreborn.survivalgames.settings.object.Setting.Info;
 import com.thenexusreborn.survivalgames.util.SGUtils;
+import net.md_5.bungee.api.chat.*;
+import net.md_5.bungee.api.chat.HoverEvent.Action;
 import org.bukkit.*;
 import org.bukkit.block.*;
 import org.bukkit.command.*;
@@ -558,8 +561,8 @@ public class SGCommand implements CommandExecutor {
                 }
             }
         } else if (List.of("settings", "setting", "s").contains(subCommand)) {
-            if (!(args.length > 3)) {
-                sender.sendMessage(MCUtils.color(MsgType.WARN + "Usage: /" + label + " " + args[0] + " <type> <name | save> <value | savename>"));
+            if (!(args.length > 2)) {
+                sender.sendMessage(MCUtils.color(MsgType.WARN + "Usage: /" + label + " " + args[0] + " <type> <name | save | list> [value | savename]"));
                 return true;
             }
             
@@ -582,6 +585,37 @@ public class SGCommand implements CommandExecutor {
             
             if (args[2].equalsIgnoreCase("save")) {
                 sender.sendMessage(MCUtils.color(MsgType.WARN + "This functionality is temporarily disabled."));
+                return true;
+            }
+    
+            if (args[2].equalsIgnoreCase("list")) {
+                sender.sendMessage(MCUtils.color(MsgType.INFO + "List of &b" + type + " settings."));
+    
+                SettingRegistry settingRegistry = switch (type) {
+                    case "game" -> plugin.getGameSettingRegistry();
+                    case "lobby" -> plugin.getLobbySettingRegistry();
+                    default -> null;
+                };
+    
+                for (Info setting : settingRegistry.getObjects()) {
+                    TextComponent component = new TextComponent(TextComponent.fromLegacyText(MCUtils.color(" &8- &a" + setting.getName())));
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("&dName: &e").append(setting.getDisplayName()).append("\n");
+                    sb.append("&dDescription: &e").append(setting.getDescription());
+                    if (setting.getMinValue() != null) {
+                        sb.append("\n").append("&dMin: &e").append(setting.getMinValue().get());
+                    }
+                    if (setting.getMaxValue() != null) {
+                        sb.append("\n").append("&dMax: &e").append(setting.getMaxValue().get());
+                    }
+                    component.setHoverEvent(new HoverEvent(Action.SHOW_TEXT, TextComponent.fromLegacyText(MCUtils.color(sb.toString()))));
+                    if (sender instanceof Player player) {
+                        player.spigot().sendMessage(component);
+                    } else if (sender instanceof ConsoleCommandSender console) {
+                        console.sendMessage(MCUtils.color(component.getText()));
+                    }
+                }
+    
                 return true;
             }
             
