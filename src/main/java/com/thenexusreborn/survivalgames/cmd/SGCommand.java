@@ -2,6 +2,8 @@ package com.thenexusreborn.survivalgames.cmd;
 
 import com.starmediadev.starlib.Operator;
 import com.thenexusreborn.api.NexusAPI;
+import com.thenexusreborn.api.frameworks.value.*;
+import com.thenexusreborn.api.frameworks.value.Value.Type;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.stats.*;
 import com.thenexusreborn.nexuscore.util.*;
@@ -10,17 +12,22 @@ import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.lobby.*;
 import com.thenexusreborn.survivalgames.map.*;
-import com.thenexusreborn.survivalgames.settings.*;
+import com.thenexusreborn.survivalgames.settings.SettingRegistry;
+import com.thenexusreborn.survivalgames.settings.collection.SettingList;
+import com.thenexusreborn.survivalgames.settings.object.Setting;
+import com.thenexusreborn.survivalgames.settings.object.Setting.Info;
 import com.thenexusreborn.survivalgames.util.SGUtils;
+import net.md_5.bungee.api.chat.*;
+import net.md_5.bungee.api.chat.HoverEvent.Action;
 import org.bukkit.*;
 import org.bukkit.block.*;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.lang.reflect.Field;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.stream.Stream;
 
 public class SGCommand implements CommandExecutor {
     
@@ -54,7 +61,7 @@ public class SGCommand implements CommandExecutor {
             
             String gameSubCommand = args[1].toLowerCase();
             
-            if (gameSubCommand.equals("automatic") || gameSubCommand.equals("auto") || gameSubCommand.equals("manual") || gameSubCommand.equals("mnl")) {
+            if (List.of("automatic", "auto", "manual", "mnl").contains(gameSubCommand)) {
                 ControlType controlType = null;
                 try {
                     controlType = ControlType.valueOf(gameSubCommand.toUpperCase());
@@ -90,7 +97,7 @@ public class SGCommand implements CommandExecutor {
                 sender.sendMessage(MCUtils.color(MsgType.WARN + "The game had an error, you cannot modify it."));
                 return true;
             }
-    
+            
             switch (gameSubCommand) {
                 case "setup" -> {
                     if (game.getState() != GameState.UNDEFINED) {
@@ -200,7 +207,7 @@ public class SGCommand implements CommandExecutor {
                     }
                 }
                 case "startdeathmatch", "sdm" -> {
-                    if (game.getState() == GameState.TELEPORT_DEATHMATCH_DONE || game.getState() == GameState.DEATHMATCH_WARMUP || game.getState() == GameState.DEATHMATCH_WARMUP_DONE) {
+                    if (Stream.of(GameState.TELEPORT_DEATHMATCH_DONE, GameState.DEATHMATCH_WARMUP, GameState.DEATHMATCH_WARMUP_DONE).anyMatch(gameState -> game.getState() == gameState)) {
                         game.startDeathmatch();
                         sender.sendMessage(MCUtils.color(MsgType.INFO + "You started the deathmatch"));
                     } else {
@@ -453,7 +460,7 @@ public class SGCommand implements CommandExecutor {
                         return true;
                     }
                     
-                    if (!(targetBlock.getType() == Material.SIGN || targetBlock.getType() == Material.WALL_SIGN || targetBlock.getType() == Material.SKULL)) {
+                    if (Stream.of(Material.SIGN, Material.WALL_SIGN, Material.SKULL).noneMatch(material -> targetBlock.getType() == material)) {
                         player.sendMessage("&cYou are not looking at a sign or a head.");
                         return true;
                     }
@@ -501,11 +508,8 @@ public class SGCommand implements CommandExecutor {
                             String msg = "You created a new tribute sign with index &b" + index;
                             if (signLocation == null) {
                                 msg += "&e, however you still need to add a sign to it. Just use the same command while looking at a sign.";
-                            } else if (headLocation == null) {
-                                msg += "&e, however you still need to add a head to it. Just use the same command while looking at a head.";
                             } else {
-                                player.sendMessage(MCUtils.color(MsgType.WARN + "Unknown error occured. Please report as a bug."));
-                                return true;
+                                msg += "&e, however you still need to add a head to it. Just use the same command while looking at a head.";
                             }
                             plugin.getLobby().getTributeSigns().add(tributeSign);
                             player.sendMessage(MCUtils.color(MsgType.INFO + msg));
@@ -553,136 +557,133 @@ public class SGCommand implements CommandExecutor {
                     sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the lobby spawnpoint to your location."));
                 }
             }
-        } else if (subCommand.equals("settings") || subCommand.equals("setting") || subCommand.equals("s")) {
-            if (!(args.length > 3)) {
-                sender.sendMessage(MCUtils.color(MsgType.WARN + "Usage: /" + label + " " + args[0] + " <type> <name | save> <value | savename>"));
+        } else if (List.of("settings", "setting", "s").contains(subCommand)) {
+            if (!(args.length > 2)) {
+                sender.sendMessage(MCUtils.color(MsgType.WARN + "Usage: /" + label + " " + args[0] + " <type> <name | save | list> [value | savename]"));
                 return true;
             }
-            // /sg settings <type> <save> <name>
-            String type = args[1];
             
-            if (!(type.equalsIgnoreCase("game") || type.equalsIgnoreCase("lobby"))) {
-                sender.sendMessage(MCUtils.color(MsgType.WARN + "Invalid setting type. Can only be game or lobby"));
+            String type = switch (args[1].toLowerCase()) {
+                case "game", "g" -> "game";
+                case "lobby", "l" -> "lobby";
+                default -> null;
+            };
+            
+            if (type == null) {
+                sender.sendMessage(MCUtils.color(MsgType.WARN + "Invalid setting type. Can only be game (g) or lobby (l)"));
                 return true;
             }
+            
+            SettingRegistry registry = switch (type) {
+                case "game" -> plugin.getGameSettingRegistry();
+                case "lobby" -> plugin.getLobbySettingRegistry();
+                default -> null;
+            };
             
             if (args[2].equalsIgnoreCase("save")) {
-                String saveName = args[3];
-                SGSettings settings;
-                if (type.equalsIgnoreCase("lobby")) {
-                    settings = plugin.getLobby().getLobbySettings();
-                } else {
-                    if (game == null) {
-                        settings = plugin.getLobby().getGameSettings();
-                    } else {
-                        settings = game.getSettings();
+                sender.sendMessage(MCUtils.color(MsgType.WARN + "This functionality is temporarily disabled."));
+                return true;
+            }
+    
+            if (args[2].equalsIgnoreCase("list")) {
+                sender.sendMessage(MCUtils.color(MsgType.INFO + "List of &b" + type + " settings."));
+    
+                SettingRegistry settingRegistry = switch (type) {
+                    case "game" -> plugin.getGameSettingRegistry();
+                    case "lobby" -> plugin.getLobbySettingRegistry();
+                    default -> null;
+                };
+    
+                for (Info setting : settingRegistry.getObjects()) {
+                    TextComponent component = new TextComponent(TextComponent.fromLegacyText(MCUtils.color(" &8- &a" + setting.getName())));
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("&dName: &e").append(setting.getDisplayName()).append("\n");
+                    sb.append("&dDescription: &e").append(setting.getDescription());
+                    if (setting.getMinValue() != null) {
+                        sb.append("\n").append("&dMin: &e").append(setting.getMinValue().get());
+                    }
+                    if (setting.getMaxValue() != null) {
+                        sb.append("\n").append("&dMax: &e").append(setting.getMaxValue().get());
+                    }
+                    component.setHoverEvent(new HoverEvent(Action.SHOW_TEXT, TextComponent.fromLegacyText(MCUtils.color(sb.toString()))));
+                    if (sender instanceof Player player) {
+                        player.spigot().sendMessage(component);
+                    } else if (sender instanceof ConsoleCommandSender console) {
+                        console.sendMessage(MCUtils.color(component.getText()));
                     }
                 }
-                
-                settings.setId(0);
-                settings.setType(args[3].toLowerCase());
-                NexusAPI.getApi().getPrimaryDatabase().push(settings);
-                if (settings.getId() > 0) {
-                    sender.sendMessage(MCUtils.color(MsgType.INFO + "Successfully saved the settings with the name &b" + settings.getType()));
-                    if (type.equalsIgnoreCase("lobby")) {
-                        plugin.addLobbySettings((LobbySettings) settings);
-                    } else {
-                        if (type.equalsIgnoreCase("game")) {
-                            plugin.addGameSettings((GameSettings) settings);
-                        }
-                    }
-                } else {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "There was a problem saving the settings, report to Firestar311"));
-                }
+    
                 return true;
             }
             
-            String settingName = args[2];
-            String rawValue = args[3];
+            String settingName = args[2].toLowerCase();
+            Setting.Info settingInfo = registry.get(settingName);
             
-            Field settingField = null;
-            if (type.equalsIgnoreCase("game")) {
-                for (Field field : GameSettings.class.getDeclaredFields()) {
-                    if (field.getName().equalsIgnoreCase(settingName)) {
-                        settingField = field;
-                        break;
-                    }
-                }
-            } else if (type.equalsIgnoreCase("lobby")) {
-                for (Field field : LobbySettings.class.getDeclaredFields()) {
-                    if (field.getName().equalsIgnoreCase(settingName)) {
-                        settingField = field;
-                        break;
-                    }
-                }
-            }
-            
-            if (settingField == null) {
+            if (settingInfo == null) {
                 sender.sendMessage(MCUtils.color(MsgType.WARN + "A setting with that name does not exist."));
                 return true;
             }
-            
-            Object value;
-            if (settingField.getType().equals(int.class)) {
-                try {
-                    value = Integer.parseInt(rawValue);
-                } catch (NumberFormatException e) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid number for that setting."));
-                    return true;
-                }
-            } else if (settingField.getType().equals(boolean.class)) {
-                if (rawValue.equalsIgnoreCase("true") || rawValue.equalsIgnoreCase("yes")) {
-                    value = true;
-                } else if (rawValue.equalsIgnoreCase("false") || rawValue.equalsIgnoreCase("no")) {
-                    value = false;
-                } else {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "Invalid value, only true, false, yes and no are accepted for that setting"));
-                    return true;
-                }
-            } else if (settingField.getType().equals(Time.class)) {
-                try {
-                    value = Time.valueOf(rawValue.toUpperCase());
-                } catch (Exception e) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid time value"));
-                    return true;
-                }
-            } else if (settingField.getType().equals(Weather.class)) {
-                try {
-                    value = Weather.valueOf(rawValue.toUpperCase());
-                } catch (Exception e) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid weather value"));
-                    return true;
-                }
-            } else if (settingField.getType().equals(ColorMode.class)) {
-                try {
-                    value = ColorMode.valueOf(rawValue.toUpperCase());
-                } catch (Exception e) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid color mode value."));
-                    return true;
-                }
-            } else {
-                sender.sendMessage(MCUtils.color(MsgType.WARN + "Unhandled setting type: " + settingField.getType().getName() + ". This is a BUG"));
+    
+            Value value;
+            try {
+                value = new ValueCodec().decode(settingInfo.getDefaultValue().getType() + ":" + args[3]);
+            } catch (Exception e) {
+                sender.sendMessage(MCUtils.color(MsgType.WARN + "There was an error parsing the value: " + e.getMessage()));
                 return true;
             }
             
-            try {
-                settingField.setAccessible(true);
-                Object object = null;
-                if (type.equalsIgnoreCase("game")) {
-                    if (game == null) {
-                        object = plugin.getLobby().getGameSettings();
-                    } else {
-                        object = game.getSettings();
-                    }
-                } else if (type.equalsIgnoreCase("lobby")) {
-                    object = plugin.getLobby().getLobbySettings();
-                }
-                settingField.set(object, value);
-                sender.sendMessage(MCUtils.color("&6&l>> &eYou set the &b" + type.toLowerCase() + " &esetting &b" + settingField.getName() + " &eto &b" + value));
-            } catch (Exception e) {
-                sender.sendMessage(MCUtils.color(MsgType.WARN + "Error while setting the value. Please report with the following message."));
-                sender.sendMessage(MCUtils.color(MsgType.WARN + "" + e.getClass().getName() + ": " + e.getMessage()));
+            if (value == null) {
+                sender.sendMessage(MCUtils.color(MsgType.WARN + "There was a problem parsing the value."));
+                return true;
             }
+    
+            Value minValue = settingInfo.getMinValue();
+            Value maxValue = settingInfo.getMaxValue();
+            if (minValue != null && maxValue != null) {
+                if (List.of(Type.INTEGER, Type.DOUBLE, Type.LONG).contains(value.getType())) {
+                    boolean lowerInBounds, upperInBounds;
+                    if (value.getType() == Type.INTEGER) {
+                        lowerInBounds = value.getAsInt() >= minValue.getAsInt();
+                        upperInBounds = value.getAsInt() <= maxValue.getAsInt();
+                    } else if (value.getType() == Type.DOUBLE) {
+                        lowerInBounds = value.getAsDouble() >= minValue.getAsDouble();
+                        upperInBounds = value.getAsDouble() <= maxValue.getAsDouble();
+                    } else {
+                        lowerInBounds = value.getAsLong() >= minValue.getAsLong();
+                        upperInBounds = value.getAsLong() <= maxValue.getAsLong();
+                    }
+                    
+                    if (!lowerInBounds) {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "The value you provided is less than the minimum allowed value. Min: " + minValue.get()));
+                        return true;
+                    }
+                    
+                    if (!upperInBounds) {
+                        sender.sendMessage(MCUtils.color(MsgType.WARN + "The value you provided is greater than the maximum allowed value. Max: " + maxValue.get()));
+                        return true;
+                    }
+                }
+            }
+    
+            SettingList<?> settingList;
+            if (type.equalsIgnoreCase("game")) {
+                if (game == null) {
+                    settingList = plugin.getLobby().getGameSettings();
+                } else {
+                    settingList = plugin.getGame().getSettings();
+                }
+            } else {
+                settingList = plugin.getLobby().getLobbySettings();
+            }
+            
+            settingList.setValue(settingName, value.get());
+            Object settingValue = settingList.get(settingName).getValue().get();
+            if (!Objects.equals(value.get(), settingValue)) {
+                sender.sendMessage(MCUtils.color(MsgType.WARN + "The actual setting value is not equal to the new value. Please report to Firestar311."));
+                return true;
+            }
+            
+            sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the &b" + type.toLowerCase() + " &esetting &b" + settingName + " &eto &b" + value.get()));
         } else if (subCommand.equals("map") || subCommand.equals("m")) {
             if (!(args.length > 1)) {
                 sender.sendMessage(MCUtils.color(MsgType.WARN + "You must provide a sub command."));
@@ -707,7 +708,7 @@ public class SGCommand implements CommandExecutor {
                     return true;
                 }
                 
-                String url = args[2];
+                String url = args[2].replace("{url}", SurvivalGames.MAP_URL);
                 String mapName = SGUtils.getMapNameFromCommand(args, 3);
                 if (plugin.getMapManager().getMap(mapName) != null) {
                     sender.sendMessage(MCUtils.color(MsgType.WARN + "A map with that name already exists."));
@@ -893,7 +894,7 @@ public class SGCommand implements CommandExecutor {
                         }
                         
                         String[] creators = cb.toString().trim().split(",");
-                        if (creators == null || creators.length == 0) {
+                        if (creators.length == 0) {
                             sender.sendMessage(MCUtils.color(MsgType.WARN + "You must separate the creators with commas."));
                             return true;
                         }
@@ -990,7 +991,7 @@ public class SGCommand implements CommandExecutor {
                         sender.sendMessage(MsgType.WARN + "You provided an invalid integer value.");
                         return true;
                     }
-                    long milliseconds = (seconds * 1000L) + 50;
+                    long milliseconds = seconds * 1000L + 50;
                     if (operator == null) {
                         timer.setLength(milliseconds);
                     } else {

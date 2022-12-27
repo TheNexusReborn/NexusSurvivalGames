@@ -15,6 +15,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import javax.lang.model.element.TypeElement;
+
 public class BountyCmd implements CommandExecutor {
     
     private final SurvivalGames plugin;
@@ -71,6 +73,7 @@ public class BountyCmd implements CommandExecutor {
             }
         }
     
+        int max = 0;
         if (type == Type.SCORE) {
             if (senderPlayer.getStatValue("sg_score").getAsInt() < amount) {
                 senderPlayer.sendMessage(MsgType.WARN + "You do not have enough score to set a bounty of " + amount);
@@ -78,6 +81,7 @@ public class BountyCmd implements CommandExecutor {
             } else {
                senderPlayer.changeStat("sg_score", amount, StatOperator.SUBTRACT);
             }
+            max = game.getSettings().getMaxScoreBounty();
         } else if (type == Type.CREDIT) {
             if (senderPlayer.getStatValue("credits").getAsInt() < amount) {
                 senderPlayer.sendMessage(MsgType.WARN + "You do not have enough credits to set a bounty of " + amount);
@@ -85,9 +89,17 @@ public class BountyCmd implements CommandExecutor {
             } else {
                 senderPlayer.changeStat("credits", amount, StatOperator.SUBTRACT);
             }
+            max = game.getSettings().getMaxCreditBounty();
         }
-    
+        
         Bounty bounty = gamePlayer.getBounty();
+    
+        double currentAmount = bounty.getAmount(type);
+        if (currentAmount + amount >= max) {
+            senderPlayer.sendMessage(MsgType.WARN + "You cannot set the bounty higher than " + max + " " + type.name().toLowerCase());
+            return true;
+        }
+        
         bounty.add(type, amount);
         String coloredName = senderPlayer.getColoredName();
         String formattedAmount = NumberHelper.formatNumber(amount);

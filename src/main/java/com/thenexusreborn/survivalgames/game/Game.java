@@ -34,7 +34,6 @@ import org.bukkit.inventory.*;
 import org.bukkit.potion.*;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.lang.reflect.Field;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
@@ -82,16 +81,17 @@ public class Game {
         }
         gameInfo.setPlayerCount(tributeCount);
         gameInfo.setPlayers(playerNames.toArray(new String[0]));
-        StringBuilder sb = new StringBuilder();
-        for (Field field : this.settings.getClass().getDeclaredFields()) {
-            field.setAccessible(true);
-            try {
-                sb.append(field.getName()).append("=").append(field.get(this.settings).toString()).append(",");
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        gameInfo.setSettings(sb.substring(0, sb.length() - 1));
+        //TODO Parse settings, or just get rid of the settings from the GameInfo
+//        StringBuilder sb = new StringBuilder();
+//        for (Field field : this.settings.getClass().getDeclaredFields()) {
+//            field.setAccessible(true);
+//            try {
+//                sb.append(field.getName()).append("=").append(field.get(this.settings).toString()).append(",");
+//            } catch (IllegalAccessException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        gameInfo.setSettings(sb.substring(0, sb.length() - 1));
     }
     
     protected void setState(GameState state) {
@@ -330,7 +330,7 @@ public class Game {
                 p.getInventory().setArmorContents(null);
                 p.setFlying(false);
                 p.setAllowFlight(false);
-                p.setSaturation(5.0F);
+                p.setSaturation(settings.getStartingSaturation());
                 if (player.getTeam() == GameTeam.TRIBUTES) {
                     tributes.add(player.getUniqueId());
                 } else if (player.getTeam() == GameTeam.SPECTATORS) {
@@ -372,7 +372,7 @@ public class Game {
                         spectators.offer(player.getUniqueId());
                     }
                 } else {
-                    if (tributes.size() >= settings.getMaxPlayers()) {
+                    if (tributes.size() >= gameMap.getSpawns().size()) {
                         player.setTeam(GameTeam.SPECTATORS);
                         spectators.offer(uuid);
                     } else {
@@ -505,9 +505,9 @@ public class Game {
         sendMessage("&6&l>> &a&lMAY THE ODDS BE EVER IN YOUR FAVOR.");
         sendMessage("&6&l>> &c&lCLICKING MORE THAN 16 CPS WILL LIKELY RESULT IN A BAN.");
         if (this.settings.isTeamingAllowed()) {
-            sendMessage("&6&l>> &d&lTHERE IS A MAXIUMUM OF 2 PLAYER TEAMS.");
+            sendMessage("&6&l>> &d&lTHERE IS A MAXIUMUM OF " + this.settings.getMaxTeamAmount() + " PLAYER TEAMS.");
         } else {
-            sendMessage("&6&l>> &d&lTEAMING IS NOT ALLOWED.");
+            sendMessage("&6&l>> &d&lTEAMING IS NOT ALLOWED IN THIS GAME.");
         }
     }
     
@@ -600,7 +600,7 @@ public class Game {
             }
         }
         
-        this.timer = new Timer(new DeathmatchCountdownCallback(this)).run(10050); //TODO Add a setting for this
+        this.timer = new Timer(new DeathmatchCountdownCallback(this)).run(TimeUnit.SECONDS.toMilliseconds(settings.getDeathmatchTimerLength()) + 50L);
     }
     
     public void startDeathmatch() {
@@ -686,7 +686,7 @@ public class Game {
         if (winner != null) {
             winner.changeStat("sg_wins", 1, StatOperator.ADD);
             winner.changeStat("sg_win_streak", 1, StatOperator.ADD);
-            int winGain = 50;
+            int winGain = settings.getWinScoreBaseGain();
             int currentScore = winner.getStatValue("sg_score").getAsInt();
             if (currentScore < 100 && currentScore > 50) {
                 winGain *= 1.25;
@@ -694,8 +694,6 @@ public class Game {
                 winGain *= 1.5;
             } else if (currentScore < 25) {
                 winGain *= 2;
-            } else if (currentScore >= 500) {
-                winGain *= .8;
             } else if (currentScore < 1000 && currentScore > 500) {
                 winGain *= .75;
             } else if (currentScore >= 1000) {
@@ -707,7 +705,7 @@ public class Game {
             Rank rank = winner.getRank();
             String multiplierMessage = rank.getColor() + "&l * x" + MCUtils.formatNumber(multiplier) + " " + rank.getPrefix() + " Bonus";
             if (settings.isGiveXp()) {
-                double xp = 10;
+                double xp = settings.getWinXPBaseGain();
                 xp *= multiplier;
                 winner.changeStat("xp", xp, StatOperator.ADD);
                 String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(xp) + " &2&lXP&a&l!";
@@ -719,11 +717,25 @@ public class Game {
             }
             
             if (settings.isGiveCredits()) {
-                double credits = 10;
+                double credits = settings.getWinCreditsBaseGain();
                 credits *= multiplier;
                 winner.changeStat("credits", credits, StatOperator.ADD);
                 String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(credits) + " &3&lCREDITS&a&l!";
                 if (multiplier > 1) {
+                    winner.sendMessage(baseMessage + multiplierMessage);
+                } else {
+                    winner.sendMessage(baseMessage);
+                }
+            }
+            
+            if (settings.isEarnNexites()) {
+                double nexites = settings.getWinNexiteBaseGain();
+                if (winner.getRank().isNexiteBoost()) {
+                    nexites *= multiplier;
+                }
+    
+                String baseMessage = "&2&l>> &a&l" + nexites + " &9&lNEXITES&a&l!";
+                if (multiplier > 1 && winner.getRank().isNexiteBoost()) {
                     winner.sendMessage(baseMessage + multiplierMessage);
                 } else {
                     winner.sendMessage(baseMessage);
@@ -871,7 +883,7 @@ public class Game {
         
         boolean vanished = deathInfo.getType() == DeathType.VANISH;
         int score = gamePlayer.getStatValue("sg_score").getAsInt();
-        int lost = (int) Math.ceil(score / 10D);
+        int lost = (int) Math.ceil(score / settings.getScoreDivisor());
         if (score - lost < 0) {
             lost = 0;
         }
@@ -892,7 +904,7 @@ public class Game {
         
         boolean claimedFirstBlood = false;
         
-        int scoreGain = 0, currentStreak = 0, personalBest = 0, xpGain = 0, creditGain = 0;
+        int scoreGain = 0, currentStreak = 0, personalBest = 0, xpGain = 0, creditGain = 0, nexiteGain = 0;
         Rank killerRank = null;
         boolean claimedScoreBounty = false, claimedCreditBounty = false;
         Bounty bounty = gamePlayer.getBounty();
@@ -909,7 +921,7 @@ public class Game {
             }
             
             if (claimedFirstBlood) {
-                scoreGain = (int) (scoreGain * 1.25);
+                scoreGain = (int) (scoreGain * settings.getFirstBloodMultiplier());
             }
             
             if (scoreBounty > 0) {
@@ -930,7 +942,7 @@ public class Game {
             }
             
             if (getSettings().isGiveXp()) {
-                xpGain = 2;
+                xpGain = settings.getKillXPGain();
                 if (getSettings().isMultiplier()) {
                     xpGain *= killerRank.getMultiplier();
                 }
@@ -938,7 +950,7 @@ public class Game {
             }
             
             if (getSettings().isGiveCredits()) {
-                creditGain = 2;
+                creditGain = settings.getKillCreditGain();
                 if (getSettings().isMultiplier()) {
                     creditGain *= killerRank.getMultiplier();
                 }
@@ -950,6 +962,15 @@ public class Game {
                 }
                 
                 killerPlayer.changeStat("credits", creditGain, StatOperator.ADD);
+            }
+            
+            if (getSettings().isEarnNexites()) {
+                nexiteGain = settings.getKillNexiteGain();
+                if (getSettings().isMultiplier() && killerRank.isNexiteBoost()) {
+                    nexiteGain *= killerRank.getMultiplier();
+                }
+                
+                killerPlayer.changeStat("nexites", nexiteGain, StatOperator.ADD);
             }
             
             killerPlayer.changeStat("sg_kills", 1, StatOperator.ADD);
@@ -964,17 +985,19 @@ public class Game {
         }
         
         List<UUID> damagers = gamePlayer.getDamageInfo().getDamagers();
-        List<GamePlayer> assisters = new ArrayList<>();
-        if (!damagers.isEmpty()) {
-            for (UUID damager : damagers) {
-                if (killer != null && killer.getKiller().equals(damager)) {
-                    continue;
+        List<AssisterInfo> assistors = new ArrayList<>();
+        if (settings.isAllowAssists()) {
+            if (!damagers.isEmpty()) {
+                for (UUID damager : damagers) {
+                    if (killer != null && killer.getKiller().equals(damager)) {
+                        continue;
+                    }
+            
+                    GamePlayer assisterPlayer = getPlayer(damager);
+                    assisterPlayer.setAssists(assisterPlayer.getAssists() + 1);
+                    assisterPlayer.changeStat("sg_assists", 1, StatOperator.ADD);
+                    assistors.add(new AssisterInfo(this, assisterPlayer));
                 }
-                
-                GamePlayer assisterPlayer = getPlayer(damager);
-                assisterPlayer.setAssists(assisterPlayer.getAssists() + 1);
-                assisterPlayer.changeStat("sg_assists", 1, StatOperator.ADD);
-                assisters.add(assisterPlayer);
             }
         }
         
@@ -1001,7 +1024,7 @@ public class Game {
                 }
                 
                 if (!playerKiller) {
-                    gp.sendMessage("&6&l>> &cYour killer died without a killer, you have been set back as a spectator.");
+                    gp.sendMessage("&6&l>> &cYour target died without a killer, you have been set back as a spectator.");
                     removeMutation(mutation);
                     gp.sendMessage(gp.getTeam().getLeaveMessage());
                     gp.setTeam(GameTeam.SPECTATORS);
@@ -1012,7 +1035,7 @@ public class Game {
                     gp.sendMessage(gp.getTeam().getJoinMessage());
                 } else {
                     mutation.setTarget(killer.getKiller());
-                    gp.sendMessage("&6&l>> &cYour target died, your  new target is &a" + getPlayer(killer.getKiller()).getName());
+                    gp.sendMessage("&6&l>> &cYour target died, your new target is &a" + getPlayer(killer.getKiller()).getName());
                 }
             }
         }
@@ -1081,10 +1104,35 @@ public class Game {
                 
                 killerPlayer.sendMessage(creditsMsg);
             }
+            
+            if (settings.isEarnNexites()) {
+                String nexiteMsg = "&2&l>> &a&l" + nexiteGain + " &9&lNEXITES&a&l!";
+                if (settings.isMultiplier() && killerRank.isNexiteBoost()) {
+                    nexiteMsg += multiplierMessage;
+                }
+                
+                killerPlayer.sendMessage(nexiteMsg);
+            }
         }
         
-        for (GamePlayer assister : assisters) {
-            assister.sendMessage("&2&l>> &a+1 &aAssist");
+        for (AssisterInfo assister : assistors) {
+            GamePlayer assisterPlayer = assister.getGamePlayer();
+            assisterPlayer.sendMessage("&2&l>> &a+1 &aAssist");
+            String multiplierMsg = killerRank.getColor() + "&l * x" + MCUtils.formatNumber(assisterPlayer.getRank().getMultiplier()) + " " + assisterPlayer.getRank().getPrefix() + " Bonus";
+            String xpMsg = "&2&l>> &a&l+" + assister.getXp() + " &2&lXP&a&l!" + (settings.isMultiplier() ? " " + multiplierMsg : "");
+            String creditsMsg = "&2&l>> &a&l+" + assister.getCredits() + " &3&lCREDITS&a&l!" + (settings.isMultiplier() ? " " + multiplierMsg : "");;
+            String nexitesMsg = "&2&l>> &a&l" + assister.getNexites() + " &9&lNEXITES&a&l!" + (settings.isMultiplier() && assisterPlayer.getRank().isNexiteBoost() ? " " + multiplierMsg : "");;
+            if (assister.getXp() > 0) {
+                assisterPlayer.sendMessage(xpMsg);
+            }
+            
+            if (assister.getCredits() > 0) {
+                assisterPlayer.sendMessage(creditsMsg);
+            }
+            
+            if (assister.getNexites() > 0) {
+                assisterPlayer.sendMessage(nexitesMsg);
+            }
         }
         
         gamePlayer.sendMessage("&4&l>> &cYou lost " + lost + " Points for dying!");
@@ -1208,7 +1256,7 @@ public class Game {
         
         sendMessage("&6&l>> &4&lTHE DEATHMATCH COUNTDOWN HAS STARTED");
         
-        this.timer = new Timer(new DeathmatchPlayingCallback(this)).run(TimeUnit.MINUTES.toMilliseconds(settings.getDeathmatchTimerLength()) + 50);
+        this.timer = new Timer(new DeathmatchPlayingCallback(this)).run(TimeUnit.SECONDS.toMilliseconds(settings.getDeathmatchTimerLength()) + 50);
     }
     
     public boolean isLootedChest(Block block) {
@@ -1276,8 +1324,8 @@ public class Game {
         DisguiseAPI.undisguiseToAll(player);
         player.getInventory().clear();
         player.getInventory().setArmorContents(null);
-        player.setMaxHealth(20);
-        player.setHealth(20);
+        player.setMaxHealth(settings.getMaxHealth());
+        player.setHealth(settings.getMaxHealth());
         player.setExp(0);
         player.setLevel(0);
         player.spigot().setCollidesWithEntities(true);
@@ -1293,5 +1341,15 @@ public class Game {
             }
         }
         return null;
+    }
+    
+    public int getTeamCount(GameTeam gameTeam) {
+        int amount = 0;
+        for (GamePlayer gamePlayer : new ArrayList<>(this.players.values())) {
+            if (gamePlayer.getTeam() == gameTeam) {
+                amount++;
+            }
+        }
+        return amount;
     }
 }

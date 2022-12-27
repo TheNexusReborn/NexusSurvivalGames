@@ -3,7 +3,7 @@ package com.thenexusreborn.survivalgames.game;
 import com.thenexusreborn.api.frameworks.value.Value;
 import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
-import com.thenexusreborn.api.stats.StatOperator;
+import com.thenexusreborn.api.stats.*;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
@@ -32,8 +32,8 @@ public class GamePlayer {
         this.damageInfo = new DamageInfo(nexusPlayer.getUniqueId());
     }
 
-    public void changeStat(String statName, Object value, StatOperator operator) {
-        getNexusPlayer().changeStat(statName, value, operator);
+    public StatChange changeStat(String statName, Object value, StatOperator operator) {
+        return getNexusPlayer().changeStat(statName, value, operator).push(); //TODO Change how this works eventually
     }
 
     public Value getStatValue(String statName) {
@@ -164,6 +164,16 @@ public class GamePlayer {
         return damageInfo;
     }
     
+    public int getTotalTimesMutated() {
+        int totalMutations = 0;
+        for (DeathInfo deathInfo : new ArrayList<>(deaths.values())) {
+            if (deathInfo.getTeam() == GameTeam.MUTATIONS) {
+                totalMutations++;
+            }
+        }
+        return totalMutations;
+    }
+    
     public boolean canMutate() {
         if (deathByMutation) {
             return false;
@@ -179,6 +189,10 @@ public class GamePlayer {
         }
         
         if (!(game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_DEATHMATCH)) {
+            return false;
+        }
+        
+        if (getTotalTimesMutated() >= game.getSettings().getMaxMutationAmount()) {
             return false;
         }
         

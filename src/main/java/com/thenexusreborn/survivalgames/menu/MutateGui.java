@@ -8,19 +8,11 @@ import com.thenexusreborn.nexuscore.menu.gui.Menu;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.Game;
-import com.thenexusreborn.survivalgames.game.GamePlayer;
-import com.thenexusreborn.survivalgames.game.GameTeam;
-import com.thenexusreborn.survivalgames.mutations.Mutation;
-import com.thenexusreborn.survivalgames.mutations.MutationType;
-import com.thenexusreborn.survivalgames.mutations.PlayerMutations;
-import com.thenexusreborn.survivalgames.mutations.UnlockedMutation;
+import com.thenexusreborn.survivalgames.game.*;
+import com.thenexusreborn.survivalgames.mutations.*;
 import org.bukkit.Material;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 public class MutateGui extends Menu {
     public MutateGui(SurvivalGames plugin, GamePlayer player) {
@@ -106,6 +98,16 @@ public class MutateGui extends Menu {
                 
                 if (passes <= 0 && !game.getSettings().isUnlimitedPasses()) {
                     player.sendMessage(MsgType.WARN + "You do not have any mutation passes.");
+                    return;
+                }
+                
+                if (player.getTotalTimesMutated() >= game.getSettings().getMaxMutationAmount()) {
+                    player.sendMessage(MsgType.WARN + "You cannot mutate more than " + game.getSettings().getMaxMutationAmount() + " times in this game.");
+                    return;
+                }
+                
+                if (game.getTeamCount(GameTeam.MUTATIONS) >= game.getSettings().getMaxMutationsAllowed()) {
+                    player.sendMessage(MsgType.WARN + "You cannot mutate as there are too many mutations in the game already.");
                     return;
                 }
                 

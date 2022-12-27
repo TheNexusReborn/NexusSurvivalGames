@@ -1,128 +1,69 @@
 package com.thenexusreborn.survivalgames.settings;
 
-import com.thenexusreborn.api.storage.annotations.*;
-import com.thenexusreborn.api.helper.ReflectionHelper;
-
-import java.lang.reflect.Field;
+import com.thenexusreborn.api.storage.annotations.TableInfo;
+import com.thenexusreborn.survivalgames.SurvivalGames;
+import com.thenexusreborn.survivalgames.settings.collection.SettingList;
+import com.thenexusreborn.survivalgames.settings.object.Setting;
+import com.thenexusreborn.survivalgames.settings.object.impl.LobbySetting;
 
 @TableInfo("sglobbysettings")
-public class LobbySettings extends SGSettings {
-    private int maxPlayers = 24;
-    private int minPlayers = 4;
-    private int maxGames = 10;
-    private int timerLength = 10; //Default 30
-    private int voteStartThreshold = 2;
-    private boolean voteWeight = true;
-    private boolean keepPreviousGameSettings = true;
-    private boolean sounds = true;
-    
-    private LobbySettings() {
+public class LobbySettings extends SettingList<LobbySetting> {
+    public LobbySettings() {
+        super("lobby");
     }
     
     public LobbySettings(String type) {
         super(type);
     }
     
-    public int getMaxPlayers() {
-        return maxPlayers;
+    @Override
+    public LobbySetting createSetting(String name) {
+        Setting.Info info = SurvivalGames.getPlugin(SurvivalGames.class).getLobbySettingRegistry().get(name);
+        return new LobbySetting(info, getCategory(), info.getDefaultValue());
     }
     
-    public LobbySettings setMaxPlayers(int maxPlayers) {
-        this.maxPlayers = maxPlayers;
-        return this;
+    public int getMaxPlayers() {
+        return getValue("max_players").getAsInt();
     }
     
     public int getMinPlayers() {
-        return minPlayers;
-    }
-    
-    public LobbySettings setMinPlayers(int minPlayers) {
-        this.minPlayers = minPlayers;
-        return this;
+        return getValue("min_players").getAsInt();
     }
     
     public int getMaxGames() {
-        return maxGames;
-    }
-    
-    public LobbySettings setMaxGames(int maxGames) {
-        this.maxGames = maxGames;
-        return this;
+        return getValue("max_games").getAsInt();
     }
     
     public int getTimerLength() {
-        return timerLength;
-    }
-    
-    public LobbySettings setTimerLength(int timerLength) {
-        this.timerLength = timerLength;
-        return this;
+        return getValue("timer_length").getAsInt();
     }
     
     public boolean isVoteWeight() {
-        return voteWeight;
-    }
-    
-    public LobbySettings setVoteWeight(boolean voteWeight) {
-        this.voteWeight = voteWeight;
-        return this;
+        return getValue("allow_vote_weight").getAsBoolean();
     }
     
     public boolean isKeepPreviousGameSettings() {
-        return keepPreviousGameSettings;
-    }
-    
-    public LobbySettings setKeepPreviousGameSettings(boolean keepPreviousGameSettings) {
-        this.keepPreviousGameSettings = keepPreviousGameSettings;
-        return this;
+        return getValue("keep_previous_game_settings").getAsBoolean();
     }
     
     public boolean isSounds() {
-        return sounds;
-    }
-    
-    public LobbySettings setSounds(boolean sounds) {
-        this.sounds = sounds;
-        return this;
+        return getValue("sounds").getAsBoolean();
     }
     
     public int getVoteStartThreshold() {
-        return voteStartThreshold;
+        return getValue("vote_start_threshold").getAsInt();
     }
     
-    public LobbySettings setVoteStartThreshold(int voteStartThreshold) {
-        this.voteStartThreshold = voteStartThreshold;
-        return this;
+    public boolean isAllowVoteStart() {
+        return getValue("allow_vote_start").getAsBoolean();
     }
     
-    @Override
-    public String toString() {
-        return "LobbySettings{" +
-                "maxPlayers=" + maxPlayers +
-                ", minPlayers=" + minPlayers +
-                ", maxGames=" + maxGames +
-                ", timerLength=" + timerLength +
-                ", voteWeight=" + voteWeight +
-                ", keepPreviousGameSettings=" + keepPreviousGameSettings +
-                ", sounds=" + sounds +
-                ", id=" + id +
-                ", type='" + type + '\'' +
-                '}';
+    public int getVoteStartAvailableThreshold() {
+        return getValue("vote_start_available_threshold").getAsInt();
     }
     
     @Override
     public LobbySettings clone() {
-        LobbySettings settings = new LobbySettings();
-    
-        for (Field field : ReflectionHelper.getClassFields(getClass())) {
-            field.setAccessible(true);
-            try {
-                field.set(settings, field.get(this));
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        
-        return settings;
+        return (LobbySettings) super.clone();
     }
 }

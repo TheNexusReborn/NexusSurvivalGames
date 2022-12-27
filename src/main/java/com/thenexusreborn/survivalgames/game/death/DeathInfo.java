@@ -4,9 +4,8 @@ import com.thenexusreborn.api.helper.NumberHelper;
 import com.thenexusreborn.nexuscore.util.EntityNames;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.Game;
-import com.thenexusreborn.survivalgames.game.GamePlayer;
-import com.thenexusreborn.survivalgames.settings.ColorMode;
+import com.thenexusreborn.survivalgames.game.*;
+import com.thenexusreborn.survivalgames.settings.object.enums.ColorMode;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -15,7 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.UUID;
+import java.util.*;
 
 public class DeathInfo {
     
@@ -26,6 +25,7 @@ public class DeathInfo {
     protected DeathType type;
     protected String teamColor;
     protected KillerInfo killer;
+    protected GameTeam team;
     private long time;
     
     public DeathInfo(Game game, long time, GamePlayer player, DeathType type) {
@@ -33,6 +33,7 @@ public class DeathInfo {
         this.player = player.getUniqueId();
         this.type = type;
         this.teamColor = player.getTeam().getColor();
+        this.team = player.getTeam();
     }
     
     public DeathInfo(Game game, long time, GamePlayer player, DeathType type, KillerInfo killer) {
@@ -66,6 +67,10 @@ public class DeathInfo {
     
     public void setKiller(KillerInfo killer) {
         this.killer = killer;
+    }
+    
+    public GameTeam getTeam() {
+        return team;
     }
     
     public String getDeathMessage() {

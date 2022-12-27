@@ -1,5 +1,8 @@
 package com.thenexusreborn.survivalgames.game;
 
+import com.starmediadev.starlib.TimeUnit;
+import com.thenexusreborn.survivalgames.SurvivalGames;
+
 import java.util.UUID;
 
 public final class CombatTag {
@@ -50,6 +53,6 @@ public final class CombatTag {
     }
     
     public boolean isInCombat() {
-        return this.other != null && System.currentTimeMillis() < this.timestamp + 10000;
+        return this.other != null && System.currentTimeMillis() < this.timestamp + TimeUnit.SECONDS.toMilliseconds(SurvivalGames.getPlugin(SurvivalGames.class).getGame().getSettings().getCombatTagLength());
     }
 }

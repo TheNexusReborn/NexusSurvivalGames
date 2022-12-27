@@ -30,6 +30,16 @@ public class VoteStartCommand implements CommandExecutor {
     
         NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(senderPlayer.getUniqueId());
         Lobby lobby = plugin.getLobby();
+    
+        if (!lobby.getLobbySettings().isAllowVoteStart()) {
+            nexusPlayer.sendMessage(MsgType.WARN + "You cannot vote to start because it is disabled.");
+            return true;
+        }
+        
+        if (lobby.getPlayingCount() > lobby.getLobbySettings().getVoteStartAvailableThreshold()) {
+            nexusPlayer.sendMessage(MsgType.WARN + "You cannot vote to start because the player count is too high.");
+            return true;
+        }
         
         if (nexusPlayer.getToggleValue("vanish")) {
             nexusPlayer.sendMessage(MsgType.WARN + "You cannot vote to start while in vanish mode.");
