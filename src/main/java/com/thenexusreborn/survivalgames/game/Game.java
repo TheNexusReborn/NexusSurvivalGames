@@ -600,7 +600,7 @@ public class Game {
             }
         }
         
-        this.timer = new Timer(new DeathmatchCountdownCallback(this)).run(TimeUnit.SECONDS.toMilliseconds(settings.getDeathmatchTimerLength()) + 50L); //TODO Add a setting for this
+        this.timer = new Timer(new DeathmatchCountdownCallback(this)).run(TimeUnit.SECONDS.toMilliseconds(settings.getDeathmatchTimerLength()) + 50L);
     }
     
     public void startDeathmatch() {
@@ -686,7 +686,7 @@ public class Game {
         if (winner != null) {
             winner.changeStat("sg_wins", 1, StatOperator.ADD);
             winner.changeStat("sg_win_streak", 1, StatOperator.ADD);
-            int winGain = 50;
+            int winGain = settings.getWinScoreBaseGain();
             int currentScore = winner.getStatValue("sg_score").getAsInt();
             if (currentScore < 100 && currentScore > 50) {
                 winGain *= 1.25;
@@ -694,8 +694,6 @@ public class Game {
                 winGain *= 1.5;
             } else if (currentScore < 25) {
                 winGain *= 2;
-            } else if (currentScore >= 500) {
-                winGain *= .8;
             } else if (currentScore < 1000 && currentScore > 500) {
                 winGain *= .75;
             } else if (currentScore >= 1000) {
@@ -707,7 +705,7 @@ public class Game {
             Rank rank = winner.getRank();
             String multiplierMessage = rank.getColor() + "&l * x" + MCUtils.formatNumber(multiplier) + " " + rank.getPrefix() + " Bonus";
             if (settings.isGiveXp()) {
-                double xp = 10;
+                double xp = settings.getWinXPBaseGain();
                 xp *= multiplier;
                 winner.changeStat("xp", xp, StatOperator.ADD);
                 String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(xp) + " &2&lXP&a&l!";
@@ -719,11 +717,25 @@ public class Game {
             }
             
             if (settings.isGiveCredits()) {
-                double credits = 10;
+                double credits = settings.getWinCreditsBaseGain();
                 credits *= multiplier;
                 winner.changeStat("credits", credits, StatOperator.ADD);
                 String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(credits) + " &3&lCREDITS&a&l!";
                 if (multiplier > 1) {
+                    winner.sendMessage(baseMessage + multiplierMessage);
+                } else {
+                    winner.sendMessage(baseMessage);
+                }
+            }
+            
+            if (settings.isEarnNexites()) {
+                double nexites = settings.getWinNexiteBaseGain();
+                if (winner.getRank().isNexiteBoost()) {
+                    nexites *= multiplier;
+                }
+    
+                String baseMessage = "&2&l>> &a&l" + nexites + " &9&lNEXITES&a&l!";
+                if (multiplier > 1 && winner.getRank().isNexiteBoost()) {
                     winner.sendMessage(baseMessage + multiplierMessage);
                 } else {
                     winner.sendMessage(baseMessage);
@@ -930,7 +942,7 @@ public class Game {
             }
             
             if (getSettings().isGiveXp()) {
-                xpGain = 2;
+                xpGain = settings.getKillXPGain();
                 if (getSettings().isMultiplier()) {
                     xpGain *= killerRank.getMultiplier();
                 }
@@ -938,7 +950,7 @@ public class Game {
             }
             
             if (getSettings().isGiveCredits()) {
-                creditGain = 2;
+                creditGain = settings.getKillCreditGain();
                 if (getSettings().isMultiplier()) {
                     creditGain *= killerRank.getMultiplier();
                 }
@@ -953,10 +965,12 @@ public class Game {
             }
             
             if (getSettings().isEarnNexites()) {
-                nexiteGain = 2;
+                nexiteGain = settings.getKillNexiteGain();
                 if (getSettings().isMultiplier() && killerRank.isNexiteBoost()) {
                     nexiteGain *= killerRank.getMultiplier();
                 }
+                
+                killerPlayer.changeStat("nexites", nexiteGain, StatOperator.ADD);
             }
             
             killerPlayer.changeStat("sg_kills", 1, StatOperator.ADD);
@@ -971,7 +985,7 @@ public class Game {
         }
         
         List<UUID> damagers = gamePlayer.getDamageInfo().getDamagers();
-        List<GamePlayer> assisters = new ArrayList<>();
+        List<AssisterInfo> assistors = new ArrayList<>();
         if (settings.isAllowAssists()) {
             if (!damagers.isEmpty()) {
                 for (UUID damager : damagers) {
@@ -982,7 +996,7 @@ public class Game {
                     GamePlayer assisterPlayer = getPlayer(damager);
                     assisterPlayer.setAssists(assisterPlayer.getAssists() + 1);
                     assisterPlayer.changeStat("sg_assists", 1, StatOperator.ADD);
-                    assisters.add(assisterPlayer);
+                    assistors.add(new AssisterInfo(this, assisterPlayer));
                 }
             }
         }
@@ -1101,8 +1115,24 @@ public class Game {
             }
         }
         
-        for (GamePlayer assister : assisters) {
-            assister.sendMessage("&2&l>> &a+1 &aAssist");
+        for (AssisterInfo assister : assistors) {
+            GamePlayer assisterPlayer = assister.getGamePlayer();
+            assisterPlayer.sendMessage("&2&l>> &a+1 &aAssist");
+            String multiplierMsg = killerRank.getColor() + "&l * x" + MCUtils.formatNumber(assisterPlayer.getRank().getMultiplier()) + " " + assisterPlayer.getRank().getPrefix() + " Bonus";
+            String xpMsg = "&2&l>> &a&l+" + assister.getXp() + " &2&lXP&a&l!" + (settings.isMultiplier() ? " " + multiplierMsg : "");
+            String creditsMsg = "&2&l>> &a&l+" + assister.getCredits() + " &3&lCREDITS&a&l!" + (settings.isMultiplier() ? " " + multiplierMsg : "");;
+            String nexitesMsg = "&2&l>> &a&l" + assister.getNexites() + " &9&lNEXITES&a&l!" + (settings.isMultiplier() && assisterPlayer.getRank().isNexiteBoost() ? " " + multiplierMsg : "");;
+            if (assister.getXp() > 0) {
+                assisterPlayer.sendMessage(xpMsg);
+            }
+            
+            if (assister.getCredits() > 0) {
+                assisterPlayer.sendMessage(creditsMsg);
+            }
+            
+            if (assister.getNexites() > 0) {
+                assisterPlayer.sendMessage(nexitesMsg);
+            }
         }
         
         gamePlayer.sendMessage("&4&l>> &cYou lost " + lost + " Points for dying!");

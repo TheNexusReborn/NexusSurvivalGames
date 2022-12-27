@@ -167,6 +167,58 @@ public class GameSettings extends SettingList<GameSetting> {
         return getValue("max_mutations_allowed").getAsInt();
     }
     
+    public int getWinScoreBaseGain() {
+        return getValue("win_score_base_gain").getAsInt();
+    }
+    
+    public int getWinCreditsBaseGain() {
+        return getValue("win_credits_base_gain").getAsInt();
+    }
+    
+    public int getWinXPBaseGain() {
+        return getValue("win_xp_base_gain").getAsInt();
+    }
+    
+    public int getWinNexiteBaseGain() {
+        return getValue("win_nexite_base_gain").getAsInt();
+    }
+    
+    public int getKillCreditGain() {
+        return getValue("kill_credit_gain").getAsInt();
+    }
+    
+    public int getKillXPGain() {
+        return getValue("kill_xp_gain").getAsInt();
+    }
+    
+    public int getKillNexiteGain() {
+        return getValue("kill_nexite_gain").getAsInt();
+    }
+    
+    public int getAssistCreditGain() {
+        return getValue("assist_credit_gain").getAsInt();
+    }
+    
+    public int getAssistXPGain() {
+        return getValue("assist_xp_gain").getAsInt();
+    }
+    
+    public int getAssistNexiteGain() {
+        return getValue("assist_nexite_gain").getAsInt();
+    }
+    
+    public int getMaxCreditBounty() {
+        return getValue("max_credit_bounty").getAsInt();
+    }
+    
+    public int getMaxScoreBounty() {
+        return getValue("max_score_bounty").getAsInt();
+    }
+    
+    public int getCombatTagLength() {
+        return getValue("combat_tag_length").getAsInt();
+    }
+    
     @Override
     public GameSettings clone() {
         return (GameSettings) super.clone();

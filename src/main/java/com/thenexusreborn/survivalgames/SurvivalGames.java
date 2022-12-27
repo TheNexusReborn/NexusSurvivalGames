@@ -282,15 +282,19 @@ public class SurvivalGames extends NexusSpigotPlugin {
         createGameSetting("earn_nexites", "Earn Nexites", "Controls if Nexites are earned on certain actions", Type.BOOLEAN, false);
         createGameSetting("allow_assists", "Allow Assists", "Controls if assists are counted.", Type.BOOLEAN, true);
         createGameSetting("max_mutations_allowed", "Maximum Mutations Allowed", "The maximum amount of mutations allowed to be in a single game", Type.INTEGER, 10, 0, 20);
-        
-        
-        
-        
-        
-        
-        
-        
-        
+        createGameSetting("win_score_base_gain", "Win Score Base Gain", "The base amount of score that is gained when a player wins.", Type.INTEGER, 50);
+        createGameSetting("win_credits_base_gain", "Win Credits Base Gain", "The base amount of credits that is gained when a player wins", Type.INTEGER, 10);
+        createGameSetting("win_xp_base_gain", "Win XP Base Gain", "The base amount of xp that is gained when a player wins", Type.INTEGER, 10);
+        createGameSetting("win_nexite_base_gain", "Win Nexite Base Gain", "The base amount of Nexites that is gained when a player wins", Type.INTEGER, 10);
+        createGameSetting("kill_credit_gain", "Kill Credit Gain", "The base amount of credits that is gained on a kill.", Type.INTEGER, 2);
+        createGameSetting("kill_xp_gain", "Kill XP Gain", "The base amount of xp that is gained on a kill.", Type.INTEGER, 2);
+        createGameSetting("kill_nexite_gain", "Kill Nexite Gain", "The base amount of nexites that is gained on a kill.", Type.INTEGER, 2);
+        createGameSetting("assist_credit_gain", "Assist Credit Gain", "The base amount of credits that is gained on an assist.", Type.INTEGER, 1);
+        createGameSetting("assist_xp_gain", "Assist XP Gain", "The base amount of xp that is gained on an assist.", Type.INTEGER, 1);
+        createGameSetting("assist_nexite_gain", "Assist Nexite Gain", "The base amount of nexites that is gained on an assist.", Type.INTEGER, 1);
+        createGameSetting("max_credit_bounty", "Maximum Credit Bounty", "The maximum credit bounty that one player can have", Type.INTEGER, 10000);
+        createGameSetting("max_score_bounty", "Maximum Score Bounty", "The maximum score bounty that one player can have", Type.INTEGER, 10000);
+        createGameSetting("combat_tag_length", "Combat Tag Length", "The length in seconds that the combat tag lasts", Type.INTEGER, 10, 0, 60);
     }
     
     private void createLobbySetting(String name, String displayName, String description, Value.Type valueType, Object valueDefault) {

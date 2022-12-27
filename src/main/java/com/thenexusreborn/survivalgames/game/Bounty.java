@@ -4,7 +4,7 @@ import java.util.*;
 
 public final class Bounty {
     private final UUID player;
-    private Map<Type, Integer> amounts = new HashMap<>();
+    private Map<Type, Integer> amounts = new EnumMap<>(Type.class);
     
     public Bounty(UUID player) {
         this.player = player;

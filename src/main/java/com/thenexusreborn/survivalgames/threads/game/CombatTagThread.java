@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames.threads.game;
 
+import com.starmediadev.starlib.TimeUnit;
 import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.CombatTag;
@@ -32,7 +33,7 @@ public class CombatTagThread extends NexusThread<SurvivalGames> {
                 continue;
             }
             
-            if (combatTag.getTimestamp() + 10000 > System.currentTimeMillis()) {
+            if (combatTag.getTimestamp() + TimeUnit.SECONDS.toMilliseconds(game.getSettings().getCombatTagLength()) > System.currentTimeMillis()) {
                 continue;
             }
             
