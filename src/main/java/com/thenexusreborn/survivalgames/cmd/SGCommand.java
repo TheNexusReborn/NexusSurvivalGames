@@ -508,11 +508,8 @@ public class SGCommand implements CommandExecutor {
                             String msg = "You created a new tribute sign with index &b" + index;
                             if (signLocation == null) {
                                 msg += "&e, however you still need to add a sign to it. Just use the same command while looking at a sign.";
-                            } else if (headLocation == null) {
-                                msg += "&e, however you still need to add a head to it. Just use the same command while looking at a head.";
                             } else {
-                                player.sendMessage(MCUtils.color(MsgType.WARN + "Unknown error occured. Please report as a bug."));
-                                return true;
+                                msg += "&e, however you still need to add a head to it. Just use the same command while looking at a head.";
                             }
                             plugin.getLobby().getTributeSigns().add(tributeSign);
                             player.sendMessage(MCUtils.color(MsgType.INFO + msg));
@@ -897,7 +894,7 @@ public class SGCommand implements CommandExecutor {
                         }
                         
                         String[] creators = cb.toString().trim().split(",");
-                        if (creators == null || creators.length == 0) {
+                        if (creators.length == 0) {
                             sender.sendMessage(MCUtils.color(MsgType.WARN + "You must separate the creators with commas."));
                             return true;
                         }
