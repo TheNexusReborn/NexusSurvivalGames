@@ -9,7 +9,7 @@ import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.loot.*;
-import com.thenexusreborn.survivalgames.map.GameMap;
+import com.thenexusreborn.survivalgames.map.*;
 import com.thenexusreborn.survivalgames.scoreboard.DefaultLobbyBoard;
 import com.thenexusreborn.survivalgames.settings.*;
 import net.md_5.bungee.api.ChatColor;
@@ -24,6 +24,7 @@ import org.bukkit.potion.PotionEffect;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 public class Lobby {
     private final SurvivalGames plugin;
@@ -136,7 +137,7 @@ public class Lobby {
                     creatorBuilder.append(creator).append(", ");
                 }
             }
-            if (creatorBuilder.length() == 0) {
+            if (creatorBuilder.isEmpty()) {
                 creatorBuilder.append(" ");
             }
             String creators = creatorBuilder.substring(0, creatorBuilder.length() - 2);
@@ -148,7 +149,7 @@ public class Lobby {
                     .append(creators).italic(false).color(ChatColor.DARK_AQUA).append(votesText).color(ChatColor.GRAY).italic(true);
             
             TextComponent line = new TextComponent(builder.create());
-            line.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/map " + entry.getKey()));
+            line.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/mapvote " + entry.getKey()));
             line.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to vote").create()));
             
             Bukkit.getPlayer(nexusPlayer.getUniqueId()).spigot().sendMessage(line);
@@ -336,6 +337,27 @@ public class Lobby {
             }
         }
         
+        sendMessage("");
+        sendMessage("&6&l>> &a&lTHE MAP HAS BEEN SELECTED!");
+        sendMessage("&6&l> &7Map: &e" + gameMap.getName());
+        int totalRatings = gameMap.getRatings().size();
+        
+        String ratingMsg;
+        if (totalRatings == 0) {
+            ratingMsg = "&cNo Ratings Yet";
+        } else {
+            int rating = 0;
+            for (MapRating playerRating : gameMap.getRatings().values()) {
+                rating += playerRating.getRating();
+            }
+            
+            ratingMsg = new ProgressBar(rating / totalRatings, rating, 5, "✦ ", "&a", "&7").display() + " &7&o(rating: " + rating / totalRatings + " star(s), based on: " + totalRatings + " vote(s))";
+        }
+        
+        sendMessage("&6&l> &7Rating: " + ratingMsg);
+        sendMessage("&6&l> &7Votes: &e" + gameMap.getVotes());
+        sendMessage("");
+        
         Game game = new Game(gameMap, this.gameSettings, getPlayers());
         this.players.clear();
         plugin.setGame(game);
@@ -384,7 +406,6 @@ public class Lobby {
     
     public void addPlayer(NexusPlayer nexusPlayer) {
         if (nexusPlayer == null) {
-            System.out.println("Nexus Player was null");
             return;
         }
         
@@ -540,14 +561,7 @@ public class Lobby {
     }
     
     public List<UUID> getSpectatingPlayers() {
-        List<UUID> spectatingPlayers = new ArrayList<>();
-        getPlayers().forEach(player -> {
-            if (player.isSpectating()) {
-                spectatingPlayers.add(player.getUniqueId());
-            }
-        });
-        
-        return spectatingPlayers;
+        return getPlayers().stream().filter(LobbyPlayer::isSpectating).map(LobbyPlayer::getUniqueId).collect(Collectors.toList());
     }
     
     public void setGameMap(GameMap gameMap) {

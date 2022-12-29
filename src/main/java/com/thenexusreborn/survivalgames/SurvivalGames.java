@@ -196,9 +196,10 @@ public class SurvivalGames extends NexusSpigotPlugin {
         getCommand("stats").setExecutor(new StatsCommand(this));
         getCommand("survivalgames").setExecutor(new SGCommand(this));
         getCommand("spectate").setExecutor(new SpectateCommand(this));
-        getCommand("map").setExecutor(new MapCommand(this));
+        getCommand("mapvote").setExecutor(new MapVoteCommand(this));
         getCommand("bounty").setExecutor(new BountyCmd(this));
         getCommand("spectatorchat").setExecutor(nexusCore.getToggleCmdExecutor());
+        getCommand("ratemap").setExecutor(new RateMapCmd(this));
         
         getLogger().info("Registered commands");
         
@@ -441,6 +442,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
                 database.registerClass(GameSetting.class);
                 database.registerClass(LobbySetting.class);
                 database.registerClass(UnlockedMutation.class);
+                database.registerClass(MapRating.class);
             }
         }
         

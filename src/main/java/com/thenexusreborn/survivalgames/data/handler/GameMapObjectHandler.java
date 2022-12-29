@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames.data.handler;
 
+import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.storage.objects.*;
 import com.thenexusreborn.survivalgames.map.*;
 
@@ -18,6 +19,11 @@ public class GameMapObjectHandler extends ObjectHandler {
             List<MapSpawn> mapSpawns = database.get(MapSpawn.class, "mapId", gameMap.getId());
             gameMap.setSpawns(mapSpawns);
             gameMap.recalculateSpawns();
+            
+            List<MapRating> ratings = NexusAPI.getApi().getPrimaryDatabase().get(MapRating.class, "mapName", gameMap.getName().toLowerCase().replace("'", "''"));
+            if (ratings != null) {
+                gameMap.setRatings(ratings);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -34,7 +40,13 @@ public class GameMapObjectHandler extends ObjectHandler {
         }
         
         for (MapSpawn mapSpawn : gameMap.getSpawns()) {
-            database.push(mapSpawn);
+            database.queue(mapSpawn);
         }
+    
+        for (MapRating rating : gameMap.getRatings().values()) {
+            database.queue(rating);
+        }
+        
+        database.flush();
     }
 }

@@ -16,3 +16,5 @@ commands:
   bounty:
   spectatorchat:
     aliases: [specchat]
+  mapvote:
+  ratemap:

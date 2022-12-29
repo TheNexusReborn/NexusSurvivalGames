@@ -53,7 +53,7 @@ public class Game {
     private final Map<UUID, GamePlayer> players = new HashMap<>();
     private final Map<Integer, UUID> spawns = new HashMap<>();
     private GameState state = UNDEFINED;
-    private Timer timer, graceperiodTimer, restockTimer;
+    private Timer timer, graceperiodTimer, restockTimer, ratingPromptTimer;
     private final List<Location> lootedChests = new ArrayList<>();
     private final GameInfo gameInfo;
     private long start, end;
@@ -108,6 +108,14 @@ public class Game {
         
         if (this.graceperiodTimer != null) {
             this.graceperiodTimer.cancel();
+        }
+    
+        if (this.ratingPromptTimer != null) {
+            this.ratingPromptTimer.cancel();
+        }
+    
+        if (this.restockTimer != null) {
+            this.restockTimer.cancel();
         }
         
         if (this.gameMap != null) {
@@ -494,6 +502,16 @@ public class Game {
     
     public void startGame() {
         this.timer = new Timer(new GameTimerCallback(this)).run(TimeUnit.MINUTES.toMilliseconds(settings.getGameLength()) + 50);
+        this.ratingPromptTimer = new Timer(snapshot -> {
+            if (snapshot.getSecondsLeft() == 0) {
+                sendMessage("");
+                sendMessage("&6&l>> &9&lWHAT DO YOU THINK OF &e&l" + getGameMap().getName().toUpperCase() + "&9&l?");
+                sendMessage("&6&l>> &7Type &8[&6/ratemap &4&l1 &c&l2 &6&l3 &e&l4 &a&l5&8] &7to submit a rating!");
+                sendMessage("");
+                return false;
+            }
+            return true;
+        }).run(TimeUnit.MINUTES.toMilliseconds(settings.getGameLength()) / 4);
         this.start = System.currentTimeMillis();
         if (this.settings.isGracePeriod()) {
             this.graceperiodTimer = new Timer(new GraceperiodCountdownCallback(this)).run(TimeUnit.SECONDS.toMilliseconds(settings.getGracePeriodLength()) + 50L);
@@ -501,7 +519,7 @@ public class Game {
         } else {
             setState(INGAME);
         }
-        this.restockTimer = new Timer(new RestockTimerCallback(this)).run(TimeUnit.MINUTES.toMilliseconds(settings.getGameLength() / 2) + 50);
+        this.restockTimer = new Timer(new RestockTimerCallback(this)).run(TimeUnit.MINUTES.toMilliseconds(settings.getGameLength()) / 2 + 50);
         sendMessage("&6&l>> &a&lMAY THE ODDS BE EVER IN YOUR FAVOR.");
         sendMessage("&6&l>> &c&lCLICKING MORE THAN 16 CPS WILL LIKELY RESULT IN A BAN.");
         if (this.settings.isTeamingAllowed()) {
@@ -651,6 +669,11 @@ public class Game {
         if (this.restockTimer != null) {
             this.restockTimer.cancel();
             this.restockTimer = null;
+        }
+        
+        if (this.ratingPromptTimer != null) {
+            this.ratingPromptTimer.cancel();
+            this.ratingPromptTimer = null;
         }
         
         for (Player player : Bukkit.getOnlinePlayers()) {
@@ -1120,8 +1143,8 @@ public class Game {
             assisterPlayer.sendMessage("&2&l>> &a+1 &aAssist");
             String multiplierMsg = killerRank.getColor() + "&l * x" + MCUtils.formatNumber(assisterPlayer.getRank().getMultiplier()) + " " + assisterPlayer.getRank().getPrefix() + " Bonus";
             String xpMsg = "&2&l>> &a&l+" + assister.getXp() + " &2&lXP&a&l!" + (settings.isMultiplier() ? " " + multiplierMsg : "");
-            String creditsMsg = "&2&l>> &a&l+" + assister.getCredits() + " &3&lCREDITS&a&l!" + (settings.isMultiplier() ? " " + multiplierMsg : "");;
-            String nexitesMsg = "&2&l>> &a&l" + assister.getNexites() + " &9&lNEXITES&a&l!" + (settings.isMultiplier() && assisterPlayer.getRank().isNexiteBoost() ? " " + multiplierMsg : "");;
+            String creditsMsg = "&2&l>> &a&l+" + assister.getCredits() + " &3&lCREDITS&a&l!" + (settings.isMultiplier() ? " " + multiplierMsg : "");
+            String nexitesMsg = "&2&l>> &a&l" + assister.getNexites() + " &9&lNEXITES&a&l!" + (settings.isMultiplier() && assisterPlayer.getRank().isNexiteBoost() ? " " + multiplierMsg : "");
             if (assister.getXp() > 0) {
                 assisterPlayer.sendMessage(xpMsg);
             }

@@ -27,10 +27,12 @@ public class GameMap {
     private Position center = new Position(0, 0, 0);
     @ColumnIgnored
     private List<MapSpawn> spawns = new LinkedList<>();
-    private int borderDistance = 0, deathmatchBorderDistance = 0;
+    private int borderDistance, deathmatchBorderDistance;
     @ColumnInfo(type = "varchar(1000)", codec = StringSetCodec.class)
     private Set<String> creators = new HashSet<>();
     private boolean active;
+    @ColumnIgnored
+    private Map<UUID, MapRating> ratings = new HashMap<>();
     
     @ColumnIgnored
     private UUID uniqueId;
@@ -42,7 +44,7 @@ public class GameMap {
     @ColumnIgnored
     private boolean editing;
     @ColumnIgnored
-    private int votes = 0;
+    private int votes;
     @ColumnIgnored
     private Cuboid deathmatchArea;
     
@@ -394,5 +396,13 @@ public class GameMap {
                 ", editing=" + editing +
                 ", votes=" + votes +
                 '}';
+    }
+    
+    public void setRatings(List<MapRating> ratings) {
+        ratings.forEach(rating -> this.ratings.put(rating.getPlayer(), rating));
+    }
+    
+    public Map<UUID, MapRating> getRatings() {
+        return ratings;
     }
 }
