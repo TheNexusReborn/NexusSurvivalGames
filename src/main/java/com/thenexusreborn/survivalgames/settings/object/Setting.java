@@ -1,8 +1,9 @@
 package com.thenexusreborn.survivalgames.settings.object;
 
+import com.starmediadev.starsql.annotations.column.ColumnInfo;
+import com.starmediadev.starsql.annotations.table.TableInfo;
+import com.starmediadev.starsql.objects.SqlCodec;
 import com.thenexusreborn.api.frameworks.value.*;
-import com.thenexusreborn.api.storage.annotations.*;
-import com.thenexusreborn.api.storage.objects.SqlCodec;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import java.util.Objects;
 

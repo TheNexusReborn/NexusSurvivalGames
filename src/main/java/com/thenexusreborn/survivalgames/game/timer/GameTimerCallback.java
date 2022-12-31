@@ -17,6 +17,8 @@ public class GameTimerCallback implements ReturnableCallback<TimerSnapshot, Bool
     private final Set<Integer> announcedMinutes = new HashSet<>();
     private Set<Integer> chestsRestocked = new HashSet<>();
     
+    private boolean announcedRatingMessage;
+    
     private final Game game;
     
     public GameTimerCallback(Game game) {

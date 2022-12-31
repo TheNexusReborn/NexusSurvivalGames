@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames;
 
+import com.starmediadev.starsql.objects.Database;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.frameworks.value.Value;
 import com.thenexusreborn.api.frameworks.value.Value.Type;
@@ -7,7 +8,6 @@ import com.thenexusreborn.api.network.cmd.NetworkCommand;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.registry.*;
 import com.thenexusreborn.api.stats.StatType;
-import com.thenexusreborn.api.storage.objects.Database;
 import com.thenexusreborn.nexuscore.NexusCore;
 import com.thenexusreborn.nexuscore.api.NexusSpigotPlugin;
 import com.thenexusreborn.nexuscore.util.ServerProperties;
@@ -196,9 +196,10 @@ public class SurvivalGames extends NexusSpigotPlugin {
         getCommand("stats").setExecutor(new StatsCommand(this));
         getCommand("survivalgames").setExecutor(new SGCommand(this));
         getCommand("spectate").setExecutor(new SpectateCommand(this));
-        getCommand("map").setExecutor(new MapCommand(this));
+        getCommand("mapvote").setExecutor(new MapVoteCommand(this));
         getCommand("bounty").setExecutor(new BountyCmd(this));
         getCommand("spectatorchat").setExecutor(nexusCore.getToggleCmdExecutor());
+        getCommand("ratemap").setExecutor(new RateMapCmd(this));
         
         getLogger().info("Registered commands");
         
@@ -441,11 +442,12 @@ public class SurvivalGames extends NexusSpigotPlugin {
                 database.registerClass(GameSetting.class);
                 database.registerClass(LobbySetting.class);
                 database.registerClass(UnlockedMutation.class);
+                database.registerClass(MapRating.class);
             }
         }
         
         FileConfiguration config = getConfig();
-        mapDatabase = new Database(config.getString("mapdatabase.database"), config.getString("mapdatabase.host"), config.getString("mapdatabase.user"), config.getString("mapdatabase.password"), false);
+        mapDatabase = new Database("mysql", config.getString("mapdatabase.database"), config.getString("mapdatabase.host"), config.getString("mapdatabase.user"), config.getString("mapdatabase.password"), false);
         mapDatabase.registerClass(GameMap.class);
         mapDatabase.registerClass(MapSpawn.class);
         registry.register(mapDatabase);

@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.settings;
 
-import com.thenexusreborn.api.storage.annotations.TableInfo;
+import com.starmediadev.starsql.annotations.table.TableInfo;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.settings.collection.SettingList;
 import com.thenexusreborn.survivalgames.settings.object.Setting;

@@ -12,11 +12,11 @@ import org.bukkit.entity.Player;
 
 import java.util.Map.Entry;
 
-public class MapCommand implements CommandExecutor {
+public class MapVoteCommand implements CommandExecutor {
     
     private final SurvivalGames plugin;
     
-    public MapCommand(SurvivalGames plugin) {
+    public MapVoteCommand(SurvivalGames plugin) {
         this.plugin = plugin;
     }
     

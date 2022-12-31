@@ -17,7 +17,7 @@ public class MapChatOptionsMsgThread extends NexusThread<SurvivalGames> {
             return;
         }
     
-        if (lobby.getPlayers().size() == 0) {
+        if (lobby.getPlayers().isEmpty()) {
             return;
         }
     

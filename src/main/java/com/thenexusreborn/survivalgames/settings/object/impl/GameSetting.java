@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.settings.object.impl;
 
+import com.starmediadev.starsql.annotations.table.TableInfo;
 import com.thenexusreborn.api.frameworks.value.Value;
-import com.thenexusreborn.api.storage.annotations.TableInfo;
 import com.thenexusreborn.survivalgames.settings.object.Setting;
 
 @TableInfo("sggamesettings")

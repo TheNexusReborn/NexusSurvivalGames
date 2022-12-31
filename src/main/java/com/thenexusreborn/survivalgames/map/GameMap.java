@@ -1,6 +1,8 @@
 package com.thenexusreborn.survivalgames.map;
 
-import com.thenexusreborn.api.storage.annotations.*;
+import com.starmediadev.starsql.annotations.Primary;
+import com.starmediadev.starsql.annotations.column.*;
+import com.starmediadev.starsql.annotations.table.TableInfo;
 import com.thenexusreborn.api.storage.codec.StringSetCodec;
 import com.thenexusreborn.api.helper.FileHelper;
 import com.thenexusreborn.nexuscore.data.codec.PositionCodec;
@@ -27,10 +29,12 @@ public class GameMap {
     private Position center = new Position(0, 0, 0);
     @ColumnIgnored
     private List<MapSpawn> spawns = new LinkedList<>();
-    private int borderDistance = 0, deathmatchBorderDistance = 0;
+    private int borderDistance, deathmatchBorderDistance;
     @ColumnInfo(type = "varchar(1000)", codec = StringSetCodec.class)
     private Set<String> creators = new HashSet<>();
     private boolean active;
+    @ColumnIgnored
+    private Map<UUID, MapRating> ratings = new HashMap<>();
     
     @ColumnIgnored
     private UUID uniqueId;
@@ -42,7 +46,7 @@ public class GameMap {
     @ColumnIgnored
     private boolean editing;
     @ColumnIgnored
-    private int votes = 0;
+    private int votes;
     @ColumnIgnored
     private Cuboid deathmatchArea;
     
@@ -394,5 +398,13 @@ public class GameMap {
                 ", editing=" + editing +
                 ", votes=" + votes +
                 '}';
+    }
+    
+    public void setRatings(List<MapRating> ratings) {
+        ratings.forEach(rating -> this.ratings.put(rating.getPlayer(), rating));
+    }
+    
+    public Map<UUID, MapRating> getRatings() {
+        return ratings;
     }
 }
