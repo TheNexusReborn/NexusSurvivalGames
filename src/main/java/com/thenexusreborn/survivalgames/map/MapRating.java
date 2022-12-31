@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.map;
 
-import com.thenexusreborn.api.storage.annotations.TableInfo;
+import com.starmediadev.starsql.annotations.table.TableInfo;
 
 import java.util.UUID;
 

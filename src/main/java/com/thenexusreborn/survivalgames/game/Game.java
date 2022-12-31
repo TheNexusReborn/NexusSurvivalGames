@@ -804,7 +804,7 @@ public class Game {
         gameInfo.setLength(this.end - this.start);
         
         NexusAPI.getApi().getThreadFactory().runAsync(() -> {
-            NexusAPI.getApi().getPrimaryDatabase().push(gameInfo);
+            NexusAPI.getApi().getPrimaryDatabase().pushSilent(gameInfo);
             if (gameInfo.getId() == 0) {
                 sendMessage("&4&l>> &cThere was a database error archiving the game. Please report with date and time.");
             } else {
@@ -830,7 +830,7 @@ public class Game {
                             Tag tag = new Tag(nexusPlayer.getUniqueId(), gameInfo.getId() + "th", System.currentTimeMillis());
                             nexusPlayer.getTags().add(tag);
                             nexusPlayer.sendMessage(MsgType.INFO + "Unlocked the tag " + tag.getDisplayName());
-                            NexusAPI.getApi().getPrimaryDatabase().push(nexusPlayer);
+                            NexusAPI.getApi().getPrimaryDatabase().pushSilent(nexusPlayer);
                         });
                     }
                 }

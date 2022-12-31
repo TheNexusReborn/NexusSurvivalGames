@@ -1,6 +1,7 @@
 package com.thenexusreborn.survivalgames.map;
 
-import com.thenexusreborn.api.storage.annotations.*;
+import com.starmediadev.starsql.annotations.Primary;
+import com.starmediadev.starsql.annotations.table.TableInfo;
 import org.bukkit.*;
 
 import java.util.Objects;
