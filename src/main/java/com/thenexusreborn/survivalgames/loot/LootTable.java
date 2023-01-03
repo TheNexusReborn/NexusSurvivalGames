@@ -67,7 +67,10 @@ public class LootTable {
     
         for (Entry<LootCategory, Integer> entry : categoryAmounts.entrySet()) {
             for (int i = 0; i < entry.getValue(); i++) {
-                loot.add(entry.getKey().generateLoot(random).generateItemStack());
+                LootEntry lootEntry = entry.getKey().generateLoot(random);
+                if (lootEntry != null) {
+                    loot.add(lootEntry.generateItemStack());
+                }
             }
         }
         

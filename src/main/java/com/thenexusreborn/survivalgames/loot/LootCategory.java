@@ -1,6 +1,7 @@
 package com.thenexusreborn.survivalgames.loot;
 
 import com.starmediadev.starlib.Range;
+import com.thenexusreborn.survivalgames.SurvivalGames;
 import org.bukkit.Material;
 
 import java.util.*;
@@ -117,9 +118,14 @@ public class LootCategory {
         int rand = random.nextInt(entryTotal + 1);
         for (Range<LootEntry> range : entryProbabilties) {
             if (range.contains(rand)) {
+                if (range.object() == null) {
+                    SurvivalGames.getPlugin(SurvivalGames.class).getLogger().severe("A range has a null object " + range.min() + " - " + range.max());
+                }
                 return range.object();
             }
         }
+        
+        SurvivalGames.getPlugin(SurvivalGames.class).getLogger().severe("Could not find an object for the generated number " + rand);
         return null;
     }
     
