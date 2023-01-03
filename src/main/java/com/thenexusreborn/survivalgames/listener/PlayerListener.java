@@ -218,11 +218,6 @@ public class PlayerListener implements Listener {
                             e.setCancelled(true);
                             return;
                         }
-                        if (game.isLootedChest(block)) {
-                            return;
-                        }
-                        
-                        game.getPlayer(player.getUniqueId()).changeStat("sg_chests_looted", 1, StatOperator.ADD);
                         
                         Inventory inv;
                         if (block.getType() == Material.ENDER_CHEST) {
@@ -230,10 +225,20 @@ public class PlayerListener implements Listener {
                             if (inv == null) {
                                 inv = Bukkit.createInventory(null, 27, "Ender Chest");
                                 game.getEnderchestInventories().put(block.getLocation(), inv);
+                            } else {
+                                e.setCancelled(true);
+                                player.openInventory(inv);
+                                return;
                             }
                         } else {
                             inv = ((Chest) block.getState()).getBlockInventory();
                         }
+    
+                        if (game.isLootedChest(block)) {
+                            return;
+                        }
+    
+                        game.getPlayer(player.getUniqueId()).changeStat("sg_chests_looted", 1, StatOperator.ADD);
                         
                         int maxAmount = 8;
                         
