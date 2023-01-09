@@ -1,10 +1,11 @@
 package com.thenexusreborn.survivalgames.map;
 
-import com.starmediadev.starsql.annotations.table.TableInfo;
+
+import com.starmediadev.starsql.annotations.table.TableName;
 
 import java.util.UUID;
 
-@TableInfo("sgmapratings")
+@TableName("sgmapratings")
 public class MapRating {
     private long id;
     private String mapName;

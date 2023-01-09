@@ -1,10 +1,10 @@
 package com.thenexusreborn.survivalgames.mutations;
 
-import com.starmediadev.starsql.annotations.table.TableInfo;
+import com.starmediadev.starsql.annotations.table.TableName;
 
 import java.util.UUID;
 
-@TableInfo("unlockedmutations")
+@TableName("unlockedmutations")
 public class UnlockedMutation {
     private long id;
     private UUID uuid;

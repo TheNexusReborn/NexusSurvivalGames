@@ -1,13 +1,13 @@
 package com.thenexusreborn.survivalgames.settings;
 
-import com.starmediadev.starsql.annotations.table.TableInfo;
+import com.starmediadev.starsql.annotations.table.TableName;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.settings.collection.SettingList;
 import com.thenexusreborn.survivalgames.settings.object.Setting;
 import com.thenexusreborn.survivalgames.settings.object.enums.*;
 import com.thenexusreborn.survivalgames.settings.object.impl.*;
 
-@TableInfo("sggamesettings")
+@TableName("sggamesettings")
 public class GameSettings extends SettingList<GameSetting> {
     public GameSettings() {
         super("game");

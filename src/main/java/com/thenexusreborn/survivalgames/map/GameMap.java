@@ -2,7 +2,7 @@ package com.thenexusreborn.survivalgames.map;
 
 import com.starmediadev.starsql.annotations.Primary;
 import com.starmediadev.starsql.annotations.column.*;
-import com.starmediadev.starsql.annotations.table.TableInfo;
+import com.starmediadev.starsql.annotations.table.*;
 import com.thenexusreborn.api.storage.codec.StringSetCodec;
 import com.thenexusreborn.api.helper.FileHelper;
 import com.thenexusreborn.nexuscore.data.codec.PositionCodec;
@@ -18,19 +18,22 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.zip.*;
 
-@TableInfo(value = "sgmaps", handler = GameMapObjectHandler.class)
+@TableName(value = "sgmaps")
+@TableHandler(GameMapObjectHandler.class)
 public class GameMap {
     @Primary
     private long id;
     private String url;
     private String name;
     
-    @ColumnInfo(type = "varchar(100)", codec = PositionCodec.class) 
+    @ColumnType("varchar(100)")
+    @ColumnCodec(PositionCodec.class)
     private Position center = new Position(0, 0, 0);
     @ColumnIgnored
     private List<MapSpawn> spawns = new LinkedList<>();
     private int borderDistance, deathmatchBorderDistance;
-    @ColumnInfo(type = "varchar(1000)", codec = StringSetCodec.class)
+    @ColumnType("varchar(1000)")
+    @ColumnCodec(StringSetCodec.class)
     private Set<String> creators = new HashSet<>();
     private boolean active;
     @ColumnIgnored
@@ -50,7 +53,8 @@ public class GameMap {
     @ColumnIgnored
     private Cuboid deathmatchArea;
     
-    private GameMap() {}
+    private GameMap() {
+    }
     
     public GameMap(String fileName, String name) {
         this.url = fileName;
@@ -107,7 +111,7 @@ public class GameMap {
                 }
                 world = null;
             }
-    
+            
             if (Files.exists(worldFolder)) {
                 FileHelper.deleteDirectory(worldFolder);
                 worldFolder = null;
@@ -267,7 +271,7 @@ public class GameMap {
                             throw new IOException("Failed to create directory " + parent);
                         }
                     }
-        
+                    
                     // write file content
                     FileOutputStream fos = new FileOutputStream(newFile.toFile());
                     int len;
@@ -294,14 +298,14 @@ public class GameMap {
     
     private Path newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
         Path path = FileHelper.subPath(destinationDir.toPath(), zipEntry.getName());
-    
+        
         String destDirPath = destinationDir.getCanonicalPath();
         String destFilePath = path.toFile().getCanonicalPath();
-    
+        
         if (!destFilePath.startsWith(destDirPath + File.separator)) {
             throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
         }
-    
+        
         return path;
     }
     
@@ -312,7 +316,7 @@ public class GameMap {
                 if (randomizeName) {
                     uniqueId = UUID.randomUUID();
                     worldName = uniqueId.toString();
-                }  else {
+                } else {
                     worldName = this.name;
                 }
                 this.worldFolder = FileHelper.subPath(Bukkit.getServer().getWorldContainer().toPath(), worldName);

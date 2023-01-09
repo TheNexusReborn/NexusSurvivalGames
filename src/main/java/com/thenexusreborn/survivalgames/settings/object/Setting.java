@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.settings.object;
 
-import com.starmediadev.starsql.annotations.column.ColumnInfo;
-import com.starmediadev.starsql.annotations.table.TableInfo;
+import com.starmediadev.starsql.annotations.column.*;
+import com.starmediadev.starsql.annotations.table.TableName;
 import com.starmediadev.starsql.objects.SqlCodec;
 import com.thenexusreborn.api.frameworks.value.*;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -10,10 +10,13 @@ import java.util.Objects;
 public abstract class Setting implements Cloneable {
     private long id;
     
-    @ColumnInfo(name = "name", type = "varchar(100)", codec = InfoCodec.class)
+    @ColumnName("name")
+    @ColumnType("varchar(100)")
+    @ColumnCodec(InfoCodec.class)
     private Info info;
     private String category;
-    @ColumnInfo(type = "varchar(1000)", codec = ValueCodec.class)
+    @ColumnType("varchar(1000)")
+    @ColumnCodec(ValueCodec.class)
     private Value value;
     
     protected Setting() {}
@@ -60,11 +63,12 @@ public abstract class Setting implements Cloneable {
         }
     }
     
-    @TableInfo("sgsettinginfo")
+    @TableName("sgsettinginfo")
     public static class Info {
         private long id;
         private String name, displayName, description, type;
-        @ColumnInfo(type = "varchar(1000)", codec = ValueCodec.class)
+        @ColumnType("varchar(1000)")
+        @ColumnCodec(ValueCodec.class)
         private Value defaultValue, minValue, maxValue;
         
         private Info() {}
