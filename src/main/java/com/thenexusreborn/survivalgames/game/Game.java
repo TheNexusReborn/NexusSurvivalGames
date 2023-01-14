@@ -26,6 +26,7 @@ import com.thenexusreborn.survivalgames.map.*;
 import com.thenexusreborn.survivalgames.mutations.*;
 import com.thenexusreborn.survivalgames.scoreboard.*;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
+import com.thenexusreborn.survivalgames.sponsoring.SponsorManager;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -59,6 +60,7 @@ public class Game {
     private long start, end;
     private GamePlayer firstBlood;
     private final Map<Location, Inventory> enderchestInventories = new HashMap<>();
+    private SponsorManager sponsorManager = new SponsorManager();
     
     public Game(GameMap gameMap, GameSettings settings, Collection<LobbyPlayer> players) {
         this.gameMap = gameMap;
@@ -1374,5 +1376,9 @@ public class Game {
             }
         }
         return amount;
+    }
+    
+    public SponsorManager getSponsorManager() {
+        return sponsorManager;
     }
 }

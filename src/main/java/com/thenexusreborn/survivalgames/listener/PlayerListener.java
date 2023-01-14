@@ -11,13 +11,13 @@ import com.thenexusreborn.nexuscore.api.events.NexusPlayerLoadEvent;
 import com.thenexusreborn.nexuscore.api.events.ToggleChangeEvent;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
+import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.game.death.DeathType;
 import com.thenexusreborn.survivalgames.game.death.KillerInfo;
-import com.thenexusreborn.survivalgames.lobby.Lobby;
-import com.thenexusreborn.survivalgames.lobby.LobbyState;
+import com.thenexusreborn.survivalgames.lobby.*;
 import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.loot.LootTable;
 import com.thenexusreborn.survivalgames.menu.MutateGui;
@@ -64,6 +64,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Stream;
 
 public class PlayerListener implements Listener {
     private final SurvivalGames plugin;
@@ -196,6 +197,40 @@ public class PlayerListener implements Listener {
                     e.setCancelled(true);
                     return;
                 }
+            } else {
+                if (e.getItem() == null) {
+                    return;
+                }
+    
+                if (e.getItem().getItemMeta() == null) {
+                    return;
+                }
+    
+                if (e.getItem().getItemMeta().getDisplayName() == null) {
+                    return;
+                }
+    
+                LobbyPlayer lobbyPlayer = null;
+                for (LobbyPlayer lp : plugin.getLobby().getPlayers()) {
+                    if (lp.getUniqueId().equals(player.getUniqueId())) {
+                        lobbyPlayer = lp;
+                    }
+                }
+    
+                if (lobbyPlayer == null) {
+                    return;
+                }
+    
+                if (e.getItem().getItemMeta().getDisplayName().contains("Sponsors")) {
+                    boolean sponsorsValue = lobbyPlayer.getToggleValue("allowsponsors");
+                    lobbyPlayer.getPlayer().setToggleValue("allowsponsors", !sponsorsValue);
+                    sponsorsValue = lobbyPlayer.getToggleValue("allowsponsors");
+                    Material sponsorsItemMaterial = sponsorsValue ? Material.GLOWSTONE_DUST : Material.SULPHUR;
+                    //TODO For some reason it does not update properly
+                    player.getInventory().setItem(0, ItemBuilder.start(sponsorsItemMaterial).displayName("&e&lSponsors &7&o(Right click to toggle)").build());
+                } else if (e.getItem().getItemMeta().getDisplayName().contains("Return to Hub")) {
+                    SGUtils.sendToHub(player);
+                }
             }
         }
         
@@ -208,9 +243,9 @@ public class PlayerListener implements Listener {
         
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
             if (e.getClickedBlock() != null) {
-                if (!(block.getType() == Material.DISPENSER || block.getType() == Material.FURNACE || block.getType() == Material.BURNING_FURNACE || block.getType() == Material.WORKBENCH || block.getType() == Material.ENCHANTMENT_TABLE || block.getType() == Material.ANVIL)) {
+                if (Stream.of(Material.DISPENSER, Material.FURNACE, Material.BURNING_FURNACE, Material.WORKBENCH, Material.ENCHANTMENT_TABLE, Material.ANVIL).noneMatch(material -> block.getType() == material)) {
                     LootManager lootManager = LootManager.getInstance();
-                    if (block.getType() == Material.CHEST || block.getType() == Material.TRAPPED_CHEST || block.getType() == Material.ENDER_CHEST) {
+                    if (Stream.of(Material.CHEST, Material.TRAPPED_CHEST, Material.ENDER_CHEST).anyMatch(material -> block.getType() == material)) {
                         if (game == null) {
                             return;
                         }

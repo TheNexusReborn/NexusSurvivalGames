@@ -219,6 +219,18 @@ public class GameSettings extends SettingList<GameSetting> {
         return getValue("combat_tag_length").getAsInt();
     }
     
+    public boolean isAllowSponsoring() {
+        return getValue("allow_sponsoring").getAsBoolean();
+    }
+    
+    public int getSponsorCreditCost() {
+        return getValue("sponsor_credit_cost").getAsInt();
+    }
+    
+    public int getSponsorScoreCost() {
+        return getValue("sponsor_score_cost").getAsInt();
+    }
+    
     @Override
     public GameSettings clone() {
         return (GameSettings) super.clone();

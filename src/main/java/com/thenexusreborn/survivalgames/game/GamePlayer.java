@@ -7,19 +7,22 @@ import com.thenexusreborn.api.stats.*;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
-import org.bukkit.entity.EntityType;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.*;
 
+import java.text.DecimalFormat;
 import java.util.*;
 
 public class GamePlayer {
     private final NexusPlayer nexusPlayer;
     private GameTeam team;
-    private boolean spectatorByDeath, newPersonalBestNotified = false;
+    private boolean spectatorByDeath, newPersonalBestNotified;
     private TrackerInfo trackerInfo;
     private int kills, killStreak, assists;
     private boolean mutated;
     private Mutation mutation;
     private boolean deathByMutation;
+    private boolean sponsored;
     private Bounty bounty;
     private CombatTag combatTag;
     private DamageInfo damageInfo;
@@ -254,5 +257,43 @@ public class GamePlayer {
             }
         }
         return null;
+    }
+    
+    public List<String> getMenuVitals() {
+        DecimalFormat format = new DecimalFormat("#0.#");
+        Player player = Bukkit.getPlayer(getUniqueId());
+        List<String> vitals = new LinkedList<>();
+        vitals.add("&fHealth: &c" + format.format(player.getHealth() / 2) + "&f/&c" + format.format(player.getMaxHealth() / 2));
+        vitals.add("&fHunger: &e" + format.format(player.getFoodLevel() / 2) + "&f/&e10");
+        vitals.add("&fXP Level: &a" + player.getLevel());
+        return vitals;
+    }
+    
+    private String generateStatLine(String title, String statName) {
+        return "&f" + title + ": &e" + getStatValue(statName).getAsInt();
+    }
+    
+    public List<String> getMenuStats() {
+        List<String> stats = new LinkedList<>();
+        stats.add(generateStatLine("Score", "sg_score"));
+        stats.add(generateStatLine("Players Killed", "sg_kills"));
+        stats.add(generateStatLine("Highest Killstreak", "sg_highest_kill_streak"));
+        stats.add(generateStatLine("Games Won", "sg_wins"));
+        stats.add(generateStatLine("Deaths", "sg_deaths"));
+        stats.add(generateStatLine("Passes Used", "sg_times_mutated"));
+        stats.add(generateStatLine("Mutation Kills", "sg_mutation_kills"));
+        stats.add(generateStatLine("Mutation Deaths", "sg_mutation_deaths"));
+        stats.add(generateStatLine("Deathmatches Reached", "sg_deathmatches_reached"));
+        stats.add(generateStatLine("Chests Looted", "sg_chests_looted"));
+        stats.add(generateStatLine("Mutation Passes", "sg_mutation_passes"));
+        return stats;
+    }
+    
+    public boolean hasSponsored() {
+        return sponsored;
+    }
+    
+    public void setSponsored(boolean sponsored) {
+        this.sponsored = sponsored;
     }
 }
