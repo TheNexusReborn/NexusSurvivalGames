@@ -22,9 +22,7 @@ public class TeamMenu extends Menu {
                         meta.setDisplayName(MCUtils.color(player.getDisplayName()));
                         skull.setItemMeta(meta);
                         Button button = new Button(skull);
-                        button.setLeftClickAction((p, menu, clickType) -> {
-                            p.teleport(Bukkit.getPlayer(player.getUniqueId()).getLocation()); //TODO This will be replaced with a menu at some point
-                        });
+                        button.setLeftClickAction((p, menu, clickType) -> p.openInventory(new PlayerMenu(plugin, player).getInventory()));
                         addElement(button);
                     }
                 }

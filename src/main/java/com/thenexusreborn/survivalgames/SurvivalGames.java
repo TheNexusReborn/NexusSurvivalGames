@@ -199,6 +199,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         getCommand("mapvote").setExecutor(new MapVoteCommand(this));
         getCommand("bounty").setExecutor(new BountyCmd(this));
         getCommand("spectatorchat").setExecutor(nexusCore.getToggleCmdExecutor());
+        getCommand("sponsors").setExecutor(nexusCore.getToggleCmdExecutor());
         getCommand("ratemap").setExecutor(new RateMapCmd(this));
         
         getLogger().info("Registered commands");
@@ -296,6 +297,10 @@ public class SurvivalGames extends NexusSpigotPlugin {
         createGameSetting("max_credit_bounty", "Maximum Credit Bounty", "The maximum credit bounty that one player can have", Type.INTEGER, 10000);
         createGameSetting("max_score_bounty", "Maximum Score Bounty", "The maximum score bounty that one player can have", Type.INTEGER, 10000);
         createGameSetting("combat_tag_length", "Combat Tag Length", "The length in seconds that the combat tag lasts", Type.INTEGER, 10, 0, 60);
+        createGameSetting("allow_sponsoring", "Allow Sponsoring", "Controls if sponsoring is enabled for the game", Type.BOOLEAN, true);
+        createGameSetting("allow_swag_shack", "Allow Swag Shack", "Controls if the swag shack is enabled for the game", Type.BOOLEAN, true);
+        createGameSetting("sponsor_credit_cost", "Sponsor Credit Cost", "The cost of credits for the Credit Sponsorship", Type.INTEGER, 200);
+        createGameSetting("sponsor_score_cost", "Sponsor Score Cost", "The cost of score for the Score Sponsorship", Type.INTEGER, 100);
     }
     
     private void createLobbySetting(String name, String displayName, String description, Value.Type valueType, Object valueDefault) {
@@ -338,6 +343,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
     @Override
     public void registerToggles(ToggleRegistry registry) {
         registry.register("spectatorchat", Rank.HELPER, "View Spectator Chat", "Allows you to see the spectator chat", false);
+        registry.register("allowsponsors", Rank.MEMBER, "Allow Sponsors", "Allow other players to sponsor you", true);
     }
     
     public int getGamesPlayed() {

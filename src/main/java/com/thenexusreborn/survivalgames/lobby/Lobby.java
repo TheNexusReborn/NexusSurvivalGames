@@ -5,6 +5,7 @@ import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.nexuscore.scoreboard.impl.RankTablistHandler;
 import com.thenexusreborn.nexuscore.util.*;
+import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.*;
@@ -19,6 +20,7 @@ import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
 import java.util.*;
@@ -427,6 +429,7 @@ public class Lobby {
         if (totalPlayers > lobbySettings.getMaxPlayers()) {
             nexusPlayer.sendMessage("&eYou will be a spectator in the game as you joined with the player count above the maximum game amount. However, you can be a tribute if those before you leave or become spectators");
         }
+        
         Player player = Bukkit.getPlayer(nexusPlayer.getUniqueId());
         
         Location spawn = getSpawnpoint().clone();
@@ -481,6 +484,11 @@ public class Lobby {
             for (PotionEffect pe : player.getActivePotionEffects()) {
                 player.removePotionEffect(pe.getType());
             }
+    
+            boolean sponsors = nexusPlayer.getToggleValue("allowsponsors");
+            Material sponsorsItemMaterial = sponsors ? Material.GLOWSTONE_DUST : Material.SULPHUR;
+            player.getInventory().setItem(0, ItemBuilder.start(sponsorsItemMaterial).displayName("&e&lSponsors &7&o(Right click to toggle)").build());
+            player.getInventory().setItem(8, ItemBuilder.start(Material.WOOD_DOOR).displayName("&e&lReturn to Hub &7(Right Click)").build());
         }
         
         if (nexusPlayer.getRank().ordinal() <= Rank.DIAMOND.ordinal()) {

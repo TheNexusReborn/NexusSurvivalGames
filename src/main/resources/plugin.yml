@@ -18,3 +18,5 @@ commands:
     aliases: [specchat]
   mapvote:
   ratemap:
+  allowsponsors:
+    aliases: [sponsors]
