@@ -353,10 +353,10 @@ public class Lobby {
                 rating += playerRating.getRating();
             }
             
-            ratingMsg = new ProgressBar(rating / totalRatings, rating, 5, "✦ ", "&a", "&7").display() + " &7&o(rating: " + rating / totalRatings + " star(s), based on: " + totalRatings + " vote(s))";
+            ratingMsg = "&7Rating: " + new ProgressBar(rating / totalRatings, rating, 5, "✦ ", "&a", "&7").display() + " &7&o(rating: " + rating / totalRatings + " star(s), based on: " + totalRatings + " vote(s))";
         }
         
-        sendMessage("&6&l> &7Rating: " + ratingMsg);
+        sendMessage("&6&l> " + ratingMsg);
         sendMessage("&6&l> &7Votes: &e" + gameMap.getVotes());
         sendMessage("");
         
