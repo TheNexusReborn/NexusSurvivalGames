@@ -39,12 +39,16 @@ public class GameMapObjectHandler extends ObjectHandler {
             }
         }
         
-        for (MapSpawn mapSpawn : gameMap.getSpawns()) {
-            database.queue(mapSpawn);
-        }
+        try {
+            for (MapSpawn mapSpawn : gameMap.getSpawns()) {
+                database.push(mapSpawn);
+            }
     
-        for (MapRating rating : gameMap.getRatings().values()) {
-            database.queue(rating);
+            for (MapRating rating : gameMap.getRatings().values()) {
+                NexusAPI.getApi().getPrimaryDatabase().push(rating);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         
         database.flush();
