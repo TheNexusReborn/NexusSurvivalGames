@@ -531,7 +531,6 @@ public class Game {
         }
     
         if (gameMap.getSwagShack() != null) {
-            System.out.println("Swag Shack Exists");
             Villager entity = (Villager) gameMap.getWorld().spawnEntity(gameMap.getSwagShack().toLocation(gameMap.getWorld()), EntityType.VILLAGER);
             entity.setCustomNameVisible(true);
             entity.setCustomName(MCUtils.color("&e&lSwag Shack"));
@@ -909,19 +908,20 @@ public class Game {
             player.setAllowFlight(true);
             player.setFlying(true);
         }
-        
-        gamePlayer.setSpectatorByDeath(deathInfo.getType() != DeathType.LEAVE);
+    
+        boolean deathByLeave = deathInfo.getType() == DeathType.SUICIDE;
+        gamePlayer.setSpectatorByDeath(!deathByLeave);
         KillerInfo killer = deathInfo.getKiller();
         gamePlayer.setDeathByMutation(killer != null && killer.isMutationKill());
         
-        boolean vanished = deathInfo.getType() == DeathType.VANISH;
+        boolean deathByVanish = deathInfo.getType() == DeathType.VANISH;
         int score = gamePlayer.getStatValue("sg_score").getAsInt();
         int lost = (int) Math.ceil(score / settings.getScoreDivisor());
         if (score - lost < 0) {
             lost = 0;
         }
-        
-        if (!vanished) {
+    
+        if (!(deathByVanish || deathByLeave)) {
             if (lost > 0) {
                 gamePlayer.changeStat("sg_score", lost, StatOperator.SUBTRACT);
             }
