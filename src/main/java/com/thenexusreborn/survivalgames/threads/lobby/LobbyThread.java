@@ -69,7 +69,7 @@ public class LobbyThread extends NexusThread<SurvivalGames> {
         }
         
         boolean resetLobby = false;
-        if (!(plugin.getLobby().getState() == LobbyState.WAITING || plugin.getLobby().getState() != LobbyState.MAP_EDITING)) {
+        if (!(plugin.getLobby().getState() == LobbyState.WAITING || plugin.getLobby().getState() == LobbyState.MAP_EDITING)) {
             if (lobby.getTimer() == null) {
                 resetLobby = true;
             } else if (lobby.getTimer().getSecondsLeft() <= 0) {
