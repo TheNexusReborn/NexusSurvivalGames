@@ -771,7 +771,7 @@ public class SGCommand implements CommandExecutor {
                     case "teleport", "tp" -> {
                         Location spawn;
                         if (gameMap.getWorld() == null) {
-                            sender.sendMessage(MsgType.WARN + "That map is not loaded. Please load before teleporting.");
+                            sender.sendMessage(MCUtils.color(MsgType.WARN + "That map is not loaded. Please load before teleporting."));
                             return true;
                         }
                         if (gameMap.getCenter() != null) {
@@ -920,6 +920,10 @@ public class SGCommand implements CommandExecutor {
                         boolean value = Boolean.parseBoolean(args[argIndex]);
                         gameMap.setActive(value);
                         sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the status of the map to " + MsgType.INFO.getVariableColor() + value));
+                    } case "setswagshack", "sss" -> {
+                        Location location = player.getPlayer().getLocation();
+                        gameMap.setSwagShack(new Position(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+                        player.sendMessage(MCUtils.color(MsgType.INFO + "You set the swag shack of the map &b" + gameMap.getName() + " &eto your current location."));
                     }
                 }
                 GameMap finalGameMap = gameMap;

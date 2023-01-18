@@ -231,6 +231,10 @@ public class GameSettings extends SettingList<GameSetting> {
         return getValue("sponsor_score_cost").getAsInt();
     }
     
+    public boolean isAllowSwagShack() {
+        return getValue("allow_swag_shack").getAsBoolean();
+    }
+    
     @Override
     public GameSettings clone() {
         return (GameSettings) super.clone();

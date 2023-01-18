@@ -529,6 +529,14 @@ public class Game {
         } else {
             sendMessage("&6&l>> &d&lTEAMING IS NOT ALLOWED IN THIS GAME.");
         }
+    
+        if (gameMap.getSwagShack() != null) {
+            System.out.println("Swag Shack Exists");
+            Villager entity = (Villager) gameMap.getWorld().spawnEntity(gameMap.getSwagShack().toLocation(gameMap.getWorld()), EntityType.VILLAGER);
+            entity.setCustomNameVisible(true);
+            entity.setCustomName(MCUtils.color("&e&lSwag Shack"));
+            entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 255, false, false));
+        }
     }
     
     public void restockChests() {

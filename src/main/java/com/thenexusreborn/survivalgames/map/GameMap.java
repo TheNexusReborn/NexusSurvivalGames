@@ -38,6 +38,9 @@ public class GameMap {
     private boolean active;
     @ColumnIgnored
     private Map<UUID, MapRating> ratings = new HashMap<>();
+    @ColumnType("varchar(1000)")
+    @ColumnCodec(PositionCodec.class)
+    private Position swagShack;
     
     @ColumnIgnored
     private UUID uniqueId;
@@ -410,5 +413,13 @@ public class GameMap {
     
     public Map<UUID, MapRating> getRatings() {
         return ratings;
+    }
+    
+    public Position getSwagShack() {
+        return swagShack;
+    }
+    
+    public void setSwagShack(Position swagShack) {
+        this.swagShack = swagShack;
     }
 }

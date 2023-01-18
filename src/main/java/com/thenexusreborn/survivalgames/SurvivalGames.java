@@ -301,6 +301,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         createGameSetting("allow_swag_shack", "Allow Swag Shack", "Controls if the swag shack is enabled for the game", Type.BOOLEAN, true);
         createGameSetting("sponsor_credit_cost", "Sponsor Credit Cost", "The cost of credits for the Credit Sponsorship", Type.INTEGER, 200);
         createGameSetting("sponsor_score_cost", "Sponsor Score Cost", "The cost of score for the Score Sponsorship", Type.INTEGER, 100);
+        createGameSetting("allow_swag_shack", "Allow Swag Shack", "Whether or not the Swag Shack is allowed to be used", Type.BOOLEAN, true);
     }
     
     private void createLobbySetting(String name, String displayName, String description, Value.Type valueType, Object valueDefault) {
