@@ -1,10 +1,10 @@
 package com.thenexusreborn.survivalgames.game.timer;
 
 import com.thenexusreborn.nexuscore.util.ReturnableCallback;
-import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.nexuscore.util.timer.TimerSnapshot;
 import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.*;
+import org.bukkit.Bukkit;
 
 import java.util.*;
 
@@ -21,6 +21,11 @@ public class NextGameTimerCallback implements ReturnableCallback<TimerSnapshot, 
     @Override
     public Boolean callback(TimerSnapshot timerSnapshot) {
         if (game.getState() != GameState.ENDING) {
+            return false;
+        }
+        
+        if (game.getPlayers().isEmpty() || Bukkit.getOnlinePlayers().isEmpty()) {
+            game.nextGame();
             return false;
         }
     
