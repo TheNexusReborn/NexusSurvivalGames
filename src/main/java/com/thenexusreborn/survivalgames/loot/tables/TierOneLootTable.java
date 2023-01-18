@@ -20,9 +20,9 @@ public class TierOneLootTable extends LootTable {
         addCategory(utilities);
         addCategory(components);
     
-        food.addEntries(Rarity.RARE, Items.PORKCHOP, Items.STEAK, Items.GRILLED_CHICKEN, Items.CAKE, Items.PUMPKIN_PIE, Items.VILE_CREATURE, Items.COOKIE);
+        food.addEntries(Rarity.RARE, Items.PORKCHOP, Items.STEAK, Items.GRILLED_CHICKEN, Items.CAKE, Items.PUMPKIN_PIE, Items.VILE_CREATURE);
         food.addEntries(Rarity.COMMON, Items.RAW_PORKCHOP, Items.RAW_BEEF, Items.CARROT, Items.POTATO, Items.RAW_FISH, Items.MELON);
-        food.addEntries(Rarity.UNCOMMON, Items.RAW_CHICKEN, Items.BAKED_POTATO, Items.APPLE);
+        food.addEntries(Rarity.UNCOMMON, Items.RAW_CHICKEN, Items.BAKED_POTATO, Items.APPLE, Items.COOKIE, Items.MUSHROOM_SOUP);
         food.addEntry(Rarity.EPIC, Items.GOLDEN_CARROT);
         food.addEntry(Rarity.LEGENDARY, Items.GOLDEN_MUNCHIE);
     
