@@ -846,7 +846,11 @@ public class Game {
             }
         });
         
-        this.timer = new Timer(new NextGameTimerCallback(this)).run(TimeUnit.SECONDS.toMilliseconds(settings.getNextGameStart()));
+        if (!(this.players.isEmpty() || Bukkit.getOnlinePlayers().isEmpty())) {
+            this.timer = new Timer(new NextGameTimerCallback(this)).run(TimeUnit.SECONDS.toMilliseconds(settings.getNextGameStart()));
+        } else {
+            this.nextGame();
+        }
     }
     
     public void resetPlayer(Player player) {
