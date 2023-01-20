@@ -189,7 +189,7 @@ public class Game {
         } else {
             sendMessage("&a&l>> &b" + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined.");
         }
-        nexusPlayer.getScoreboard().setView(new DefaultGameBoard(nexusPlayer.getScoreboard(), plugin));
+        nexusPlayer.getScoreboard().setView(new OldGameBoard(nexusPlayer.getScoreboard(), plugin));
         nexusPlayer.getScoreboard().setTablistHandler(new GameTablistHandler(nexusPlayer.getScoreboard(), plugin));
         nexusPlayer.setActionBar(new GameActionBar(plugin, gamePlayer));
         recalculateVisibility();
@@ -419,7 +419,7 @@ public class Game {
         setState(SETTING_UP);
         
         for (GamePlayer player : this.players.values()) {
-            player.getScoreboard().setView(new DefaultGameBoard(player.getScoreboard(), plugin));
+            player.getScoreboard().setView(new OldGameBoard(player.getScoreboard(), plugin));
         }
         
         new BukkitRunnable() {

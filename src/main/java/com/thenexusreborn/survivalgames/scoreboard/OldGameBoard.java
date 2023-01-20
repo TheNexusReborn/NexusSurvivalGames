@@ -6,15 +6,14 @@ import com.thenexusreborn.nexuscore.scoreboard.SpigotScoreboardView;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
-import com.thenexusreborn.survivalgames.map.GameMap;
+import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.ChatColor;
 
-@SuppressWarnings("DuplicatedCode")
-public class DefaultGameBoard extends SpigotScoreboardView {
+public class OldGameBoard extends SpigotScoreboardView {
     
     private final SurvivalGames plugin;
     
-    public DefaultGameBoard(NexusScoreboard nexusScoreboard, SurvivalGames plugin) {
+    public OldGameBoard(NexusScoreboard nexusScoreboard, SurvivalGames plugin) {
         super(nexusScoreboard, "survivalgames", MCUtils.color("&d&lSurvival Games"));
         this.plugin = plugin;
     }
@@ -22,20 +21,7 @@ public class DefaultGameBoard extends SpigotScoreboardView {
     @Override
     public void registerTeams() {
         createTeam(new TeamBuilder("mapLabel").entry("&6&lMAP:").score(15));
-        createTeam(new TeamBuilder("mapValue").entry(ChatColor.AQUA.toString()).prefix("&f").score(14).valueUpdater((player, team) -> {
-            Game game = plugin.getGame();
-            GameMap map = game.getGameMap();
-            String prefix = "&f", suffix = "&f";
-            if (map.getName().length() > 14) {
-                prefix += map.getName().substring(0, 14);
-                suffix += map.getName().substring(14);
-            } else {
-                prefix += map.getName();
-            }
-            
-            team.setPrefix(prefix);
-            team.setSuffix(suffix);
-        }));
+        createTeam(new TeamBuilder("mapValue").entry(ChatColor.AQUA.toString()).prefix("&f").score(14).valueUpdater((player, team) -> SGUtils.setMapNameForScoreboard(plugin.getGame().getGameMap(), team)));
         createTeam(new TeamBuilder("blank1").entry(ChatColor.BLACK.toString()).score(13));
         createTeam(new TeamBuilder("playersLabel").entry("&6&lPLAYERS:").score(12));
         

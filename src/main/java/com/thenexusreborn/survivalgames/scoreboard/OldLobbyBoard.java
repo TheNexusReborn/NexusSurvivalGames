@@ -6,11 +6,10 @@ import com.thenexusreborn.nexuscore.scoreboard.SpigotScoreboardView;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.*;
-import com.thenexusreborn.survivalgames.map.GameMap;
+import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.ChatColor;
 
-@SuppressWarnings("DuplicatedCode")
-public class DefaultLobbyBoard extends SpigotScoreboardView {
+public class OldLobbyBoard extends SpigotScoreboardView {
     
     private final SurvivalGames plugin;
     
@@ -18,7 +17,7 @@ public class DefaultLobbyBoard extends SpigotScoreboardView {
             playersLabelName = "playersLabel", waitingValueName = "waitingValue", neededValueName = "neededValue", blank2Name = "blank2",
             serverLabelName = "serverLabel", serverValueName = "serverValue";
     
-    public DefaultLobbyBoard(NexusScoreboard scoreboard, SurvivalGames plugin) {
+    public OldLobbyBoard(NexusScoreboard scoreboard, SurvivalGames plugin) {
         super(scoreboard, "lobby", MCUtils.color("&a&lLobby"));
         this.plugin = plugin;
     }
@@ -29,16 +28,7 @@ public class DefaultLobbyBoard extends SpigotScoreboardView {
         createTeam(new TeamBuilder("mapValue").entry(ChatColor.AQUA.toString()).score(14).valueUpdater((player, team) -> {
             Lobby lobby = plugin.getLobby();
             if (lobby.getGameMap() != null) {
-                GameMap map = lobby.getGameMap();
-                String prefix = "&f", suffix = "&f";
-                if (map.getName().length() > 14) {
-                    prefix += map.getName().substring(0, 14);
-                    suffix += map.getName().substring(14);
-                } else {
-                    prefix += map.getName();
-                }
-                team.setPrefix(MCUtils.color(prefix));
-                team.setSuffix(MCUtils.color(suffix));
+                SGUtils.setMapNameForScoreboard(lobby.getGameMap(), team);
             } else {
                 team.setPrefix(MCUtils.color("&7Voting"));
                 team.setSuffix("");

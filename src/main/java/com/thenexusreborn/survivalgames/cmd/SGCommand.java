@@ -750,6 +750,7 @@ public class SGCommand implements CommandExecutor {
                 switch (mapSubCommand) {
                     case "download", "dl" -> {
                         GameMap finalGameMap = gameMap;
+                        plugin.getLobby().setGameMap(finalGameMap);
                         player.sendMessage(MCUtils.color(MsgType.VERBOSE + "Please wait, downloading the map " + MsgType.VERBOSE.getVariableColor() + finalGameMap.getName() + MsgType.VERBOSE.getBaseColor() + "."));
                         NexusAPI.getApi().getThreadFactory().runAsync(() -> {
                             finalGameMap.download(plugin);
@@ -789,6 +790,7 @@ public class SGCommand implements CommandExecutor {
                     }
                     case "delete" -> {
                         gameMap.delete(plugin);
+                        plugin.getLobby().setGameMap(null);
                         player.sendMessage(MCUtils.color(MsgType.INFO + "Deleted the map " + MsgType.INFO.getVariableColor() + gameMap.getName() + MsgType.INFO.getBaseColor() + " from the server."));
                         return true;
                     }

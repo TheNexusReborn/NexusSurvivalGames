@@ -246,7 +246,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         createLobbySetting("sounds", "Sounds", "Whether or not to play custom sounds", Type.BOOLEAN, true);
         createLobbySetting("allow_vote_start", "Allow Vote Start", "Whether or not Vote Start is allowed.", Type.BOOLEAN, true);
         createLobbySetting("vote_start_available_threshold", "Vote Start Available Threshold", "The amount of players that has to be equal to or under to allow voting to start.", Type.INTEGER, 4);
-        
+        createLobbySetting("use_new_scoreboards", "Use New Scoreboards", "If the new scoreboards are to be used or to use the old ones", Type.BOOLEAN, true);
         
         createGameSetting("max_health", "Maximum Health", "The default maximum health of the tributes", Type.INTEGER, 20, 1, 1024);
         createGameSetting("grace_period_length", "Grace Period Length", "The time in seconds for how long the grace period lasts. Due note that the graceperiod setting must also be true", Type.INTEGER, 60);
@@ -302,6 +302,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         createGameSetting("sponsor_credit_cost", "Sponsor Credit Cost", "The cost of credits for the Credit Sponsorship", Type.INTEGER, 200);
         createGameSetting("sponsor_score_cost", "Sponsor Score Cost", "The cost of score for the Score Sponsorship", Type.INTEGER, 100);
         createGameSetting("allow_swag_shack", "Allow Swag Shack", "Whether or not the Swag Shack is allowed to be used", Type.BOOLEAN, true);
+        createGameSetting("use_new_scoreboards", "Use New Scoreboards", "If the new scoreboards are to be used or to use the old ones", Type.BOOLEAN, true);
     }
     
     private void createLobbySetting(String name, String displayName, String description, Value.Type valueType, Object valueDefault) {

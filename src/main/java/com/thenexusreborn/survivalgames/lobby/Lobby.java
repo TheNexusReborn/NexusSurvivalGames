@@ -11,7 +11,8 @@ import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.loot.*;
 import com.thenexusreborn.survivalgames.map.*;
-import com.thenexusreborn.survivalgames.scoreboard.DefaultLobbyBoard;
+import com.thenexusreborn.survivalgames.scoreboard.OldLobbyBoard;
+import com.thenexusreborn.survivalgames.scoreboard.newboards.MapEditingBoard;
 import com.thenexusreborn.survivalgames.settings.*;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
@@ -20,7 +21,6 @@ import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
 import java.util.*;
@@ -257,11 +257,23 @@ public class Lobby {
             this.timer.cancel();
             this.timer = null;
         }
+        
+        if (lobbySettings.isUseNewScoreboards()) {
+            for (LobbyPlayer player : this.getPlayers()) {
+                player.getPlayer().getScoreboard().setView(new MapEditingBoard(player.getPlayer().getScoreboard(), plugin));
+            }
+        }
+        
         sendMessage("&eThe lobby has been set to editing maps. Automatic actions are temporarily suspended");
     }
     
     public void stopEditingMaps() {
         this.state = LobbyState.WAITING;
+        
+        for (LobbyPlayer player : this.getPlayers()) {
+            player.getPlayer().getScoreboard().setView(new OldLobbyBoard(player.getPlayer().getScoreboard(), plugin));
+        }
+        
         sendMessage("&eThe lobby has been set to no longer editing maps. Automatic actions resumed.");
     }
     
@@ -484,7 +496,7 @@ public class Lobby {
             for (PotionEffect pe : player.getActivePotionEffects()) {
                 player.removePotionEffect(pe.getType());
             }
-    
+            
             boolean sponsors = nexusPlayer.getToggleValue("allowsponsors");
             Material sponsorsItemMaterial = sponsors ? Material.GLOWSTONE_DUST : Material.SULPHUR;
             player.getInventory().setItem(0, ItemBuilder.start(sponsorsItemMaterial).displayName("&e&lSponsors &7&o(Right click to toggle)").build());
@@ -495,7 +507,7 @@ public class Lobby {
             player.setAllowFlight(nexusPlayer.getToggleValue("fly"));
         }
         
-        nexusPlayer.getScoreboard().setView(new DefaultLobbyBoard(nexusPlayer.getScoreboard(), plugin));
+        nexusPlayer.getScoreboard().setView(new OldLobbyBoard(nexusPlayer.getScoreboard(), plugin));
         nexusPlayer.getScoreboard().setTablistHandler(new RankTablistHandler(nexusPlayer.getScoreboard()));
         nexusPlayer.setActionBar(new LobbyActionBar(plugin));
         sendMapOptions(nexusPlayer);

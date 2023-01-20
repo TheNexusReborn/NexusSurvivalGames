@@ -62,6 +62,10 @@ public class LobbySettings extends SettingList<LobbySetting> {
         return getValue("vote_start_available_threshold").getAsInt();
     }
     
+    public boolean isUseNewScoreboards() {
+        return getValue("use_new_scoreboards").getAsBoolean();
+    }
+    
     @Override
     public LobbySettings clone() {
         return (LobbySettings) super.clone();
