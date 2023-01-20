@@ -11,7 +11,7 @@ import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.loot.*;
 import com.thenexusreborn.survivalgames.map.*;
-import com.thenexusreborn.survivalgames.scoreboard.OldLobbyBoard;
+import com.thenexusreborn.survivalgames.scoreboard.newboards.LobbyBoard;
 import com.thenexusreborn.survivalgames.scoreboard.newboards.MapEditingBoard;
 import com.thenexusreborn.survivalgames.settings.*;
 import net.md_5.bungee.api.ChatColor;
@@ -271,7 +271,7 @@ public class Lobby {
         this.state = LobbyState.WAITING;
         
         for (LobbyPlayer player : this.getPlayers()) {
-            player.getPlayer().getScoreboard().setView(new OldLobbyBoard(player.getPlayer().getScoreboard(), plugin));
+            player.getPlayer().getScoreboard().setView(new LobbyBoard(player.getPlayer().getScoreboard(), plugin));
         }
         
         sendMessage("&eThe lobby has been set to no longer editing maps. Automatic actions resumed.");
@@ -507,7 +507,7 @@ public class Lobby {
             player.setAllowFlight(nexusPlayer.getToggleValue("fly"));
         }
         
-        nexusPlayer.getScoreboard().setView(new OldLobbyBoard(nexusPlayer.getScoreboard(), plugin));
+        nexusPlayer.getScoreboard().setView(new LobbyBoard(nexusPlayer.getScoreboard(), plugin));
         nexusPlayer.getScoreboard().setTablistHandler(new RankTablistHandler(nexusPlayer.getScoreboard()));
         nexusPlayer.setActionBar(new LobbyActionBar(plugin));
         sendMapOptions(nexusPlayer);

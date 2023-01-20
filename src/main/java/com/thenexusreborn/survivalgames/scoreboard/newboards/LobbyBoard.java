@@ -1,4 +1,4 @@
-package com.thenexusreborn.survivalgames.scoreboard;
+package com.thenexusreborn.survivalgames.scoreboard.newboards;
 
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.scoreboard.*;
@@ -9,7 +9,7 @@ import com.thenexusreborn.survivalgames.lobby.*;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.ChatColor;
 
-public class OldLobbyBoard extends SpigotScoreboardView {
+public class LobbyBoard extends SpigotScoreboardView {
     
     private final SurvivalGames plugin;
     
@@ -17,7 +17,7 @@ public class OldLobbyBoard extends SpigotScoreboardView {
             playersLabelName = "playersLabel", waitingValueName = "waitingValue", neededValueName = "neededValue", blank2Name = "blank2",
             serverLabelName = "serverLabel", serverValueName = "serverValue";
     
-    public OldLobbyBoard(NexusScoreboard scoreboard, SurvivalGames plugin) {
+    public LobbyBoard(NexusScoreboard scoreboard, SurvivalGames plugin) {
         super(scoreboard, "lobby", MCUtils.color("&a&lLobby"));
         this.plugin = plugin;
     }
@@ -51,7 +51,6 @@ public class OldLobbyBoard extends SpigotScoreboardView {
             team.setSuffix(lobby.getLobbySettings().getMinPlayers() + "");
         }));
         createTeam(new TeamBuilder("blank2").entry(ChatColor.DARK_PURPLE).score(9));
-        createTeam(new TeamBuilder("serverLabel").entry("&6&lSERVER:").score(2));
         createTeam(new TeamBuilder("serverValue").entry(NexusAPI.getApi().getServerManager().getCurrentServer().getName()).score(1));
     }
 }
