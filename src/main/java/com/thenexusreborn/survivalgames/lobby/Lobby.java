@@ -269,7 +269,7 @@ public class Lobby {
         this.state = LobbyState.WAITING;
         
         for (LobbyPlayer player : this.getPlayers()) {
-            player.getPlayer().getScoreboard().setView(new LobbyBoard(player.getPlayer().getScoreboard(), plugin));
+            player.getPlayer().getScoreboard().setView(new LobbyBoard(player.getPlayer().getScoreboard(), this));
         }
         
         sendMessage("&eThe lobby has been set to no longer editing maps. Automatic actions resumed.");
@@ -506,9 +506,9 @@ public class Lobby {
         }
         
         if (this.debugMode) {
-            nexusPlayer.getScoreboard().setView(new DebugLobbyBoard(nexusPlayer.getScoreboard(), plugin));
+            nexusPlayer.getScoreboard().setView(new DebugLobbyBoard(nexusPlayer.getScoreboard(), this));
         } else {
-            nexusPlayer.getScoreboard().setView(new LobbyBoard(nexusPlayer.getScoreboard(), plugin));
+            nexusPlayer.getScoreboard().setView(new LobbyBoard(nexusPlayer.getScoreboard(), this));
         }
         nexusPlayer.getScoreboard().setTablistHandler(new RankTablistHandler(nexusPlayer.getScoreboard()));
         nexusPlayer.setActionBar(new LobbyActionBar(plugin));
@@ -785,32 +785,35 @@ public class Lobby {
     public void enableDebug() {
         this.debugMode = true;
         for (LobbyPlayer player : this.getPlayers()) {
-            player.getPlayer().getScoreboard().setView(new DebugLobbyBoard(player.getPlayer().getScoreboard(), plugin));
+            player.getPlayer().getScoreboard().setView(new DebugLobbyBoard(player.getPlayer().getScoreboard(), this));
         }
     }
     
     public void disableDebug() {
         this.debugMode = false;
         for (LobbyPlayer player : this.getPlayers()) {
-            player.getPlayer().getScoreboard().setView(new LobbyBoard(player.getPlayer().getScoreboard(), plugin));
+            player.getPlayer().getScoreboard().setView(new LobbyBoard(player.getPlayer().getScoreboard(), this));
         }
     }
     
     @Override
     public String toString() {
         return "Lobby{" +
-                "plugin=" + plugin.getName() +
-                ", players=" + players +
-                ", timer=" + timer +
-                ", gameSettings=" + gameSettings +
-                ", lobbySettings=" + lobbySettings +
-                ", gameMap=" + gameMap +
+                "plugin=" + plugin +
                 ", controlType=" + controlType +
                 ", state=" + state +
+                ", timer=" + timer +
+                ", players=" + players +
+                ", gameSettings=" + gameSettings +
+                ", lobbySettings=" + lobbySettings +
                 ", spawnpoint=" + spawnpoint +
+                ", gameMap=" + gameMap +
                 ", mapSigns=" + mapSigns +
                 ", mapOptions=" + mapOptions +
                 ", forceStarted=" + forceStarted +
+                ", statSigns=" + statSigns +
+                ", tributeSigns=" + tributeSigns +
+                ", debugMode=" + debugMode +
                 '}';
     }
     
