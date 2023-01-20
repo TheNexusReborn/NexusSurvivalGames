@@ -11,8 +11,7 @@ import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.loot.*;
 import com.thenexusreborn.survivalgames.map.*;
-import com.thenexusreborn.survivalgames.scoreboard.newboards.LobbyBoard;
-import com.thenexusreborn.survivalgames.scoreboard.newboards.MapEditingBoard;
+import com.thenexusreborn.survivalgames.scoreboard.newboards.*;
 import com.thenexusreborn.survivalgames.settings.*;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
@@ -43,6 +42,7 @@ public class Lobby {
     private boolean forceStarted;
     private final List<StatSign> statSigns = new ArrayList<>();
     private final List<TributeSign> tributeSigns = new ArrayList<>();
+    private boolean debugMode;
     
     public Lobby(SurvivalGames plugin) {
         this.plugin = plugin;
@@ -258,10 +258,8 @@ public class Lobby {
             this.timer = null;
         }
         
-        if (lobbySettings.isUseNewScoreboards()) {
-            for (LobbyPlayer player : this.getPlayers()) {
-                player.getPlayer().getScoreboard().setView(new MapEditingBoard(player.getPlayer().getScoreboard(), plugin));
-            }
+        for (LobbyPlayer player : this.getPlayers()) {
+            player.getPlayer().getScoreboard().setView(new MapEditingBoard(player.getPlayer().getScoreboard(), plugin));
         }
         
         sendMessage("&eThe lobby has been set to editing maps. Automatic actions are temporarily suspended");
@@ -507,7 +505,11 @@ public class Lobby {
             player.setAllowFlight(nexusPlayer.getToggleValue("fly"));
         }
         
-        nexusPlayer.getScoreboard().setView(new LobbyBoard(nexusPlayer.getScoreboard(), plugin));
+        if (this.debugMode) {
+            nexusPlayer.getScoreboard().setView(new DebugLobbyBoard(nexusPlayer.getScoreboard(), plugin));
+        } else {
+            nexusPlayer.getScoreboard().setView(new LobbyBoard(nexusPlayer.getScoreboard(), plugin));
+        }
         nexusPlayer.getScoreboard().setTablistHandler(new RankTablistHandler(nexusPlayer.getScoreboard()));
         nexusPlayer.setActionBar(new LobbyActionBar(plugin));
         sendMapOptions(nexusPlayer);
@@ -774,6 +776,24 @@ public class Lobby {
     
     public List<TributeSign> getTributeSigns() {
         return tributeSigns;
+    }
+    
+    public boolean isDebugMode() {
+        return debugMode;
+    }
+    
+    public void enableDebug() {
+        this.debugMode = true;
+        for (LobbyPlayer player : this.getPlayers()) {
+            player.getPlayer().getScoreboard().setView(new DebugLobbyBoard(player.getPlayer().getScoreboard(), plugin));
+        }
+    }
+    
+    public void disableDebug() {
+        this.debugMode = false;
+        for (LobbyPlayer player : this.getPlayers()) {
+            player.getPlayer().getScoreboard().setView(new LobbyBoard(player.getPlayer().getScoreboard(), plugin));
+        }
     }
     
     @Override

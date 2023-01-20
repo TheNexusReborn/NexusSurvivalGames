@@ -235,10 +235,6 @@ public class GameSettings extends SettingList<GameSetting> {
         return getValue("allow_swag_shack").getAsBoolean();
     }
     
-    public boolean isUseNewScoreboards() {
-        return getValue("use_new_scoreboards").getAsBoolean();
-    }
-    
     @Override
     public GameSettings clone() {
         return (GameSettings) super.clone();
