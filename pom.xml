@@ -18,7 +18,7 @@
         <maven.plugin.jar.version>3.3.0</maven.plugin.jar.version>
         <maven.plugin.shade.version>3.4.1</maven.plugin.shade.version>
         <mysql.version>8.0.31</mysql.version>
-        <nexus.core.version>1.9.5-ALPHA</nexus.core.version>
+        <nexus.core.version>1.9.6-ALPHA</nexus.core.version>
         <nexus.disguises.version>1.0-ALPHA</nexus.disguises.version>
     </properties>
 
