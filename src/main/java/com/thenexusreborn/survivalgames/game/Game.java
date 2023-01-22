@@ -25,6 +25,7 @@ import com.thenexusreborn.survivalgames.loot.Items;
 import com.thenexusreborn.survivalgames.map.*;
 import com.thenexusreborn.survivalgames.mutations.*;
 import com.thenexusreborn.survivalgames.scoreboard.*;
+import com.thenexusreborn.survivalgames.scoreboard.newboards.GameBoard;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.sponsoring.SponsorManager;
 import com.thenexusreborn.survivalgames.util.SGUtils;
@@ -61,6 +62,7 @@ public class Game {
     private GamePlayer firstBlood;
     private final Map<Location, Inventory> enderchestInventories = new HashMap<>();
     private SponsorManager sponsorManager = new SponsorManager();
+    private Mode mode = Mode.CLASSIC; //This will be implemented later, this is mainly for some other checks to exist
     
     public Game(GameMap gameMap, GameSettings settings, Collection<LobbyPlayer> players) {
         this.gameMap = gameMap;
@@ -189,7 +191,7 @@ public class Game {
         } else {
             sendMessage("&a&l>> &b" + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined.");
         }
-        nexusPlayer.getScoreboard().setView(new OldGameBoard(nexusPlayer.getScoreboard(), plugin));
+        nexusPlayer.getScoreboard().setView(new GameBoard(nexusPlayer.getScoreboard(), plugin));
         nexusPlayer.getScoreboard().setTablistHandler(new GameTablistHandler(nexusPlayer.getScoreboard(), plugin));
         nexusPlayer.setActionBar(new GameActionBar(plugin, gamePlayer));
         recalculateVisibility();
@@ -419,7 +421,7 @@ public class Game {
         setState(SETTING_UP);
         
         for (GamePlayer player : this.players.values()) {
-            player.getScoreboard().setView(new OldGameBoard(player.getScoreboard(), plugin));
+            player.getScoreboard().setView(new GameBoard(player.getScoreboard(), plugin));
         }
         
         new BukkitRunnable() {
@@ -1392,5 +1394,9 @@ public class Game {
     
     public SponsorManager getSponsorManager() {
         return sponsorManager;
+    }
+    
+    public Mode getMode() {
+        return mode;
     }
 }
