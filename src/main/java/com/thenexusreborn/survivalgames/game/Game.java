@@ -25,7 +25,7 @@ import com.thenexusreborn.survivalgames.loot.Items;
 import com.thenexusreborn.survivalgames.map.*;
 import com.thenexusreborn.survivalgames.mutations.*;
 import com.thenexusreborn.survivalgames.scoreboard.*;
-import com.thenexusreborn.survivalgames.scoreboard.newboards.GameBoard;
+import com.thenexusreborn.survivalgames.scoreboard.game.GameBoard;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.sponsoring.SponsorManager;
 import com.thenexusreborn.survivalgames.util.SGUtils;
@@ -63,6 +63,7 @@ public class Game {
     private final Map<Location, Inventory> enderchestInventories = new HashMap<>();
     private SponsorManager sponsorManager = new SponsorManager();
     private Mode mode = Mode.CLASSIC; //This will be implemented later, this is mainly for some other checks to exist
+    private boolean debugMode; //TODO Debug Mode. This may be replaced with a class with other settings
     
     public Game(GameMap gameMap, GameSettings settings, Collection<LobbyPlayer> players) {
         this.gameMap = gameMap;
@@ -1398,5 +1399,9 @@ public class Game {
     
     public Mode getMode() {
         return mode;
+    }
+    
+    public boolean isDebug() {
+        return this.debugMode;
     }
 }

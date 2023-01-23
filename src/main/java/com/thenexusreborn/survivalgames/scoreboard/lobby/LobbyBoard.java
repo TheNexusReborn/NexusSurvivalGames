@@ -1,4 +1,4 @@
-package com.thenexusreborn.survivalgames.scoreboard.newboards;
+package com.thenexusreborn.survivalgames.scoreboard.lobby;
 
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.scoreboard.*;

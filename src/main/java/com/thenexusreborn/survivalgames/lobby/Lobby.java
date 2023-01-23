@@ -11,7 +11,7 @@ import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.loot.*;
 import com.thenexusreborn.survivalgames.map.*;
-import com.thenexusreborn.survivalgames.scoreboard.newboards.*;
+import com.thenexusreborn.survivalgames.scoreboard.lobby.*;
 import com.thenexusreborn.survivalgames.settings.*;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;

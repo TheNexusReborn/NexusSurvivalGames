@@ -1,4 +1,4 @@
-package com.thenexusreborn.survivalgames.scoreboard.newboards;
+package com.thenexusreborn.survivalgames.scoreboard.lobby;
 
 import com.starmediadev.starlib.TimeFormat;
 import com.thenexusreborn.api.player.Rank;
