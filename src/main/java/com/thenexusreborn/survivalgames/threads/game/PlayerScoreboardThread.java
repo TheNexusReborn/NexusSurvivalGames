@@ -27,10 +27,9 @@ public class PlayerScoreboardThread extends NexusThread<SurvivalGames> {
                 if (!(view instanceof CombatTagBoard)) {
                     scoreboard.setView(new CombatTagBoard(scoreboard, plugin));
                 }
-            } else if (gamePlayer.getTeam() == GameTeam.MUTATIONS) { //TODO replace the gameboard instanceof check with mutation board check
-                //TODO MUTATION BOARD
-                if (!(view instanceof GameBoard)) {
-                    scoreboard.setView(new GameBoard(scoreboard, plugin));
+            } else if (gamePlayer.getTeam() == GameTeam.MUTATIONS) {
+                if (!(view instanceof MutationBoard mutationBoard)) {
+                    scoreboard.setView(new MutationBoard(scoreboard, plugin));
                 }
             } else if (!game.isDebug()) {
                 if (!(view instanceof GameBoard)) {
