@@ -23,13 +23,19 @@ public class PlayerScoreboardThread extends NexusThread<SurvivalGames> {
         for (GamePlayer gamePlayer : new ArrayList<>(game.getPlayers().values())) {
             NexusScoreboard scoreboard = gamePlayer.getScoreboard();
             ScoreboardView view = scoreboard.getView();
-            if (gamePlayer.getCombatTag().isInCombat() && !(view instanceof CombatTagBoard)) {
-                scoreboard.setView(new CombatTagBoard(scoreboard, plugin));
-            } else if (gamePlayer.getTeam() == GameTeam.MUTATIONS && !(view instanceof GameBoard)) { //TODO replace the gameboard instanceof check with mutation board check
+            if (gamePlayer.getCombatTag().isInCombat()) {
+                if (!(view instanceof CombatTagBoard)) {
+                    scoreboard.setView(new CombatTagBoard(scoreboard, plugin));
+                }
+            } else if (gamePlayer.getTeam() == GameTeam.MUTATIONS) { //TODO replace the gameboard instanceof check with mutation board check
                 //TODO MUTATION BOARD
-                scoreboard.setView(new GameBoard(scoreboard, plugin));
-            } else if (!game.isDebug() && !(view instanceof GameBoard)) {
-                scoreboard.setView(new GameBoard(scoreboard, plugin));
+                if (!(view instanceof GameBoard)) {
+                    scoreboard.setView(new GameBoard(scoreboard, plugin));
+                }
+            } else if (!game.isDebug()) {
+                if (!(view instanceof GameBoard)) {
+                    scoreboard.setView(new GameBoard(scoreboard, plugin));
+                }
             }
             //TODO Debug Boards for Game
         }
