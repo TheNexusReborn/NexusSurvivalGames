@@ -25,6 +25,7 @@ import com.thenexusreborn.survivalgames.loot.Items;
 import com.thenexusreborn.survivalgames.map.*;
 import com.thenexusreborn.survivalgames.mutations.*;
 import com.thenexusreborn.survivalgames.scoreboard.*;
+import com.thenexusreborn.survivalgames.scoreboard.game.GameBoard;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.sponsoring.SponsorManager;
 import com.thenexusreborn.survivalgames.util.SGUtils;
@@ -61,6 +62,8 @@ public class Game {
     private GamePlayer firstBlood;
     private final Map<Location, Inventory> enderchestInventories = new HashMap<>();
     private SponsorManager sponsorManager = new SponsorManager();
+    private Mode mode = Mode.CLASSIC; //This will be implemented later, this is mainly for some other checks to exist
+    private boolean debugMode; //TODO Debug Mode. This may be replaced with a class with other settings
     
     public Game(GameMap gameMap, GameSettings settings, Collection<LobbyPlayer> players) {
         this.gameMap = gameMap;
@@ -189,7 +192,7 @@ public class Game {
         } else {
             sendMessage("&a&l>> &b" + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined.");
         }
-        nexusPlayer.getScoreboard().setView(new DefaultGameBoard(nexusPlayer.getScoreboard(), plugin));
+        nexusPlayer.getScoreboard().setView(new GameBoard(nexusPlayer.getScoreboard(), plugin));
         nexusPlayer.getScoreboard().setTablistHandler(new GameTablistHandler(nexusPlayer.getScoreboard(), plugin));
         nexusPlayer.setActionBar(new GameActionBar(plugin, gamePlayer));
         recalculateVisibility();
@@ -419,7 +422,7 @@ public class Game {
         setState(SETTING_UP);
         
         for (GamePlayer player : this.players.values()) {
-            player.getScoreboard().setView(new DefaultGameBoard(player.getScoreboard(), plugin));
+            player.getScoreboard().setView(new GameBoard(player.getScoreboard(), plugin));
         }
         
         new BukkitRunnable() {
@@ -528,6 +531,13 @@ public class Game {
             sendMessage("&6&l>> &d&lTHERE IS A MAXIUMUM OF " + this.settings.getMaxTeamAmount() + " PLAYER TEAMS.");
         } else {
             sendMessage("&6&l>> &d&lTEAMING IS NOT ALLOWED IN THIS GAME.");
+        }
+    
+        if (gameMap.getSwagShack() != null) {
+            Villager entity = (Villager) gameMap.getWorld().spawnEntity(gameMap.getSwagShack().toLocation(gameMap.getWorld()), EntityType.VILLAGER);
+            entity.setCustomNameVisible(true);
+            entity.setCustomName(MCUtils.color("&e&lSwag Shack"));
+            entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 255, false, false));
         }
     }
     
@@ -839,7 +849,11 @@ public class Game {
             }
         });
         
-        this.timer = new Timer(new NextGameTimerCallback(this)).run(TimeUnit.SECONDS.toMilliseconds(settings.getNextGameStart()));
+        if (!(this.players.isEmpty() || Bukkit.getOnlinePlayers().isEmpty())) {
+            this.timer = new Timer(new NextGameTimerCallback(this)).run(TimeUnit.SECONDS.toMilliseconds(settings.getNextGameStart()));
+        } else {
+            this.nextGame();
+        }
     }
     
     public void resetPlayer(Player player) {
@@ -901,19 +915,20 @@ public class Game {
             player.setAllowFlight(true);
             player.setFlying(true);
         }
-        
-        gamePlayer.setSpectatorByDeath(deathInfo.getType() != DeathType.LEAVE);
+    
+        boolean deathByLeave = deathInfo.getType() == DeathType.SUICIDE;
+        gamePlayer.setSpectatorByDeath(!deathByLeave);
         KillerInfo killer = deathInfo.getKiller();
         gamePlayer.setDeathByMutation(killer != null && killer.isMutationKill());
         
-        boolean vanished = deathInfo.getType() == DeathType.VANISH;
+        boolean deathByVanish = deathInfo.getType() == DeathType.VANISH;
         int score = gamePlayer.getStatValue("sg_score").getAsInt();
         int lost = (int) Math.ceil(score / settings.getScoreDivisor());
         if (score - lost < 0) {
             lost = 0;
         }
-        
-        if (!vanished) {
+    
+        if (!(deathByVanish || deathByLeave)) {
             if (lost > 0) {
                 gamePlayer.changeStat("sg_score", lost, StatOperator.SUBTRACT);
             }
@@ -1380,5 +1395,13 @@ public class Game {
     
     public SponsorManager getSponsorManager() {
         return sponsorManager;
+    }
+    
+    public Mode getMode() {
+        return mode;
+    }
+    
+    public boolean isDebug() {
+        return this.debugMode;
     }
 }

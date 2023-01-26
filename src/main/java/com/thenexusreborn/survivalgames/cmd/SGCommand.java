@@ -556,6 +556,16 @@ public class SGCommand implements CommandExecutor {
                     plugin.getLobby().setSpawnpoint(player.getLocation());
                     sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the lobby spawnpoint to your location."));
                 }
+                case "debug" -> {
+                    Lobby lobby = plugin.getLobby();
+                    if (lobby.isDebugMode()) {
+                        lobby.disableDebug();
+                        sender.sendMessage(MCUtils.color(MsgType.INFO + "You &cdisabled &elobby debug mode."));
+                    } else {
+                        lobby.enableDebug();
+                        sender.sendMessage(MCUtils.color(MsgType.INFO + "You &aenabled &elobby debug mode."));
+                    }
+                }
             }
         } else if (List.of("settings", "setting", "s").contains(subCommand)) {
             if (!(args.length > 2)) {
@@ -584,16 +594,16 @@ public class SGCommand implements CommandExecutor {
                 sender.sendMessage(MCUtils.color(MsgType.WARN + "This functionality is temporarily disabled."));
                 return true;
             }
-    
+            
             if (args[2].equalsIgnoreCase("list")) {
                 sender.sendMessage(MCUtils.color(MsgType.INFO + "List of &b" + type + " settings."));
-    
+                
                 SettingRegistry settingRegistry = switch (type) {
                     case "game" -> plugin.getGameSettingRegistry();
                     case "lobby" -> plugin.getLobbySettingRegistry();
                     default -> null;
                 };
-    
+                
                 for (Info setting : settingRegistry.getObjects()) {
                     TextComponent component = new TextComponent(TextComponent.fromLegacyText(MCUtils.color(" &8- &a" + setting.getName())));
                     StringBuilder sb = new StringBuilder();
@@ -612,7 +622,7 @@ public class SGCommand implements CommandExecutor {
                         console.sendMessage(MCUtils.color(component.getText()));
                     }
                 }
-    
+                
                 return true;
             }
             
@@ -623,7 +633,7 @@ public class SGCommand implements CommandExecutor {
                 sender.sendMessage(MCUtils.color(MsgType.WARN + "A setting with that name does not exist."));
                 return true;
             }
-    
+            
             Value value;
             try {
                 value = new ValueCodec().decode(settingInfo.getDefaultValue().getType() + ":" + args[3]);
@@ -636,7 +646,7 @@ public class SGCommand implements CommandExecutor {
                 sender.sendMessage(MCUtils.color(MsgType.WARN + "There was a problem parsing the value."));
                 return true;
             }
-    
+            
             Value minValue = settingInfo.getMinValue();
             Value maxValue = settingInfo.getMaxValue();
             if (minValue != null && maxValue != null) {
@@ -664,7 +674,7 @@ public class SGCommand implements CommandExecutor {
                     }
                 }
             }
-    
+            
             SettingList<?> settingList;
             if (type.equalsIgnoreCase("game")) {
                 if (game == null) {
@@ -750,6 +760,7 @@ public class SGCommand implements CommandExecutor {
                 switch (mapSubCommand) {
                     case "download", "dl" -> {
                         GameMap finalGameMap = gameMap;
+                        plugin.getLobby().setGameMap(finalGameMap);
                         player.sendMessage(MCUtils.color(MsgType.VERBOSE + "Please wait, downloading the map " + MsgType.VERBOSE.getVariableColor() + finalGameMap.getName() + MsgType.VERBOSE.getBaseColor() + "."));
                         NexusAPI.getApi().getThreadFactory().runAsync(() -> {
                             finalGameMap.download(plugin);
@@ -771,7 +782,7 @@ public class SGCommand implements CommandExecutor {
                     case "teleport", "tp" -> {
                         Location spawn;
                         if (gameMap.getWorld() == null) {
-                            sender.sendMessage(MsgType.WARN + "That map is not loaded. Please load before teleporting.");
+                            sender.sendMessage(MCUtils.color(MsgType.WARN + "That map is not loaded. Please load before teleporting."));
                             return true;
                         }
                         if (gameMap.getCenter() != null) {
@@ -789,6 +800,7 @@ public class SGCommand implements CommandExecutor {
                     }
                     case "delete" -> {
                         gameMap.delete(plugin);
+                        plugin.getLobby().setGameMap(null);
                         player.sendMessage(MCUtils.color(MsgType.INFO + "Deleted the map " + MsgType.INFO.getVariableColor() + gameMap.getName() + MsgType.INFO.getBaseColor() + " from the server."));
                         return true;
                     }
@@ -920,6 +932,11 @@ public class SGCommand implements CommandExecutor {
                         boolean value = Boolean.parseBoolean(args[argIndex]);
                         gameMap.setActive(value);
                         sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the status of the map to " + MsgType.INFO.getVariableColor() + value));
+                    }
+                    case "setswagshack", "sss" -> {
+                        Location location = player.getPlayer().getLocation();
+                        gameMap.setSwagShack(new Position(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+                        player.sendMessage(MCUtils.color(MsgType.INFO + "You set the swag shack of the map &b" + gameMap.getName() + " &eto your current location."));
                     }
                 }
                 GameMap finalGameMap = gameMap;

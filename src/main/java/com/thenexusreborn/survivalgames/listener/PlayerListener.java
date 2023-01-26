@@ -20,8 +20,7 @@ import com.thenexusreborn.survivalgames.game.death.KillerInfo;
 import com.thenexusreborn.survivalgames.lobby.*;
 import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.loot.LootTable;
-import com.thenexusreborn.survivalgames.menu.MutateGui;
-import com.thenexusreborn.survivalgames.menu.TeamMenu;
+import com.thenexusreborn.survivalgames.menu.*;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
 import com.thenexusreborn.survivalgames.mutations.impl.ChickenMutation;
 import com.thenexusreborn.survivalgames.mutations.impl.CreeperMutation;
@@ -469,6 +468,35 @@ public class PlayerListener implements Listener {
         }
         if (e.getRightClicked() instanceof ArmorStand || e.getRightClicked() instanceof ItemFrame || e.getRightClicked() instanceof Painting) {
             e.setCancelled(true);
+        }
+        
+        if (e.getRightClicked() instanceof Villager villager) {
+            e.setCancelled(true);
+            if (villager.getCustomName().contains("Swag Shack")) {
+                Game game = plugin.getGame();
+                if (game == null) {
+                    e.getPlayer().sendMessage(MCUtils.color(MsgType.WARN + "You cannot open the Swag Shack when not in a game."));
+                    return;
+                }
+                
+                if (!game.getSettings().isAllowSwagShack()) {
+                    e.getPlayer().sendMessage(MCUtils.color(MsgType.WARN + "The Swag Shack is disabled for this game."));
+                    return;
+                }
+                
+                GamePlayer gamePlayer = game.getPlayer(e.getPlayer().getUniqueId());
+                if (gamePlayer.getTeam() != GameTeam.TRIBUTES) {
+                    gamePlayer.sendMessage(MsgType.WARN + "You can only open the Swag Shack as a Tribute.");
+                    return;
+                }
+                
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        e.getPlayer().openInventory(new SwagShackMenu(plugin, game, gamePlayer).getInventory());
+                    }
+                }.runTaskLater(plugin, 1L);
+            }
         }
     }
     

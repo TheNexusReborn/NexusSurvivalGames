@@ -1,6 +1,7 @@
 package com.thenexusreborn.survivalgames.util;
 
 import com.google.common.io.*;
+import com.thenexusreborn.api.scoreboard.wrapper.ITeam;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.map.GameMap;
@@ -14,9 +15,30 @@ import org.bukkit.util.Vector;
 
 import java.lang.reflect.Field;
 
-public class SGUtils {
+public final class SGUtils {
     
     private static final SurvivalGames plugin = SurvivalGames.getPlugin(SurvivalGames.class);
+    
+    public static void setMapNameForScoreboard(GameMap map, ITeam team) {
+        if (map != null) {
+            setTeamValueForString(map.getName(), team);
+        } else {
+            team.setPrefix("&fNot Set");
+        }
+    }
+    
+    public static void setTeamValueForString(String string, ITeam team) {
+        String prefix = "&f", suffix = "&f";
+        if (string.length() > 14) {
+            prefix += string.substring(0, 14);
+            suffix += string.substring(14);
+        } else {
+            prefix += string;
+        }
+    
+        team.setPrefix(prefix);
+        team.setSuffix(suffix);
+    }
     
     public static void spawnTNTWithSource(Location location, Player player, int fuseTicks, float yield) {
         TNTPrimed entity = (TNTPrimed) location.getWorld().spawnEntity(location, EntityType.PRIMED_TNT);
@@ -95,16 +117,14 @@ public class SGUtils {
     }
     
     public static String getHandItemName(ItemStack handItem) {
-        String itemName;
-        if (handItem != null && !handItem.getType().equals(Material.AIR)) {
+        if (handItem != null && handItem.getType() != Material.AIR) {
             if (!handItem.hasItemMeta() || handItem.getItemMeta().getDisplayName() == null) {
-                itemName = handItem.getType().name().toLowerCase().replace("_", " ");
+                return handItem.getType().name().toLowerCase().replace("_", " ");
             } else {
-                itemName = handItem.getItemMeta().getDisplayName();
+                return handItem.getItemMeta().getDisplayName();
             }
         } else {
-            itemName = "their fists";
+            return "their fists";
         }
-        return itemName;
     }
 }

@@ -11,7 +11,7 @@ import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.loot.*;
 import com.thenexusreborn.survivalgames.map.*;
-import com.thenexusreborn.survivalgames.scoreboard.DefaultLobbyBoard;
+import com.thenexusreborn.survivalgames.scoreboard.lobby.*;
 import com.thenexusreborn.survivalgames.settings.*;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
@@ -20,7 +20,6 @@ import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
 import java.util.*;
@@ -43,6 +42,7 @@ public class Lobby {
     private boolean forceStarted;
     private final List<StatSign> statSigns = new ArrayList<>();
     private final List<TributeSign> tributeSigns = new ArrayList<>();
+    private boolean debugMode;
     
     public Lobby(SurvivalGames plugin) {
         this.plugin = plugin;
@@ -257,11 +257,21 @@ public class Lobby {
             this.timer.cancel();
             this.timer = null;
         }
+        
+        for (LobbyPlayer player : this.getPlayers()) {
+            player.getPlayer().getScoreboard().setView(new MapEditingBoard(player.getPlayer().getScoreboard(), plugin));
+        }
+        
         sendMessage("&eThe lobby has been set to editing maps. Automatic actions are temporarily suspended");
     }
     
     public void stopEditingMaps() {
         this.state = LobbyState.WAITING;
+        
+        for (LobbyPlayer player : this.getPlayers()) {
+            player.getPlayer().getScoreboard().setView(new LobbyBoard(player.getPlayer().getScoreboard(), this));
+        }
+        
         sendMessage("&eThe lobby has been set to no longer editing maps. Automatic actions resumed.");
     }
     
@@ -353,10 +363,10 @@ public class Lobby {
                 rating += playerRating.getRating();
             }
             
-            ratingMsg = new ProgressBar(rating / totalRatings, rating, 5, "✦ ", "&a", "&7").display() + " &7&o(rating: " + rating / totalRatings + " star(s), based on: " + totalRatings + " vote(s))";
+            ratingMsg = "&7Rating: " + new ProgressBar(rating / totalRatings, rating, 5, "✦ ", "&a", "&7").display() + " &7&o(rating: " + rating / totalRatings + " star(s), based on: " + totalRatings + " vote(s))";
         }
         
-        sendMessage("&6&l> &7Rating: " + ratingMsg);
+        sendMessage("&6&l> " + ratingMsg);
         sendMessage("&6&l> &7Votes: &e" + gameMap.getVotes());
         sendMessage("");
         
@@ -484,7 +494,7 @@ public class Lobby {
             for (PotionEffect pe : player.getActivePotionEffects()) {
                 player.removePotionEffect(pe.getType());
             }
-    
+            
             boolean sponsors = nexusPlayer.getToggleValue("allowsponsors");
             Material sponsorsItemMaterial = sponsors ? Material.GLOWSTONE_DUST : Material.SULPHUR;
             player.getInventory().setItem(0, ItemBuilder.start(sponsorsItemMaterial).displayName("&e&lSponsors &7&o(Right click to toggle)").build());
@@ -495,7 +505,11 @@ public class Lobby {
             player.setAllowFlight(nexusPlayer.getToggleValue("fly"));
         }
         
-        nexusPlayer.getScoreboard().setView(new DefaultLobbyBoard(nexusPlayer.getScoreboard(), plugin));
+        if (this.debugMode) {
+            nexusPlayer.getScoreboard().setView(new DebugLobbyBoard(nexusPlayer.getScoreboard(), this));
+        } else {
+            nexusPlayer.getScoreboard().setView(new LobbyBoard(nexusPlayer.getScoreboard(), this));
+        }
         nexusPlayer.getScoreboard().setTablistHandler(new RankTablistHandler(nexusPlayer.getScoreboard()));
         nexusPlayer.setActionBar(new LobbyActionBar(plugin));
         sendMapOptions(nexusPlayer);
@@ -764,21 +778,42 @@ public class Lobby {
         return tributeSigns;
     }
     
+    public boolean isDebugMode() {
+        return debugMode;
+    }
+    
+    public void enableDebug() {
+        this.debugMode = true;
+        for (LobbyPlayer player : this.getPlayers()) {
+            player.getPlayer().getScoreboard().setView(new DebugLobbyBoard(player.getPlayer().getScoreboard(), this));
+        }
+    }
+    
+    public void disableDebug() {
+        this.debugMode = false;
+        for (LobbyPlayer player : this.getPlayers()) {
+            player.getPlayer().getScoreboard().setView(new LobbyBoard(player.getPlayer().getScoreboard(), this));
+        }
+    }
+    
     @Override
     public String toString() {
         return "Lobby{" +
-                "plugin=" + plugin.getName() +
-                ", players=" + players +
-                ", timer=" + timer +
-                ", gameSettings=" + gameSettings +
-                ", lobbySettings=" + lobbySettings +
-                ", gameMap=" + gameMap +
+                "plugin=" + plugin +
                 ", controlType=" + controlType +
                 ", state=" + state +
+                ", timer=" + timer +
+                ", players=" + players +
+                ", gameSettings=" + gameSettings +
+                ", lobbySettings=" + lobbySettings +
                 ", spawnpoint=" + spawnpoint +
+                ", gameMap=" + gameMap +
                 ", mapSigns=" + mapSigns +
                 ", mapOptions=" + mapOptions +
                 ", forceStarted=" + forceStarted +
+                ", statSigns=" + statSigns +
+                ", tributeSigns=" + tributeSigns +
+                ", debugMode=" + debugMode +
                 '}';
     }
     
