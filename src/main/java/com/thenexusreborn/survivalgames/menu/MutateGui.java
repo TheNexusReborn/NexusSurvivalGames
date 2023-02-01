@@ -136,7 +136,7 @@ public class MutateGui extends Menu {
             button.setLeftClickAction((p, menu, click) -> {
                 player.removeCredits(type.getUnlockCost());
                 UnlockedMutation unlockedMutation = new UnlockedMutation(player.getUniqueId(), type.getId(), System.currentTimeMillis());
-                NexusAPI.getApi().getThreadFactory().runAsync(() -> NexusAPI.getApi().getPrimaryDatabase().pushSilent(unlockedMutation));
+                NexusAPI.getApi().getThreadFactory().runAsync(() -> NexusAPI.getApi().getPrimaryDatabase().saveSilent(unlockedMutation));
                 NexusAPI.getApi().getNetworkManager().send("unlockmutation", player.getUniqueId().toString(), unlockedMutation.getType(), unlockedMutation.getTimestamp() + "");
                 unlockedMutations.add(unlockedMutation);
                 player.sendMessage(MsgType.INFO + "You bought the mutation &b" + type.getDisplayName() + " &efor &b" + type.getUnlockCost() + " &ecredits.");

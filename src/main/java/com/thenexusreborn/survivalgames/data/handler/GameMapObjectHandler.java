@@ -41,11 +41,11 @@ public class GameMapObjectHandler extends ObjectHandler {
         
         try {
             for (MapSpawn mapSpawn : gameMap.getSpawns()) {
-                database.push(mapSpawn);
+                database.save(mapSpawn);
             }
     
             for (MapRating rating : gameMap.getRatings().values()) {
-                NexusAPI.getApi().getPrimaryDatabase().push(rating);
+                NexusAPI.getApi().getPrimaryDatabase().save(rating);
             }
         } catch (SQLException e) {
             e.printStackTrace();

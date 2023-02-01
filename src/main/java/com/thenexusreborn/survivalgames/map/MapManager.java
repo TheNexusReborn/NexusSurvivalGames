@@ -86,7 +86,7 @@ public class MapManager {
             }
     
             for (GameMap map : maps) {
-                plugin.getMapDatabase().pushSilent(map);
+                plugin.getMapDatabase().saveSilent(map);
                 this.gameMaps.add(map);
             }
         }
@@ -110,7 +110,7 @@ public class MapManager {
     }
     
     public void saveToDatabase(GameMap gameMap) {
-        plugin.getMapDatabase().pushSilent(gameMap);
+        plugin.getMapDatabase().saveSilent(gameMap);
     }
     
     public void addMap(GameMap gameMap) {

@@ -454,7 +454,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         }
         
         FileConfiguration config = getConfig();
-        mapDatabase = new Database("mysql", config.getString("mapdatabase.database"), config.getString("mapdatabase.host"), config.getString("mapdatabase.user"), config.getString("mapdatabase.password"), false);
+        mapDatabase = new Database(getLogger(), "mysql", config.getString("mapdatabase.database"), config.getString("mapdatabase.host"), config.getString("mapdatabase.user"), config.getString("mapdatabase.password"), false);
         mapDatabase.registerClass(GameMap.class);
         mapDatabase.registerClass(MapSpawn.class);
         registry.register(mapDatabase);

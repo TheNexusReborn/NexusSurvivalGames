@@ -66,7 +66,7 @@ public class RateMapCmd implements CommandExecutor {
             player.sendMessage(MCUtils.color(MsgType.INFO + "You rated the map &b" + gameMap.getName() + " &ea &b" + rating));
         }
         
-        NexusAPI.getApi().getPrimaryDatabase().pushSilent(mapRating);
+        NexusAPI.getApi().getPrimaryDatabase().saveSilent(mapRating);
         return true;
     }
 }
