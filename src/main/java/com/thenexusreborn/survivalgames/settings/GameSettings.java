@@ -35,6 +35,10 @@ public class GameSettings extends SettingList<GameSetting> {
         return getValue("deathmatch_countdown_length").getAsInt();
     }
     
+    public int getDeathmatchWarmupLength() {
+        return getValue("deathmatch_warmup_length").getAsInt();
+    }
+    
     public int getMaxHealth() {
         return getValue("max_health").getAsInt();
     }

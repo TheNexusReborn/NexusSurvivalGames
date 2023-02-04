@@ -256,6 +256,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         createGameSetting("deathmatch_threshold", "Deathmatch Threshold", "The amount of tributes remaining to start the deathmatch countdown", Type.INTEGER, 2, 2, 24); //Actual Default is 4
         createGameSetting("next_game_timer_length", "Next Game Timer Length", "The time in seconds to start the next game (or auto-restart)", Type.INTEGER, 10);
         createGameSetting("deathmatch_countdown_length", "Deathmatch Countdown Length", "The time in seconds for the deathmatch countdown. This refers to either the threshold being triggered or the end of the game length", Type.INTEGER, 60);
+        createGameSetting("deathmatch_warmup_length", "Deathmatch Warmup Length", "The time in seconds for the deathmatch warmup", Type.INTEGER, 10);
         createGameSetting("mutation_spawn_delay", "Mutation Spawn Delay", "The time in seconds it takes before a mutation spawns.", Type.INTEGER, 10); //This is probably 15 with the Skills system that then can be lowered to 10
         createGameSetting("pass_award_chance", "Pass Award Chance", "The chance to get a mutation pass on a win", Type.DOUBLE, 0.75, 0, 1.0);
         createGameSetting("pass_use_chance", "Pass Use Chance", "The chance for a mutation pass to be used", Type.DOUBLE, 0.99, 0, 1.0);

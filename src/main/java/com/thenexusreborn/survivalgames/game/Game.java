@@ -114,11 +114,11 @@ public class Game {
         if (this.graceperiodTimer != null) {
             this.graceperiodTimer.cancel();
         }
-    
+        
         if (this.ratingPromptTimer != null) {
             this.ratingPromptTimer.cancel();
         }
-    
+        
         if (this.restockTimer != null) {
             this.restockTimer.cancel();
         }
@@ -532,7 +532,7 @@ public class Game {
         } else {
             sendMessage("&6&l>> &d&lTEAMING IS NOT ALLOWED IN THIS GAME.");
         }
-    
+        
         if (gameMap.getSwagShack() != null) {
             Villager entity = (Villager) gameMap.getWorld().spawnEntity(gameMap.getSwagShack().toLocation(gameMap.getWorld()), EntityType.VILLAGER);
             entity.setCustomNameVisible(true);
@@ -630,7 +630,7 @@ public class Game {
             }
         }
         
-        this.timer = new Timer(new DeathmatchCountdownCallback(this)).run(TimeUnit.SECONDS.toMilliseconds(settings.getDeathmatchTimerLength()) + 50L);
+        this.timer = new Timer(new DeathmatchCountdownCallback(this)).run(TimeUnit.SECONDS.toMilliseconds(settings.getDeathmatchWarmupLength()) + 50L);
     }
     
     public void startDeathmatch() {
@@ -768,7 +768,7 @@ public class Game {
                 if (winner.getRank().isNexiteBoost()) {
                     nexites *= multiplier;
                 }
-    
+                
                 String baseMessage = "&2&l>> &a&l" + nexites + " &9&lNEXITES&a&l!";
                 if (multiplier > 1 && winner.getRank().isNexiteBoost()) {
                     winner.sendMessage(baseMessage + multiplierMessage);
@@ -915,7 +915,7 @@ public class Game {
             player.setAllowFlight(true);
             player.setFlying(true);
         }
-    
+        
         boolean deathByLeave = deathInfo.getType() == DeathType.SUICIDE;
         gamePlayer.setSpectatorByDeath(!deathByLeave);
         KillerInfo killer = deathInfo.getKiller();
@@ -927,7 +927,7 @@ public class Game {
         if (score - lost < 0) {
             lost = 0;
         }
-    
+        
         if (!(deathByVanish || deathByLeave)) {
             if (lost > 0) {
                 gamePlayer.changeStat("sg_score", lost, StatOperator.SUBTRACT);
@@ -1032,7 +1032,7 @@ public class Game {
                     if (killer != null && killer.getKiller().equals(damager)) {
                         continue;
                     }
-            
+                    
                     GamePlayer assisterPlayer = getPlayer(damager);
                     assisterPlayer.setAssists(assisterPlayer.getAssists() + 1);
                     assisterPlayer.changeStat("sg_assists", 1, StatOperator.ADD);
