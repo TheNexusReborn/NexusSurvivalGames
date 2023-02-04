@@ -66,7 +66,7 @@ public class StatsCommand implements CommandExecutor {
                     return;
                 }
 
-                sender.sendMessage(MCUtils.color("&6&l>> &aSurvival Games Stats for " + nexusPlayer.getRank() + nexusPlayer.getName()));
+                sender.sendMessage(MCUtils.color("&6&l>> &aSurvival Games Stats for " + nexusPlayer.getRank().getPrefix() + " " + nexusPlayer.getName()));
                 for (Stat stat : nexusPlayer.getStats().findAll()) {
                     String name = stat.getName();
                     if (!name.startsWith("sg_")) {

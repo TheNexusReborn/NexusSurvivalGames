@@ -1,6 +1,5 @@
 package com.thenexusreborn.survivalgames.map;
 
-import com.starmediadev.starsql.annotations.Primary;
 import com.starmediadev.starsql.annotations.column.*;
 import com.starmediadev.starsql.annotations.table.*;
 import com.thenexusreborn.api.storage.codec.StringSetCodec;
@@ -21,7 +20,6 @@ import java.util.zip.*;
 @TableName(value = "sgmaps")
 @TableHandler(GameMapObjectHandler.class)
 public class GameMap {
-    @Primary
     private long id;
     private String url;
     private String name;

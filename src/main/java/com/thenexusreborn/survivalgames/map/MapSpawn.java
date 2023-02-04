@@ -1,6 +1,5 @@
 package com.thenexusreborn.survivalgames.map;
 
-import com.starmediadev.starsql.annotations.Primary;
 import com.starmediadev.starsql.annotations.table.TableName;
 import org.bukkit.*;
 
@@ -8,7 +7,6 @@ import java.util.Objects;
 
 @TableName("sgmapspawns")
 public class MapSpawn implements Comparable<MapSpawn> {
-    @Primary
     private long id; 
     private long mapId;
     private int index = -1;
