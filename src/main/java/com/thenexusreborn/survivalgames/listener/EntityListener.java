@@ -9,6 +9,8 @@ import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.hanging.HangingBreakEvent;
+import org.bukkit.event.hanging.HangingBreakEvent.RemoveCause;
 import org.bukkit.potion.*;
 
 import java.util.*;
@@ -26,6 +28,13 @@ public class EntityListener implements Listener {
     @EventHandler
     public void onEntityExplode(EntityExplodeEvent e) {
         e.setCancelled(true);
+    }
+    
+    @EventHandler
+    public void onHangingBreak(HangingBreakEvent e) {
+        if (plugin.getGame() != null && (e.getCause() == RemoveCause.EXPLOSION || e.getCause() == RemoveCause.ENTITY)) {
+            e.setCancelled(true);
+        }
     }
     
     @EventHandler
