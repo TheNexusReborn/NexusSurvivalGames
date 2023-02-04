@@ -5,6 +5,7 @@ public class AssisterInfo {
     private double credits, xp, nexites;
     
     public AssisterInfo(Game game, GamePlayer player) {
+        this.gamePlayer = player;
         if (game.getSettings().isGiveCredits()) {
             credits = game.getSettings().getAssistCreditGain();
         }
