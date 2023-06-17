@@ -1,9 +1,9 @@
 package com.thenexusreborn.survivalgames.cmd;
 
-import com.starmediadev.starlib.Operator;
+import com.starmediadev.starlib.util.*;
+import com.starmediadev.starlib.util.Value.Type;
+import com.starmediadev.starsql.objects.typehandlers.ValueHandler;
 import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.api.frameworks.value.*;
-import com.thenexusreborn.api.frameworks.value.Value.Type;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.stats.*;
 import com.thenexusreborn.nexuscore.util.*;
@@ -636,7 +636,7 @@ public class SGCommand implements CommandExecutor {
             
             Value value;
             try {
-                value = new ValueCodec().decode(settingInfo.getDefaultValue().getType() + ":" + args[3]);
+                value = (Value) new ValueHandler().getDeserializer().deserialize(null, settingInfo.getDefaultValue().getType() + ":" + args[3]);
             } catch (Exception e) {
                 sender.sendMessage(MCUtils.color(MsgType.WARN + "There was an error parsing the value: " + e.getMessage()));
                 return true;
@@ -762,7 +762,7 @@ public class SGCommand implements CommandExecutor {
                         GameMap finalGameMap = gameMap;
                         plugin.getLobby().setGameMap(finalGameMap);
                         player.sendMessage(MCUtils.color(MsgType.VERBOSE + "Please wait, downloading the map " + MsgType.VERBOSE.getVariableColor() + finalGameMap.getName() + MsgType.VERBOSE.getBaseColor() + "."));
-                        NexusAPI.getApi().getThreadFactory().runAsync(() -> {
+                        NexusAPI.getApi().getScheduler().runTaskAsynchronously(() -> {
                             finalGameMap.download(plugin);
                             player.sendMessage(MCUtils.color(MsgType.INFO + "Downloaded the map " + MsgType.INFO.getVariableColor() + finalGameMap.getName() + MsgType.INFO.getBaseColor() + "."));
                         });

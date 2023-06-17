@@ -1,9 +1,9 @@
 package com.thenexusreborn.survivalgames;
 
+import com.starmediadev.starlib.util.Value;
+import com.starmediadev.starlib.util.Value.Type;
 import com.starmediadev.starsql.objects.Database;
 import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.api.frameworks.value.Value;
-import com.thenexusreborn.api.frameworks.value.Value.Type;
 import com.thenexusreborn.api.network.cmd.NetworkCommand;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.registry.*;
@@ -228,10 +228,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         getServer().getPluginManager().registerEvents(new EntityListener(this), this);
         getServer().getPluginManager().registerEvents(new BlockListener(this), this);
-        
-        if (getServer().getPluginManager().getPlugin("Spartan") != null) {
-            getServer().getPluginManager().registerEvents(new AnticheatListener(this), this);
-        }
         
         getLogger().info("Registered Listeners");
     }

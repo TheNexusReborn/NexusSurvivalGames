@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.loot;
 
-import com.starmediadev.starlib.Range;
+import com.starmediadev.starlib.util.Range;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import org.bukkit.Material;
 

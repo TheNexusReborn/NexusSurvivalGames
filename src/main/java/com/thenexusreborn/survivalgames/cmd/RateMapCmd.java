@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.cmd;
 
-import com.starmediadev.starlib.TimeUnit;
+import com.starmediadev.starlib.util.TimeUnit;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.survivalgames.SurvivalGames;

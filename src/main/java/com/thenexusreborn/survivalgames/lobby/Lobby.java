@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.lobby;
 
-import com.starmediadev.starlib.TimeUnit;
+import com.starmediadev.starlib.util.TimeUnit;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.nexuscore.scoreboard.impl.RankTablistHandler;

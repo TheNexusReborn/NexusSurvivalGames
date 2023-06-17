@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.game;
 
-import com.thenexusreborn.api.frameworks.value.Value;
+import com.starmediadev.starlib.util.Value;
 import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.stats.*;

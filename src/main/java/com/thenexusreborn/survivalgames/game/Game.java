@@ -2,9 +2,11 @@ package com.thenexusreborn.survivalgames.game;
 
 import com.google.common.io.*;
 import com.starmediadev.starlib.*;
+import com.starmediadev.starlib.util.*;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.gamearchive.*;
 import com.thenexusreborn.api.helper.*;
+import com.thenexusreborn.api.helper.StringHelper;
 import com.thenexusreborn.api.multicraft.MulticraftAPI;
 import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.api.server.Environment;
@@ -815,7 +817,7 @@ public class Game {
         
         gameInfo.setLength(this.end - this.start);
         
-        NexusAPI.getApi().getThreadFactory().runAsync(() -> {
+        NexusAPI.getApi().getScheduler().runTaskAsynchronously(() -> {
             NexusAPI.getApi().getPrimaryDatabase().saveSilent(gameInfo);
             if (gameInfo.getId() == 0) {
                 sendMessage("&4&l>> &cThere was a database error archiving the game. Please report with date and time.");
@@ -825,7 +827,7 @@ public class Game {
                 
                 if (gameInfo.getId() % 1000 == 0) {
                     for (String p : gameInfo.getPlayers()) {
-                        NexusAPI.getApi().getThreadFactory().runAsync(() -> {
+                        NexusAPI.getApi().getScheduler().runTaskAsynchronously(() -> {
                             NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(p);
                             if (nexusPlayer == null) {
                                 for (CachedPlayer cachedPlayer : NexusAPI.getApi().getPlayerManager().getCachedPlayers().values()) {

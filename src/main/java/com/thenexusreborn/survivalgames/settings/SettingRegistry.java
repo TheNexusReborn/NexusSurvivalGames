@@ -1,7 +1,6 @@
 package com.thenexusreborn.survivalgames.settings;
 
-import com.starmediadev.starlib.Registry;
-import com.thenexusreborn.api.frameworks.value.Value;
+import com.starmediadev.starlib.util.*;
 import com.thenexusreborn.survivalgames.settings.object.Setting;
 import com.thenexusreborn.survivalgames.settings.object.Setting.Info;
 

@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.scoreboard.lobby;
 
-import com.starmediadev.starlib.TimeFormat;
+import com.starmediadev.starlib.util.TimeFormat;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.scoreboard.*;
 import com.thenexusreborn.nexuscore.scoreboard.SpigotScoreboardView;

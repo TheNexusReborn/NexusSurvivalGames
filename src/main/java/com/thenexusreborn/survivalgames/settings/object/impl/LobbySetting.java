@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.settings.object.impl;
 
 import com.starmediadev.starsql.annotations.table.TableName;
-import com.thenexusreborn.api.frameworks.value.Value;
+import com.starmediadev.starlib.util.Value;
 import com.thenexusreborn.survivalgames.settings.object.Setting;
 
 @TableName("sglobbysettings")
