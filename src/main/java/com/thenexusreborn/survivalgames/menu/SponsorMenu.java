@@ -1,23 +1,25 @@
 package com.thenexusreborn.survivalgames.menu;
 
+import com.starmediadev.starui.element.button.Button;
+import com.starmediadev.starui.gui.InventoryGUI;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.stats.StatOperator;
-import com.thenexusreborn.nexuscore.menu.element.button.*;
-import com.thenexusreborn.nexuscore.menu.gui.Menu;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
-import com.thenexusreborn.survivalgames.sponsoring.*;
+import com.thenexusreborn.survivalgames.sponsoring.SponsorCategory;
+import com.thenexusreborn.survivalgames.sponsoring.SponsorManager;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 
-public class SponsorMenu extends Menu {
+public class SponsorMenu extends InventoryGUI {
     public SponsorMenu(SurvivalGames plugin, GamePlayer actor, GamePlayer target) {
-        super(plugin, "sponsor", "&lSponsor " + target.getName(), 1);
+        super(1, "&lSponsor " + target.getName());
         
         int creditCost = plugin.getGame().getSettings().getSponsorCreditCost();
         int scoreCost = plugin.getGame().getSettings().getSponsorScoreCost();
@@ -33,57 +35,47 @@ public class SponsorMenu extends Menu {
             lore.add("&6&lLeft Click &fto use " + creditCost + " &3Credits");
             lore.add("&6&lRight Click &fto use " + scoreCost + " &dScore");
             iconBuilder.lore(lore);
-    
-            Button button = new Button(iconBuilder.build());
-            button.setLeftClickAction(new SponsorAction(plugin, category, actor, target, "credits", creditCost));
-            button.setRightClickAction(new SponsorAction(plugin, category, actor, target, "sg_score", scoreCost));
+            
+            Button button = new Button().creator(p -> iconBuilder.build()).consumer(e -> {
+                String currency;
+                int cost;
+                
+                if (e.getClick() == ClickType.LEFT) {
+                    currency = "credits";
+                    cost = creditCost;
+                } else if (e.getClick() == ClickType.RIGHT) {
+                    currency = "sg_score";
+                    cost = scoreCost;
+                } else {
+                    return;
+                }
+                
+                if (actor.hasSponsored()) {
+                    actor.sendMessage(MsgType.WARN + "You can only sponsor once per game.");
+                    return;
+                }
+
+                if (!actor.isSpectatorByDeath()) {
+                    actor.sendMessage(MsgType.WARN + "You can only sponsor players if you died.");
+                    return;
+                }
+
+                int amount = actor.getStatValue(currency).getAsInt();
+                if (amount < cost) {
+                    actor.sendMessage(MsgType.WARN + "You do not have enough " + NexusAPI.getApi().getStatRegistry().get(currency).getDisplayName() + ".");
+                    return;
+                }
+
+                actor.changeStat(currency, cost, StatOperator.SUBTRACT).push();
+                actor.setSponsored(true);
+
+                Object chosen = category.getEntries().get(new Random().nextInt(category.getEntries().size()));
+                category.apply(Bukkit.getPlayer(target.getUniqueId()), chosen);
+                plugin.getGame().sendMessage("&6&l>> " + target.getColoredName() + " &awas &lSPONSORED &aa(n) &l" + category.getName() + " item &aby " + actor.getColoredName() + "&a!");
+                actor.changeStat("sg_sponsored_others", 1, StatOperator.ADD).push();
+                target.changeStat("sg_sponsors_received", 1, StatOperator.ADD).push();
+            });
             addElement(button);
-        }
-    }
-    
-    private static class SponsorAction implements ButtonAction {
-        
-        private SurvivalGames plugin;
-        private SponsorCategory<?> category;
-        private GamePlayer actor, target;
-        private String currency;
-        private int cost;
-    
-        public SponsorAction(SurvivalGames plugin, SponsorCategory<?> category, GamePlayer actor, GamePlayer target, String currency, int cost) {
-            this.plugin = plugin;
-            this.category = category;
-            this.actor = actor;
-            this.target = target;
-            this.currency = currency;
-            this.cost = cost;
-        }
-    
-        @Override
-        public void onClick(Player player, Menu menu, ClickType click) {
-            if (actor.hasSponsored()) {
-                actor.sendMessage(MsgType.WARN + "You can only sponsor once per game.");
-                return;
-            }
-    
-            if (!actor.isSpectatorByDeath()) {
-                actor.sendMessage(MsgType.WARN + "You can only sponsor players if you died.");
-                return;
-            }
-    
-            int amount = actor.getStatValue(currency).getAsInt();
-            if (amount < cost) {
-                actor.sendMessage(MsgType.WARN + "You do not have enough " + NexusAPI.getApi().getStatRegistry().get(currency).getDisplayName() + ".");
-                return;
-            }
-    
-            actor.changeStat(currency, cost, StatOperator.SUBTRACT).push();
-            actor.setSponsored(true);
-    
-            Object chosen = category.getEntries().get(new Random().nextInt(category.getEntries().size()));
-            category.apply(Bukkit.getPlayer(target.getUniqueId()), chosen);
-            plugin.getGame().sendMessage("&6&l>> " + target.getColoredName() + " &awas &lSPONSORED &aa(n) &l" + category.getName() + " item &aby " + actor.getColoredName() + "&a!");
-            actor.changeStat("sg_sponsored_others", 1, StatOperator.ADD).push();
-            target.changeStat("sg_sponsors_received", 1, StatOperator.ADD).push();
         }
     }
 }

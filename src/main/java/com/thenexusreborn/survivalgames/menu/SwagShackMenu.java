@@ -1,21 +1,26 @@
 package com.thenexusreborn.survivalgames.menu;
 
+import com.starmediadev.starui.element.button.Button;
+import com.starmediadev.starui.gui.InventoryGUI;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.stats.StatOperator;
-import com.thenexusreborn.nexuscore.menu.element.button.*;
-import com.thenexusreborn.nexuscore.menu.gui.Menu;
-import com.thenexusreborn.nexuscore.util.*;
+import com.thenexusreborn.nexuscore.util.MCUtils;
+import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.*;
-import com.thenexusreborn.survivalgames.loot.*;
-import org.bukkit.entity.Player;
+import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.GamePlayer;
+import com.thenexusreborn.survivalgames.loot.Items;
+import com.thenexusreborn.survivalgames.loot.LootItem;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
-public class SwagShackMenu extends Menu {
+public class SwagShackMenu extends InventoryGUI {
     
     public static Set<ShopItem> items = new HashSet<>();
     
@@ -36,7 +41,7 @@ public class SwagShackMenu extends Menu {
     }
     
     public SwagShackMenu(SurvivalGames plugin, Game game, GamePlayer player) {
-        super(plugin, "swagshack", "&lSwag Shack", 3);
+        super(3, "&lSwag Shack");
     
         for (ShopItem item : items) {
             ItemStack itemStack = item.getItem().getItemStack();
@@ -53,38 +58,31 @@ public class SwagShackMenu extends Menu {
             itemMeta.setLore(lore);
             itemStack.setItemMeta(itemMeta);
             
-            Button button = new Button(itemStack);
-            button.setLeftClickAction(new ShopClickListener(player, item.getPointsCost(), "sg_score", itemStack));
-            button.setRightClickAction(new ShopClickListener(player, item.getCreditsCost(), "credits", itemStack));
+            Button button = new Button().creator(p -> itemStack).consumer(e -> {
+                String currency;
+                int cost;
+
+                if (e.getClick() == ClickType.LEFT) {
+                    currency = "credits";
+                    cost = item.getCreditsCost();
+                } else if (e.getClick() == ClickType.RIGHT) {
+                    currency = "sg_score";
+                    cost = item.getPointsCost();
+                } else {
+                    return;
+                }
+                
+                int amount = player.getStatValue(currency).getAsInt();
+                if (amount < cost) {
+                    player.sendMessage(MsgType.WARN + "You do not have enough " + NexusAPI.getApi().getStatRegistry().get(currency).getDisplayName() + " to buy this item.");
+                    return;
+                }
+
+                player.changeStat(currency, cost, StatOperator.SUBTRACT).push();
+                e.getWhoClicked().getInventory().addItem(itemStack);
+            });
             
             setElement(item.getPosition(), button);
-        }
-    }
-    
-    public static class ShopClickListener implements ButtonAction {
-        
-        private GamePlayer player;
-        private int cost;
-        private String currency;
-        private ItemStack itemStack;
-    
-        public ShopClickListener(GamePlayer player, int cost, String currency, ItemStack itemStack) {
-            this.player = player;
-            this.cost = cost;
-            this.currency = currency;
-            this.itemStack = itemStack;
-        }
-    
-        @Override
-        public void onClick(Player p, Menu menu, ClickType click) {
-            int amount = this.player.getStatValue(currency).getAsInt();
-            if (amount < cost) {
-                player.sendMessage(MsgType.WARN + "You do not have enough " + NexusAPI.getApi().getStatRegistry().get(currency).getDisplayName() + " to buy this item.");
-                return;
-            }
-            
-            player.changeStat(currency, cost, StatOperator.SUBTRACT).push();
-            p.getInventory().addItem(itemStack);
         }
     }
     

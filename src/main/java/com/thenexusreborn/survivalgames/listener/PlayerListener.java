@@ -2,6 +2,7 @@ package com.thenexusreborn.survivalgames.listener;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import com.starmediadev.starui.GuiManager;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
@@ -67,9 +68,11 @@ import java.util.stream.Stream;
 
 public class PlayerListener implements Listener {
     private final SurvivalGames plugin;
+    private final GuiManager manager;
     
     public PlayerListener(SurvivalGames plugin) {
         this.plugin = plugin;
+        manager = plugin.getServer().getServicesManager().getRegistration(GuiManager.class).getProvider();
     }
     
     @EventHandler
@@ -138,7 +141,7 @@ public class PlayerListener implements Listener {
                             }
                         } else if (item.getType() == Material.ROTTEN_FLESH) {
                             if (gamePlayer.canMutate()) {
-                                player.openInventory(new MutateGui(plugin, gamePlayer).getInventory());
+                                manager.openGUI(new MutateGui(plugin, gamePlayer), player);
                             }
                         } else if (item.getType() == Material.WATCH) {
                             player.teleport(game.getGameMap().getCenter().toLocation(game.getGameMap().getWorld()));
@@ -493,7 +496,7 @@ public class PlayerListener implements Listener {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        e.getPlayer().openInventory(new SwagShackMenu(plugin, game, gamePlayer).getInventory());
+                        manager.openGUI(new SwagShackMenu(plugin, game, gamePlayer), e.getPlayer());
                     }
                 }.runTaskLater(plugin, 1L);
             }
