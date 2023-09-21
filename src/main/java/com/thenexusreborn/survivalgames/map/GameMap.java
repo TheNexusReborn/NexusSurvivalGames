@@ -128,9 +128,11 @@ public class GameMap {
     }
     
     public boolean download(SurvivalGames plugin) {
-        Path downloadFolder = FileHelper.subPath(plugin.getDataFolder().toPath(), "mapdownloads");
-        FileHelper.createDirectoryIfNotExists(downloadFolder);
-        downloadedZip = FileHelper.downloadFile(url, downloadFolder, getName().toLowerCase().replace("'", "").replace(" ", "_"), true);
+        if (downloadedZip == null || !Files.exists(downloadedZip)) {
+            Path downloadFolder = FileHelper.subPath(plugin.getDataFolder().toPath(), "mapdownloads");
+            FileHelper.createDirectoryIfNotExists(downloadFolder);
+            downloadedZip = FileHelper.downloadFile(url, downloadFolder, getName().toLowerCase().replace("'", "").replace(" ", "_"), true);
+        }
         return true;
     }
     
