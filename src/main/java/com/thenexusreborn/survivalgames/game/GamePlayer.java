@@ -1,12 +1,12 @@
 package com.thenexusreborn.survivalgames.game;
 
-import com.starmediadev.starlib.util.Value;
 import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.stats.*;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
+import me.firestar311.starlib.api.Value;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.*;
 

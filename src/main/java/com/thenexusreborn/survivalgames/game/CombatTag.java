@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.game;
 
-import com.starmediadev.starlib.util.TimeUnit;
 import com.thenexusreborn.survivalgames.SurvivalGames;
+import me.firestar311.starlib.api.time.TimeUnit;
 
 import java.util.UUID;
 

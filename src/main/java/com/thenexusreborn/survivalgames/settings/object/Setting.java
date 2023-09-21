@@ -1,10 +1,13 @@
 package com.thenexusreborn.survivalgames.settings.object;
 
-import com.starmediadev.starlib.util.Value;
-import com.starmediadev.starsql.annotations.column.*;
-import com.starmediadev.starsql.annotations.table.TableName;
-import com.starmediadev.starsql.objects.SqlCodec;
 import com.thenexusreborn.survivalgames.SurvivalGames;
+import me.firestar311.starlib.api.Value;
+import me.firestar311.starsql.api.annotations.column.ColumnCodec;
+import me.firestar311.starsql.api.annotations.column.ColumnName;
+import me.firestar311.starsql.api.annotations.column.ColumnType;
+import me.firestar311.starsql.api.annotations.table.TableName;
+import me.firestar311.starsql.api.objects.SqlCodec;
+
 import java.util.Objects;
 
 public abstract class Setting implements Cloneable {

@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.lobby;
 
-import com.starmediadev.starlib.util.Value;
 import com.thenexusreborn.api.player.*;
+import me.firestar311.starlib.api.Value;
 
 import java.util.UUID;
 

@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.settings.collection;
 
-import com.starmediadev.starlib.util.Value;
 import com.thenexusreborn.survivalgames.settings.object.Setting;
+import me.firestar311.starlib.api.Value;
 
 import java.util.*;
 

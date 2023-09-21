@@ -1,11 +1,12 @@
 package com.thenexusreborn.survivalgames.menu;
 
-import com.starmediadev.starui.GuiManager;
-import com.starmediadev.starui.element.button.Button;
-import com.starmediadev.starui.gui.InventoryGUI;
-import com.thenexusreborn.nexuscore.util.*;
+import com.thenexusreborn.nexuscore.util.MCUtils;
+import com.thenexusreborn.nexuscore.util.SpigotUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
+import me.firestar311.starui.GuiManager;
+import me.firestar311.starui.element.button.Button;
+import me.firestar311.starui.gui.InventoryGUI;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -24,7 +25,7 @@ public class TeamMenu extends InventoryGUI {
                         ItemMeta meta = skull.getItemMeta();
                         meta.setDisplayName(MCUtils.color(player.getDisplayName()));
                         skull.setItemMeta(meta);
-                        Button button = new Button().creator(p -> skull).consumer(e -> manager.openGUI(new PlayerMenu(plugin, player), (Player) e.getWhoClicked()));
+                        Button button = new Button().iconCreator(p -> skull).consumer(e -> manager.openGUI(new PlayerMenu(plugin, player), (Player) e.getWhoClicked()));
                         addElement(button);
                     }
                 }

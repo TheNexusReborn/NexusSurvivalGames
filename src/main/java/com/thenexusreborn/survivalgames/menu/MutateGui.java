@@ -1,8 +1,5 @@
 package com.thenexusreborn.survivalgames.menu;
 
-import com.starmediadev.starui.element.Element;
-import com.starmediadev.starui.element.button.Button;
-import com.starmediadev.starui.gui.InventoryGUI;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.nexuscore.util.MsgType;
@@ -10,6 +7,9 @@ import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.mutations.*;
+import me.firestar311.starui.element.Element;
+import me.firestar311.starui.element.button.Button;
+import me.firestar311.starui.gui.InventoryGUI;
 import org.bukkit.Material;
 
 import java.util.*;
@@ -42,17 +42,17 @@ public class MutateGui extends InventoryGUI {
         int purchasedIndex = 0, availableIndex = 0, lockedIndex = 0;
         
         ItemBuilder glassPane = ItemBuilder.start(Material.STAINED_GLASS_PANE).displayName("&f").data((short) 7);
-        setElement(0, purchasedIndex++, new Element().creator(p -> ItemBuilder.start(Material.EMERALD_BLOCK).displayName("&a&lPurchased").build()));
-        setElement(0, purchasedIndex++, new Element().creator(p -> glassPane.build()));
-        setElement(1, availableIndex++, new Element().creator(p -> ItemBuilder.start(Material.GOLD_BLOCK).displayName("&e&lAvailable").build()));
-        setElement(1, availableIndex++, new Element().creator(p -> glassPane.build()));
-        setElement(2, lockedIndex++, new Element().creator(p -> ItemBuilder.start(Material.REDSTONE_BLOCK).displayName("&4&lLocked").build()));
-        setElement(2, lockedIndex++, new Element().creator(p -> glassPane.build()));
+        setElement(0, purchasedIndex++, new Element().iconCreator(p -> ItemBuilder.start(Material.EMERALD_BLOCK).displayName("&a&lPurchased").build()));
+        setElement(0, purchasedIndex++, new Element().iconCreator(p -> glassPane.build()));
+        setElement(1, availableIndex++, new Element().iconCreator(p -> ItemBuilder.start(Material.GOLD_BLOCK).displayName("&e&lAvailable").build()));
+        setElement(1, availableIndex++, new Element().iconCreator(p -> glassPane.build()));
+        setElement(2, lockedIndex++, new Element().iconCreator(p -> ItemBuilder.start(Material.REDSTONE_BLOCK).displayName("&4&lLocked").build()));
+        setElement(2, lockedIndex++, new Element().iconCreator(p -> glassPane.build()));
     
         //TODO The Item Lore for the different categories
         for (String m : purchased) {
             MutationType type = MutationType.getType(m);
-            Button button = new Button().creator(p -> ItemBuilder.start(type.getIcon()).displayName("&a&l" + type.getDisplayName()).build())
+            Button button = new Button().iconCreator(p -> ItemBuilder.start(type.getIcon()).displayName("&a&l" + type.getDisplayName()).build())
                     .consumer(e -> {
                         Game game = plugin.getGame();
                         if (game == null) {
@@ -133,7 +133,7 @@ public class MutateGui extends InventoryGUI {
         for (String m : available) {
             MutationType type = MutationType.getType(m);
             Button button = new Button()
-                    .creator(p -> ItemBuilder.start(type.getIcon()).displayName("&e&l" + type.getDisplayName()).lore("&eCost: &f" + type.getUnlockCost() + " &3Credits", "&6&lLeft Click &fto purchase.").build())
+                    .iconCreator(p -> ItemBuilder.start(type.getIcon()).displayName("&e&l" + type.getDisplayName()).lore("&eCost: &f" + type.getUnlockCost() + " &3Credits", "&6&lLeft Click &fto purchase.").build())
                     .consumer(e -> {
                         player.removeCredits(type.getUnlockCost());
                         UnlockedMutation unlockedMutation = new UnlockedMutation(player.getUniqueId(), type.getId(), System.currentTimeMillis());
@@ -148,7 +148,7 @@ public class MutateGui extends InventoryGUI {
     
         for (String m : locked) {
             MutationType type = MutationType.getType(m);
-            Element element = new Element().creator(p -> ItemBuilder.start(type.getIcon()).displayName("&c&l" + type.getDisplayName()).lore("&eCost: &f" + type.getUnlockCost() + " &3Credits").build());
+            Element element = new Element().iconCreator(p -> ItemBuilder.start(type.getIcon()).displayName("&c&l" + type.getDisplayName()).lore("&eCost: &f" + type.getUnlockCost() + " &3Credits").build());
             setElement(2, lockedIndex++, element);
         }
     }

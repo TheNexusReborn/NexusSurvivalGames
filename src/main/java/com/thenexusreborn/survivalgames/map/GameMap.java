@@ -1,7 +1,5 @@
 package com.thenexusreborn.survivalgames.map;
 
-import com.starmediadev.starsql.annotations.column.*;
-import com.starmediadev.starsql.annotations.table.*;
 import com.thenexusreborn.api.storage.codec.StringSetCodec;
 import com.thenexusreborn.api.helper.FileHelper;
 import com.thenexusreborn.nexuscore.data.codec.PositionCodec;
@@ -9,6 +7,11 @@ import com.thenexusreborn.nexuscore.util.Position;
 import com.thenexusreborn.nexuscore.util.region.Cuboid;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.data.handler.GameMapObjectHandler;
+import me.firestar311.starsql.api.annotations.column.ColumnCodec;
+import me.firestar311.starsql.api.annotations.column.ColumnIgnored;
+import me.firestar311.starsql.api.annotations.column.ColumnType;
+import me.firestar311.starsql.api.annotations.table.TableHandler;
+import me.firestar311.starsql.api.annotations.table.TableName;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 

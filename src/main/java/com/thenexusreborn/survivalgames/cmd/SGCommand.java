@@ -1,8 +1,5 @@
 package com.thenexusreborn.survivalgames.cmd;
 
-import com.starmediadev.starlib.util.*;
-import com.starmediadev.starlib.util.Value.Type;
-import com.starmediadev.starsql.objects.typehandlers.ValueHandler;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.stats.*;
@@ -16,7 +13,11 @@ import com.thenexusreborn.survivalgames.settings.SettingRegistry;
 import com.thenexusreborn.survivalgames.settings.collection.SettingList;
 import com.thenexusreborn.survivalgames.settings.object.Setting;
 import com.thenexusreborn.survivalgames.settings.object.Setting.Info;
+import com.thenexusreborn.survivalgames.util.Operator;
 import com.thenexusreborn.survivalgames.util.SGUtils;
+import me.firestar311.starlib.api.Value;
+import me.firestar311.starlib.api.Value.Type;
+import me.firestar311.starsql.api.objects.typehandlers.ValueHandler;
 import net.md_5.bungee.api.chat.*;
 import net.md_5.bungee.api.chat.HoverEvent.Action;
 import org.bukkit.*;
@@ -28,6 +29,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
+
+import static me.firestar311.starlib.api.Value.Type.*;
 
 public class SGCommand implements CommandExecutor {
     
@@ -604,7 +607,7 @@ public class SGCommand implements CommandExecutor {
                     default -> null;
                 };
                 
-                for (Info setting : settingRegistry.getObjects()) {
+                for (Info setting : settingRegistry.getRegisteredObjects().values()) {
                     TextComponent component = new TextComponent(TextComponent.fromLegacyText(MCUtils.color(" &8- &a" + setting.getName())));
                     StringBuilder sb = new StringBuilder();
                     sb.append("&dName: &e").append(setting.getDisplayName()).append("\n");
@@ -650,7 +653,7 @@ public class SGCommand implements CommandExecutor {
             Value minValue = settingInfo.getMinValue();
             Value maxValue = settingInfo.getMaxValue();
             if (minValue != null && maxValue != null) {
-                if (List.of(Type.INTEGER, Type.DOUBLE, Type.LONG).contains(value.getType())) {
+                if (List.of(INTEGER, Type.DOUBLE, Type.LONG).contains(value.getType())) {
                     boolean lowerInBounds, upperInBounds;
                     if (value.getType() == Type.INTEGER) {
                         lowerInBounds = value.getAsInt() >= minValue.getAsInt();

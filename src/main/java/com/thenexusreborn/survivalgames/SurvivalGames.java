@@ -2,36 +2,55 @@ package com.thenexusreborn.survivalgames;
 
 import com.starmediadev.starlib.util.Value;
 import com.starmediadev.starlib.util.Value.Type;
-import com.starmediadev.starsql.objects.Database;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.network.cmd.NetworkCommand;
 import com.thenexusreborn.api.player.Rank;
-import com.thenexusreborn.api.registry.*;
+import com.thenexusreborn.api.registry.DatabaseRegistry;
+import com.thenexusreborn.api.registry.NetworkCommandRegistry;
+import com.thenexusreborn.api.registry.StatRegistry;
+import com.thenexusreborn.api.registry.ToggleRegistry;
 import com.thenexusreborn.api.stats.StatType;
 import com.thenexusreborn.nexuscore.NexusCore;
 import com.thenexusreborn.nexuscore.api.NexusSpigotPlugin;
 import com.thenexusreborn.nexuscore.util.ServerProperties;
 import com.thenexusreborn.survivalgames.cmd.*;
 import com.thenexusreborn.survivalgames.game.Game;
-import com.thenexusreborn.survivalgames.listener.*;
+import com.thenexusreborn.survivalgames.listener.BlockListener;
+import com.thenexusreborn.survivalgames.listener.EntityListener;
+import com.thenexusreborn.survivalgames.listener.PlayerListener;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.loot.LootManager;
-import com.thenexusreborn.survivalgames.map.*;
-import com.thenexusreborn.survivalgames.mutations.*;
-import com.thenexusreborn.survivalgames.settings.*;
+import com.thenexusreborn.survivalgames.map.GameMap;
+import com.thenexusreborn.survivalgames.map.MapManager;
+import com.thenexusreborn.survivalgames.map.MapRating;
+import com.thenexusreborn.survivalgames.map.MapSpawn;
+import com.thenexusreborn.survivalgames.mutations.PlayerMutations;
+import com.thenexusreborn.survivalgames.mutations.UnlockedMutation;
+import com.thenexusreborn.survivalgames.settings.GameSettings;
+import com.thenexusreborn.survivalgames.settings.LobbySettings;
+import com.thenexusreborn.survivalgames.settings.SettingRegistry;
 import com.thenexusreborn.survivalgames.settings.object.Setting;
 import com.thenexusreborn.survivalgames.settings.object.Setting.Info;
+import com.thenexusreborn.survivalgames.settings.object.enums.ColorMode;
 import com.thenexusreborn.survivalgames.settings.object.enums.Time;
-import com.thenexusreborn.survivalgames.settings.object.enums.*;
-import com.thenexusreborn.survivalgames.settings.object.impl.*;
+import com.thenexusreborn.survivalgames.settings.object.enums.Weather;
+import com.thenexusreborn.survivalgames.settings.object.impl.GameSetting;
+import com.thenexusreborn.survivalgames.settings.object.impl.LobbySetting;
 import com.thenexusreborn.survivalgames.threads.ServerStatusThread;
 import com.thenexusreborn.survivalgames.threads.game.*;
 import com.thenexusreborn.survivalgames.threads.lobby.*;
-import org.bukkit.*;
-import org.bukkit.configuration.file.*;
+import me.firestar311.starsql.api.objects.SQLDatabase;
+import me.firestar311.starsql.mysql.MySQLDatabase;
+import me.firestar311.starsql.mysql.MySQLProperties;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
-import java.sql.*;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.*;
 
 public class SurvivalGames extends NexusSpigotPlugin {
@@ -54,7 +73,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
     private final Map<String, LobbySettings> lobbySettings = new HashMap<>();
     private final Map<String, GameSettings> gameSettings = new HashMap<>();
-    private Database mapDatabase;
+    private SQLDatabase mapDatabase;
     
     private final Map<UUID, PlayerMutations> playerUnlockedMutations = new HashMap<>();
     
@@ -95,7 +114,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
         getLogger().info("Loading Game and Lobby Settings");
     
-        Database database = NexusAPI.getApi().getPrimaryDatabase();
+        SQLDatabase database = NexusAPI.getApi().getPrimaryDatabase();
         try {
             List<Info> settingInfos = database.get(Info.class);
             settingInfos.forEach(settingInfo -> {
@@ -408,7 +427,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         this.restart = restart;
     }
     
-    public Database getMapDatabase() {
+    public SQLDatabase getMapDatabase() {
         return this.mapDatabase;
     }
     
@@ -430,7 +449,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
 
     @Override
     public void registerNetworkCommands(NetworkCommandRegistry registry) {
-        registry.register(new NetworkCommand("unlockmutation", (cmd, origin, args) -> {
+        registry.register("unlockmutation", new NetworkCommand("unlockmutation", (cmd, origin, args) -> {
             UUID uuid = UUID.fromString(args[0]);
             String type = args[1];
             long timestamp = Long.parseLong(args[2]);
@@ -440,7 +459,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
 
     @Override
     public void registerDatabases(DatabaseRegistry registry) {
-        for (Database database : registry.getObjects()) {
+        for (SQLDatabase database : registry.getRegisteredObjects().values()) {
             if (database.isPrimary()) {
                 database.registerClass(Setting.Info.class);
                 database.registerClass(GameSetting.class);
@@ -451,7 +470,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         }
         
         FileConfiguration config = getConfig();
-        mapDatabase = new Database(getLogger(), "mysql", config.getString("mapdatabase.database"), config.getString("mapdatabase.host"), config.getString("mapdatabase.user"), config.getString("mapdatabase.password"), false);
+        mapDatabase = new MySQLDatabase(getLogger(), new MySQLProperties().setDatabaseName(config.getString("mapdatabase.database")).setHost(config.getString("mapdatabase.host")).setUsername(config.getString("mapdatabase.user")).setPassword(config.getString("mapdatabase.password")));
         mapDatabase.registerClass(GameMap.class);
         mapDatabase.registerClass(MapSpawn.class);
         registry.register(mapDatabase);

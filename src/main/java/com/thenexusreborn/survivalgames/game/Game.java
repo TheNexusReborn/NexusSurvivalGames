@@ -1,8 +1,6 @@
 package com.thenexusreborn.survivalgames.game;
 
 import com.google.common.io.*;
-import com.starmediadev.starlib.*;
-import com.starmediadev.starlib.util.*;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.gamearchive.*;
 import com.thenexusreborn.api.helper.*;
@@ -31,6 +29,8 @@ import com.thenexusreborn.survivalgames.scoreboard.game.GameBoard;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.sponsoring.SponsorManager;
 import com.thenexusreborn.survivalgames.util.SGUtils;
+import me.firestar311.starlib.api.time.TimeFormat;
+import me.firestar311.starlib.api.time.TimeUnit;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
