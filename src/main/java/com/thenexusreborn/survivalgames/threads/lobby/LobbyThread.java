@@ -6,6 +6,7 @@ import com.thenexusreborn.nexuscore.util.ServerProperties;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.*;
 import com.thenexusreborn.survivalgames.util.SGUtils;
+import me.firestar311.starlib.api.time.TimeUnit;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 
@@ -72,7 +73,7 @@ public class LobbyThread extends NexusThread<SurvivalGames> {
         if (!(plugin.getLobby().getState() == LobbyState.WAITING || plugin.getLobby().getState() == LobbyState.MAP_EDITING)) {
             if (lobby.getTimer() == null) {
                 resetLobby = true;
-            } else if (lobby.getTimer().getSecondsLeft() <= 0) {
+            } else if (TimeUnit.SECONDS.fromMillis(lobby.getTimer().getTime()) <= 0) {
                 resetLobby = true;
             }
             

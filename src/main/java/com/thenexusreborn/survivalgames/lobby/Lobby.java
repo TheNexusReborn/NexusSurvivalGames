@@ -1,21 +1,35 @@
 package com.thenexusreborn.survivalgames.lobby;
 
 import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.api.player.*;
+import com.thenexusreborn.api.player.NexusPlayer;
+import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.nexuscore.scoreboard.impl.RankTablistHandler;
-import com.thenexusreborn.nexuscore.util.*;
+import com.thenexusreborn.nexuscore.util.MCUtils;
+import com.thenexusreborn.nexuscore.util.MsgType;
+import com.thenexusreborn.nexuscore.util.ProgressBar;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
-import com.thenexusreborn.nexuscore.util.timer.Timer;
-import com.thenexusreborn.survivalgames.*;
-import com.thenexusreborn.survivalgames.game.*;
-import com.thenexusreborn.survivalgames.loot.*;
-import com.thenexusreborn.survivalgames.map.*;
-import com.thenexusreborn.survivalgames.scoreboard.lobby.*;
-import com.thenexusreborn.survivalgames.settings.*;
+import com.thenexusreborn.survivalgames.ControlType;
+import com.thenexusreborn.survivalgames.SurvivalGames;
+import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.GamePlayer;
+import com.thenexusreborn.survivalgames.lobby.timer.LobbyTimerCallback;
+import com.thenexusreborn.survivalgames.loot.LootManager;
+import com.thenexusreborn.survivalgames.loot.LootTable;
+import com.thenexusreborn.survivalgames.map.GameMap;
+import com.thenexusreborn.survivalgames.map.MapRating;
+import com.thenexusreborn.survivalgames.scoreboard.lobby.DebugLobbyBoard;
+import com.thenexusreborn.survivalgames.scoreboard.lobby.LobbyBoard;
+import com.thenexusreborn.survivalgames.scoreboard.lobby.MapEditingBoard;
+import com.thenexusreborn.survivalgames.settings.GameSettings;
+import com.thenexusreborn.survivalgames.settings.LobbySettings;
+import me.firestar311.starclock.api.clocks.Timer;
 import me.firestar311.starlib.api.time.TimeUnit;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.*;
+import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ClickEvent.Action;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -27,6 +41,7 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("DuplicatedCode")
 public class Lobby {
     private final SurvivalGames plugin;
     private ControlType controlType = ControlType.MANUAL;
@@ -43,11 +58,11 @@ public class Lobby {
     private final List<StatSign> statSigns = new ArrayList<>();
     private final List<TributeSign> tributeSigns = new ArrayList<>();
     private boolean debugMode;
-    
+
     public Lobby(SurvivalGames plugin) {
         this.plugin = plugin;
         plugin.getLogger().info("Setting up the lobby.");
-        
+
         if (plugin.getConfig().contains("mapsigns")) {
             plugin.getLogger().info("Loading Map Signs");
             ConfigurationSection signsSection = plugin.getConfig().getConfigurationSection("mapsigns");
@@ -62,7 +77,7 @@ public class Lobby {
             }
             plugin.getLogger().info("Map Signs Loaded");
         }
-        
+
         if (plugin.getConfig().contains("statsigns")) {
             plugin.getLogger().info("Loading Stat Signs");
             ConfigurationSection signsSection = plugin.getConfig().getConfigurationSection("statsigns");
@@ -76,7 +91,7 @@ public class Lobby {
                 this.statSigns.add(new StatSign(location, key, displayName));
             }
         }
-        
+
         if (plugin.getConfig().contains("tributesigns")) {
             plugin.getLogger().info("Loading Tribute Signs");
             ConfigurationSection signsSection = plugin.getConfig().getConfigurationSection("tributesigns");
@@ -86,40 +101,40 @@ public class Lobby {
                 int signX = signsSection.getInt(key + ".sign.x");
                 int signY = signsSection.getInt(key + ".sign.y");
                 int signZ = signsSection.getInt(key + ".sign.z");
-                
+
                 int headX = signsSection.getInt(key + ".head.x");
                 int headY = signsSection.getInt(key + ".head.y");
                 int headZ = signsSection.getInt(key + ".head.z");
-                
+
                 Location signLocation = new Location(world, signX, signY, signZ);
                 Location headLocation = new Location(world, headX, headY, headZ);
-                
+
                 TributeSign tributeSign = new TributeSign(index, signLocation, headLocation);
                 this.tributeSigns.add(tributeSign);
             }
         }
-        
+
         this.lobbySettings = plugin.getLobbySettings("default");
         this.gameSettings = plugin.getGameSettings("default");
-        
+
         generateMapOptions();
-        
+
         for (LootTable lootTable : LootManager.getInstance().getLootTables()) {
             lootTable.generateNewProbabilities(new Random());
         }
     }
-    
+
     public void resetInvalidState() {
         NexusAPI.logMessage(Level.SEVERE, "Resetting Lobby from an Invalid State, see below for the stored information", this + "");
-        
+
         this.players.entrySet().removeIf(entry -> Bukkit.getPlayer(entry.getKey()) == null);
-        
+
         this.players.values().forEach(player -> {
             player.setSpectating(false);
             player.setMapVote(-1);
             player.setVoteStart(false);
         });
-        
+
         sendMessage(MsgType.ERROR + "Resetting lobby from an Invalid State...");
         this.timer = null;
         this.gameMap = null;
@@ -128,7 +143,7 @@ public class Lobby {
         this.forceStarted = false;
         sendMessage(MsgType.SUCCESS + "Lobby Reset from Invalid State complete");
     }
-    
+
     public void sendMapOptions(NexusPlayer nexusPlayer) {
         nexusPlayer.sendMessage(MsgType.INFO + "&e&lVOTING OPTIONS - &7Click an option to vote!");
         for (Entry<Integer, GameMap> entry : mapOptions.entrySet()) {
@@ -144,35 +159,35 @@ public class Lobby {
             }
             String creators = creatorBuilder.substring(0, creatorBuilder.length() - 2);
             String votesText = " (" + getTotalMapVotes(entry.getKey()) + " votes)";
-            
+
             ComponentBuilder builder = new ComponentBuilder("").append("> ").color(ChatColor.GOLD).bold(true)
                     .append(entry.getKey() + "").color(ChatColor.RED).bold(true).append(": ").color(ChatColor.DARK_RED).bold(false)
                     .append(mapName).color(ChatColor.AQUA).append(" by ").color(ChatColor.GRAY).italic(true)
                     .append(creators).italic(false).color(ChatColor.DARK_AQUA).append(votesText).color(ChatColor.GRAY).italic(true);
-            
+
             TextComponent line = new TextComponent(builder.create());
             line.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/mapvote " + entry.getKey()));
             line.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to vote").create()));
-            
+
             Bukkit.getPlayer(nexusPlayer.getUniqueId()).spigot().sendMessage(line);
         }
     }
-    
+
     public Map<Integer, GameMap> getMapOptions() {
         return mapOptions;
     }
-    
+
     public void handleShutdown() {
         this.state = LobbyState.SHUTTING_DOWN;
         sendMessage("&4&l>> THE SERVER IS SHUTTING DOWN!");
         if (timer != null) {
             timer.cancel();
         }
-        
+
         if (gameMap != null) {
             gameMap.delete(plugin);
         }
-        
+
         FileConfiguration config = plugin.getConfig();
         this.mapSigns.forEach((position, location) -> {
             config.set("mapsigns." + position + ".world", location.getWorld().getName());
@@ -180,7 +195,7 @@ public class Lobby {
             config.set("mapsigns." + position + ".y", location.getBlockY());
             config.set("mapsigns." + position + ".z", location.getBlockZ());
         });
-        
+
         this.statSigns.forEach(statSign -> {
             Location location = statSign.getLocation();
             config.set("statsigns." + statSign.getStat() + ".world", location.getWorld().getName());
@@ -189,11 +204,11 @@ public class Lobby {
             config.set("statsigns." + statSign.getStat() + ".z", location.getBlockZ());
             config.set("statsigns." + statSign.getStat() + ".displayName", statSign.getDisplayName());
         });
-        
+
         this.tributeSigns.forEach(tributeSign -> {
             Location sl = tributeSign.getSignLocation();
             Location hl = tributeSign.getHeadLocation();
-            
+
             config.set("tributesigns." + tributeSign.getIndex() + ".world", sl.getWorld().getName());
             config.set("tributesigns." + tributeSign.getIndex() + ".sign.x", sl.getBlockX());
             config.set("tributesigns." + tributeSign.getIndex() + ".sign.y", sl.getBlockY());
@@ -203,18 +218,17 @@ public class Lobby {
             config.set("tributesigns." + tributeSign.getIndex() + ".head.z", hl.getBlockZ());
         });
     }
-    
+
     public List<LobbyPlayer> getPlayers() {
         return new ArrayList<>(this.players.values());
     }
-    
+
     public void generateMapOptions() {
         plugin.getLogger().info("Generating Map Options");
         this.mapOptions.clear();
-        
+
         getPlayers().forEach(player -> player.setMapVote(-1));
-        
-        
+
         if (plugin.getMapManager().getMaps().size() == 1 && this.mapSigns.size() == 1) {
             this.mapOptions.put(1, plugin.getMapManager().getMaps().get(0));
         } else if (plugin.getMapManager().getMaps().size() >= this.mapSigns.size()) {
@@ -231,81 +245,83 @@ public class Lobby {
             }
         }
     }
-    
+
     public boolean checkMapEditing(Player player) {
         if (this.state == LobbyState.MAP_EDITING) {
             return !player.getWorld().getName().equalsIgnoreCase(this.spawnpoint.getWorld().getName());
         }
-        
+
         return false;
     }
-    
+
     public SurvivalGames getPlugin() {
         return plugin;
     }
-    
+
     public void sendMessage(String message) {
         for (LobbyPlayer player : getPlayers()) {
             player.sendMessage(message);
         }
         Bukkit.getConsoleSender().sendMessage(MCUtils.color(message));
     }
-    
+
     public void editMaps() {
         this.state = LobbyState.MAP_EDITING;
         if (timer != null) {
             this.timer.cancel();
             this.timer = null;
         }
-        
+
         for (LobbyPlayer player : this.getPlayers()) {
             player.getPlayer().getScoreboard().setView(new MapEditingBoard(player.getPlayer().getScoreboard(), plugin));
         }
-        
+
         sendMessage("&eThe lobby has been set to editing maps. Automatic actions are temporarily suspended");
     }
-    
+
     public void stopEditingMaps() {
         this.state = LobbyState.WAITING;
-        
+
         for (LobbyPlayer player : this.getPlayers()) {
             player.getPlayer().getScoreboard().setView(new LobbyBoard(player.getPlayer().getScoreboard(), this));
         }
-        
+
         sendMessage("&eThe lobby has been set to no longer editing maps. Automatic actions resumed.");
     }
-    
+
     public void automatic() {
         this.controlType = ControlType.AUTOMATIC;
     }
-    
+
     public void manual() {
         this.controlType = ControlType.MANUAL;
         if (this.timer != null) {
             this.timer.cancel();
             this.timer = null;
         }
+
         this.state = LobbyState.WAITING;
     }
-    
+
     public void startTimer() {
         this.state = LobbyState.COUNTDOWN;
-        this.timer = new Timer(new LobbyTimerCallback(this)).run(TimeUnit.SECONDS.toMilliseconds(lobbySettings.getTimerLength()) + 50);
+        this.timer = NexusAPI.getApi().getClockManager().createTimer(TimeUnit.SECONDS.toMilliseconds(lobbySettings.getTimerLength()) + 50L);
+        this.timer.addCallback(new LobbyTimerCallback(this), TimeUnit.SECONDS.toMilliseconds(1));
     }
-    
+
     private int getVoteCount(int position, UUID uuid) {
         NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(uuid);
         if (nexusPlayer == null) {
             return 0;
         }
-        
+
         if (lobbySettings.isVoteWeight()) {
             return (int) nexusPlayer.getRank().getMultiplier();
         } else {
             return 1;
         }
     }
-    
+
     public int getTotalMapVotes(int position) {
         int votes = 0;
         for (LobbyPlayer player : getPlayers()) {
@@ -319,7 +335,7 @@ public class Lobby {
         }
         return votes;
     }
-    
+
     public void prepareGame() {
         this.state = LobbyState.PREPARING_GAME;
         int mapVotes = 0;
@@ -338,7 +354,7 @@ public class Lobby {
                     }
                 }
             }
-            
+
             if (mostVoted == null) {
                 this.gameMap = new ArrayList<>(this.mapOptions.values()).get(new Random().nextInt(this.mapOptions.size()));
                 this.gameMap.setVotes(0);
@@ -348,12 +364,12 @@ public class Lobby {
                 this.gameMap.setVotes(mostVotedVotes);
             }
         }
-        
+
         sendMessage("");
         sendMessage("&6&l>> &a&lTHE MAP HAS BEEN SELECTED!");
         sendMessage("&6&l> &7Map: &e" + gameMap.getName());
         int totalRatings = gameMap.getRatings().size();
-        
+
         String ratingMsg;
         if (totalRatings == 0) {
             ratingMsg = "&cNo Ratings Yet";
@@ -362,14 +378,14 @@ public class Lobby {
             for (MapRating playerRating : gameMap.getRatings().values()) {
                 rating += playerRating.getRating();
             }
-            
+
             ratingMsg = "&7Rating: " + new ProgressBar(rating / totalRatings, rating, 5, "✦ ", "&a", "&7").display() + " &7&o(rating: " + rating / totalRatings + " star(s), based on: " + totalRatings + " vote(s))";
         }
-        
+
         sendMessage("&6&l> " + ratingMsg);
         sendMessage("&6&l> &7Votes: &e" + gameMap.getVotes());
         sendMessage("");
-        
+
         Game game = new Game(gameMap, this.gameSettings, getPlayers());
         this.players.clear();
         plugin.setGame(game);
@@ -384,75 +400,74 @@ public class Lobby {
             this.state = LobbyState.GAME_PREPARED;
         }
     }
-    
+
     public void resetLobby() {
         this.state = LobbyState.SETUP;
         this.players.clear();
         if (timer != null) {
-            if (timer.isRunning()) {
-                timer.cancel();
-            }
+            timer.cancel();
         }
+
         this.timer = null;
         this.gameMap = null;
         this.state = LobbyState.WAITING;
         this.forceStarted = false;
         generateMapOptions();
     }
-    
+
     public Timer getTimer() {
         return timer;
     }
-    
+
     public GameSettings getGameSettings() {
         return gameSettings;
     }
-    
+
     public LobbySettings getLobbySettings() {
         return lobbySettings;
     }
-    
+
     public GameMap getGameMap() {
         return gameMap;
     }
-    
+
     public void addPlayer(NexusPlayer nexusPlayer) {
         if (nexusPlayer == null) {
             return;
         }
-        
+
         if (nexusPlayer.getPlayer() == null) {
             return;
         }
-        
+
         this.players.put(nexusPlayer.getUniqueId(), new LobbyPlayer(nexusPlayer));
-        
+
         int totalPlayers = 0;
         for (LobbyPlayer player : getPlayers()) {
             if (player.isSpectating()) {
                 continue;
             }
-            
+
             totalPlayers++;
         }
-        
+
         if (totalPlayers > lobbySettings.getMaxPlayers()) {
             nexusPlayer.sendMessage("&eYou will be a spectator in the game as you joined with the player count above the maximum game amount. However, you can be a tribute if those before you leave or become spectators");
         }
-        
+
         Player player = Bukkit.getPlayer(nexusPlayer.getUniqueId());
-        
+
         Location spawn = getSpawnpoint().clone();
         spawn.setY(spawn.getY() + 2);
         player.teleport(spawn);
         player.setMaxHealth(20);
         player.setLevel(0);
-        
+
         for (Player online : Bukkit.getOnlinePlayers()) {
             online.showPlayer(player);
             player.showPlayer(online);
         }
-        
+
         if (nexusPlayer.getToggleValue("vanish")) {
             for (Player p : Bukkit.getOnlinePlayers()) {
                 LobbyPlayer psp = this.players.get(p.getUniqueId());
@@ -475,7 +490,7 @@ public class Lobby {
         } else {
             sendMessage("&a&l>> " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined.");
         }
-        
+
         boolean joiningPlayerStaff = nexusPlayer.getRank().ordinal() <= Rank.HELPER.ordinal();
         for (Player p : Bukkit.getOnlinePlayers()) {
             LobbyPlayer psp = this.players.get(p.getUniqueId());
@@ -485,7 +500,7 @@ public class Lobby {
                 }
             }
         }
-        
+
         player.setHealth(player.getMaxHealth());
         player.setGameMode(GameMode.SURVIVAL);
         if (this.getState() != LobbyState.MAP_EDITING) {
@@ -494,17 +509,17 @@ public class Lobby {
             for (PotionEffect pe : player.getActivePotionEffects()) {
                 player.removePotionEffect(pe.getType());
             }
-            
+
             boolean sponsors = nexusPlayer.getToggleValue("allowsponsors");
             Material sponsorsItemMaterial = sponsors ? Material.GLOWSTONE_DUST : Material.SULPHUR;
             player.getInventory().setItem(0, ItemBuilder.start(sponsorsItemMaterial).displayName("&e&lSponsors &7&o(Right click to toggle)").build());
             player.getInventory().setItem(8, ItemBuilder.start(Material.WOOD_DOOR).displayName("&e&lReturn to Hub &7(Right Click)").build());
         }
-        
+
         if (nexusPlayer.getRank().ordinal() <= Rank.DIAMOND.ordinal()) {
             player.setAllowFlight(nexusPlayer.getToggleValue("fly"));
         }
-        
+
         if (this.debugMode) {
             nexusPlayer.getScoreboard().setView(new DebugLobbyBoard(nexusPlayer.getScoreboard(), this));
         } else {
@@ -514,7 +529,7 @@ public class Lobby {
         nexusPlayer.setActionBar(new LobbyActionBar(plugin));
         sendMapOptions(nexusPlayer);
     }
-    
+
     public void removePlayer(NexusPlayer nexusPlayer) {
         if (!this.players.containsKey(nexusPlayer.getUniqueId())) {
             return;
@@ -527,7 +542,7 @@ public class Lobby {
             }
             totalPlayers++;
         }
-        
+
         if (nexusPlayer.getToggleValue("vanish")) {
             for (LobbyPlayer snp : getPlayers()) {
                 if (snp.getRank().ordinal() <= Rank.HELPER.ordinal()) {
@@ -543,7 +558,7 @@ public class Lobby {
         } else {
             sendMessage("&c&l<< " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft.");
         }
-        
+
         if (this.state == LobbyState.COUNTDOWN) {
             if (totalPlayers < lobbySettings.getMinPlayers() && !(getVoteStartCount() >= 2)) {
                 if (getPlayers().size() > 1 && !forceStarted) {
@@ -551,45 +566,46 @@ public class Lobby {
                     if (this.timer != null) {
                         this.timer.cancel();
                         this.timer = null;
-                        this.state = LobbyState.WAITING;
                     }
+
+                    this.state = LobbyState.WAITING;
                 }
             }
         }
     }
-    
+
     public ControlType getControlType() {
         return controlType;
     }
-    
+
     public void setControlType(ControlType controlType) {
         this.controlType = controlType;
     }
-    
+
     public LobbyState getState() {
         return state;
     }
-    
+
     public void setState(LobbyState state) {
         this.state = state;
     }
-    
+
     public void addSpectatingPlayer(UUID uuid) {
         this.players.get(uuid).setSpectating(true);
     }
-    
+
     public void removeSpectatingPlayer(UUID uuid) {
         this.players.get(uuid).setSpectating(false);
     }
-    
+
     public List<UUID> getSpectatingPlayers() {
         return getPlayers().stream().filter(LobbyPlayer::isSpectating).map(LobbyPlayer::getUniqueId).collect(Collectors.toList());
     }
-    
+
     public void setGameMap(GameMap gameMap) {
         this.gameMap = gameMap;
     }
-    
+
     public boolean hasPlayer(UUID uniqueId) {
         for (LobbyPlayer player : getPlayers()) {
             if (player.getUniqueId().equals(uniqueId)) {
@@ -598,41 +614,41 @@ public class Lobby {
         }
         return false;
     }
-    
-    public void setTimer(Timer timer) {
+
+    public void setTimer(me.firestar311.starclock.api.clocks.Timer timer) {
         this.timer = timer;
     }
-    
+
     public void fromGame(Game game) {
         if (this.lobbySettings.isKeepPreviousGameSettings()) {
             this.gameSettings = game.getSettings();
         } else {
             this.gameSettings = plugin.getGameSettings("default");
         }
-        
+
         for (GamePlayer player : game.getPlayers().values()) {
             if (player.getNexusPlayer().getPlayer() != null) {
                 addPlayer(player.getNexusPlayer());
             }
         }
-        
+
         game.getPlayers().clear();
         plugin.getGame().getGameMap().delete(plugin);
         plugin.setGame(null);
     }
-    
+
     public Location getSpawnpoint() {
         return this.spawnpoint;
     }
-    
+
     public void setSpawnpoint(Location location) {
         this.spawnpoint = location;
     }
-    
+
     public void setGameSettings(GameSettings gameSettings) {
         this.gameSettings = gameSettings;
     }
-    
+
     public void playSound(Sound sound) {
         for (LobbyPlayer player : getPlayers()) {
             Player p = Bukkit.getPlayer(player.getUniqueId());
@@ -641,15 +657,15 @@ public class Lobby {
             }
         }
     }
-    
+
     public Map<Integer, Location> getMapSigns() {
         return mapSigns;
     }
-    
+
     public boolean isPlayer(UUID uniqueId) {
         return this.players.containsKey(uniqueId);
     }
-    
+
     public int getVoteStartCount() {
         int count = 0;
         for (LobbyPlayer player : getPlayers()) {
@@ -657,10 +673,10 @@ public class Lobby {
                 count++;
             }
         }
-        
+
         return count;
     }
-    
+
     public void addStartVote(NexusPlayer player) {
         this.players.get(player.getUniqueId()).setVoteStart(true);
         sendMessage("&6&l>> " + player.getColoredName() + " &evoted to run the game early. &7&o(/votestart)");
@@ -668,34 +684,34 @@ public class Lobby {
         int threshold = getLobbySettings().getVoteStartThreshold();
         int neededVotes = Math.max(threshold - votes, 0);
         sendMessage("&6&l>> &eVotes: &l" + votes + "/" + threshold + " &f(" + neededVotes + " Votes Needed)");
-        
+
         if (this.state != LobbyState.WAITING) {
             return;
         }
-        
+
         if (votes < threshold) {
             return;
         }
-        
+
         if (!getLobbySettings().isAllowVoteStart()) {
             return;
         }
-        
+
         if (getPlayingCount() > getLobbySettings().getVoteStartAvailableThreshold()) {
             return;
         }
-        
+
         sendMessage("&6&l>> &f&lThe game lobby has been started!");
         this.startTimer();
     }
-    
+
     public boolean hasVotedToStart(NexusPlayer player) {
         return this.players.get(player.getUniqueId()).isVoteStart();
     }
-    
+
     public void removeStartVote(UUID uuid) {
         this.players.get(uuid).setVoteStart(false);
-        
+
         if (getVoteStartCount() < getLobbySettings().getVoteStartThreshold()) {
             if (this.timer != null) {
                 sendMessage("&6&l>> &eNot enough votes to start.");
@@ -704,21 +720,21 @@ public class Lobby {
             }
         }
     }
-    
+
     public void addMapVote(NexusPlayer nexusPlayer, Location location) {
         if (plugin.getGame() != null) {
             return;
         }
-        
+
         LobbyPlayer player = this.players.get(nexusPlayer.getUniqueId());
-        
+
         for (Entry<Integer, Location> entry : this.mapSigns.entrySet()) {
             if (entry.getValue().equals(location)) {
                 if (entry.getKey() == player.getMapVote()) {
                     nexusPlayer.sendMessage("&cYou have already voted for this map.");
                     return;
                 }
-                
+
                 if (player.getMapVote() > -1) {
                     player.sendMessage("&6&l>> &eYou changed your vote to &b" + this.mapOptions.get(entry.getKey()).getName());
                 } else {
@@ -729,19 +745,19 @@ public class Lobby {
             }
         }
     }
-    
+
     public void forceStart() {
         this.forceStarted = true;
         this.startTimer();
     }
-    
+
     public boolean isForceStarted() {
         return forceStarted;
     }
-    
+
     public void setLobbySettings(LobbySettings settings) {
         this.lobbySettings = settings;
-        if (this.timer != null && this.timer.isRunning()) {
+        if (this.timer != null) {
             int playerCount = 0;
             for (LobbyPlayer player : getPlayers()) {
                 if (!player.isSpectating()) {
@@ -749,6 +765,8 @@ public class Lobby {
                 }
             }
             
+            this.timer.setLengthAndReset(TimeUnit.SECONDS.toMilliseconds(settings.getTimerLength()));
+
             if (playerCount < this.lobbySettings.getMinPlayers()) {
                 if (!this.forceStarted) {
                     sendMessage("&6&l>> &cNot enough players to start.");
@@ -759,7 +777,7 @@ public class Lobby {
             }
         }
     }
-    
+
     public int getPlayingCount() {
         int playerCount = 0;
         for (LobbyPlayer player : getPlayers()) {
@@ -769,33 +787,33 @@ public class Lobby {
         }
         return playerCount;
     }
-    
+
     public List<StatSign> getStatSigns() {
         return statSigns;
     }
-    
+
     public List<TributeSign> getTributeSigns() {
         return tributeSigns;
     }
-    
+
     public boolean isDebugMode() {
         return debugMode;
     }
-    
+
     public void enableDebug() {
         this.debugMode = true;
         for (LobbyPlayer player : this.getPlayers()) {
             player.getPlayer().getScoreboard().setView(new DebugLobbyBoard(player.getPlayer().getScoreboard(), this));
         }
     }
-    
+
     public void disableDebug() {
         this.debugMode = false;
         for (LobbyPlayer player : this.getPlayers()) {
             player.getPlayer().getScoreboard().setView(new LobbyBoard(player.getPlayer().getScoreboard(), this));
         }
     }
-    
+
     @Override
     public String toString() {
         return "Lobby{" +
@@ -816,7 +834,7 @@ public class Lobby {
                 ", debugMode=" + debugMode +
                 '}';
     }
-    
+
     public void recalculateVisibility() {
         for (LobbyPlayer player : this.getPlayers()) {
             Player bukkitPlayer = Bukkit.getPlayer(player.getUniqueId());

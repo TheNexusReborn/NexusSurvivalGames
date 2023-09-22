@@ -957,13 +957,13 @@ public class SGCommand implements CommandExecutor {
                 return true;
             }
             
-            Timer timer;
+            Timer timer = null;
             String timerType;
             if (game != null) {
                 timer = game.getTimer();
                 timerType = "game";
             } else {
-                timer = plugin.getLobby().getTimer();
+                //TODO timer = plugin.getLobby().getTimer();
                 timerType = "lobby";
             }
             

@@ -45,8 +45,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
-import java.sql.Driver;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -91,15 +89,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
     @Override
     public void onEnable() {
         getLogger().info("Loading NexusSurvivalGames v" + getDescription().getVersion());
-        try {
-            Driver mysqlDriver = new com.mysql.cj.jdbc.Driver();
-            DriverManager.registerDriver(mysqlDriver);
-        } catch (SQLException e) {
-            getLogger().severe("Error while loading the MySQL driver, disabling plugin");
-            e.printStackTrace();
-            return;
-        }
-        
         saveDefaultConfig();
         
         deathMessagesFile = new File(getDataFolder(), "deathmessages.yml");
@@ -454,7 +443,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
     @Override
     public void registerDatabases(DatabaseRegistry registry) {
         for (SQLDatabase database : registry.getRegisteredObjects().values()) {
-            if (database.isPrimary()) {
+            if (database.getName().toLowerCase().contains("nexus")) { //TODO Temporary
                 database.registerClass(Setting.Info.class);
                 database.registerClass(GameSetting.class);
                 database.registerClass(LobbySetting.class);
