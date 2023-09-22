@@ -1,7 +1,5 @@
 package com.thenexusreborn.survivalgames;
 
-import com.starmediadev.starlib.util.Value;
-import com.starmediadev.starlib.util.Value.Type;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.network.cmd.NetworkCommand;
 import com.thenexusreborn.api.player.Rank;
@@ -39,9 +37,8 @@ import com.thenexusreborn.survivalgames.settings.object.impl.LobbySetting;
 import com.thenexusreborn.survivalgames.threads.ServerStatusThread;
 import com.thenexusreborn.survivalgames.threads.game.*;
 import com.thenexusreborn.survivalgames.threads.lobby.*;
+import me.firestar311.starlib.api.Value;
 import me.firestar311.starsql.api.objects.SQLDatabase;
-import me.firestar311.starsql.mysql.MySQLDatabase;
-import me.firestar311.starsql.mysql.MySQLProperties;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -52,6 +49,8 @@ import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.*;
+
+import static me.firestar311.starlib.api.Value.Type;
 
 public class SurvivalGames extends NexusSpigotPlugin {
     
@@ -73,7 +72,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
     private final Map<String, LobbySettings> lobbySettings = new HashMap<>();
     private final Map<String, GameSettings> gameSettings = new HashMap<>();
-    private SQLDatabase mapDatabase;
     
     private final Map<UUID, PlayerMutations> playerUnlockedMutations = new HashMap<>();
     
@@ -116,12 +114,12 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
         SQLDatabase database = NexusAPI.getApi().getPrimaryDatabase();
         try {
-            List<Info> settingInfos = database.get(Info.class);
+            List<Setting.Info> settingInfos = database.get(Info.class);
             settingInfos.forEach(settingInfo -> {
                 if (settingInfo.getType().equalsIgnoreCase("lobby")) {
-                    lobbySettingRegistry.register(settingInfo);
+                    lobbySettingRegistry.register(settingInfo.getName(), settingInfo);
                 } else if (settingInfo.getType().equalsIgnoreCase("game")) {
-                    gameSettingRegistry.register(settingInfo);
+                    gameSettingRegistry.register(settingInfo.getName(), settingInfo);
                 }
             });
         } catch (SQLException e) {
@@ -133,8 +131,8 @@ public class SurvivalGames extends NexusSpigotPlugin {
         registerDefaultSettings();
         
         Set<Setting.Info> allSettingInfos = new HashSet<>();
-        allSettingInfos.addAll(gameSettingRegistry.getObjects());
-        allSettingInfos.addAll(lobbySettingRegistry.getObjects());
+        allSettingInfos.addAll(gameSettingRegistry.getRegisteredObjects().values());
+        allSettingInfos.addAll(lobbySettingRegistry.getRegisteredObjects().values());
         
         allSettingInfos.forEach(database::queue);
         database.flush();
@@ -320,20 +318,20 @@ public class SurvivalGames extends NexusSpigotPlugin {
         createGameSetting("allow_swag_shack", "Allow Swag Shack", "Whether or not the Swag Shack is allowed to be used", Type.BOOLEAN, true);
     }
     
-    private void createLobbySetting(String name, String displayName, String description, Value.Type valueType, Object valueDefault) {
+    private void createLobbySetting(String name, String displayName, String description, Type valueType, Object valueDefault) {
         lobbySettingRegistry.register(name, displayName, description, "lobby", new Value(valueType, valueDefault));
     }
     
     @SuppressWarnings("SameParameterValue")
-    private void createLobbySetting(String name, String displayName, String description, Value.Type valueType, Object valueDefault, Object minValue, Object maxValue) {
+    private void createLobbySetting(String name, String displayName, String description, Type valueType, Object valueDefault, Object minValue, Object maxValue) {
         lobbySettingRegistry.register(name, displayName, description, "lobby", new Value(valueType, valueDefault), new Value(valueType, minValue), new Value(valueType, maxValue));
     }
     
-    private void createGameSetting(String name, String displayName, String description, Value.Type valueType, Object valueDefault) {
+    private void createGameSetting(String name, String displayName, String description, Type valueType, Object valueDefault) {
         gameSettingRegistry.register(name, displayName, description, "game", new Value(valueType, valueDefault));
     }
     
-    private void createGameSetting(String name, String displayName, String description, Value.Type valueType, Object valueDefault, Object minValue, Object maxValue) {
+    private void createGameSetting(String name, String displayName, String description, Type valueType, Object valueDefault, Object minValue, Object maxValue) {
         gameSettingRegistry.register(name, displayName, description, "game", new Value(valueType, valueDefault), new Value(valueType, minValue), new Value(valueType, maxValue));
     }
     
@@ -427,10 +425,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
         this.restart = restart;
     }
     
-    public SQLDatabase getMapDatabase() {
-        return this.mapDatabase;
-    }
-    
     public LobbySettings getLobbySettings(String type) {
         LobbySettings settings = this.lobbySettings.get(type.toLowerCase());
         if (settings != null) {
@@ -466,14 +460,10 @@ public class SurvivalGames extends NexusSpigotPlugin {
                 database.registerClass(LobbySetting.class);
                 database.registerClass(UnlockedMutation.class);
                 database.registerClass(MapRating.class);
+                database.registerClass(GameMap.class);
+                database.registerClass(MapSpawn.class);
             }
         }
-        
-        FileConfiguration config = getConfig();
-        mapDatabase = new MySQLDatabase(getLogger(), new MySQLProperties().setDatabaseName(config.getString("mapdatabase.database")).setHost(config.getString("mapdatabase.host")).setUsername(config.getString("mapdatabase.user")).setPassword(config.getString("mapdatabase.password")));
-        mapDatabase.registerClass(GameMap.class);
-        mapDatabase.registerClass(MapSpawn.class);
-        registry.register(mapDatabase);
     }
 
     public PlayerMutations getUnlockedMutations(UUID uniqueId) {

@@ -720,7 +720,7 @@ public class SGCommand implements CommandExecutor {
                     sender.sendMessage(MCUtils.color(MsgType.WARN + "Usage: /" + label + " " + subCommand + " " + mapSubCommand + " <url> <name>"));
                     return true;
                 }
-                
+                //TODO URLs allow file:/path
                 String url = args[2].replace("{url}", SurvivalGames.MAP_URL);
                 String mapName = SGUtils.getMapNameFromCommand(args, 3);
                 if (plugin.getMapManager().getMap(mapName) != null) {

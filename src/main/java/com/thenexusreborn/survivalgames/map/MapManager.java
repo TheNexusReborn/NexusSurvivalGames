@@ -1,10 +1,12 @@
 package com.thenexusreborn.survivalgames.map;
 
+import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 
 import java.sql.*;
 import java.util.*;
+import java.util.logging.Level;
 
 public class MapManager {
     private final SurvivalGames plugin;
@@ -21,49 +23,28 @@ public class MapManager {
     public void load() {
         plugin.getLogger().info("Loading the Maps...");
         try {
-            gameMaps.addAll(plugin.getMapDatabase().get(GameMap.class));
+            gameMaps.addAll(NexusAPI.getApi().getPrimaryDatabase().get(GameMap.class));
         } catch (SQLException e) {
             e.printStackTrace();
         }
         
-        if (gameMaps.size() == 0) {
-            List<GameMap> maps = new ArrayList<>(); 
-            List<MapSpawn> spawns = new ArrayList<>();
-            try (Connection connection = plugin.getNexusCore().getConnection("nexusmaps"); Statement statement = connection.createStatement()) {
-                ResultSet mapSet = statement.executeQuery("select * from sgmaps;");
-                while (mapSet.next()) {
-                    int id = mapSet.getInt("id");
-                    String name = mapSet.getString("name");
-                    String url = mapSet.getString("url");
-                    int centerX = mapSet.getInt("centerX");
-                    int centerY = mapSet.getInt("centerY");
-                    int centerZ = mapSet.getInt("centerZ");
-                    int borderRadius = mapSet.getInt("borderRadius");
-                    int dmBorderRadius = mapSet.getInt("dmBorderRadius");
-                    String creators = mapSet.getString("creators");
-                    boolean active = Boolean.parseBoolean(mapSet.getString("active"));
-                    GameMap gameMap = new GameMap(url, name);
-                    gameMap.setId(id);
-                    gameMap.setCenter(new Position(centerX, centerY, centerZ));
-                    gameMap.setBorderDistance(borderRadius);
-                    gameMap.setDeathmatchBorderDistance(dmBorderRadius);
-                    gameMap.getCreators().addAll(Arrays.asList(creators.split(",")));
-                    gameMap.setActive(active);
-                    maps.add(gameMap);
-                }
-                
-                ResultSet spawnsSet = statement.executeQuery("select * from sgmapspawns;");
-                while (spawnsSet.next()) {
-                    int index = spawnsSet.getInt("id");
-                    int mapId = spawnsSet.getInt("mapId");
-                    int x = spawnsSet.getInt("x");
-                    int y = spawnsSet.getInt("y");
-                    int z = spawnsSet.getInt("z");
-                    MapSpawn mapSpawn = new MapSpawn(mapId, index, x, y, z);
-                    spawns.add(mapSpawn);
-                }
+        if (gameMaps.isEmpty()) {
+            List<GameMap> maps;
+            try {
+                maps = NexusAPI.getApi().getPrimaryDatabase().get(GameMap.class);
             } catch (SQLException e) {
-                e.printStackTrace();
+                plugin.getLogger().log(Level.SEVERE, "Could not get the maps from the database", e);
+                plugin.getServer().getPluginManager().disablePlugin(plugin);
+                return;
+            }
+
+            List<MapSpawn> spawns;
+            try {
+                spawns = NexusAPI.getApi().getPrimaryDatabase().get(MapSpawn.class);
+            } catch (SQLException e) {
+                plugin.getLogger().log(Level.SEVERE, "Could not get the map spawns from the database", e);
+                plugin.getServer().getPluginManager().disablePlugin(plugin);
+                return;
             }
     
             Iterator<MapSpawn> spawnIterator = spawns.iterator();
@@ -77,16 +58,12 @@ public class MapManager {
                 }
             }
             
-            if (spawns.size() > 0) {
+            if (!spawns.isEmpty()) {
                 plugin.getLogger().warning("There was a total of " + spawns.size() + " spawns that didn't have a map.");
             }
     
             for (GameMap map : maps) {
-                map.setId(0);
-            }
-    
-            for (GameMap map : maps) {
-                plugin.getMapDatabase().saveSilent(map);
+                NexusAPI.getApi().getPrimaryDatabase().saveSilent(map);
                 this.gameMaps.add(map);
             }
         }
@@ -110,7 +87,7 @@ public class MapManager {
     }
     
     public void saveToDatabase(GameMap gameMap) {
-        plugin.getMapDatabase().saveSilent(gameMap);
+        NexusAPI.getApi().getPrimaryDatabase().saveSilent(gameMap);
     }
     
     public void addMap(GameMap gameMap) {
