@@ -943,6 +943,7 @@ public class SGCommand implements CommandExecutor {
                     }
                     case "loadfromfile", "lff" -> {
                         gameMap.loadInfoFromYaml();
+                        player.sendMessage(MCUtils.color(MsgType.INFO + "You loaded map information from the map.yml file."));
                     }
                 }
                 GameMap finalGameMap = gameMap;
