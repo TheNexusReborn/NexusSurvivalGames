@@ -26,7 +26,7 @@ public class StatSignUpdateThread extends NexusThread<SurvivalGames> {
             return;
         }
     
-        if (lobby.getStatSigns().size() < 1) {
+        if (lobby.getStatSigns().isEmpty()) {
             return;
         }
     

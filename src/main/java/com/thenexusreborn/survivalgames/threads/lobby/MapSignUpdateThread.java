@@ -31,7 +31,7 @@ public class MapSignUpdateThread extends NexusThread<SurvivalGames> {
             return;
         }
         
-        if (lobby.getMapOptions().size() < 1) {
+        if (lobby.getMapOptions().isEmpty()) {
             return;
         }
         

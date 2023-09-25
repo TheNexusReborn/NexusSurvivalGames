@@ -35,7 +35,7 @@ public class TributeSignUpdateThread extends NexusThread<SurvivalGames> {
         }
     
         Set<TributeSign> tributeSigns = new TreeSet<>(lobby.getTributeSigns());
-        if (tributeSigns.size() < 1) {
+        if (tributeSigns.isEmpty()) {
             return;
         }
     
@@ -58,7 +58,7 @@ public class TributeSignUpdateThread extends NexusThread<SurvivalGames> {
                 } catch (NoSuchFieldException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
-                String[] lines = new String[] {"", "", "", ""};
+                String[] lines = {"", "", "", ""};
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     if (p.getWorld() == tributeSign.getSignLocation().getWorld()) {
                         p.sendSignChange(tributeSign.getSignLocation(), lines);
@@ -81,7 +81,7 @@ public class TributeSignUpdateThread extends NexusThread<SurvivalGames> {
             skull.setOwner(player.getName());
             skull.update();
     
-            String[] lines = new String[] {name, "Score: " + score + "", "Kills: " + kills + "", "Wins: " + wins + ""};
+            String[] lines = {name, "Score: " + score + "", "Kills: " + kills + "", "Wins: " + wins + ""};
     
             for (Player op : Bukkit.getOnlinePlayers()) {
                 if (op.getWorld() == tributeSign.getSignLocation().getWorld()) {
