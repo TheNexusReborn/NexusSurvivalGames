@@ -941,6 +941,9 @@ public class SGCommand implements CommandExecutor {
                         gameMap.setSwagShack(new Position(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
                         player.sendMessage(MCUtils.color(MsgType.INFO + "You set the swag shack of the map &b" + gameMap.getName() + " &eto your current location."));
                     }
+                    case "loadfromfile", "lff" -> {
+                        gameMap.loadInfoFromYaml();
+                    }
                 }
                 GameMap finalGameMap = gameMap;
                 new BukkitRunnable() {

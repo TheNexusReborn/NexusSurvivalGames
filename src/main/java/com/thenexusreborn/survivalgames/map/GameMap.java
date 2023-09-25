@@ -13,6 +13,9 @@ import me.firestar311.starsql.api.annotations.column.ColumnType;
 import me.firestar311.starsql.api.annotations.table.TableHandler;
 import me.firestar311.starsql.api.annotations.table.TableName;
 import org.bukkit.*;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import java.io.*;
@@ -408,6 +411,29 @@ public class GameMap {
                 ", editing=" + editing +
                 ", votes=" + votes +
                 '}';
+    }
+    
+    public boolean loadInfoFromYaml() {
+        File file = new File(this.worldFolder.toFile(), "map.yml");
+        if (!file.exists()) {
+            return false;
+        }
+
+        FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+        this.name = config.getString("name");
+        this.borderDistance = config.getInt("borderdistance");
+        this.creators.addAll(config.getStringList("creators"));
+        ConfigurationSection section = config.getConfigurationSection("spawns");
+        if (spawns != null) {
+            for (String spawnId : section.getKeys(false)) {
+                int x = section.getInt(spawnId + ".x");
+                int y = section.getInt(spawnId + ".y");
+                int z = section.getInt(spawnId + ".z");
+                MapSpawn mapSpawn = new MapSpawn(this.id, Integer.parseInt(spawnId), x, y, z);
+                this.setSpawn(mapSpawn.getIndex(), mapSpawn);
+            }
+        }
+        return true;
     }
     
     public void setRatings(List<MapRating> ratings) {
