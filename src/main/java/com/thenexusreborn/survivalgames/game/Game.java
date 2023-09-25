@@ -723,7 +723,7 @@ public class Game {
         if (winner != null) {
             winner.changeStat("sg_wins", 1, StatOperator.ADD);
             winner.changeStat("sg_win_streak", 1, StatOperator.ADD);
-            int winGain = settings.getWinScoreBaseGain();
+            double winGain = settings.getWinScoreBaseGain();
             int currentScore = winner.getStatValue("sg_score").getAsInt();
             if (currentScore < 100 && currentScore > 50) {
                 winGain *= 1.25;
@@ -736,8 +736,8 @@ public class Game {
             } else if (currentScore >= 1000) {
                 winGain *= .5;
             }
-            winner.changeStat("sg_score", winGain, StatOperator.ADD);
-            winner.sendMessage("&2&l>> &a+" + winGain + " Score!");
+            winner.changeStat("sg_score", (int) winGain, StatOperator.ADD);
+            winner.sendMessage("&2&l>> &a+" + (int) winGain + " Score!");
             double multiplier = winner.getRank().getMultiplier();
             Rank rank = winner.getRank();
             String multiplierMessage = rank.getColor() + "&l * x" + MCUtils.formatNumber(multiplier) + " " + rank.getPrefix() + " Bonus";
@@ -967,7 +967,7 @@ public class Game {
             }
             
             if (scoreBounty > 0) {
-                scoreGain += scoreBounty;
+                scoreGain += (int) scoreBounty;
                 claimedScoreBounty = true;
                 bounty.remove(Bounty.Type.SCORE);
             }
@@ -986,7 +986,7 @@ public class Game {
             if (getSettings().isGiveXp()) {
                 xpGain = settings.getKillXPGain();
                 if (getSettings().isMultiplier()) {
-                    xpGain *= killerRank.getMultiplier();
+                    xpGain *= (int) killerRank.getMultiplier();
                 }
                 killerPlayer.changeStat("xp", xpGain, StatOperator.ADD);
             }
@@ -994,11 +994,11 @@ public class Game {
             if (getSettings().isGiveCredits()) {
                 creditGain = settings.getKillCreditGain();
                 if (getSettings().isMultiplier()) {
-                    creditGain *= killerRank.getMultiplier();
+                    creditGain *= (int) killerRank.getMultiplier();
                 }
                 
                 if (creditBounty > 0) {
-                    creditGain += creditBounty;
+                    creditGain += (int) creditBounty;
                     bounty.remove(Bounty.Type.CREDIT);
                     claimedCreditBounty = true;
                 }
@@ -1009,7 +1009,7 @@ public class Game {
             if (getSettings().isEarnNexites()) {
                 nexiteGain = settings.getKillNexiteGain();
                 if (getSettings().isMultiplier() && killerRank.isNexiteBoost()) {
-                    nexiteGain *= killerRank.getMultiplier();
+                    nexiteGain *= (int) killerRank.getMultiplier();
                 }
                 
                 killerPlayer.changeStat("nexites", nexiteGain, StatOperator.ADD);
