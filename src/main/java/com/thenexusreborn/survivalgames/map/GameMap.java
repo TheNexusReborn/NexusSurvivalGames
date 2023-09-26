@@ -140,9 +140,9 @@ public class GameMap {
         if (downloadedZip == null || !Files.exists(downloadedZip)) {
             Path downloadFolder = FileHelper.subPath(plugin.getDataFolder().toPath(), "mapdownloads");
             FileHelper.createDirectoryIfNotExists(downloadFolder);
-            downloadedZip = FileHelper.downloadFile(url, downloadFolder, getName().toLowerCase().replace("'", "").replace(" ", "_"), true);
+            downloadedZip = FileHelper.downloadFile(url, downloadFolder, getName().toLowerCase().replace("'", "").replace(" ", "_") + ".zip", true);
         }
-        return true;
+        return downloadedZip != null;
     }
     
     public void addCreator(String creator) {
