@@ -142,7 +142,7 @@ public class GameMap {
             FileHelper.createDirectoryIfNotExists(downloadFolder);
             downloadedZip = FileHelper.downloadFile(url, downloadFolder, getName().toLowerCase().replace("'", "").replace(" ", "_") + ".zip", true);
         }
-        return downloadedZip != null;
+        return downloadedZip != null && Files.exists(downloadedZip);
     }
     
     public void addCreator(String creator) {
@@ -167,9 +167,8 @@ public class GameMap {
         if (spawn.getIndex() == -1) {
             int index = getNextIndex();
             spawn.setIndex(index);
-        } else {
-            this.spawns.add(spawn);
         }
+        this.spawns.add(spawn);
         spawn.setMapId(this.getId());
         return spawn.getIndex();
     }

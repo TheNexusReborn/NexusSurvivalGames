@@ -229,7 +229,7 @@ public class Lobby {
 
         getPlayers().forEach(player -> player.setMapVote(-1));
 
-        if (plugin.getMapManager().getMaps().size() == 1 && this.mapSigns.size() == 1) {
+        if (plugin.getMapManager().getMaps().size() == 1 && !this.mapSigns.isEmpty()) {
             this.mapOptions.put(1, plugin.getMapManager().getMaps().get(0));
         } else if (plugin.getMapManager().getMaps().size() >= this.mapSigns.size()) {
             List<GameMap> maps = new ArrayList<>(plugin.getMapManager().getMaps());
@@ -736,9 +736,9 @@ public class Lobby {
                 }
 
                 if (player.getMapVote() > -1) {
-                    player.sendMessage("&6&l>> &eYou changed your vote to &b" + this.mapOptions.get(entry.getKey()).getName());
+                    player.sendMessage("&6&l>> &eYou changed your vote to &b" + this.mapOptions.get(entry.getKey() + 1).getName());
                 } else {
-                    player.sendMessage("&6&l>> &eYou voted for the map &b" + this.mapOptions.get(entry.getKey()).getName());
+                    player.sendMessage("&6&l>> &eYou voted for the map &b" + this.mapOptions.get(entry.getKey() + 1).getName());
                 }
                 player.setMapVote(entry.getKey());
                 return;

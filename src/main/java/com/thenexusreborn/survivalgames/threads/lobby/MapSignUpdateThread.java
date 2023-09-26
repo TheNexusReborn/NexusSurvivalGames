@@ -36,7 +36,10 @@ public class MapSignUpdateThread extends NexusThread<SurvivalGames> {
         }
         
         for (Entry<Integer, Location> entry : lobby.getMapSigns().entrySet()) {
-            GameMap map = lobby.getMapOptions().get(entry.getKey());
+            GameMap map = lobby.getMapOptions().get(entry.getKey() + 1);
+            if (map == null) {
+                continue;
+            }
             BlockState state = entry.getValue().getBlock().getState();
             if (!(state instanceof Sign sign)) {
                 continue;
