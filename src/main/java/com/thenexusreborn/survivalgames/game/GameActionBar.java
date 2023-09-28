@@ -1,7 +1,6 @@
 package com.thenexusreborn.survivalgames.game;
 
 import com.thenexusreborn.api.player.IActionBar;
-import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
 
@@ -54,7 +53,7 @@ public class GameActionBar implements IActionBar {
             return "&aWarmup done, waiting for game...";
         }
         
-        if (game.getState().ordinal() >= GameState.INGAME_GRACEPERIOD.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal()) {
+        if (game.getState().ordinal() >= GameState.INGAME.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal()) {
             TrackerInfo trackerInfo = player.getTrackerInfo();
             if (trackerInfo != null) {
                 String target = trackerInfo.target();
@@ -71,7 +70,7 @@ public class GameActionBar implements IActionBar {
             return "&c&lSEEKING REVENGE ON &a" + target.getName();
         }
         
-        if (game.getState() == GameState.INGAME_GRACEPERIOD) {
+        if (game.isGraceperiod()) {
             return "&f&lGrace Period ends in &e" + Game.LONG_TIME_FORMAT.format(game.getGraceperiodTimer().getTimeLeft());
         }
         

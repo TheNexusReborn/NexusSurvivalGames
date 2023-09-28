@@ -312,7 +312,7 @@ public class PlayerListener implements Listener {
                                 lootTable = lootManager.getLootTable("tierFour");
                             } else {
                                 boolean withinCenter = game.getGameMap().getDeathmatchArea().contains(player);
-                                if (game.getState() == GameState.INGAME_GRACEPERIOD) {
+                                if (game.isGraceperiod()) {
                                     lootTable = lootManager.getLootTable("tierOne");
                                 } else if (game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_DEATHMATCH) {
                                     boolean afterRestock = game.getRestockTimer() == null;

@@ -51,7 +51,7 @@ public class Game {
     public static final TimeFormat SHORT_TIME_FORMAT = new TimeFormat("%*00h%%*#0m%%*#0s%");
     public static final TimeFormat TIME_FORMAT = new TimeFormat("%*00h%%#0m%%00s%");
     public static final TimeFormat LONG_TIME_FORMAT = new TimeFormat("%*00h%%00m%%00s%");
-    
+
     private final GameMap gameMap;
     private final GameSettings settings;
     private final Map<UUID, GamePlayer> players = new HashMap<>();
@@ -65,8 +65,9 @@ public class Game {
     private final Map<Location, Inventory> enderchestInventories = new HashMap<>();
     private SponsorManager sponsorManager = new SponsorManager();
     private Mode mode = Mode.CLASSIC; //This will be implemented later, this is mainly for some other checks to exist
-    private boolean debugMode; //TODO Debug Mode. This may be replaced with a class with other settings
-    
+    private boolean debugMode; //sDebug Mode. This may be replaced with a class with other settings
+    private boolean graceperiod;
+
     public Game(GameMap gameMap, GameSettings settings, Collection<LobbyPlayer> players) {
         this.gameMap = gameMap;
         this.settings = settings;
@@ -100,40 +101,40 @@ public class Game {
 //        }
 //        gameInfo.setSettings(sb.substring(0, sb.length() - 1));
     }
-    
+
     protected void setState(GameState state) {
         this.state = state;
         this.gameInfo.getActions().add(new GameAction(System.currentTimeMillis(), "statechange", state.name()));
     }
-    
+
     public void handleShutdown() {
         this.state = SHUTTING_DOWN;
         sendMessage("&4&l>> THE SERVER IS SHUTTING DOWN!");
         if (this.timer != null) {
             this.timer.cancel();
         }
-        
+
         if (this.graceperiodTimer != null) {
             this.graceperiodTimer.cancel();
         }
-        
+
         if (this.ratingPromptTimer != null) {
             this.ratingPromptTimer.cancel();
         }
-        
+
         if (this.restockTimer != null) {
             this.restockTimer.cancel();
         }
-        
+
         if (this.gameMap != null) {
             this.gameMap.delete(plugin);
         }
     }
-    
+
     public static ControlType getControlType() {
         return controlType;
     }
-    
+
     public static void setControlType(ControlType controlType) {
         Game.controlType = controlType;
         if (controlType == ControlType.MANUAL) {
@@ -149,23 +150,23 @@ public class Game {
             }
         }
     }
-    
+
     public GameMap getGameMap() {
         return gameMap;
     }
-    
+
     public GameSettings getSettings() {
         return settings;
     }
-    
+
     public Timer getGraceperiodTimer() {
         return graceperiodTimer;
     }
-    
+
     public Timer getRestockTimer() {
         return restockTimer;
     }
-    
+
     public void addPlayer(NexusPlayer nexusPlayer) {
         GamePlayer gamePlayer = new GamePlayer(nexusPlayer);
         gamePlayer.setTeam(GameTeam.SPECTATORS);
@@ -178,7 +179,7 @@ public class Game {
         giveSpectatorItems(player);
         player.spigot().setCollidesWithEntities(false);
         teleportSpectator(player, this.gameMap.getCenter().toLocation(this.gameMap.getWorld()));
-        
+
         if (nexusPlayer.getToggleValue("vanish")) {
             for (GamePlayer gp : this.players.values()) {
                 if (gp.getRank().ordinal() <= Rank.HELPER.ordinal() || gp.getUniqueId().equals(nexusPlayer.getUniqueId())) {
@@ -199,7 +200,7 @@ public class Game {
         nexusPlayer.setActionBar(new GameActionBar(plugin, gamePlayer));
         recalculateVisibility();
     }
-    
+
     public void removePlayer(NexusPlayer nexusPlayer) {
         if (!this.players.containsKey(nexusPlayer.getUniqueId())) {
             return;
@@ -211,9 +212,9 @@ public class Game {
                 killPlayer(gamePlayer, new DeathInfo(plugin.getGame(), System.currentTimeMillis(), gamePlayer, DeathType.SUICIDE));
             }
         }
-        
+
         this.players.remove(nexusPlayer.getUniqueId());
-        
+
         if (nexusPlayer.getToggleValue("vanish")) {
             for (GamePlayer gp : this.players.values()) {
                 if (gp.getRank().ordinal() <= Rank.HELPER.ordinal()) {
@@ -230,15 +231,15 @@ public class Game {
             sendMessage("&c&l<< &b" + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft.");
         }
     }
-    
+
     public Map<UUID, GamePlayer> getPlayers() {
         return players;
     }
-    
+
     public void resetSpawns() {
         this.spawns.entrySet().forEach(entry -> entry.setValue(null));
     }
-    
+
     public void teleportTributes(List<UUID> tributes, Location mapSpawn) {
         List<Entry<Integer, UUID>> spawns = new ArrayList<>(this.spawns.entrySet());
         Collections.shuffle(spawns);
@@ -255,7 +256,7 @@ public class Game {
             }
         }
     }
-    
+
     private void teleportToGameSpawn(Player player, Location mapSpawn, Location spawn, GameTeam gameTeam) {
         spawn.setX(spawn.getX() + 0.5);
         spawn.setY(spawn.getY() + 2.0);
@@ -272,15 +273,15 @@ public class Game {
             }
         }.runTaskLater(plugin, 1L);
     }
-    
+
     public void teleportTribute(Player tribute, Location mapSpawn, Location spawn) {
         teleportToGameSpawn(tribute, mapSpawn, spawn, GameTeam.TRIBUTES);
     }
-    
+
     public void teleportMutation(Player mutation, Location mapSpawn, Location spawn) {
         teleportToGameSpawn(mutation, mapSpawn, spawn, GameTeam.MUTATIONS);
     }
-    
+
     public void teleportSpectator(Player spectator, Location mapSpawn) {
         try {
             spectator.teleport(mapSpawn);
@@ -295,7 +296,7 @@ public class Game {
             }
         }
     }
-    
+
     public void recalculateVisibility() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             GamePlayer gamePlayer = getPlayer(player.getUniqueId());
@@ -304,11 +305,11 @@ public class Game {
             }
             for (Player other : Bukkit.getOnlinePlayers()) {
                 GamePlayer otherGamePlayer = getPlayer(other.getUniqueId());
-                
+
                 if (otherGamePlayer == null) {
                     continue;
                 }
-                
+
                 if (gamePlayer.getToggleValue("vanish")) {
                     player.showPlayer(other);
                     if (otherGamePlayer.getRank().ordinal() > Rank.HELPER.ordinal()) {
@@ -326,18 +327,18 @@ public class Game {
             }
         }
     }
-    
+
     public void teleportSpectators(List<UUID> spectators, Location mapSpawn) {
         for (UUID spectator : spectators) {
             Player player = Bukkit.getPlayer(spectator);
             teleportSpectator(player, mapSpawn);
         }
     }
-    
+
     public void teleportStart() {
         try {
             setState(TELEPORT_START);
-            
+
             List<UUID> tributes = new LinkedList<>(), spectators = new LinkedList<>();
             for (GamePlayer player : this.players.values()) {
                 Player p = Bukkit.getPlayer(player.getUniqueId());
@@ -365,16 +366,16 @@ public class Game {
                     entity.remove();
                 }
             }
-            
+
             recalculateVisibility();
-            
+
             setState(TELEPORT_START_DONE);
         } catch (Exception e) {
             e.printStackTrace();
             handleError("There was an error teleporting players to their starting positions.");
         }
     }
-    
+
     public void assignStartingTeams() {
         try {
             setState(ASSIGN_TEAMS);
@@ -395,38 +396,38 @@ public class Game {
                         tributes.offer(uuid);
                     }
                 }
-                
+
                 player.sendMessage(player.getTeam().getJoinMessage());
             }
-            
+
             UUID spectator;
             while ((spectator = spectators.poll()) != null) {
                 SurvivalGames.PLAYER_QUEUE.offer(spectator);
             }
-            
+
             UUID tribute;
             while ((tribute = tributes.poll()) != null) {
                 SurvivalGames.PLAYER_QUEUE.offer(tribute);
             }
-            
+
             for (GamePlayer player : new ArrayList<>(this.players.values())) {
                 player.getScoreboard().setTablistHandler(new GameTablistHandler(player.getScoreboard(), plugin));
             }
-            
+
             setState(TEAMS_ASSIGNED);
         } catch (Exception e) {
             e.printStackTrace();
             handleError("There was an error assiging teams.");
         }
     }
-    
+
     public void setup() {
         setState(SETTING_UP);
-        
+
         for (GamePlayer player : this.players.values()) {
             player.getScoreboard().setView(new GameBoard(player.getScoreboard(), plugin));
         }
-        
+
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -449,7 +450,7 @@ public class Game {
                             handleError("There was an error loading the world.");
                             return;
                         }
-                        
+
                         int radius = gameMap.getDeathmatchBorderDistance();
                         Location center = gameMap.getCenter().toLocation(gameMap.getWorld());
                         Location corner1 = center.clone();
@@ -457,12 +458,12 @@ public class Game {
                         Location corner2 = center.clone();
                         corner2.subtract(radius, radius, radius);
                         gameMap.setDeathmatchArea(new Cuboid(corner1, corner2));
-                        
+
                         try {
                             for (int i = 0; i < gameMap.getSpawns().size(); i++) {
                                 spawns.put(i, null);
                             }
-                            
+
                             gameMap.getWorld().setGameRuleValue("naturalRegeneration", "" + settings.isRegeneration());
                             gameMap.getWorld().setGameRuleValue("doDaylightCycle", "" + settings.isTimeProgression());
                             gameMap.getWorld().setGameRuleValue("doWeatherCycle", "" + settings.isWeatherProgression());
@@ -482,31 +483,31 @@ public class Game {
             }
         }.runTaskAsynchronously(plugin);
     }
-    
+
     public void handleError(String message) {
         setState(ERROR);
         sendMessage("&4&l>> &4" + message + " Resetting back to lobby.");
         plugin.getLobby().resetLobby();
         plugin.getLobby().fromGame(this);
     }
-    
+
     public void sendMessage(String message) {
         for (GamePlayer player : this.players.values()) {
             player.sendMessage(message);
         }
-        
+
         Bukkit.getConsoleSender().sendMessage(MCUtils.color(message));
     }
-    
+
     public GameState getState() {
         return state;
     }
-    
+
     public void startWarmup() {
         setState(WARMUP);
         this.timer = new Timer(new CountdownTimerCallback(this)).run(TimeUnit.SECONDS.toMilliseconds(settings.getWarmupLength()) + 50L);
     }
-    
+
     public void startGame() {
         this.timer = new Timer(new GameTimerCallback(this)).run(TimeUnit.MINUTES.toMilliseconds(settings.getGameLength()) + 50);
         this.ratingPromptTimer = new Timer(snapshot -> {
@@ -522,10 +523,9 @@ public class Game {
         this.start = System.currentTimeMillis();
         if (this.settings.isGracePeriod()) {
             this.graceperiodTimer = new Timer(new GraceperiodCountdownCallback(this)).run(TimeUnit.SECONDS.toMilliseconds(settings.getGracePeriodLength()) + 50L);
-            setState(INGAME_GRACEPERIOD);
-        } else {
-            setState(INGAME);
+            this.graceperiod = true;
         }
+        setState(INGAME);
         this.restockTimer = new Timer(new RestockTimerCallback(this)).run(TimeUnit.MINUTES.toMilliseconds(settings.getGameLength()) / 2 + 50);
         sendMessage("&6&l>> &a&lMAY THE ODDS BE EVER IN YOUR FAVOR.");
         sendMessage("&6&l>> &c&lCLICKING MORE THAN 16 CPS WILL LIKELY RESULT IN A BAN.");
@@ -534,7 +534,7 @@ public class Game {
         } else {
             sendMessage("&6&l>> &d&lTEAMING IS NOT ALLOWED IN THIS GAME.");
         }
-        
+
         if (gameMap.getSwagShack() != null) {
             Villager entity = (Villager) gameMap.getWorld().spawnEntity(gameMap.getSwagShack().toLocation(gameMap.getWorld()), EntityType.VILLAGER);
             entity.setCustomNameVisible(true);
@@ -542,7 +542,7 @@ public class Game {
             entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 255, false, false));
         }
     }
-    
+
     public void restockChests() {
         this.lootedChests.clear();
         if (this.restockTimer != null) {
@@ -557,19 +557,19 @@ public class Game {
             }
         }
     }
-    
+
     public void warmupComplete() {
         setState(WARMUP_DONE);
     }
-    
+
     public Map<Location, Inventory> getEnderchestInventories() {
         return enderchestInventories;
     }
-    
+
     public Timer getTimer() {
         return this.timer;
     }
-    
+
     public void playSound(Sound sound) {
         for (GamePlayer player : this.players.values()) {
             Player p = Bukkit.getPlayer(player.getUniqueId());
@@ -578,11 +578,11 @@ public class Game {
             }
         }
     }
-    
+
     public void teleportDeathmatch() {
         try {
             setState(TELEPORT_DEATHMATCH);
-            
+
             for (GamePlayer gp : this.players.values()) {
                 if (gp.getTeam() == GameTeam.MUTATIONS) {
                     removeMutation(gp.getMutation());
@@ -594,7 +594,7 @@ public class Game {
                     gp.sendMessage("&6&l>> &cYou were made a spectator because deathmatch started.");
                 }
             }
-            
+
             sendMessage("&6&l>> &e&LPREPARE FOR DEATHMATCH...");
             List<UUID> tributes = new LinkedList<>(), spectators = new LinkedList<>();
             for (GamePlayer player : this.players.values()) {
@@ -609,7 +609,7 @@ public class Game {
             Location mapSpawn = gameMap.getCenter().toLocation(gameMap.getWorld());
             teleportTributes(tributes, mapSpawn);
             teleportSpectators(spectators, mapSpawn);
-            
+
             recalculateVisibility();
             setState(TELEPORT_DEATHMATCH_DONE);
         } catch (Exception e) {
@@ -617,55 +617,55 @@ public class Game {
             handleError("There was an error teleporting tributes to the deathmatch.");
         }
     }
-    
+
     public void startDeathmatchWarmup() {
         setState(DEATHMATCH_WARMUP);
-        
+
         if (this.timer != null) {
             timer.cancel();
         }
-        
+
         playSound(Sound.ENDERDRAGON_GROWL);
         for (GamePlayer player : this.players.values()) {
             if (player.getTeam() == GameTeam.TRIBUTES) {
                 Bukkit.getPlayer(player.getUniqueId()).addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 0));
             }
         }
-        
+
         this.timer = new Timer(new DeathmatchCountdownCallback(this)).run(TimeUnit.SECONDS.toMilliseconds(settings.getDeathmatchWarmupLength()) + 50L);
     }
-    
+
     public void startDeathmatch() {
         setState(DEATHMATCH);
-        
+
         if (this.timer != null) {
             timer.cancel();
         }
-        
+
         for (GamePlayer player : this.players.values()) {
             if (player.getTeam() == GameTeam.TRIBUTES) {
                 Bukkit.getPlayer(player.getUniqueId()).removePotionEffect(PotionEffectType.BLINDNESS);
             }
         }
-        
+
         sendMessage("&6&l>> &a&lLAST PLAYER STANDING CLAIMS VICTORY!");
         sendMessage("&6&l>> &a&lALL CHESTS HAVE BEEN RESTOCKED.");
         sendMessage("&6&l>> &d&lTHERE IS NO TEAMING ALLOWED IN DEATHMATCH.");
         restockChests();
-        
+
         World world = this.gameMap.getWorld();
         WorldBorder worldBorder = world.getWorldBorder();
         worldBorder.setCenter(this.gameMap.getCenter().toLocation(world));
         worldBorder.setSize(100);
         worldBorder.setSize(10, 300);
-        
+
         this.timer = new Timer(new GameEndTimerCallback(this)).run(TimeUnit.MINUTES.toMilliseconds(settings.getDeathmatchLength()) + 50);
     }
-    
+
     public void deathmatchWarmupDone() {
         setState(DEATHMATCH_WARMUP_DONE);
     }
-    
+
     public void end() {
         setState(ENDING);
         this.end = System.currentTimeMillis();
@@ -674,22 +674,22 @@ public class Game {
             timer.cancel();
             this.timer = null;
         }
-        
+
         if (this.graceperiodTimer != null) {
             graceperiodTimer.cancel();
             this.graceperiodTimer = null;
         }
-        
+
         if (this.restockTimer != null) {
             this.restockTimer.cancel();
             this.restockTimer = null;
         }
-        
+
         if (this.ratingPromptTimer != null) {
             this.ratingPromptTimer.cancel();
             this.ratingPromptTimer = null;
         }
-        
+
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.setAllowFlight(true);
             for (Player p : Bukkit.getOnlinePlayers()) {
@@ -697,7 +697,7 @@ public class Game {
                 p.showPlayer(player);
             }
         }
-        
+
         GamePlayer winner = null;
         for (GamePlayer player : this.players.values()) {
             if (player.getTeam() == GameTeam.TRIBUTES) {
@@ -710,16 +710,16 @@ public class Game {
                 }
             }
         }
-        
+
         String winnerName;
         if (winner != null) {
             winnerName = winner.getDisplayName();
         } else {
             winnerName = "&f&lNo one";
         }
-        
+
         sendMessage("&6&l>> " + winnerName + " &a&lhas won Survival Games!");
-        
+
         if (winner != null) {
             winner.changeStat("sg_wins", 1, StatOperator.ADD);
             winner.changeStat("sg_win_streak", 1, StatOperator.ADD);
@@ -752,7 +752,7 @@ public class Game {
                     winner.sendMessage(baseMessage);
                 }
             }
-            
+
             if (settings.isGiveCredits()) {
                 double credits = settings.getWinCreditsBaseGain();
                 credits *= multiplier;
@@ -764,13 +764,13 @@ public class Game {
                     winner.sendMessage(baseMessage);
                 }
             }
-            
+
             if (settings.isEarnNexites()) {
                 double nexites = settings.getWinNexiteBaseGain();
                 if (winner.getRank().isNexiteBoost()) {
                     nexites *= multiplier;
                 }
-                
+
                 String baseMessage = "&2&l>> &a&l" + nexites + " &9&lNEXITES&a&l!";
                 if (multiplier > 1 && winner.getRank().isNexiteBoost()) {
                     winner.sendMessage(baseMessage + multiplierMessage);
@@ -778,7 +778,7 @@ public class Game {
                     winner.sendMessage(baseMessage);
                 }
             }
-            
+
             double passWinValue = new Random().nextDouble();
             if (passWinValue <= getSettings().getPassRewardChance()) {
                 winner.changeStat("sg_mutation_passes", 1, StatOperator.ADD);
@@ -786,7 +786,7 @@ public class Game {
             } else {
                 winner.sendMessage(MsgType.INFO + "You did not win a mutation pass this time.");
             }
-            
+
             Bounty bounty = winner.getBounty();
             for (Type type : Type.values()) {
                 double amount = bounty.getAmount(type);
@@ -800,7 +800,7 @@ public class Game {
                 }
             }
         }
-        
+
         gameInfo.setGameStart(this.start);
         gameInfo.setGameEnd(this.end);
         if (winner != null) {
@@ -808,15 +808,15 @@ public class Game {
         } else {
             gameInfo.setWinner("No one");
         }
-        
+
         if (this.firstBlood != null) {
             gameInfo.setFirstBlood(firstBlood.getName());
         } else {
             gameInfo.setFirstBlood("No one");
         }
-        
+
         gameInfo.setLength(this.end - this.start);
-        
+
         NexusAPI.getApi().getScheduler().runTaskAsynchronously(() -> {
             NexusAPI.getApi().getPrimaryDatabase().saveSilent(gameInfo);
             if (gameInfo.getId() == 0) {
@@ -824,7 +824,7 @@ public class Game {
             } else {
                 sendMessage("&6&l>> &aThis game has been archived!");
                 sendMessage("&6&l>> &aGame ID: &b" + gameInfo.getId() + " &7&oCustom Website Coming Soon.");
-                
+
                 if (gameInfo.getId() % 1000 == 0) {
                     for (String p : gameInfo.getPlayers()) {
                         NexusAPI.getApi().getScheduler().runTaskAsynchronously(() -> {
@@ -840,7 +840,7 @@ public class Game {
                                     }
                                 }
                             }
-                            
+
                             Tag tag = new Tag(nexusPlayer.getUniqueId(), gameInfo.getId() + "th", System.currentTimeMillis());
                             nexusPlayer.getTags().add(tag);
                             nexusPlayer.sendMessage(MsgType.INFO + "Unlocked the tag " + tag.getDisplayName());
@@ -850,14 +850,14 @@ public class Game {
                 }
             }
         });
-        
+
         if (!(this.players.isEmpty() || Bukkit.getOnlinePlayers().isEmpty())) {
             this.timer = new Timer(new NextGameTimerCallback(this)).run(TimeUnit.SECONDS.toMilliseconds(settings.getNextGameStart()));
         } else {
             this.nextGame();
         }
     }
-    
+
     public void resetPlayer(Player player) {
         player.setTotalExperience(0);
         player.setLevel(0);
@@ -869,10 +869,10 @@ public class Game {
         player.setHealth(20);
         player.spigot().setCollidesWithEntities(true);
     }
-    
+
     public void nextGame() {
         setState(ENDED);
-        
+
         if (plugin.restart()) {
             ByteArrayDataOutput out = ByteStreams.newDataOutput();
             out.writeUTF("Connect");
@@ -880,7 +880,7 @@ public class Game {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 player.sendPluginMessage(plugin.getNexusCore(), "BungeeCord", out.toByteArray());
             }
-            
+
             new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -895,11 +895,11 @@ public class Game {
             for (GamePlayer player : this.players.values()) {
                 resetPlayer(Bukkit.getPlayer(player.getUniqueId()));
             }
-            
+
             plugin.getLobby().fromGame(this);
         }
     }
-    
+
     public void killPlayer(GamePlayer gamePlayer, DeathInfo deathInfo) {
         GameTeam oldTeam = gamePlayer.getTeam();
         gamePlayer.addDeathInfo(deathInfo);
@@ -917,19 +917,19 @@ public class Game {
             player.setAllowFlight(true);
             player.setFlying(true);
         }
-        
+
         boolean deathByLeave = deathInfo.getType() == DeathType.SUICIDE;
         gamePlayer.setSpectatorByDeath(!deathByLeave);
         KillerInfo killer = deathInfo.getKiller();
         gamePlayer.setDeathByMutation(killer != null && killer.isMutationKill());
-        
+
         boolean deathByVanish = deathInfo.getType() == DeathType.VANISH;
         int score = gamePlayer.getStatValue("sg_score").getAsInt();
         int lost = (int) Math.ceil(score / settings.getScoreDivisor());
         if (score - lost < 0) {
             lost = 0;
         }
-        
+
         if (!(deathByVanish || deathByLeave)) {
             if (lost > 0) {
                 gamePlayer.changeStat("sg_score", lost, StatOperator.SUBTRACT);
@@ -941,11 +941,11 @@ public class Game {
                 gamePlayer.changeStat("sg_mutation_deaths", 1, StatOperator.ADD);
             }
         }
-        
+
         boolean playerKiller = killer != null && killer.getType() == EntityType.PLAYER;
-        
+
         boolean claimedFirstBlood = false;
-        
+
         int scoreGain = 0, currentStreak = 0, personalBest = 0, xpGain = 0, creditGain = 0, nexiteGain = 0;
         Rank killerRank = null;
         boolean claimedScoreBounty = false, claimedCreditBounty = false;
@@ -956,33 +956,33 @@ public class Game {
             GamePlayer killerPlayer = getPlayer(killer.getKiller());
             killerRank = killerPlayer.getRank();
             scoreGain = lost;
-            
+
             if (this.firstBlood == null) {
                 this.firstBlood = killerPlayer;
                 claimedFirstBlood = true;
             }
-            
+
             if (claimedFirstBlood) {
                 scoreGain = (int) (scoreGain * settings.getFirstBloodMultiplier());
             }
-            
+
             if (scoreBounty > 0) {
                 scoreGain += (int) scoreBounty;
                 claimedScoreBounty = true;
                 bounty.remove(Bounty.Type.SCORE);
             }
-            
+
             killerPlayer.changeStat("sg_score", scoreGain, StatOperator.ADD);
-            
+
             killerPlayer.setKillStreak(killerPlayer.getKillStreak() + 1);
             currentStreak = killerPlayer.getKillStreak();
             killerPlayer.setKills(killerPlayer.getKills() + 1);
             personalBest = killerPlayer.getStatValue("sg_highest_kill_streak").getAsInt();
-            
+
             if (currentStreak > personalBest) {
                 killerPlayer.changeStat("sg_highest_kill_streak", currentStreak, StatOperator.SET);
             }
-            
+
             if (getSettings().isGiveXp()) {
                 xpGain = settings.getKillXPGain();
                 if (getSettings().isMultiplier()) {
@@ -990,31 +990,31 @@ public class Game {
                 }
                 killerPlayer.changeStat("xp", xpGain, StatOperator.ADD);
             }
-            
+
             if (getSettings().isGiveCredits()) {
                 creditGain = settings.getKillCreditGain();
                 if (getSettings().isMultiplier()) {
                     creditGain *= (int) killerRank.getMultiplier();
                 }
-                
+
                 if (creditBounty > 0) {
                     creditGain += (int) creditBounty;
                     bounty.remove(Bounty.Type.CREDIT);
                     claimedCreditBounty = true;
                 }
-                
+
                 killerPlayer.changeStat("credits", creditGain, StatOperator.ADD);
             }
-            
+
             if (getSettings().isEarnNexites()) {
                 nexiteGain = settings.getKillNexiteGain();
                 if (getSettings().isMultiplier() && killerRank.isNexiteBoost()) {
                     nexiteGain *= (int) killerRank.getMultiplier();
                 }
-                
+
                 killerPlayer.changeStat("nexites", nexiteGain, StatOperator.ADD);
             }
-            
+
             killerPlayer.changeStat("sg_kills", 1, StatOperator.ADD);
             if (killer.isMutationKill()) {
                 killerPlayer.changeStat("sg_mutation_kills", 1, StatOperator.ADD);
@@ -1025,7 +1025,7 @@ public class Game {
                 killerPlayer.sendMessage(killerPlayer.getTeam().getJoinMessage());
             }
         }
-        
+
         List<UUID> damagers = gamePlayer.getDamageInfo().getDamagers();
         List<AssisterInfo> assistors = new ArrayList<>();
         if (settings.isAllowAssists()) {
@@ -1034,7 +1034,7 @@ public class Game {
                     if (killer != null && killer.getKiller().equals(damager)) {
                         continue;
                     }
-                    
+
                     GamePlayer assisterPlayer = getPlayer(damager);
                     assisterPlayer.setAssists(assisterPlayer.getAssists() + 1);
                     assisterPlayer.changeStat("sg_assists", 1, StatOperator.ADD);
@@ -1042,29 +1042,29 @@ public class Game {
                 }
             }
         }
-        
+
         int oldTeamRemaining = 0;
         for (GamePlayer gp : new ArrayList<>(getPlayers().values())) {
             if (gp.getTeam() == oldTeam) {
                 oldTeamRemaining++;
             }
         }
-        
+
         if (oldTeam == GameTeam.MUTATIONS) {
             removeMutation(gamePlayer.getMutation());
         }
-        
+
         if (oldTeam == GameTeam.TRIBUTES) {
             for (GamePlayer gp : this.players.values()) {
                 if (gp.getTeam() != GameTeam.MUTATIONS) {
                     continue;
                 }
-                
+
                 Mutation mutation = gp.getMutation();
                 if (!mutation.getTarget().equals(gamePlayer.getUniqueId())) {
                     continue;
                 }
-                
+
                 if (!playerKiller) {
                     gp.sendMessage("&6&l>> &cYour target died without a killer, you have been set back as a spectator.");
                     removeMutation(mutation);
@@ -1081,16 +1081,16 @@ public class Game {
                 }
             }
         }
-        
+
         int totalTributes = 0;
         for (GamePlayer gp : new ArrayList<>(this.players.values())) {
             if (gp.getTeam() == GameTeam.TRIBUTES) {
                 totalTributes++;
             }
         }
-        
+
         if (totalTributes <= settings.getDeathmatchThreshold()) {
-            if (state == INGAME || state == INGAME_GRACEPERIOD) {
+            if (state == INGAME) {
                 if (totalTributes > 1) {
                     if (controlType == ControlType.AUTOMATIC) {
                         this.startDeathmatchTimer();
@@ -1100,14 +1100,14 @@ public class Game {
                 }
             }
         }
-        
+
         GamePlayer killerPlayer = null;
         if (playerKiller) {
             killerPlayer = getPlayer(killer.getKiller());
         }
-        
+
         gamePlayer.sendMessage(oldTeam.getLeaveMessage());
-        
+
         if (killerPlayer != null) {
             if (killer.isMutationKill()) {
                 sendMessage("&6&l>> " + killerPlayer.getColoredName() + " &ahas taken revenge and is back in the game!");
@@ -1133,30 +1133,30 @@ public class Game {
                 }
                 killerPlayer.sendMessage(xpMsg);
             }
-            
+
             if (settings.isGiveCredits()) {
                 String creditsMsg = "&2&l>> &a&l+" + creditGain + " &3&lCREDITS&a&l!";
                 if (settings.isMultiplier()) {
                     creditsMsg += multiplierMessage;
                 }
-                
+
                 if (claimedCreditBounty) {
                     creditsMsg += " &e&lClaimed Bounty";
                 }
-                
+
                 killerPlayer.sendMessage(creditsMsg);
             }
-            
+
             if (settings.isEarnNexites()) {
                 String nexiteMsg = "&2&l>> &a&l" + nexiteGain + " &9&lNEXITES&a&l!";
                 if (settings.isMultiplier() && killerRank.isNexiteBoost()) {
                     nexiteMsg += multiplierMessage;
                 }
-                
+
                 killerPlayer.sendMessage(nexiteMsg);
             }
         }
-        
+
         for (AssisterInfo assister : assistors) {
             GamePlayer assisterPlayer = assister.getGamePlayer();
             assisterPlayer.sendMessage("&2&l>> &a+1 &aAssist");
@@ -1167,54 +1167,54 @@ public class Game {
             if (assister.getXp() > 0) {
                 assisterPlayer.sendMessage(xpMsg);
             }
-            
+
             if (assister.getCredits() > 0) {
                 assisterPlayer.sendMessage(creditsMsg);
             }
-            
+
             if (assister.getNexites() > 0) {
                 assisterPlayer.sendMessage(nexitesMsg);
             }
         }
-        
+
         gamePlayer.sendMessage("&4&l>> &cYou lost " + lost + " Points for dying!");
         sendMessage("&6&l>> " + oldTeam.getRemainColor() + "&l" + oldTeamRemaining + " " + oldTeam.name().toLowerCase() + " remain.");
         if (claimedFirstBlood) {
             sendMessage("&6&l>> &c&l" + firstBlood.getName().toUpperCase() + " CLAIMED FIRST BLOOD!");
         }
-        
+
         if (killerPlayer != null) {
             String killerName = killerPlayer.getColoredName();
             String killerHealth = NumberHelper.formatNumber(killer.getHealth());
             gamePlayer.sendMessage("&4&l>> &cYour killer &8(" + killerName + "&8) &chad &4" + killerHealth + " HP &cremaining!");
         }
-        
+
         sendMessage(deathInfo.getDeathMessage());
         gamePlayer.sendMessage(GameTeam.SPECTATORS.getJoinMessage());
-        
+
         if (claimedScoreBounty) {
             sendMessage("&6&l>> " + killerPlayer.getColoredName() + " &6&lhas claimed the &b&l" + scoreBounty + " Score &6&lbounty on " + gamePlayer.getColoredName());
         }
-        
+
         if (claimedCreditBounty && settings.isGiveCredits()) {
             sendMessage("&6&l>> " + killerPlayer.getColoredName() + " &6&lhas claimed the &b&l" + scoreBounty + " Credit &6&lbounty on " + gamePlayer.getColoredName());
         }
-        
+
         playSound(oldTeam.getDeathSound());
-        
+
         new BukkitRunnable() {
             public void run() {
                 if (state == ENDING || state == ENDED) {
                     cancel();
                     return;
                 }
-                if (Stream.of(INGAME, INGAME_GRACEPERIOD, DEATHMATCH, INGAME_DEATHMATCH, WARMUP).anyMatch(gameState -> state == gameState)) {
+                if (Stream.of(INGAME, DEATHMATCH, INGAME_DEATHMATCH, WARMUP).anyMatch(gameState -> state == gameState)) {
                     checkGameEnd();
                 }
             }
         }.runTaskLater(plugin, 1L);
     }
-    
+
     public void giveSpectatorItems(Player p) {
         GamePlayer gamePlayer = getPlayer(p.getUniqueId());
         ItemStack tributesBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&a&lTributes &7&o(Right Click)").build();
@@ -1254,7 +1254,7 @@ public class Game {
         inv.setItem(7, tpCenter);
         inv.setItem(8, hubItem);
     }
-    
+
     public void checkGameEnd() {
         if (Stream.of(INGAME, INGAME_DEATHMATCH, DEATHMATCH).anyMatch(gameState -> this.state == gameState)) {
             int totalTributes = 0;
@@ -1263,76 +1263,76 @@ public class Game {
                     totalTributes++;
                 }
             }
-            
+
             if (totalTributes <= 1) {
                 this.end();
             }
         }
     }
-    
+
     public GamePlayer getPlayer(UUID uniqueId) {
         for (GamePlayer player : new ArrayList<>(this.players.values())) {
             if (player.getUniqueId().toString().equalsIgnoreCase(uniqueId.toString())) {
                 return player;
             }
         }
-        
+
         return null;
     }
-    
+
     public void startDeathmatchTimer() {
         setState(INGAME_DEATHMATCH);
         if (this.timer != null) {
             timer.cancel();
         }
-        
+
         if (this.graceperiodTimer != null) {
             this.graceperiodTimer.cancel();
             this.graceperiodTimer = null;
         }
-        
+
         if (this.restockTimer != null) {
             this.restockTimer.cancel();
             this.restockTimer = null;
         }
-        
+
         sendMessage("&6&l>> &4&lTHE DEATHMATCH COUNTDOWN HAS STARTED");
-        
+
         this.timer = new Timer(new DeathmatchPlayingCallback(this)).run(TimeUnit.SECONDS.toMilliseconds(settings.getDeathmatchTimerLength()) + 50);
     }
-    
+
     public boolean isLootedChest(Block block) {
         return this.lootedChests.contains(block.getLocation());
     }
-    
+
     public void addLootedChest(Location location) {
         this.lootedChests.add(location);
     }
-    
+
     public void endGracePeriod() {
         setState(INGAME);
         sendMessage("&6&l>> &eThe &c&lGRACE PERIOD &ehas ended.");
         this.graceperiodTimer.cancel();
         this.graceperiodTimer = null;
     }
-    
+
     public GameInfo getGameInfo() {
         return gameInfo;
     }
-    
+
     public void addMutation(Mutation mutation) {
         GamePlayer gamePlayer = getPlayer(mutation.getPlayer());
         sendMessage("&6&l>> " + gamePlayer.getColoredName() + " &6has &lMUTATED &6as a(n) &l" + mutation.getType().getDisplayName() + " &6and seeks revenge on &a" + Bukkit.getPlayer(mutation.getTarget()).getName() + "&6!");
-        
+
         MapSpawn spawn = gameMap.getSpawns().get(new Random().nextInt(gameMap.getSpawns().size()));
         Location location = spawn.toLocation(this.gameMap.getWorld());
         Player player = Bukkit.getPlayer(gamePlayer.getUniqueId());
-        
+
         gamePlayer.sendMessage(gamePlayer.getTeam().getLeaveMessage());
         gamePlayer.setTeam(GameTeam.MUTATIONS);
         gamePlayer.sendMessage(gamePlayer.getTeam().getJoinMessage());
         DisguiseAPI.disguiseEntity(player, new MobDisguise(mutation.getType().getDisguiseType()));
-        
+
         gamePlayer.setMutated(true);
         teleportMutation(player, this.gameMap.getCenter().toLocation(gameMap.getWorld()), location);
         recalculateVisibility();
@@ -1342,7 +1342,7 @@ public class Game {
         player.setFlying(false);
         player.spigot().setCollidesWithEntities(true);
         player.setSaturation(20);
-        
+
         MutationType type = mutation.getType();
         PlayerInventory inv = player.getInventory();
         inv.setItem(0, type.getWeapon());
@@ -1360,7 +1360,7 @@ public class Game {
             player.addPotionEffect(new PotionEffect(effect.getPotionType(), Integer.MAX_VALUE, effect.getAmplifier(), false, false));
         }
     }
-    
+
     public void removeMutation(Mutation mutation) {
         Player player = Bukkit.getPlayer(mutation.getPlayer());
         DisguiseAPI.undisguiseToAll(player);
@@ -1375,7 +1375,7 @@ public class Game {
             player.removePotionEffect(effect.getType());
         }
     }
-    
+
     public GamePlayer getPlayer(String name) {
         for (GamePlayer gamePlayer : new ArrayList<>(this.players.values())) {
             if (gamePlayer.getName().equalsIgnoreCase(name)) {
@@ -1384,7 +1384,7 @@ public class Game {
         }
         return null;
     }
-    
+
     public int getTeamCount(GameTeam gameTeam) {
         int amount = 0;
         for (GamePlayer gamePlayer : new ArrayList<>(this.players.values())) {
@@ -1394,16 +1394,24 @@ public class Game {
         }
         return amount;
     }
-    
+
     public SponsorManager getSponsorManager() {
         return sponsorManager;
     }
-    
+
     public Mode getMode() {
         return mode;
     }
-    
+
     public boolean isDebug() {
         return this.debugMode;
+    }
+
+    public boolean isGraceperiod() {
+        return graceperiod;
+    }
+
+    public void setGraceperiod(boolean graceperiod) {
+        this.graceperiod = graceperiod;
     }
 }

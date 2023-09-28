@@ -17,7 +17,7 @@ public class RestockTimerCallback implements ReturnableCallback<TimerSnapshot, B
             return false;
         }
         
-        if (!(game.getState() == GameState.INGAME_GRACEPERIOD || game.getState() == GameState.INGAME)) {
+        if (game.getState() != GameState.INGAME) {
             return false;
         }
         

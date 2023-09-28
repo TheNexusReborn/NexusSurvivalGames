@@ -59,7 +59,7 @@ public class SGChatHandler implements ChatHandler {
         format = format.replace("{message}", chatColor + ChatColor.stripColor(e.getMessage()));
         
         if (game != null) {
-            if (game.getState().ordinal() >= GameState.INGAME_GRACEPERIOD.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal()) {
+            if (game.getState().ordinal() >= GameState.INGAME.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal()) {
                 if (game.getPlayer(player.getUniqueId()).getTeam() == GameTeam.SPECTATORS) {
                     for (GamePlayer p : game.getPlayers().values()) {
                         if (p.getTeam() == GameTeam.SPECTATORS) {

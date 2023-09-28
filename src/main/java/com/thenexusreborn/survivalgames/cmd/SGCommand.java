@@ -178,7 +178,7 @@ public class SGCommand implements CommandExecutor {
                     }
                 }
                 case "startdeathmatchcountdown", "sdmcd" -> {
-                    if (game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_GRACEPERIOD) {
+                    if (game.getState() == GameState.INGAME) {
                         game.startDeathmatchTimer();
                         if (game.getState() == GameState.INGAME_DEATHMATCH) {
                             sender.sendMessage(MCUtils.color(MsgType.INFO + "You started the deathmatch timer"));
@@ -190,7 +190,7 @@ public class SGCommand implements CommandExecutor {
                     }
                 }
                 case "teleportdeathmatch", "tpdm" -> {
-                    if (game.getState().ordinal() >= GameState.INGAME_GRACEPERIOD.ordinal() && game.getState().ordinal() <= GameState.INGAME_DEATHMATCH.ordinal()) {
+                    if (game.getState().ordinal() >= GameState.INGAME.ordinal() && game.getState().ordinal() <= GameState.INGAME_DEATHMATCH.ordinal()) {
                         game.teleportDeathmatch();
                         if (game.getState() == GameState.TELEPORT_DEATHMATCH_DONE) {
                             sender.sendMessage(MCUtils.color(MsgType.INFO + "You teleported everyone to the deathmatch"));
@@ -226,7 +226,7 @@ public class SGCommand implements CommandExecutor {
                     }
                 }
                 case "restockchests", "rc" -> {
-                    if (game.getState().ordinal() >= GameState.INGAME_GRACEPERIOD.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal()) {
+                    if (game.getState().ordinal() >= GameState.INGAME.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal()) {
                         game.restockChests();
                         game.sendMessage("&6&l>> &a&lALL CHESTS HAVE BEEN RESTOCKED");
                     } else {
