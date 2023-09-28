@@ -63,4 +63,12 @@ public abstract class SettingList<T extends Setting> implements Cloneable {
     public List<T> findAll() {
         return new ArrayList<>(this.settingsMap.values());
     }
+
+    @Override
+    public String toString() {
+        return "SettingList{" +
+                "category='" + category + '\'' +
+                ", settingsMap=" + settingsMap +
+                '}';
+    }
 }

@@ -392,7 +392,7 @@ public class GameMap {
     public Cuboid getDeathmatchArea() {
         return deathmatchArea;
     }
-    
+
     @Override
     public String toString() {
         return "GameMap{" +
@@ -405,6 +405,8 @@ public class GameMap {
                 ", deathmatchBorderDistance=" + deathmatchBorderDistance +
                 ", creators=" + creators +
                 ", active=" + active +
+                ", ratings=" + ratings +
+                ", swagShack=" + swagShack +
                 ", uniqueId=" + uniqueId +
                 ", world=" + world +
                 ", downloadedZip=" + downloadedZip +
@@ -412,9 +414,10 @@ public class GameMap {
                 ", worldFolder=" + worldFolder +
                 ", editing=" + editing +
                 ", votes=" + votes +
+                ", deathmatchArea=" + deathmatchArea +
                 '}';
     }
-    
+
     public void setRatings(List<MapRating> ratings) {
         ratings.forEach(rating -> this.ratings.put(rating.getPlayer(), rating));
     }

@@ -73,4 +73,14 @@ public class LobbyPlayer {
     public Value getStatValue(String statName) {
         return getPlayer().getStatValue(statName);
     }
+
+    @Override
+    public String toString() {
+        return "LobbyPlayer{" +
+                "player=" + player +
+                ", spectating=" + spectating +
+                ", voteStart=" + voteStart +
+                ", mapVote=" + mapVote +
+                '}';
+    }
 }

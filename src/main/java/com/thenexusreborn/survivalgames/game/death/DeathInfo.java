@@ -135,4 +135,17 @@ public class DeathInfo {
     public long getTime() {
         return this.time;
     }
+
+    @Override
+    public String toString() {
+        return "DeathInfo{" +
+                "game=" + game +
+                ", player=" + player +
+                ", type=" + type +
+                ", teamColor='" + teamColor + '\'' +
+                ", killer=" + killer +
+                ", team=" + team +
+                ", time=" + time +
+                '}';
+    }
 }

@@ -55,4 +55,13 @@ public final class CombatTag {
     public boolean isInCombat() {
         return this.other != null && System.currentTimeMillis() < this.timestamp + TimeUnit.SECONDS.toMilliseconds(SurvivalGames.getPlugin(SurvivalGames.class).getGame().getSettings().getCombatTagLength());
     }
+
+    @Override
+    public String toString() {
+        return "CombatTag{" +
+                "player=" + player +
+                ", other=" + other +
+                ", timestamp=" + timestamp +
+                '}';
+    }
 }

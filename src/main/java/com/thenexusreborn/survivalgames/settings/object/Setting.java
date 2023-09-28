@@ -64,7 +64,17 @@ public abstract class Setting implements Cloneable {
             return null;
         }
     }
-    
+
+    @Override
+    public String toString() {
+        return "Setting{" +
+                "id=" + id +
+                ", info=" + info.name +
+                ", category='" + category + '\'' +
+                ", value=" + value +
+                '}';
+    }
+
     @TableName("sgsettinginfo")
     public static class Info {
         private long id;
@@ -139,6 +149,20 @@ public abstract class Setting implements Cloneable {
         @Override
         public int hashCode() {
             return Objects.hash(type + "_" + name);
+        }
+
+        @Override
+        public String toString() {
+            return "Info{" +
+                    "id=" + id +
+                    ", name='" + name + '\'' +
+                    ", displayName='" + displayName + '\'' +
+                    ", description='" + description + '\'' +
+                    ", type='" + type + '\'' +
+                    ", defaultValue=" + defaultValue +
+                    ", minValue=" + minValue +
+                    ", maxValue=" + maxValue +
+                    '}';
         }
     }
     

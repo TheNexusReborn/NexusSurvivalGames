@@ -296,4 +296,26 @@ public class GamePlayer {
     public void setSponsored(boolean sponsored) {
         this.sponsored = sponsored;
     }
+
+    @Override
+    public String toString() {
+        return "GamePlayer{" +
+                "nexusPlayer=" + nexusPlayer.getName() +
+                ", team=" + team +
+                ", spectatorByDeath=" + spectatorByDeath +
+                ", newPersonalBestNotified=" + newPersonalBestNotified +
+                ", trackerInfo=" + trackerInfo +
+                ", kills=" + kills +
+                ", killStreak=" + killStreak +
+                ", assists=" + assists +
+                ", mutated=" + mutated +
+                ", mutation=" + mutation +
+                ", deathByMutation=" + deathByMutation +
+                ", sponsored=" + sponsored +
+                ", bounty=" + bounty +
+                ", combatTag=" + combatTag +
+                ", damageInfo=" + damageInfo +
+                ", deaths=" + deaths +
+                '}';
+    }
 }

@@ -25,4 +25,12 @@ public class DamageInfo {
     public List<UUID> getDamagers() {
         return new ArrayList<>(damagers);
     }
+
+    @Override
+    public String toString() {
+        return "DamageInfo{" +
+                "player=" + player +
+                ", damagers=" + damagers +
+                '}';
+    }
 }

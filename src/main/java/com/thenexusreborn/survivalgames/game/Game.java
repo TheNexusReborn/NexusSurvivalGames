@@ -1414,4 +1414,27 @@ public class Game {
     public void setGraceperiod(boolean graceperiod) {
         this.graceperiod = graceperiod;
     }
+
+    @Override
+    public String toString() {
+        return "Game{" +
+                "gameMap=" + gameMap.getName() +
+                ", settings=" + settings +
+                ", players=" + players +
+                ", spawns=" + spawns +
+                ", state=" + state +
+                ", timer=" + timer +
+                ", graceperiodTimer=" + graceperiodTimer +
+                ", restockTimer=" + restockTimer +
+                ", ratingPromptTimer=" + ratingPromptTimer +
+                ", lootedChests=" + lootedChests +
+                ", start=" + start +
+                ", end=" + end +
+                ", firstBlood=" + firstBlood.getName() +
+                ", enderchestInventories=" + enderchestInventories.size() +
+                ", mode=" + mode +
+                ", debugMode=" + debugMode +
+                ", graceperiod=" + graceperiod +
+                '}';
+    }
 }
