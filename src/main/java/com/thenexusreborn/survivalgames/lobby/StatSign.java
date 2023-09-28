@@ -35,4 +35,13 @@ public class StatSign {
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
+
+    @Override
+    public String toString() {
+        return "StatSign{" +
+                "location=" + location +
+                ", stat='" + stat + '\'' +
+                ", displayName='" + displayName + '\'' +
+                '}';
+    }
 }
