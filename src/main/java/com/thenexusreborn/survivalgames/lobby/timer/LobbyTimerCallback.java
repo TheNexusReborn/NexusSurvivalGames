@@ -12,7 +12,7 @@ import java.util.List;
 
 public class LobbyTimerCallback implements ClockCallback<TimerSnapshot> {
 
-    private static final List<Integer> ANNOUNCE = new LinkedList<>(Arrays.asList(45, 30, 15, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1));
+    private static final List<Integer> ANNOUNCE = new LinkedList<>(Arrays.asList(45, 30, 15, 10, 5, 4, 3, 2, 1));
 
     private Lobby lobby;
 
@@ -22,10 +22,11 @@ public class LobbyTimerCallback implements ClockCallback<TimerSnapshot> {
 
     @Override
     public boolean callback(TimerSnapshot snapshot) {
-        int remainingSeconds = (int) TimeUnit.SECONDS.fromMillis(snapshot.getLength() - snapshot.getTime());
+        //lobby.getPlugin().getLogger().info("Timer Time: " + snapshot.getTime());
+        int remainingSeconds = (int) TimeUnit.SECONDS.fromMillis(snapshot.getTime());
         if (remainingSeconds <= 0) {
             lobby.prepareGame();
-            return true;
+            return false;
         }
 
         if (ANNOUNCE.contains(remainingSeconds)) {

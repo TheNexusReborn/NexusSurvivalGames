@@ -305,8 +305,9 @@ public class Lobby {
 
     public void startTimer() {
         this.state = LobbyState.COUNTDOWN;
-        this.timer = NexusAPI.getApi().getClockManager().createTimer(TimeUnit.SECONDS.toMilliseconds(lobbySettings.getTimerLength()) + 50L);
+        this.timer = NexusAPI.getApi().getClockManager().createTimer(TimeUnit.SECONDS.toMilliseconds(lobbySettings.getTimerLength()));
         this.timer.addCallback(new LobbyTimerCallback(this), TimeUnit.SECONDS.toMilliseconds(1));
+        this.timer.start();
     }
 
     private int getVoteCount(int position, UUID uuid) {

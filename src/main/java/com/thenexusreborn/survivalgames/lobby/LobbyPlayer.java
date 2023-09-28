@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public class LobbyPlayer {
     private final NexusPlayer player;
-    private boolean spectating = false, voteStart;
+    private boolean spectating, voteStart;
     private int mapVote = -1;
     
     public LobbyPlayer(NexusPlayer player) {
