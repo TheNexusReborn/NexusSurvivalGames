@@ -1,4 +1,4 @@
-package com.thenexusreborn.survivalgames.game.timer;
+package com.thenexusreborn.survivalgames.game.timer.old;
 
 import com.thenexusreborn.nexuscore.util.ReturnableCallback;
 import com.thenexusreborn.nexuscore.util.timer.TimerSnapshot;
