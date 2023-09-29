@@ -19,7 +19,6 @@ import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.Bounty.Type;
 import com.thenexusreborn.survivalgames.game.death.*;
-import com.thenexusreborn.survivalgames.game.timer.GraceperiodStatus;
 import com.thenexusreborn.survivalgames.game.timer.old.*;
 import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
 import com.thenexusreborn.survivalgames.loot.Items;
@@ -67,7 +66,7 @@ public class Game {
     private SponsorManager sponsorManager = new SponsorManager();
     private Mode mode = Mode.CLASSIC; //This will be implemented later, this is mainly for some other checks to exist
     private boolean debugMode; //sDebug Mode. This may be replaced with a class with other settings
-    private GraceperiodStatus graceperiod = GraceperiodStatus.INACTIVE;
+    private Graceperiod graceperiod = Graceperiod.INACTIVE;
 
     public Game(GameMap gameMap, GameSettings settings, Collection<LobbyPlayer> players) {
         this.gameMap = gameMap;
@@ -524,7 +523,7 @@ public class Game {
         this.start = System.currentTimeMillis();
         if (this.settings.isGracePeriod()) {
             this.graceperiodTimer = new Timer(new GraceperiodCountdownCallback(this)).run(TimeUnit.SECONDS.toMilliseconds(settings.getGracePeriodLength()) + 50L);
-            this.graceperiod = GraceperiodStatus.ACTIVE;
+            this.graceperiod = Graceperiod.ACTIVE;
         }
         setState(INGAME);
         this.restockTimer = new Timer(new RestockTimerCallback(this)).run(TimeUnit.MINUTES.toMilliseconds(settings.getGameLength()) / 2 + 50);
@@ -1311,12 +1310,12 @@ public class Game {
     }
     
     public void markGraceperiodDone() {
-        this.graceperiod = GraceperiodStatus.TIMER_DONE;
+        this.graceperiod = Graceperiod.TIMER_DONE;
     }
 
     public void endGracePeriod() {
         sendMessage("&6&l>> &eThe &c&lGRACE PERIOD &ehas ended.");
-        this.graceperiod = GraceperiodStatus.INACTIVE;
+        this.graceperiod = Graceperiod.INACTIVE;
     }
 
     public GameInfo getGameInfo() {
@@ -1411,11 +1410,11 @@ public class Game {
     }
 
     public boolean isGraceperiod() {
-        return graceperiod == GraceperiodStatus.ACTIVE || graceperiod == GraceperiodStatus.TIMER_DONE;
+        return graceperiod == Graceperiod.ACTIVE || graceperiod == Graceperiod.TIMER_DONE;
     }
 
     public void startGraceperiod() {
-        graceperiod = GraceperiodStatus.ACTIVE;
+        graceperiod = Graceperiod.ACTIVE;
     }
     
     @Override
