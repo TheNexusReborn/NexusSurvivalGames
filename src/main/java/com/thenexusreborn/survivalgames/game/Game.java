@@ -526,7 +526,13 @@ public class Game {
             this.graceperiod = Graceperiod.ACTIVE;
         }
         setState(INGAME);
-        this.restockTimer = new Timer(new RestockTimerCallback(this)).run(TimeUnit.MINUTES.toMilliseconds(settings.getGameLength()) / 2 + 50);
+        long restockLength;
+        if (settings.isChestRestockRelative()) {
+            restockLength = settings.getGameLength() / settings.getChestRestockDenomination();
+        } else {
+            restockLength = settings.getChestRestockInterval();
+        }
+        this.restockTimer = new Timer(new RestockTimerCallback(this)).run(TimeUnit.MINUTES.toMilliseconds(restockLength + 50));
         sendMessage("&6&l>> &a&lMAY THE ODDS BE EVER IN YOUR FAVOR.");
         sendMessage("&6&l>> &c&lCLICKING MORE THAN 16 CPS WILL LIKELY RESULT IN A BAN.");
         if (this.settings.isTeamingAllowed()) {

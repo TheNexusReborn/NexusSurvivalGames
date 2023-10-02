@@ -21,10 +21,14 @@ public class RestockTimerCallback implements ReturnableCallback<TimerSnapshot, B
             return false;
         }
         
+        if (game.getTimer().getTimeLeft() == 0) {
+            return false;
+        }
+        
         if (timerSnapshot.getSecondsLeft() == 0) {
             game.restockChests();
             game.sendMessage("&6&l>> &a&lALL CHESTS HAVE BEEN RESTOCKED");
-            return false;
+            return true;
         }
         return true;
     }

@@ -239,6 +239,18 @@ public class GameSettings extends SettingList<GameSetting> {
         return getValue("allow_swag_shack").getAsBoolean();
     }
     
+    public boolean isChestRestockRelative() {
+        return getValue("chest_restock_relative").getAsBoolean();
+    }
+    
+    public int getChestRestockDenomination() {
+        return getValue("chest_restock_denomination").getAsInt();
+    }
+    
+    public int getChestRestockInterval() {
+        return getValue("chest_restock_interval").getAsInt();
+    }
+    
     @Override
     public GameSettings clone() {
         return (GameSettings) super.clone();

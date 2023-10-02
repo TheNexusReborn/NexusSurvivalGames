@@ -305,6 +305,9 @@ public class SurvivalGames extends NexusSpigotPlugin {
         createGameSetting("sponsor_credit_cost", "Sponsor Credit Cost", "The cost of credits for the Credit Sponsorship", Type.INTEGER, 200);
         createGameSetting("sponsor_score_cost", "Sponsor Score Cost", "The cost of score for the Score Sponsorship", Type.INTEGER, 100);
         createGameSetting("allow_swag_shack", "Allow Swag Shack", "Whether or not the Swag Shack is allowed to be used", Type.BOOLEAN, true);
+        createGameSetting("chest_restock_relative", "Chest Restock Relative", "Whether or not the Restock Timer is relative to the game timer.", Type.BOOLEAN, true);
+        createGameSetting("chest_restock_denomination", "Chest Restock Denomination", "The value to divide the game time by for the restock relative.", Type.INTEGER, 2);
+        createGameSetting("chest_restock_interval", "Chest Restock Interval", "The interval for chest restock, the relative setting must be false.", Type.INTEGER, 5);
     }
     
     private void createLobbySetting(String name, String displayName, String description, Type valueType, Object valueDefault) {
