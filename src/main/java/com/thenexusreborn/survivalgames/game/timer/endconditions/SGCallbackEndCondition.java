@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 public class SGCallbackEndCondition implements ClockEndCondition<TimerSnapshot> {
-    
+
     private Game game;
     private Set<GameState> validStates = new HashSet<>();
     private Consumer<Game> autoMethod, manualMethod;
@@ -33,11 +33,12 @@ public class SGCallbackEndCondition implements ClockEndCondition<TimerSnapshot> 
     @Override
     public boolean shouldEnd(TimerSnapshot snapshot) {
         if (snapshot.getTime() == 0) {
+            if (!validStates.contains(game.getState())) {
+                return true;
+            }
             if (Game.getControlType() == ControlType.AUTOMATIC) {
-                if (validStates.contains(game.getState())) {
-                    autoMethod.accept(game);
-                    return true;
-                }
+                autoMethod.accept(game);
+                return true;
             } else {
                 if (manualMethod != null) {
                     manualMethod.accept(game);
