@@ -1,30 +1,45 @@
 package com.thenexusreborn.survivalgames.game;
 
-import com.google.common.io.*;
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.api.gamearchive.*;
-import com.thenexusreborn.api.helper.*;
+import com.thenexusreborn.api.gamearchive.GameAction;
+import com.thenexusreborn.api.gamearchive.GameInfo;
+import com.thenexusreborn.api.helper.NumberHelper;
 import com.thenexusreborn.api.helper.StringHelper;
 import com.thenexusreborn.api.multicraft.MulticraftAPI;
-import com.thenexusreborn.api.player.*;
+import com.thenexusreborn.api.player.CachedPlayer;
+import com.thenexusreborn.api.player.NexusPlayer;
+import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.server.Environment;
 import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.api.tags.Tag;
 import com.thenexusreborn.disguise.DisguiseAPI;
 import com.thenexusreborn.disguise.disguisetypes.MobDisguise;
-import com.thenexusreborn.nexuscore.util.*;
+import com.thenexusreborn.nexuscore.util.ArmorType;
+import com.thenexusreborn.nexuscore.util.MCUtils;
+import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
-import com.thenexusreborn.nexuscore.util.region.Cuboid;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
-import com.thenexusreborn.survivalgames.*;
+import com.thenexusreborn.survivalgames.ControlType;
+import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Bounty.Type;
-import com.thenexusreborn.survivalgames.game.death.*;
+import com.thenexusreborn.survivalgames.game.death.DeathInfo;
+import com.thenexusreborn.survivalgames.game.death.DeathType;
+import com.thenexusreborn.survivalgames.game.death.KillerInfo;
+import com.thenexusreborn.survivalgames.game.state.phase.AssignTeamsPhase;
+import com.thenexusreborn.survivalgames.game.state.GamePhase;
+import com.thenexusreborn.survivalgames.game.state.phase.SetupPhase;
 import com.thenexusreborn.survivalgames.game.timer.old.*;
 import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
 import com.thenexusreborn.survivalgames.loot.Items;
-import com.thenexusreborn.survivalgames.map.*;
-import com.thenexusreborn.survivalgames.mutations.*;
-import com.thenexusreborn.survivalgames.scoreboard.*;
+import com.thenexusreborn.survivalgames.map.GameMap;
+import com.thenexusreborn.survivalgames.map.MapSpawn;
+import com.thenexusreborn.survivalgames.mutations.Mutation;
+import com.thenexusreborn.survivalgames.mutations.MutationEffect;
+import com.thenexusreborn.survivalgames.mutations.MutationItem;
+import com.thenexusreborn.survivalgames.mutations.MutationType;
+import com.thenexusreborn.survivalgames.scoreboard.GameTablistHandler;
 import com.thenexusreborn.survivalgames.scoreboard.game.GameBoard;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.sponsoring.SponsorManager;
@@ -34,8 +49,11 @@ import me.firestar311.starlib.api.time.TimeUnit;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
-import org.bukkit.inventory.*;
-import org.bukkit.potion.*;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
@@ -65,8 +83,10 @@ public class Game {
     private final Map<Location, Inventory> enderchestInventories = new HashMap<>();
     private SponsorManager sponsorManager = new SponsorManager();
     private Mode mode = Mode.CLASSIC; //This will be implemented later, this is mainly for some other checks to exist
-    private boolean debugMode; //sDebug Mode. This may be replaced with a class with other settings
+    private boolean debugMode; //Debug Mode. This may be replaced with a class with other settings
     private Graceperiod graceperiod = Graceperiod.INACTIVE;
+    
+    private GamePhase setupPhase, assignTeamsPhase;
 
     public Game(GameMap gameMap, GameSettings settings, Collection<LobbyPlayer> players) {
         this.gameMap = gameMap;
@@ -100,6 +120,9 @@ public class Game {
 //            }
 //        }
 //        gameInfo.setSettings(sb.substring(0, sb.length() - 1));
+        
+        this.setupPhase = new SetupPhase(this);
+        this.assignTeamsPhase = new AssignTeamsPhase(this);
     }
 
     protected void setState(GameState state) {
@@ -377,111 +400,14 @@ public class Game {
     }
 
     public void assignStartingTeams() {
-        try {
             setState(ASSIGN_TEAMS);
-            UUID uuid;
-            Queue<UUID> tributes = new LinkedList<>(), spectators = new LinkedList<>();
-            while ((uuid = SurvivalGames.PLAYER_QUEUE.poll()) != null) {
-                GamePlayer player = this.players.get(uuid);
-                if (player.getTeam() != null) {
-                    if (player.getTeam() == GameTeam.SPECTATORS) {
-                        spectators.offer(player.getUniqueId());
-                    }
-                } else {
-                    if (tributes.size() >= gameMap.getSpawns().size()) {
-                        player.setTeam(GameTeam.SPECTATORS);
-                        spectators.offer(uuid);
-                    } else {
-                        player.setTeam(GameTeam.TRIBUTES);
-                        tributes.offer(uuid);
-                    }
-                }
-
-                player.sendMessage(player.getTeam().getJoinMessage());
-            }
-
-            UUID spectator;
-            while ((spectator = spectators.poll()) != null) {
-                SurvivalGames.PLAYER_QUEUE.offer(spectator);
-            }
-
-            UUID tribute;
-            while ((tribute = tributes.poll()) != null) {
-                SurvivalGames.PLAYER_QUEUE.offer(tribute);
-            }
-
-            for (GamePlayer player : new ArrayList<>(this.players.values())) {
-                player.getScoreboard().setTablistHandler(new GameTablistHandler(player.getScoreboard(), plugin));
-            }
-
+            this.assignTeamsPhase.beginphase(); //TODO Temporary until it can be replaced.
             setState(TEAMS_ASSIGNED);
-        } catch (Exception e) {
-            e.printStackTrace();
-            handleError("There was an error assiging teams.");
-        }
     }
 
     public void setup() {
         setState(SETTING_UP);
-
-        for (GamePlayer player : this.players.values()) {
-            player.getScoreboard().setView(new GameBoard(player.getScoreboard(), plugin));
-        }
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!gameMap.download(plugin)) {
-                    handleError("There was an error downloading the map.");
-                    return;
-                }
-                if (!gameMap.unzip(plugin)) {
-                    handleError("There was an error extracting the map files.");
-                    return;
-                }
-                if (!gameMap.copyFolder(plugin, false)) {
-                    handleError("There was an error copying the map files.");
-                    return;
-                }
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        if (!gameMap.load(plugin)) {
-                            handleError("There was an error loading the world.");
-                            return;
-                        }
-
-                        int radius = gameMap.getDeathmatchBorderDistance();
-                        Location center = gameMap.getCenter().toLocation(gameMap.getWorld());
-                        Location corner1 = center.clone();
-                        corner1.add(radius, radius, radius);
-                        Location corner2 = center.clone();
-                        corner2.subtract(radius, radius, radius);
-                        gameMap.setDeathmatchArea(new Cuboid(corner1, corner2));
-
-                        try {
-                            for (int i = 0; i < gameMap.getSpawns().size(); i++) {
-                                spawns.put(i, null);
-                            }
-
-                            gameMap.getWorld().setGameRuleValue("naturalRegeneration", "" + settings.isRegeneration());
-                            gameMap.getWorld().setGameRuleValue("doDaylightCycle", "" + settings.isTimeProgression());
-                            gameMap.getWorld().setGameRuleValue("doWeatherCycle", "" + settings.isWeatherProgression());
-                            gameMap.getWorld().setGameRuleValue("doMobSpawning", "false");
-                            gameMap.getWorld().setGameRuleValue("announceAdvancements", "false");
-                            gameMap.getWorld().setGameRuleValue("doFireTick", "false");
-                            gameMap.getWorld().setGameRuleValue("keepInventory", "false");
-                            gameMap.getWorld().setDifficulty(Difficulty.EASY);
-                            setState(SETUP_COMPLETE);
-                            plugin.getLobby().resetLobby();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            handleError("There was an error setting up the world.");
-                        }
-                    }
-                }.runTask(plugin);
-            }
-        }.runTaskAsynchronously(plugin);
+        this.setupPhase.beginphase(); //TODO Temporary until it can be fully replaced
     }
 
     public void handleError(String message) {
@@ -551,15 +477,17 @@ public class Game {
 
     public void restockChests() {
         this.lootedChests.clear();
-        if (this.restockTimer != null) {
-            this.restockTimer.cancel();
-            this.restockTimer = null;
-        }
         if (state == INGAME) {
             int secondsLeft = this.timer.getSecondsLeft();
             int minutesLeft = secondsLeft / 60;
             if (minutesLeft > 10) {
-                this.restockTimer = new Timer(new RestockTimerCallback(this)).run(TimeUnit.MINUTES.toMilliseconds(settings.getGameLength() / 2) + 50);
+                long restockLength;
+                if (settings.isChestRestockRelative()) {
+                    restockLength = settings.getGameLength() / settings.getChestRestockDenomination();
+                } else {
+                    restockLength = settings.getChestRestockInterval();
+                }
+                this.restockTimer = new Timer(new RestockTimerCallback(this)).run(TimeUnit.MINUTES.toMilliseconds(restockLength + 50));
             }
         }
     }
@@ -1422,7 +1350,15 @@ public class Game {
     public void startGraceperiod() {
         graceperiod = Graceperiod.ACTIVE;
     }
-    
+
+    public void setSpawn(int index, UUID uuid) {
+        this.spawns.put(index, uuid);
+    }
+
+    public static SurvivalGames getPlugin() {
+        return plugin;
+    }
+
     @Override
     public String toString() {
         return "Game{" +
@@ -1436,13 +1372,17 @@ public class Game {
                 ", restockTimer=" + restockTimer +
                 ", ratingPromptTimer=" + ratingPromptTimer +
                 ", lootedChests=" + lootedChests +
+                ", gameInfo=" + gameInfo +
                 ", start=" + start +
                 ", end=" + end +
-                ", firstBlood=" + firstBlood.getName() +
-                ", enderchestInventories=" + enderchestInventories.size() +
+                ", firstBlood=" + firstBlood +
+                ", enderchestInventories=" + enderchestInventories +
+                ", sponsorManager=" + sponsorManager +
                 ", mode=" + mode +
                 ", debugMode=" + debugMode +
                 ", graceperiod=" + graceperiod +
+                ", setupPhase=" + setupPhase +
+                ", assignTeamsPhase=" + assignTeamsPhase +
                 '}';
     }
 }
