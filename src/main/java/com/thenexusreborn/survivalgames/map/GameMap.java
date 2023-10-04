@@ -453,4 +453,10 @@ public class GameMap {
             worldBorder.setSize(this.borderDistance);
         }
     }
+
+    public void disableWorldBorder() {
+        World world = getWorld();
+        WorldBorder worldBorder = world.getWorldBorder();
+        worldBorder.reset();
+    }
 }

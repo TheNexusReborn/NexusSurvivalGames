@@ -35,6 +35,8 @@ import static me.firestar311.starlib.api.Value.Type.*;
 public class SGCommand implements CommandExecutor {
 
     private final SurvivalGames plugin;
+    
+    private boolean viewingWorldBorder;
 
     public SGCommand(SurvivalGames plugin) {
         this.plugin = plugin;
@@ -944,6 +946,37 @@ public class SGCommand implements CommandExecutor {
                         Location location = player.getPlayer().getLocation();
                         gameMap.setSwagShack(new Position(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
                         player.sendMessage(MCUtils.color(MsgType.INFO + "You set the swag shack of the map &b" + gameMap.getName() + " &eto your current location."));
+                    }
+                    case "viewboarder", "vb" -> {
+                        if (!(args.length > 2)) {
+                            player.sendMessage(MCUtils.color(MsgType.WARN + "You must say if it is for the game or deathmatch."));
+                            return true;
+                        }
+                        
+                        GameState state = switch (args[2].toLowerCase()) {
+                            case "game" -> GameState.INGAME;
+                            case "deathmatch" -> GameState.DEATHMATCH;
+                            default -> null;
+                        };
+                        
+                        if (state == null) {
+                            player.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid type."));
+                            return true;
+                        }
+                        
+                        gameMap.applyWorldBoarder(state);
+                        this.viewingWorldBorder = true;
+                        player.sendMessage(MCUtils.color(MsgType.INFO + "You are now viewing the world border as " + args[2].toLowerCase()));
+                    }
+                    
+                    case "disableworldborder", "dwb" -> {
+                        if (this.viewingWorldBorder) {
+                            this.viewingWorldBorder = false;
+                            gameMap.disableWorldBorder();
+                            player.sendMessage(MCUtils.color(MsgType.INFO + "You disabled the world border preview."));
+                        } else {
+                            player.sendMessage(MCUtils.color(MsgType.WARN + "The world border is not being previewed."));
+                        }
                     }
                 }
                 GameMap finalGameMap = gameMap;
