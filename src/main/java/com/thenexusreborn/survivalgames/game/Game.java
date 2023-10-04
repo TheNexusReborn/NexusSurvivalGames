@@ -589,12 +589,8 @@ public class Game {
         sendMessage("&6&l>> &a&lALL CHESTS HAVE BEEN RESTOCKED.");
         sendMessage("&6&l>> &d&lTHERE IS NO TEAMING ALLOWED IN DEATHMATCH.");
         restockChests();
-
-        World world = this.gameMap.getWorld();
-        WorldBorder worldBorder = world.getWorldBorder();
-        worldBorder.setCenter(this.gameMap.getCenter().toLocation(world));
-        worldBorder.setSize(100);
-        worldBorder.setSize(10, 300);
+        
+        this.gameMap.applyWorldBoarder(this.state, settings.getDeathmatchLength() * 60);
 
         this.timer = new Timer(new GameEndTimerCallback(this)).run(TimeUnit.MINUTES.toMilliseconds(settings.getDeathmatchLength()) + 50);
     }

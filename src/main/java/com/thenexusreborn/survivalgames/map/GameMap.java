@@ -7,6 +7,7 @@ import com.thenexusreborn.nexuscore.util.Position;
 import com.thenexusreborn.nexuscore.util.region.Cuboid;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.data.handler.GameMapObjectHandler;
+import com.thenexusreborn.survivalgames.game.GameState;
 import me.firestar311.starsql.api.annotations.column.ColumnCodec;
 import me.firestar311.starsql.api.annotations.column.ColumnIgnored;
 import me.firestar311.starsql.api.annotations.column.ColumnType;
@@ -14,6 +15,7 @@ import me.firestar311.starsql.api.annotations.table.TableHandler;
 import me.firestar311.starsql.api.annotations.table.TableName;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.WorldBorder;
 import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
 
@@ -432,5 +434,23 @@ public class GameMap {
     
     public void setSwagShack(Position swagShack) {
         this.swagShack = swagShack;
+    }
+
+    public void applyWorldBoarder(GameState state) {
+        applyWorldBoarder(state, 0);
+    }
+
+    public void applyWorldBoarder(GameState state, int seconds) {
+        World world = getWorld();
+        WorldBorder worldBorder = world.getWorldBorder();
+        worldBorder.setCenter(this.getCenter().toLocation(world));
+        if (state == GameState.DEATHMATCH) {
+            worldBorder.setSize(this.borderDistance);
+            if (seconds != 0) {
+                worldBorder.setSize(10, seconds);
+            }
+        } else if (state == GameState.INGAME || state == GameState.INGAME_DEATHMATCH) {
+            worldBorder.setSize(this.borderDistance);
+        }
     }
 }
