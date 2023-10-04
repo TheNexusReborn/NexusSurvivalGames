@@ -6,6 +6,8 @@ import com.thenexusreborn.api.stats.*;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
+import com.thenexusreborn.survivalgames.scoreboard.GameTablistHandler;
+import com.thenexusreborn.survivalgames.scoreboard.game.GameBoard;
 import me.firestar311.starlib.api.Value;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.*;
@@ -27,6 +29,7 @@ public class GamePlayer {
     private CombatTag combatTag;
     private DamageInfo damageInfo;
     private Map<Long, DeathInfo> deaths = new TreeMap<>();
+    private Status status;
     
     public GamePlayer(NexusPlayer nexusPlayer) {
         this.nexusPlayer = nexusPlayer;
@@ -297,10 +300,28 @@ public class GamePlayer {
         this.sponsored = sponsored;
     }
 
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public void applyScoreboard() {
+        nexusPlayer.getScoreboard().setView(new GameBoard(nexusPlayer.getScoreboard(), Game.getPlugin()));
+        nexusPlayer.getScoreboard().setTablistHandler(new GameTablistHandler(nexusPlayer.getScoreboard(), Game.getPlugin()));
+    }
+
+    public void applyActionBar() {
+        nexusPlayer.setActionBar(new GameActionBar(Game.getPlugin(), this));
+    }
+
+    public enum Status {
+        SETTING_UP_PLAYER, TELEPORTING_TO_CENTER, CALCULATING_VISIBILITY, SETTING_UP_SCOREBOARD, ADDING_TO_GAME
+
+    }
+
     @Override
     public String toString() {
         return "GamePlayer{" +
-                "nexusPlayer=" + nexusPlayer.getName() +
+                "name=" + nexusPlayer.getName() +
                 ", team=" + team +
                 ", spectatorByDeath=" + spectatorByDeath +
                 ", newPersonalBestNotified=" + newPersonalBestNotified +
@@ -316,6 +337,7 @@ public class GamePlayer {
                 ", combatTag=" + combatTag +
                 ", damageInfo=" + damageInfo +
                 ", deaths=" + deaths +
+                ", status=" + status +
                 '}';
     }
 }

@@ -27,8 +27,8 @@ import com.thenexusreborn.survivalgames.game.Bounty.Type;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.game.death.DeathType;
 import com.thenexusreborn.survivalgames.game.death.KillerInfo;
-import com.thenexusreborn.survivalgames.game.state.phase.AssignTeamsPhase;
 import com.thenexusreborn.survivalgames.game.state.GamePhase;
+import com.thenexusreborn.survivalgames.game.state.phase.AssignTeamsPhase;
 import com.thenexusreborn.survivalgames.game.state.phase.SetupPhase;
 import com.thenexusreborn.survivalgames.game.timer.old.*;
 import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
@@ -39,8 +39,6 @@ import com.thenexusreborn.survivalgames.mutations.Mutation;
 import com.thenexusreborn.survivalgames.mutations.MutationEffect;
 import com.thenexusreborn.survivalgames.mutations.MutationItem;
 import com.thenexusreborn.survivalgames.mutations.MutationType;
-import com.thenexusreborn.survivalgames.scoreboard.GameTablistHandler;
-import com.thenexusreborn.survivalgames.scoreboard.game.GameBoard;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.sponsoring.SponsorManager;
 import com.thenexusreborn.survivalgames.util.SGUtils;
@@ -192,17 +190,21 @@ public class Game {
 
     public void addPlayer(NexusPlayer nexusPlayer) {
         GamePlayer gamePlayer = new GamePlayer(nexusPlayer);
+        gamePlayer.setStatus(GamePlayer.Status.ADDING_TO_GAME);
         gamePlayer.setTeam(GameTeam.SPECTATORS);
         gamePlayer.sendMessage(GameTeam.SPECTATORS.getJoinMessage());
         this.players.put(nexusPlayer.getUniqueId(), gamePlayer);
+        gamePlayer.setStatus(GamePlayer.Status.SETTING_UP_PLAYER);
         Player player = Bukkit.getPlayer(nexusPlayer.getUniqueId());
         player.getInventory().clear();
         player.getInventory().setArmorContents(null);
         player.setAllowFlight(false);
         giveSpectatorItems(player);
         player.spigot().setCollidesWithEntities(false);
+        gamePlayer.setStatus(GamePlayer.Status.TELEPORTING_TO_CENTER);
         teleportSpectator(player, this.gameMap.getCenter().toLocation(this.gameMap.getWorld()));
 
+        gamePlayer.setStatus(GamePlayer.Status.CALCULATING_VISIBILITY);
         if (nexusPlayer.getToggleValue("vanish")) {
             for (GamePlayer gp : this.players.values()) {
                 if (gp.getRank().ordinal() <= Rank.HELPER.ordinal() || gp.getUniqueId().equals(nexusPlayer.getUniqueId())) {
@@ -218,9 +220,10 @@ public class Game {
         } else {
             sendMessage("&a&l>> &b" + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined.");
         }
-        nexusPlayer.getScoreboard().setView(new GameBoard(nexusPlayer.getScoreboard(), plugin));
-        nexusPlayer.getScoreboard().setTablistHandler(new GameTablistHandler(nexusPlayer.getScoreboard(), plugin));
-        nexusPlayer.setActionBar(new GameActionBar(plugin, gamePlayer));
+        
+        gamePlayer.setStatus(GamePlayer.Status.SETTING_UP_SCOREBOARD);
+        gamePlayer.applyScoreboard();
+        gamePlayer.applyActionBar();
         recalculateVisibility();
     }
 
