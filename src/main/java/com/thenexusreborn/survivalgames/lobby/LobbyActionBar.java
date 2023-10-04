@@ -31,9 +31,7 @@ public class LobbyActionBar implements IActionBar {
         }
         
         if (lobby.getState() == LobbyState.COUNTDOWN) {
-            lobby.getPlugin().getLogger().info("Timer Time: " + timer.getTime());
             int remainingSeconds = (int) Math.ceil(timer.getTime() / 1000.0);
-            lobby.getPlugin().getLogger().info("Timer Seconds: " + remainingSeconds);
             return "&f&lVoting closes in &e&l" + remainingSeconds + "s"/*Game.SHORT_TIME_FORMAT.format(TimeUnit.SECONDS.toMilliseconds(remainingSeconds)) */;
         }
         
