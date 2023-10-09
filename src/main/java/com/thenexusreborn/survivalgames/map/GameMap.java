@@ -51,6 +51,9 @@ public class GameMap {
     @ColumnCodec(PositionCodec.class)
     private Position swagShack;
     
+    //Analytics - Done via command /sg map analyze
+    private int chests, enchantTables, workbenches, totalBlocks;
+    
     @ColumnIgnored
     private UUID uniqueId;
     @ColumnIgnored
@@ -458,5 +461,37 @@ public class GameMap {
         World world = getWorld();
         WorldBorder worldBorder = world.getWorldBorder();
         worldBorder.reset();
+    }
+
+    public int getChests() {
+        return chests;
+    }
+
+    public void setChests(int chests) {
+        this.chests = chests;
+    }
+
+    public int getEnchantTables() {
+        return enchantTables;
+    }
+
+    public void setEnchantTables(int enchantTables) {
+        this.enchantTables = enchantTables;
+    }
+
+    public int getWorkbenches() {
+        return workbenches;
+    }
+
+    public void setWorkbenches(int workbenches) {
+        this.workbenches = workbenches;
+    }
+
+    public int getTotalBlocks() {
+        return totalBlocks;
+    }
+
+    public void setTotalBlocks(int totalBlocks) {
+        this.totalBlocks = totalBlocks;
     }
 }

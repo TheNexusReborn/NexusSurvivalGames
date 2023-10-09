@@ -17,6 +17,7 @@ import com.thenexusreborn.survivalgames.util.Operator;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import me.firestar311.starlib.api.Value;
 import me.firestar311.starlib.api.Value.Type;
+import me.firestar311.starlib.spigot.utils.Cuboid;
 import me.firestar311.starsql.api.objects.typehandlers.ValueHandler;
 import net.md_5.bungee.api.chat.*;
 import net.md_5.bungee.api.chat.HoverEvent.Action;
@@ -983,6 +984,38 @@ public class SGCommand implements CommandExecutor {
                         } else {
                             player.sendMessage(MCUtils.color(MsgType.WARN + "The world border is not being previewed."));
                         }
+                    }
+                    case "analyze" -> {
+                        gameMap.setChests(0);
+                        gameMap.setEnchantTables(0);
+                        gameMap.setWorkbenches(0);
+                        final GameMap map = gameMap;
+                        Position center = gameMap.getCenter();
+                        int borderDistance = gameMap.getBorderDistance();
+                        Location min = new Location(gameMap.getWorld(), center.getX() - borderDistance, 0, center.getZ() - borderDistance);
+                        Location max = new Location(gameMap.getWorld(), center.getX() + borderDistance, 256, center.getZ() + borderDistance);
+                        Cuboid cuboid = new Cuboid(min, max);
+                        Collection<Block> blockList = cuboid.getBlockList(true);
+                        gameMap.setTotalBlocks(blockList.size());
+                        Bukkit.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+                            player.sendMessage(MCUtils.color(MsgType.INFO + "Performing map analysis on " + map.getName()));
+                            blockList.forEach(block -> {
+                                switch (block.getType()) {
+                                    case CHEST, TRAPPED_CHEST -> map.setChests(map.getChests() + 1);
+                                    case ENCHANTMENT_TABLE -> map.setEnchantTables(map.getEnchantTables() + 1);
+                                    case WORKBENCH -> map.setWorkbenches(map.getWorkbenches() + 1);
+                                }
+                            });
+                            
+                            player.sendMessage(MsgType.INFO + "Analysis Complete. Use /sg map analysis to view results.");
+                        });
+                    } 
+                    case "analysis" -> {
+                        player.sendMessage(MsgType.INFO + "Map analysis results for &b" + gameMap.getName());
+                        player.sendMessage(MsgType.INFO + "Total Blocks: &b" + gameMap.getTotalBlocks());
+                        player.sendMessage(MsgType.INFO + "Total Chests: &b" + gameMap.getChests());
+                        player.sendMessage(MsgType.INFO + "Total Workbenches: &b" + gameMap.getWorkbenches());
+                        player.sendMessage(MsgType.INFO + "Total Enchantment Tables: &b" + gameMap.getEnchantTables());
                     }
                 }
                 GameMap finalGameMap = gameMap;
