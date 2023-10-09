@@ -411,6 +411,7 @@ public class Game {
     public void setup() {
         setState(SETTING_UP);
         this.setupPhase.beginphase(); //TODO Temporary until it can be fully replaced
+        setState(SETUP_COMPLETE);
     }
 
     public void handleError(String message) {
