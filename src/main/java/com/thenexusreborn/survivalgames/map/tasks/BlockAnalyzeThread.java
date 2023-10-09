@@ -23,6 +23,7 @@ public class BlockAnalyzeThread implements Runnable {
                 case CHEST, TRAPPED_CHEST -> map.setChests(map.getChests() + 1);
                 case ENCHANTMENT_TABLE -> map.setEnchantTables(map.getEnchantTables() + 1);
                 case WORKBENCH -> map.setWorkbenches(map.getWorkbenches() + 1);
+                case FURNACE, BURNING_FURNACE -> map.setFurnaces(map.getFurnaces() + 1);
                 default -> map.setTotalBlocks(map.getTotalBlocks() + 1);
             }
         } 

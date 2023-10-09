@@ -1006,6 +1006,7 @@ public class SGCommand implements CommandExecutor {
                         player.sendMessage(MCUtils.color(MsgType.INFO + "Total Chests: &b" + gameMap.getChests()));
                         player.sendMessage(MCUtils.color(MsgType.INFO + "Total Workbenches: &b" + gameMap.getWorkbenches()));
                         player.sendMessage(MCUtils.color(MsgType.INFO + "Total Enchantment Tables: &b" + gameMap.getEnchantTables()));
+                        player.sendMessage(MCUtils.color(MsgType.INFO + "Total Furnaces: &b" + gameMap.getFurnaces()));
                         return true;
                     }
                 }

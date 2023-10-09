@@ -52,7 +52,7 @@ public class GameMap {
     private Position swagShack;
     
     //Analytics - Done via command /sg map analyze
-    private int chests, enchantTables, workbenches, totalBlocks;
+    private int chests, enchantTables, workbenches, furnaces, totalBlocks;
     
     @ColumnIgnored
     private UUID uniqueId;
@@ -493,5 +493,13 @@ public class GameMap {
 
     public void setTotalBlocks(int totalBlocks) {
         this.totalBlocks = totalBlocks;
+    }
+
+    public int getFurnaces() {
+        return furnaces;
+    }
+
+    public void setFurnaces(int furnaces) {
+        this.furnaces = furnaces;
     }
 }
