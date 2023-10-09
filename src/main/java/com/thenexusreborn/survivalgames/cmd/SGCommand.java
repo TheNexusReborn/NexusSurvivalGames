@@ -9,6 +9,7 @@ import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.lobby.*;
 import com.thenexusreborn.survivalgames.map.*;
+import com.thenexusreborn.survivalgames.map.tasks.AnalyzeThread;
 import com.thenexusreborn.survivalgames.settings.SettingRegistry;
 import com.thenexusreborn.survivalgames.settings.collection.SettingList;
 import com.thenexusreborn.survivalgames.settings.object.Setting;
@@ -954,7 +955,7 @@ public class SGCommand implements CommandExecutor {
                         gameMap.setSwagShack(new Position(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
                         player.sendMessage(MCUtils.color(MsgType.INFO + "You set the swag shack of the map &b" + gameMap.getName() + " &eto your current location."));
                     }
-                    case "viewboarder", "vb" -> {
+                    case "viewborder", "vb" -> {
                         if (!(args.length > 2)) {
                             player.sendMessage(MCUtils.color(MsgType.WARN + "You must say if it is for the game or deathmatch."));
                             return true;
@@ -989,33 +990,20 @@ public class SGCommand implements CommandExecutor {
                         gameMap.setChests(0);
                         gameMap.setEnchantTables(0);
                         gameMap.setWorkbenches(0);
-                        final GameMap map = gameMap;
                         Position center = gameMap.getCenter();
                         int borderDistance = gameMap.getBorderDistance();
+                        player.sendMessage(MCUtils.color(MsgType.INFO + "Performing map analysis on " + gameMap.getName()));
                         Location min = new Location(gameMap.getWorld(), center.getX() - borderDistance, 0, center.getZ() - borderDistance);
                         Location max = new Location(gameMap.getWorld(), center.getX() + borderDistance, 256, center.getZ() + borderDistance);
                         Cuboid cuboid = new Cuboid(min, max);
-                        Collection<Block> blockList = cuboid.getBlockList(true);
-                        gameMap.setTotalBlocks(blockList.size());
-                        Bukkit.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-                            player.sendMessage(MCUtils.color(MsgType.INFO + "Performing map analysis on " + map.getName()));
-                            blockList.forEach(block -> {
-                                switch (block.getType()) {
-                                    case CHEST, TRAPPED_CHEST -> map.setChests(map.getChests() + 1);
-                                    case ENCHANTMENT_TABLE -> map.setEnchantTables(map.getEnchantTables() + 1);
-                                    case WORKBENCH -> map.setWorkbenches(map.getWorkbenches() + 1);
-                                }
-                            });
-                            
-                            player.sendMessage(MsgType.INFO + "Analysis Complete. Use /sg map analysis to view results.");
-                        });
+                        Bukkit.getServer().getScheduler().runTaskAsynchronously(plugin, new AnalyzeThread(plugin, cuboid, gameMap, player));
                     } 
                     case "analysis" -> {
-                        player.sendMessage(MsgType.INFO + "Map analysis results for &b" + gameMap.getName());
-                        player.sendMessage(MsgType.INFO + "Total Blocks: &b" + gameMap.getTotalBlocks());
-                        player.sendMessage(MsgType.INFO + "Total Chests: &b" + gameMap.getChests());
-                        player.sendMessage(MsgType.INFO + "Total Workbenches: &b" + gameMap.getWorkbenches());
-                        player.sendMessage(MsgType.INFO + "Total Enchantment Tables: &b" + gameMap.getEnchantTables());
+                        player.sendMessage(MCUtils.color(MsgType.INFO + "Map analysis results for &b" + gameMap.getName()));
+                        player.sendMessage(MCUtils.color(MsgType.INFO + "Total Blocks: &b" + gameMap.getTotalBlocks()));
+                        player.sendMessage(MCUtils.color(MsgType.INFO + "Total Chests: &b" + gameMap.getChests()));
+                        player.sendMessage(MCUtils.color(MsgType.INFO + "Total Workbenches: &b" + gameMap.getWorkbenches()));
+                        player.sendMessage(MCUtils.color(MsgType.INFO + "Total Enchantment Tables: &b" + gameMap.getEnchantTables()));
                     }
                 }
                 GameMap finalGameMap = gameMap;
