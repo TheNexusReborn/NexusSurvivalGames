@@ -975,8 +975,8 @@ public class SGCommand implements CommandExecutor {
                         gameMap.applyWorldBoarder(state);
                         this.viewingWorldBorder = true;
                         player.sendMessage(MCUtils.color(MsgType.INFO + "You are now viewing the world border as " + args[2].toLowerCase()));
+                        return true;
                     }
-                    
                     case "disableworldborder", "dwb" -> {
                         if (this.viewingWorldBorder) {
                             this.viewingWorldBorder = false;
@@ -985,6 +985,7 @@ public class SGCommand implements CommandExecutor {
                         } else {
                             player.sendMessage(MCUtils.color(MsgType.WARN + "The world border is not being previewed."));
                         }
+                        return true;
                     }
                     case "analyze" -> {
                         gameMap.setChests(0);
@@ -997,6 +998,7 @@ public class SGCommand implements CommandExecutor {
                         Location max = new Location(gameMap.getWorld(), center.getX() + borderDistance, 256, center.getZ() + borderDistance);
                         Cuboid cuboid = new Cuboid(min, max);
                         Bukkit.getServer().getScheduler().runTaskAsynchronously(plugin, new AnalyzeThread(plugin, cuboid, gameMap, player));
+                        return true;
                     } 
                     case "analysis" -> {
                         player.sendMessage(MCUtils.color(MsgType.INFO + "Map analysis results for &b" + gameMap.getName()));
@@ -1004,6 +1006,7 @@ public class SGCommand implements CommandExecutor {
                         player.sendMessage(MCUtils.color(MsgType.INFO + "Total Chests: &b" + gameMap.getChests()));
                         player.sendMessage(MCUtils.color(MsgType.INFO + "Total Workbenches: &b" + gameMap.getWorkbenches()));
                         player.sendMessage(MCUtils.color(MsgType.INFO + "Total Enchantment Tables: &b" + gameMap.getEnchantTables()));
+                        return true;
                     }
                 }
                 GameMap finalGameMap = gameMap;
