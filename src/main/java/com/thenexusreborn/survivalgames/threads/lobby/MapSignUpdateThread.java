@@ -64,7 +64,7 @@ public class MapSignUpdateThread extends NexusThread<SurvivalGames> {
                             continue;
                         }
                         if (player.getMapVote() == entry.getKey()) {
-                            sign.setLine(0, MCUtils.color("&n#" + entry.getKey()));
+                            sign.setLine(0, MCUtils.color("&n#" + entry.getKey() + 1));
                             sign.setLine(2, MCUtils.color("&2&lVOTED!"));
                         } else {
                             sign.setLine(0, MCUtils.color("&nClick to Vote"));
