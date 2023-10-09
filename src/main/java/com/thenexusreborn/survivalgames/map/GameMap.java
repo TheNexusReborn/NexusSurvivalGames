@@ -445,7 +445,7 @@ public class GameMap {
         WorldBorder worldBorder = world.getWorldBorder();
         worldBorder.setCenter(this.getCenter().toLocation(world));
         if (state == GameState.DEATHMATCH) {
-            worldBorder.setSize(this.borderDistance);
+            worldBorder.setSize(this.deathmatchBorderDistance);
             if (seconds != 0) {
                 worldBorder.setSize(10, seconds);
             }

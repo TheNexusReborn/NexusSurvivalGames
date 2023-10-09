@@ -870,6 +870,9 @@ public class SGCommand implements CommandExecutor {
                         }
 
                         gameMap.setBorderDistance(radius);
+                        if (this.viewingWorldBorder) {
+                            gameMap.applyWorldBoarder(GameState.INGAME);
+                        }
                         sender.sendMessage(MCUtils.color("You set the border radius on map &b" + gameMap.getName() + " &eto &b" + radius));
                     }
                     case "setdeathmatchborderradius", "sdmbr" -> {
@@ -894,6 +897,9 @@ public class SGCommand implements CommandExecutor {
                         }
 
                         gameMap.setDeathmatchBorderDistance(radius);
+                        if (this.viewingWorldBorder) {
+                            gameMap.applyWorldBoarder(GameState.DEATHMATCH);
+                        }
                         sender.sendMessage(MCUtils.color("You set the deathmatch border radius on map &b" + gameMap.getName() + " &eto &b" + radius));
                     }
                     case "creators" -> {
