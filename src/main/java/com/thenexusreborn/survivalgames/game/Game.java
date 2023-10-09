@@ -7,7 +7,6 @@ import com.thenexusreborn.api.gamearchive.GameAction;
 import com.thenexusreborn.api.gamearchive.GameInfo;
 import com.thenexusreborn.api.helper.NumberHelper;
 import com.thenexusreborn.api.helper.StringHelper;
-import com.thenexusreborn.api.multicraft.MulticraftAPI;
 import com.thenexusreborn.api.player.CachedPlayer;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
@@ -819,7 +818,7 @@ public class Game {
                 @Override
                 public void run() {
                     if (NexusAPI.getApi().getEnvironment() != Environment.DEVELOPMENT) {
-                        MulticraftAPI.getInstance().restartServer(NexusAPI.getApi().getServerManager().getCurrentServer().getMulticraftId());
+                        //MulticraftAPI.getInstance().restartServer(NexusAPI.getApi().getServerManager().getCurrentServer().getMulticraftId());
                     } else {
                         Bukkit.shutdown();
                     }
