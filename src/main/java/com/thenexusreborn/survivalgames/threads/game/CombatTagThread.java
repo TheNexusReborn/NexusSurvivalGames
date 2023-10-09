@@ -7,6 +7,8 @@ import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.game.GameTeam;
 import me.firestar311.starlib.api.time.TimeUnit;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 
@@ -25,6 +27,11 @@ public class CombatTagThread extends NexusThread<SurvivalGames> {
         for (GamePlayer gamePlayer : new ArrayList<>(game.getPlayers().values())) {
             if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
                 continue;
+            }
+
+            Player player = Bukkit.getPlayer(gamePlayer.getUniqueId());
+            if (player.getHealth() == player.getMaxHealth()) {
+                gamePlayer.getDamageInfo().clearDamagers();
             }
             
             CombatTag combatTag = gamePlayer.getCombatTag();

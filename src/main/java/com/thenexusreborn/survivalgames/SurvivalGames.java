@@ -17,6 +17,7 @@ import com.thenexusreborn.survivalgames.listener.BlockListener;
 import com.thenexusreborn.survivalgames.listener.EntityListener;
 import com.thenexusreborn.survivalgames.listener.PlayerListener;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
+import com.thenexusreborn.survivalgames.lobby.LobbyState;
 import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.map.GameMap;
 import com.thenexusreborn.survivalgames.map.MapManager;
@@ -226,7 +227,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
         new SpectatorUpdateThread(this).start();
         new ServerStatusThread(this).start();
         new CombatTagThread(this).start();
-        new DamagersThread(this).start();
         new PlayerScoreboardThread(this).start();
         
         getLogger().info("Registered Tasks");
@@ -236,6 +236,20 @@ public class SurvivalGames extends NexusSpigotPlugin {
         getServer().getPluginManager().registerEvents(new BlockListener(this), this);
         
         getLogger().info("Registered Listeners");
+        
+        nexusCore.setMotdSupplier(() -> {
+            String line1 = "&5NEXUS REBORN &aSurvival Games", line2;
+            if (this.game == null) {
+                line1 += " &7- &bLobby";
+                int remainingSeconds = (int) Math.ceil(lobby.getTimer().getTime() / 1000.0);
+                line2 = "&3Status: &c" + this.lobby.getState() + "   " + (lobby.getState() == LobbyState.COUNTDOWN ? "&dTime Left: &e" + remainingSeconds : "");
+            } else {
+                line1 += " &7- &bGame";
+                line2 = "&3Status: &c" + this.game.getState() + "   " + Game.TIME_FORMAT.format(game.getTimer().getTimeLeft());
+            }
+            
+            return line1 + "\n" + line2;
+        });
     }
     
     private void registerDefaultSettings() {

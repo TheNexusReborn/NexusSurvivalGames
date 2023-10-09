@@ -123,6 +123,5 @@ public class PlayerTrackerThread extends NexusThread<SurvivalGames> {
         if (totalTime > 20) {
             plugin.getLogger().severe("Player Tracker task took " + totalTime);
         }
-
     }
 }
