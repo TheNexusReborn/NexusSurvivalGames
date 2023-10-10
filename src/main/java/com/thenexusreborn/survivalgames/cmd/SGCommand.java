@@ -837,7 +837,7 @@ public class SGCommand implements CommandExecutor {
                     case "addspawn", "as" -> {
                         Location location = player.getLocation();
                         int position = gameMap.addSpawn(new MapSpawn(0, -1, location.getBlockX(), location.getBlockY(), location.getBlockZ()));
-                        sender.sendMessage(MCUtils.color(MsgType.INFO + "You added a spawn with index &b" + position + 1 + " &eto the map &b" + gameMap.getName()));
+                        sender.sendMessage(MCUtils.color(MsgType.INFO + "You added a spawn with index &b" + (position + 1) + " &eto the map &b" + gameMap.getName()));
                     }
                     case "setspawn", "sp" -> {
                         int argIndex;
