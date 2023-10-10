@@ -2,13 +2,22 @@ package com.thenexusreborn.survivalgames.cmd;
 
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.Rank;
-import com.thenexusreborn.api.stats.*;
-import com.thenexusreborn.nexuscore.util.*;
+import com.thenexusreborn.api.stats.Stat;
+import com.thenexusreborn.api.stats.StatHelper;
+import com.thenexusreborn.nexuscore.util.MCUtils;
+import com.thenexusreborn.nexuscore.util.MsgType;
+import com.thenexusreborn.nexuscore.util.Position;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
-import com.thenexusreborn.survivalgames.*;
-import com.thenexusreborn.survivalgames.game.*;
-import com.thenexusreborn.survivalgames.lobby.*;
-import com.thenexusreborn.survivalgames.map.*;
+import com.thenexusreborn.survivalgames.ControlType;
+import com.thenexusreborn.survivalgames.SurvivalGames;
+import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.GameState;
+import com.thenexusreborn.survivalgames.lobby.Lobby;
+import com.thenexusreborn.survivalgames.lobby.LobbyState;
+import com.thenexusreborn.survivalgames.lobby.StatSign;
+import com.thenexusreborn.survivalgames.lobby.TributeSign;
+import com.thenexusreborn.survivalgames.map.GameMap;
+import com.thenexusreborn.survivalgames.map.MapSpawn;
 import com.thenexusreborn.survivalgames.map.tasks.AnalyzeThread;
 import com.thenexusreborn.survivalgames.settings.SettingRegistry;
 import com.thenexusreborn.survivalgames.settings.collection.SettingList;
@@ -18,21 +27,31 @@ import com.thenexusreborn.survivalgames.util.Operator;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import me.firestar311.starlib.api.Value;
 import me.firestar311.starlib.api.Value.Type;
-import me.firestar311.starlib.spigot.utils.Cuboid;
 import me.firestar311.starsql.api.objects.typehandlers.ValueHandler;
-import net.md_5.bungee.api.chat.*;
+import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.HoverEvent.Action;
-import org.bukkit.*;
-import org.bukkit.block.*;
-import org.bukkit.command.*;
+import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.Skull;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
-import static me.firestar311.starlib.api.Value.Type.*;
+import static me.firestar311.starlib.api.Value.Type.INTEGER;
 
 public class SGCommand implements CommandExecutor {
 
@@ -991,13 +1010,10 @@ public class SGCommand implements CommandExecutor {
                         gameMap.setChests(0);
                         gameMap.setEnchantTables(0);
                         gameMap.setWorkbenches(0);
-                        Position center = gameMap.getCenter();
-                        int borderDistance = gameMap.getBorderDistance();
+                        gameMap.setTotalBlocks(0);
+                        gameMap.setFurnaces(0);
                         player.sendMessage(MCUtils.color(MsgType.INFO + "Performing map analysis on " + gameMap.getName()));
-                        Location min = new Location(gameMap.getWorld(), center.getX() - borderDistance, 0, center.getZ() - borderDistance);
-                        Location max = new Location(gameMap.getWorld(), center.getX() + borderDistance, 256, center.getZ() + borderDistance);
-                        Cuboid cuboid = new Cuboid(min, max);
-                        Bukkit.getServer().getScheduler().runTaskAsynchronously(plugin, new AnalyzeThread(plugin, cuboid, gameMap, player));
+                        Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(plugin, new AnalyzeThread(plugin, gameMap, player), 1L);
                         return true;
                     }
                     case "analysis" -> {
