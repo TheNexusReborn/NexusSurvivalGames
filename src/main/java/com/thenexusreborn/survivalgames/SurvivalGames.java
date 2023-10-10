@@ -238,11 +238,10 @@ public class SurvivalGames extends NexusSpigotPlugin {
         getLogger().info("Registered Listeners");
         
         nexusCore.setMotdSupplier(() -> {
-            String line1 = "&5NEXUS REBORN &aSurvival Games", line2;
+            String line1 = "&5&lNEXUS REBORN &aSurvival Games", line2;
             if (this.game == null) {
                 line1 += " &7- &bLobby";
-                int remainingSeconds = (int) Math.ceil(lobby.getTimer().getTime() / 1000.0);
-                line2 = "&3Status: &c" + this.lobby.getState() + "   " + (lobby.getState() == LobbyState.COUNTDOWN ? "&dTime Left: &e" + remainingSeconds : "");
+                line2 = "&3Status: &c" + this.lobby.getState() + "   " + (lobby.getState() == LobbyState.COUNTDOWN ? "&dTime Left: &e" + (int) Math.ceil(lobby.getTimer().getTime() / 1000.0) : "");
             } else {
                 line1 += " &7- &bGame";
                 line2 = "&3Status: &c" + this.game.getState() + "   " + Game.TIME_FORMAT.format(game.getTimer().getTimeLeft());

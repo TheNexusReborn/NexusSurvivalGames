@@ -37,7 +37,7 @@ import static me.firestar311.starlib.api.Value.Type.*;
 public class SGCommand implements CommandExecutor {
 
     private final SurvivalGames plugin;
-    
+
     private boolean viewingWorldBorder;
 
     public SGCommand(SurvivalGames plugin) {
@@ -724,7 +724,7 @@ public class SGCommand implements CommandExecutor {
                     sender.sendMessage(MCUtils.color(MsgType.WARN + "Usage: /" + label + " " + subCommand + " " + mapSubCommand + " <url> <name>"));
                     return true;
                 }
-                //TODO URLs allow file:/path
+
                 String url = args[2].replace("{url}", SurvivalGames.MAP_URL);
                 String mapName = SGUtils.getMapNameFromCommand(args, 3);
                 if (plugin.getMapManager().getMap(mapName) != null) {
@@ -818,7 +818,7 @@ public class SGCommand implements CommandExecutor {
                     case "addspawn", "as" -> {
                         Location location = player.getLocation();
                         int position = gameMap.addSpawn(new MapSpawn(0, -1, location.getBlockX(), location.getBlockY(), location.getBlockZ()));
-                        sender.sendMessage(MCUtils.color(MsgType.INFO + "You added a spawn with index &b" + position + " &eto the map &b" + gameMap.getName()));
+                        sender.sendMessage(MCUtils.color(MsgType.INFO + "You added a spawn with index &b" + position + 1 + " &eto the map &b" + gameMap.getName()));
                     }
                     case "setspawn", "sp" -> {
                         int argIndex;
@@ -875,7 +875,7 @@ public class SGCommand implements CommandExecutor {
                         if (this.viewingWorldBorder) {
                             gameMap.applyWorldBoarder(GameState.INGAME);
                         }
-                        sender.sendMessage(MCUtils.color("You set the border radius on map &b" + gameMap.getName() + " &eto &b" + radius));
+                        sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the border radius on map &b" + gameMap.getName() + " &eto &b" + radius));
                     }
                     case "setdeathmatchborderradius", "sdmbr" -> {
                         int argIndex;
@@ -902,7 +902,7 @@ public class SGCommand implements CommandExecutor {
                         if (this.viewingWorldBorder) {
                             gameMap.applyWorldBoarder(GameState.DEATHMATCH);
                         }
-                        sender.sendMessage(MCUtils.color("You set the deathmatch border radius on map &b" + gameMap.getName() + " &eto &b" + radius));
+                        sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the deathmatch border radius on map &b" + gameMap.getName() + " &eto &b" + radius));
                     }
                     case "creators" -> {
                         int argIndex;
@@ -960,18 +960,18 @@ public class SGCommand implements CommandExecutor {
                             player.sendMessage(MCUtils.color(MsgType.WARN + "You must say if it is for the game or deathmatch."));
                             return true;
                         }
-                        
+
                         GameState state = switch (args[2].toLowerCase()) {
                             case "game" -> GameState.INGAME;
                             case "deathmatch" -> GameState.DEATHMATCH;
                             default -> null;
                         };
-                        
+
                         if (state == null) {
                             player.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid type."));
                             return true;
                         }
-                        
+
                         gameMap.applyWorldBoarder(state);
                         this.viewingWorldBorder = true;
                         player.sendMessage(MCUtils.color(MsgType.INFO + "You are now viewing the world border as " + args[2].toLowerCase()));
@@ -999,7 +999,7 @@ public class SGCommand implements CommandExecutor {
                         Cuboid cuboid = new Cuboid(min, max);
                         Bukkit.getServer().getScheduler().runTaskAsynchronously(plugin, new AnalyzeThread(plugin, cuboid, gameMap, player));
                         return true;
-                    } 
+                    }
                     case "analysis" -> {
                         player.sendMessage(MCUtils.color(MsgType.INFO + "Map analysis results for &b" + gameMap.getName()));
                         player.sendMessage(MCUtils.color(MsgType.INFO + "Total Blocks: &b" + gameMap.getTotalBlocks()));
@@ -1007,6 +1007,39 @@ public class SGCommand implements CommandExecutor {
                         player.sendMessage(MCUtils.color(MsgType.INFO + "Total Workbenches: &b" + gameMap.getWorkbenches()));
                         player.sendMessage(MCUtils.color(MsgType.INFO + "Total Enchantment Tables: &b" + gameMap.getEnchantTables()));
                         player.sendMessage(MCUtils.color(MsgType.INFO + "Total Furnaces: &b" + gameMap.getFurnaces()));
+                        return true;
+                    }
+                    case "downloadloadteleport", "dlltp" -> {
+                        GameMap finalGameMap = gameMap;
+                        plugin.getLobby().setGameMap(finalGameMap);
+                        player.sendMessage(MCUtils.color(MsgType.VERBOSE + "Please wait, setting up the map, then teleporting you to " + MsgType.VERBOSE.getVariableColor() + finalGameMap.getName() + MsgType.VERBOSE.getBaseColor() + "."));
+                        NexusAPI.getApi().getScheduler().runTaskAsynchronously(() -> {
+                            if (!finalGameMap.download(plugin)) {
+                                player.sendMessage(MCUtils.color(MsgType.WARN + "Failed to download the map " + finalGameMap.getName()));
+                                return;
+                            }
+
+                            finalGameMap.unzip(plugin);
+                            finalGameMap.copyFolder(plugin, false);
+                            NexusAPI.getApi().getScheduler().runTask(() -> {
+                                if (!finalGameMap.load(plugin)) {
+                                    sender.sendMessage(MCUtils.color(MsgType.ERROR + "Could not load the map " + MsgType.ERROR.getVariableColor() + finalGameMap.getName() + MsgType.ERROR.getBaseColor() + ". Please report as a bug."));
+                                    return;
+                                }
+
+                                Location spawn;
+                                if (finalGameMap.getCenter() != null) {
+                                    spawn = finalGameMap.getCenter().toLocation(finalGameMap.getWorld());
+                                } else {
+                                    spawn = finalGameMap.getWorld().getSpawnLocation();
+                                }
+                                player.teleport(spawn);
+                                player.sendMessage(MCUtils.color(MsgType.INFO + "Successfully setup and teleported you to the map " + MsgType.INFO.getVariableColor() + finalGameMap.getName()));
+                            });
+                        });
+                        return true;
+                    }
+                    default -> {
                         return true;
                     }
                 }
