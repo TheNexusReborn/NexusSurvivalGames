@@ -41,7 +41,7 @@ public class AnalyzeThread implements Runnable {
             for (int y = 0; y < 256; y++) {
                 for (int z = cuboid.getZMin(); z <= cuboid.getZMax(); z++) {
                     blocks.add(new Position(x, y, z));
-                    if (blocks.size() == 100) {
+                    if (blocks.size() == 50) {
                         Bukkit.getServer().getScheduler().runTaskLater(plugin, new BlockAnalyzeThread(this, new ArrayList<>(blocks)), 1L);
                         blocks.clear();
                     }
