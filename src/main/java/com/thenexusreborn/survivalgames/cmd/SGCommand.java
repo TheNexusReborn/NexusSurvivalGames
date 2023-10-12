@@ -824,7 +824,7 @@ public class SGCommand implements CommandExecutor {
                         player.sendMessage(MCUtils.color(MsgType.INFO + "Teleported to the map " + MsgType.INFO.getVariableColor() + gameMap.getName()));
                         return true;
                     }
-                    case "save" -> {
+                    case "save", "s" -> {
                         plugin.getMapManager().saveToDatabase(gameMap);
                         player.sendMessage(MCUtils.color(MsgType.INFO + "Saved the settings for the map " + MsgType.INFO.getVariableColor() + gameMap.getName()));
                     }
@@ -924,7 +924,7 @@ public class SGCommand implements CommandExecutor {
                         }
                         sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the deathmatch border radius on map &b" + gameMap.getName() + " &eto &b" + radius));
                     }
-                    case "creators" -> {
+                    case "creators", "cs" -> {
                         int argIndex;
                         if (mapFromArgument) {
                             argIndex = 3;
@@ -953,7 +953,7 @@ public class SGCommand implements CommandExecutor {
                             sender.sendMessage(MCUtils.color(MsgType.INFO + "You added " + MsgType.INFO.getVariableColor() + creator + MsgType.INFO.getBaseColor() + " as a creator on map " + MsgType.INFO.getVariableColor() + gameMap.getName()));
                         }
                     }
-                    case "setactive" -> {
+                    case "setactive", "sa" -> {
                         int argIndex;
                         if (mapFromArgument) {
                             argIndex = 3;
