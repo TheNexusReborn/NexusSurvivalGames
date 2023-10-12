@@ -185,7 +185,7 @@ public class Lobby {
         }
 
         if (gameMap != null) {
-            gameMap.delete(plugin);
+            gameMap.removeFromServer(plugin);
         }
 
         FileConfiguration config = plugin.getConfig();
@@ -634,7 +634,7 @@ public class Lobby {
         }
 
         game.getPlayers().clear();
-        plugin.getGame().getGameMap().delete(plugin);
+        plugin.getGame().getGameMap().removeFromServer(plugin);
         plugin.setGame(null);
     }
 

@@ -102,7 +102,7 @@ public class GameMap {
         return lastIndex + 1;
     }
     
-    public void delete(SurvivalGames plugin) {
+    public void removeFromServer(SurvivalGames plugin) {
         try {
             uniqueId = null;
             if (downloadedZip != null) {

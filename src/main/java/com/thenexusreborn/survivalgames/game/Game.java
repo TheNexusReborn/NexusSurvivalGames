@@ -147,7 +147,7 @@ public class Game {
         }
 
         if (this.gameMap != null) {
-            this.gameMap.delete(plugin);
+            this.gameMap.removeFromServer(plugin);
         }
     }
 

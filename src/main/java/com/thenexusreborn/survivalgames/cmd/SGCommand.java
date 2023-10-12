@@ -828,12 +828,13 @@ public class SGCommand implements CommandExecutor {
                         plugin.getMapManager().saveToDatabase(gameMap);
                         player.sendMessage(MCUtils.color(MsgType.INFO + "Saved the settings for the map " + MsgType.INFO.getVariableColor() + gameMap.getName()));
                     }
-                    case "delete" -> {
-                        gameMap.delete(plugin);
+                    case "removefromserver", "rfs" -> {
                         plugin.getLobby().setGameMap(null);
-                        player.sendMessage(MCUtils.color(MsgType.INFO + "Deleted the map " + MsgType.INFO.getVariableColor() + gameMap.getName() + MsgType.INFO.getBaseColor() + " from the server."));
+                        gameMap.removeFromServer(plugin);
+                        player.sendMessage(MCUtils.color(MsgType.INFO + "Removed the map " + MsgType.INFO.getVariableColor() + gameMap.getName() + MsgType.INFO.getBaseColor() + " from the server."));
                         return true;
                     }
+                    case "delete" -> player.sendMessage(MCUtils.color(MsgType.WARN + "This command is not yet implemented."));
                     case "addspawn", "as" -> {
                         Location location = player.getLocation();
                         int position = gameMap.addSpawn(new MapSpawn(0, -1, location.getBlockX(), location.getBlockY(), location.getBlockZ()));
