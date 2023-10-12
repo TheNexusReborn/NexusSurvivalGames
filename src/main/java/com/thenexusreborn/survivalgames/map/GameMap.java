@@ -245,7 +245,7 @@ public class GameMap {
     }
     
     public int getDeathmatchBorderDistance() {
-        return deathmatchBorderDistance == 0 ? 30 : deathmatchBorderDistance;
+        return this.deathmatchBorderDistance;
     }
     
     public void setDeathmatchBorderDistance(int deathmatchBorderDistance) {
