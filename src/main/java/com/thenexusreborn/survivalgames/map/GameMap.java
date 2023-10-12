@@ -2,7 +2,6 @@ package com.thenexusreborn.survivalgames.map;
 
 import com.thenexusreborn.api.helper.FileHelper;
 import com.thenexusreborn.api.storage.codec.StringSetCodec;
-import com.thenexusreborn.nexuscore.data.codec.PositionCodec;
 import com.thenexusreborn.nexuscore.util.Position;
 import com.thenexusreborn.nexuscore.util.region.Cuboid;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -35,9 +34,7 @@ public class GameMap {
     private String url;
     private String name;
     
-    @ColumnType("varchar(100)")
-    @ColumnCodec(PositionCodec.class)
-    private Position center = new Position(0, 0, 0);
+    private Position center;
     @ColumnIgnored
     private List<MapSpawn> spawns = new LinkedList<>();
     private int borderDistance, deathmatchBorderDistance;
@@ -47,8 +44,6 @@ public class GameMap {
     private boolean active;
     @ColumnIgnored
     private Map<UUID, MapRating> ratings = new HashMap<>();
-    @ColumnType("varchar(1000)")
-    @ColumnCodec(PositionCodec.class)
     private Position swagShack;
     
     //Analytics - Done via command /sg map analyze
