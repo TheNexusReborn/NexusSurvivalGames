@@ -66,6 +66,26 @@ public class GameMap {
     private GameMap() {
     }
     
+    public boolean isSetup() {
+        if (this.center == null) {
+            return false;
+        }
+        
+        if (this.spawns.size() != 24) {
+            return false;
+        }
+        
+        if (this.borderDistance == 0) {
+            return false;
+        }
+        
+        if (this.deathmatchBorderDistance == 0) {
+            return false;
+        }
+
+        return !creators.isEmpty();
+    }
+    
     public GameMap(String fileName, String name) {
         this.url = fileName;
         this.name = name;
@@ -373,7 +393,11 @@ public class GameMap {
     }
     
     public void setActive(boolean active) {
-        this.active = active;
+        if (active) {
+            this.active = isSetup();
+        } else {
+            this.active = false;
+        }
     }
     
     public long getId() {

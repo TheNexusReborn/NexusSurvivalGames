@@ -29,6 +29,16 @@ public class MapManager {
             plugin.getServer().getPluginManager().disablePlugin(plugin);
             return;
         }
+
+        //This runs the checks to see if a map has the minimum requirements for a map to work.
+        for (GameMap gameMap : this.gameMaps) {
+            boolean oldValue = gameMap.isActive();
+            gameMap.setActive(oldValue);
+            //Only save the map if the old value was true and the new one is false
+            if (oldValue && !gameMap.isActive()) {
+                NexusAPI.getApi().getPrimaryDatabase().saveSilent(gameMap); 
+            }
+        }
         
         plugin.getLogger().info("Total Maps: " + gameMaps.size());
     }

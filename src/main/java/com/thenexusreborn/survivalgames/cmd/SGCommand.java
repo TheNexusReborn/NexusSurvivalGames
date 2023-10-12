@@ -968,7 +968,11 @@ public class SGCommand implements CommandExecutor {
 
                         boolean value = Boolean.parseBoolean(args[argIndex]);
                         gameMap.setActive(value);
-                        sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the status of the map to " + MsgType.INFO.getVariableColor() + value));
+                        if (value && !gameMap.isActive()) {
+                            sender.sendMessage(MCUtils.color(MsgType.WARN + "Failed to set the map to an active status, there are required elements missing."));
+                        } else {
+                            sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the status of the map to " + MsgType.INFO.getVariableColor() + value));
+                        }
                     }
                     case "setswagshack", "sss" -> {
                         Location location = player.getPlayer().getLocation();
