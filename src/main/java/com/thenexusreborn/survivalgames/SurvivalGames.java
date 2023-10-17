@@ -244,7 +244,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
                 line2 = "&3Status: &c" + this.lobby.getState() + "   " + (lobby.getState() == LobbyState.COUNTDOWN ? "&dTime Left: &e" + (int) Math.ceil(lobby.getTimer().getTime() / 1000.0) : "");
             } else {
                 line1 += " &7- &bGame";
-                line2 = "&3Status: &c" + this.game.getState() + "   "/* + Game.TIME_FORMAT.format(game.getTimer().getTimeLeft())*/;
+                line2 = "&3Status: &c" + this.game.getState() + "   " + (game.getTimer() != null ? "&dTime Left: &e" + Game.LONG_TIME_FORMAT.format(game.getTimer().getTimeLeft()) : "");
             }
             
             return line1 + "\n" + line2;
