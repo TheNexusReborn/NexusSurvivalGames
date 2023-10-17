@@ -7,6 +7,8 @@ import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.nexuscore.util.timer.TimerSnapshot;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.GamePlayer;
+import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -37,9 +39,15 @@ public class MutationCountdownCallback implements ReturnableCallback<TimerSnapsh
             p.sendMessage(MCUtils.color(MsgType.WARN + "Your target is no longer online, mutation cancelled."));
             return false;
         }
-    
+
         Game game = plugin.getGame();
         if (game == null) {
+            return false;
+        }
+
+        GamePlayer targetPlayer = plugin.getGame().getPlayer(mutation.getTarget());
+        if (targetPlayer.getTeam() != GameTeam.TRIBUTES) {
+            p.sendMessage(MCUtils.color(MsgType.WARN + "Your target is no longer a tribute, mutation cancelled."));
             return false;
         }
     
@@ -50,7 +58,7 @@ public class MutationCountdownCallback implements ReturnableCallback<TimerSnapsh
             announcedPlayer.add(secondsLeft);
         }
         
-        if (secondsLeft == 15 || secondsLeft == 10 || (secondsLeft <= 5 && secondsLeft > 0)) {
+        if (secondsLeft == 15 || secondsLeft == 10 || secondsLeft <= 5 && secondsLeft > 0) {
             if (!announcedTarget.contains(secondsLeft)) {
                 t.sendMessage(MCUtils.color("&4&l>> &c" + p.getName() + " is &lMUTATING! &cThey spawn in &c&l" + secondsLeft + "s..."));
                 announcedTarget.add(secondsLeft );
