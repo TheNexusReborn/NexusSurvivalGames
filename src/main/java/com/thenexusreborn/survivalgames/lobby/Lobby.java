@@ -11,7 +11,6 @@ import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.survivalgames.ControlType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
-import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.lobby.timer.LobbyTimerCallback;
 import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.loot.LootTable;
@@ -632,7 +631,6 @@ public class Lobby {
             addPlayer(nexusPlayer);
         }
 
-        game.getPlayers().clear();
         plugin.getGame().getGameMap().removeFromServer(plugin);
         plugin.setGame(null);
     }
