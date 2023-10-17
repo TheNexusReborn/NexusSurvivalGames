@@ -33,7 +33,7 @@ public class SGChatHandler implements ChatHandler {
         if (game != null) {
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
             if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
-                format = "{score} &8[&cSpectators&8] {level} &r{displayName}&8: {message}";
+                format = "&8[&cSpectators&8] &r{displayName}&8: {message}";
                 nameColor = player.getRank().getColor();
             } else {
                 nameColor = gamePlayer.getTeam().getColor();
