@@ -33,11 +33,11 @@ public class NextGameTimerCallback implements ReturnableCallback<TimerSnapshot, 
     
         if (ANNOUNCE_SECONDS.contains(remainingSeconds)) {
             if (!this.announced.contains(remainingSeconds)) {
-                if (!SurvivalGames.getPlugin(SurvivalGames.class).restart()) {
+                //if (!SurvivalGames.getPlugin(SurvivalGames.class).restart()) {
                     game.sendMessage("&6&l>> &eNext game starts in &b" + Game.LONG_TIME_FORMAT.format(timerSnapshot.getTimeLeft()) + "&e.");
-                } else {
-                    game.sendMessage("&6&l>> &eServer restarting in &b" + Game.LONG_TIME_FORMAT.format(timerSnapshot.getTimeLeft()));
-                }
+//                } else {
+//                    game.sendMessage("&6&l>> &eServer restarting in &b" + Game.LONG_TIME_FORMAT.format(timerSnapshot.getTimeLeft()));
+//                }
                 this.announced.add(remainingSeconds);
             }
         }

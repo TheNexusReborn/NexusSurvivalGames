@@ -521,7 +521,7 @@ public class Game {
         for (GamePlayer player : this.players.values()) {
             Player p = Bukkit.getPlayer(player.getUniqueId());
             if (p != null) {
-                p.playSound(p.getLocation(), sound, 1, 1);
+                p.playSound(p.getLocation(), sound, 0.5F, 1);
             }
         }
     }
@@ -824,31 +824,31 @@ public class Game {
     public void nextGame() {
         setState(ENDED);
 
-        if (plugin.restart()) {
-            ByteArrayDataOutput out = ByteStreams.newDataOutput();
-            out.writeUTF("Connect");
-            out.writeUTF("H1");
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                player.sendPluginMessage(plugin.getNexusCore(), "BungeeCord", out.toByteArray());
-            }
-
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (NexusAPI.getApi().getEnvironment() != Environment.DEVELOPMENT) {
-                        //MulticraftAPI.getInstance().restartServer(NexusAPI.getApi().getServerManager().getCurrentServer().getMulticraftId());
-                    } else {
-                        Bukkit.shutdown();
-                    }
-                }
-            }.runTaskLater(plugin, 100L);
-        } else {
+//        if (plugin.restart()) {
+//            ByteArrayDataOutput out = ByteStreams.newDataOutput();
+//            out.writeUTF("Connect");
+//            out.writeUTF("H1");
+//            for (Player player : Bukkit.getOnlinePlayers()) {
+//                player.sendPluginMessage(plugin.getNexusCore(), "BungeeCord", out.toByteArray());
+//            }
+//
+//            new BukkitRunnable() {
+//                @Override
+//                public void run() {
+//                    if (NexusAPI.getApi().getEnvironment() != Environment.DEVELOPMENT) {
+//                        //MulticraftAPI.getInstance().restartServer(NexusAPI.getApi().getServerManager().getCurrentServer().getMulticraftId());
+//                    } else {
+//                        Bukkit.shutdown();
+//                    }
+//                }
+//            }.runTaskLater(plugin, 100L);
+//        } else {
             for (GamePlayer player : this.players.values()) {
                 resetPlayer(Bukkit.getPlayer(player.getUniqueId()));
             }
 
             plugin.getLobby().fromGame(this);
-        }
+        //}
     }
 
     public void killPlayer(GamePlayer gamePlayer, DeathInfo deathInfo) {
@@ -1327,7 +1327,10 @@ public class Game {
         for (PotionEffect effect : player.getActivePotionEffects()) {
             player.removePotionEffect(effect.getType());
         }
-        giveSpectatorItems(player);
+        GamePlayer gamePlayer = getPlayer(player.getUniqueId());
+        if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
+            giveSpectatorItems(player);
+        }
     }
 
     public GamePlayer getPlayer(String name) {

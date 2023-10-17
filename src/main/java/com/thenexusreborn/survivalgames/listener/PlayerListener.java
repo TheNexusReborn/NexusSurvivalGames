@@ -136,7 +136,7 @@ public class PlayerListener implements Listener {
                                 }
                                 
                                 if (team != null) {
-                                    player.openInventory(new TeamMenu(plugin, team).getInventory());
+                                    manager.openGUI(new TeamMenu(plugin, team), player);
                                 }
                             }
                         } else if (item.getType() == Material.ROTTEN_FLESH) {

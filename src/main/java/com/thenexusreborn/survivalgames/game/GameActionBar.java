@@ -75,7 +75,7 @@ public class GameActionBar implements IActionBar {
         }
         
         if (game.getState() == GameState.INGAME) {
-            if (game.getRestockTimer() != null && game.getRestockTimer().getTimeLeft() > 0) {
+            if (game.getRestockTimer() != null && game.getRestockTimer().getSecondsLeft() > 0) {
                 return "&f&lChests restock in &e" + Game.LONG_TIME_FORMAT.format(game.getRestockTimer().getTimeLeft());
             } else {
                 return "&f&lDeathmatch in &e" + Game.LONG_TIME_FORMAT.format(game.getTimer().getTimeLeft());
