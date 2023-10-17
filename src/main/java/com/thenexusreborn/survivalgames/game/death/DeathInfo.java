@@ -111,8 +111,11 @@ public class DeathInfo {
                 String itemName = "air";
                 ItemStack handItem = killer.getHandItem();
                 if (handItem != null) {
+                    String displayName = "";
                     ItemMeta itemMeta = handItem.getItemMeta();
-                    String displayName = itemMeta.getDisplayName();
+                    if (itemMeta != null) {
+                        displayName = itemMeta.getDisplayName();
+                    }
                     if (displayName != null && !displayName.equals("")) {
                         itemName = ChatColor.stripColor(displayName);
                     } else {
