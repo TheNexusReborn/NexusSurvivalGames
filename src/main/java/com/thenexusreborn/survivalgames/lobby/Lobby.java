@@ -627,10 +627,9 @@ public class Lobby {
             this.gameSettings = plugin.getGameSettings("default");
         }
 
-        for (GamePlayer player : game.getPlayers().values()) {
-            if (player.getNexusPlayer().getPlayer() != null) {
-                addPlayer(player.getNexusPlayer());
-            }
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(player.getUniqueId());
+            addPlayer(nexusPlayer);
         }
 
         game.getPlayers().clear();
