@@ -1099,7 +1099,7 @@ public class Game {
         for (AssisterInfo assister : assistors) {
             GamePlayer assisterPlayer = assister.getGamePlayer();
             assisterPlayer.sendMessage("&2&l>> &a+1 &aAssist");
-            String multiplierMsg = killerRank.getColor() + "&l * x" + MCUtils.formatNumber(assisterPlayer.getRank().getMultiplier()) + " " + assisterPlayer.getRank().getPrefix() + " Bonus";
+            String multiplierMsg = assisterPlayer.getRank().getColor() + "&l * x" + MCUtils.formatNumber(assisterPlayer.getRank().getMultiplier()) + " " + assisterPlayer.getRank().getPrefix() + " Bonus";
             String xpMsg = "&2&l>> &a&l+" + assister.getXp() + " &2&lXP&a&l!" + (settings.isMultiplier() ? " " + multiplierMsg : "");
             String creditsMsg = "&2&l>> &a&l+" + assister.getCredits() + " &3&lCREDITS&a&l!" + (settings.isMultiplier() ? " " + multiplierMsg : "");
             String nexitesMsg = "&2&l>> &a&l" + assister.getNexites() + " &9&lNEXITES&a&l!" + (settings.isMultiplier() && assisterPlayer.getRank().isNexiteBoost() ? " " + multiplierMsg : "");
