@@ -92,6 +92,9 @@ public class Game {
         this.gameInfo = new GameInfo();
         gameInfo.setMapName(this.gameMap.getName().replace("'", "''"));
         gameInfo.setServerName(NexusAPI.getApi().getServerManager().getCurrentServer().getName());
+        for (MapSpawn spawn : this.gameMap.getSpawns()) {
+            this.spawns.put(spawn.getIndex(), null);
+        }
         List<String> playerNames = new ArrayList<>();
         int tributeCount = 0;
         for (LobbyPlayer player : players) {
