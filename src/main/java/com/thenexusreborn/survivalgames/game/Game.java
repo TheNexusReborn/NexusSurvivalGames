@@ -1244,12 +1244,10 @@ public class Game {
         gamePlayer.setMutated(true);
         teleportMutation(player, this.gameMap.getCenter().toLocation(gameMap.getWorld()), location);
         recalculateVisibility();
-        player.getInventory().clear();
-        player.getInventory().setArmorContents(null);
-        player.setAllowFlight(false);
-        player.setFlying(false);
-        player.spigot().setCollidesWithEntities(true);
-        player.setSaturation(20);
+        gamePlayer.clearInventory();
+        gamePlayer.setFlight(false, false);
+        gamePlayer.setCollisions(true);
+        gamePlayer.setFood(20F, 20F);
 
         MutationType type = mutation.getType();
         PlayerInventory inv = player.getInventory();

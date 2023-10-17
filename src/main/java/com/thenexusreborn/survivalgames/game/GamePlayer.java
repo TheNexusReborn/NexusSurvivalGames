@@ -22,6 +22,7 @@ import org.bukkit.inventory.PlayerInventory;
 
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.function.Consumer;
 
 import static com.thenexusreborn.survivalgames.game.GameState.INGAME;
 import static com.thenexusreborn.survivalgames.game.GameState.INGAME_DEATHMATCH;
@@ -406,6 +407,29 @@ public class GamePlayer {
         inv.setItem(6, compass);
         inv.setItem(7, tpCenter);
         inv.setItem(8, hubItem);
+    }
+    
+    private void callPlayerMethod(Consumer<Player> consumer) {
+        Player player = Bukkit.getPlayer(getUniqueId());
+        if (player != null) {
+            consumer.accept(player);
+        }
+    }
+
+    public void setFlight(boolean allow, boolean flying) {
+        callPlayerMethod(player -> {
+            player.setAllowFlight(allow);
+            player.setFlying(flying);
+        });
+    }
+
+    public void setCollisions(boolean collisions) {
+        callPlayerMethod(player -> player.spigot().setCollidesWithEntities(collisions));
+    }
+
+    public void setFood(float food, float saturation) {
+        Player player = Bukkit.getPlayer(getUniqueId());
+        
     }
 
     public enum Status {
