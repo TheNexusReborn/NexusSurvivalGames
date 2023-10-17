@@ -4,6 +4,7 @@ import com.thenexusreborn.nexuscore.util.region.Cuboid;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
+import com.thenexusreborn.survivalgames.game.GameState;
 import com.thenexusreborn.survivalgames.game.state.GamePhase;
 import com.thenexusreborn.survivalgames.game.state.PhaseStatus;
 import com.thenexusreborn.survivalgames.map.GameMap;
@@ -81,6 +82,7 @@ public class SetupPhase extends GamePhase {
                     gameMap.getWorld().setDifficulty(Difficulty.EASY);
                     plugin.getLobby().resetLobby();
                     setStatus(Status.COMPLETE);
+                    game.setState(GameState.SETUP_COMPLETE); //TODO
                 } catch (Exception e) {
                     e.printStackTrace();
                     game.handleError("There was an error setting up the world.");

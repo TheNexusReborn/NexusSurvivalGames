@@ -3,6 +3,7 @@ package com.thenexusreborn.survivalgames.game.state.phase;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
+import com.thenexusreborn.survivalgames.game.GameState;
 import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.game.state.GamePhase;
 import com.thenexusreborn.survivalgames.game.state.PhaseStatus;
@@ -61,6 +62,7 @@ public class AssignTeamsPhase extends GamePhase {
             }
             
             setStatus(Status.COMPLETE);
+            game.setState(GameState.TEAMS_ASSIGNED);
         } catch (Exception e) {
             e.printStackTrace();
             game.handleError("There was an error assiging teams.");

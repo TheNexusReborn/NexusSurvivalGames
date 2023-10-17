@@ -122,9 +122,17 @@ public class Game {
         this.assignTeamsPhase = new AssignTeamsPhase(this);
     }
 
-    protected void setState(GameState state) {
+    public void setState(GameState state) {
         this.state = state;
         this.gameInfo.getActions().add(new GameAction(System.currentTimeMillis(), "statechange", state.name()));
+    }
+
+    public GamePhase getSetupPhase() {
+        return setupPhase;
+    }
+
+    public GamePhase getAssignTeamsPhase() {
+        return assignTeamsPhase;
     }
 
     public void handleShutdown() {
