@@ -93,7 +93,7 @@ public class LobbyThread extends NexusThread<SurvivalGames> {
         }
         
         if (resetLobby) {
-            lobby.resetInvalidState();
+            //lobby.resetInvalidState();
         }
     }
 }
