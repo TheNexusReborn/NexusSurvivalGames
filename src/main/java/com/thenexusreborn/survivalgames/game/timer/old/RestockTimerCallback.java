@@ -28,7 +28,7 @@ public class RestockTimerCallback implements ReturnableCallback<TimerSnapshot, B
         if (timerSnapshot.getSecondsLeft() == 0) {
             game.restockChests();
             game.sendMessage("&6&l>> &a&lALL CHESTS HAVE BEEN RESTOCKED");
-            return true;
+            return false;
         }
         return true;
     }
