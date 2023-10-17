@@ -1,7 +1,5 @@
 package com.thenexusreborn.survivalgames.game;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.gamearchive.GameAction;
 import com.thenexusreborn.api.gamearchive.GameInfo;
@@ -10,8 +8,6 @@ import com.thenexusreborn.api.helper.StringHelper;
 import com.thenexusreborn.api.player.CachedPlayer;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
-import com.thenexusreborn.api.server.Environment;
-import com.thenexusreborn.api.stats.StatChange;
 import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.api.tags.Tag;
 import com.thenexusreborn.disguise.DisguiseAPI;
@@ -790,14 +786,6 @@ public class Game {
                             NexusAPI.getApi().getPrimaryDatabase().saveSilent(nexusPlayer);
                         });
                     }
-                }
-            }
-        });
-
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            for (GamePlayer gamePlayer : this.players.values()) {
-                for (StatChange change : gamePlayer.getNexusPlayer().getStats().findAllChanges()) {
-                    NexusAPI.getApi().getPrimaryDatabase().saveSilent(change);
                 }
             }
         });
