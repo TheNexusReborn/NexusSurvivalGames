@@ -1167,7 +1167,7 @@ public class Game {
         } else if (gamePlayer.hasMutated()) {
             mutateName = "&cCan't mutate again.";
         } else {
-            if (!gamePlayer.killedByPlayer() || gamePlayer.deathByMutation()) {
+            if (!gamePlayer.canMutate().firstValue()) {
                 mutateName = "&cCannot mutate.";
             } else {
                 GamePlayer killer = getPlayer(gamePlayer.getKiller());
