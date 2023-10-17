@@ -24,9 +24,6 @@ public abstract class Setting implements Cloneable {
     @ColumnType("varchar(1000)")
     protected Value value;
 
-    @ColumnIgnored
-    protected List<ChangeListener> changeListeners = new ArrayList<>();
-    
     protected Setting() {}
     
     public Setting(Info info, String category, Value value) {
@@ -51,13 +48,9 @@ public abstract class Setting implements Cloneable {
         return info;
     }
     
-    public void addChangeListener(ChangeListener listener) {
-        this.changeListeners.add(listener);
-    }
-    
     public void setValue(Object value) {
-        if (!this.changeListeners.isEmpty()) {
-            for (ChangeListener changeListener : this.changeListeners) {
+        if (!this.info.changeListeners.isEmpty()) {
+            for (ChangeListener changeListener : this.info.changeListeners) {
                 changeListener.onChange(this, this.value.getType(), this.value.get(), value);
             }
         }
@@ -100,6 +93,8 @@ public abstract class Setting implements Cloneable {
         private String name, displayName, description, type;
         @ColumnType("varchar(1000)")
         private Value defaultValue, minValue, maxValue;
+        @ColumnIgnored
+        protected List<ChangeListener> changeListeners = new ArrayList<>();
         
         private Info() {}
     
@@ -120,7 +115,11 @@ public abstract class Setting implements Cloneable {
             this.maxValue = maxValue;
             this.type = type;
         }
-    
+
+        public void addChangeListener(ChangeListener listener) {
+            this.changeListeners.add(listener);
+        }
+
         public long getId() {
             return id;
         }

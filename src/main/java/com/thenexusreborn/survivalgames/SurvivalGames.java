@@ -280,7 +280,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         createGameSetting("allow_teaming", "Allow Teaming", "This controls the Teaming message at the start of the game", Type.BOOLEAN, true);
         createGameSetting("max_team_amount", "Maximum Team Amount", "The maximum number in a team. This only controls the message at the start of the game", Type.INTEGER, 2);
         createGameSetting("mutations_enabled", "Mutations Enabled", "This controls if mutations are enabled.", Type.BOOLEAN, true);
-        this.gameSettings.get("default").get("mutations_enabled").addChangeListener((setting, type, oldValue, newValue) -> {
+        this.gameSettingRegistry.get("mutations_enabled").addChangeListener((setting, type, oldValue, newValue) -> {
             if (getGame() != null) {
                 for (GamePlayer gamePlayer : getGame().getPlayers().values()) {
                     if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
