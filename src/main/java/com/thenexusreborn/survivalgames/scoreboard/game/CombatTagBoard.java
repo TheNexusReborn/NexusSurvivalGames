@@ -33,6 +33,9 @@ public class CombatTagBoard extends SpigotScoreboardView {
         createTeam(new TeamBuilder("targetValue").entry(ChatColor.WHITE).score(13).valueUpdater((player, team) -> {
             Game game = plugin.getGame();
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
+            if (gamePlayer == null) {
+                return;
+            }
             CombatTag combatTag = gamePlayer.getCombatTag();
             if (combatTag == null || combatTag.getOther() == null) {
                 team.setSuffix("No one");
@@ -46,6 +49,9 @@ public class CombatTagBoard extends SpigotScoreboardView {
         createTeam(new TeamBuilder("timeValue").entry(ChatColor.AQUA).score(10).valueUpdater((player, team) -> {
             Game game = plugin.getGame();
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
+            if (gamePlayer == null) {
+                return;
+            }
             CombatTag combatTag = gamePlayer.getCombatTag();
             if (combatTag == null || combatTag.getOther() == null || !combatTag.isInCombat()) {
                 team.setSuffix("0s");
