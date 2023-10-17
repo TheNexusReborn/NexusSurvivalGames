@@ -6,12 +6,12 @@ public class TierFourLootTable extends LootTable {
     public TierFourLootTable() {
         super("tierFour");
     
-        LootCategory food = new LootCategory("food", Rarity.COMMON);
-        LootCategory armor = new LootCategory("armor", Rarity.UNCOMMON);
-        LootCategory weapons = new LootCategory("weapons", Rarity.UNCOMMON);
-        LootCategory consumables = new LootCategory("consumables", Rarity.UNCOMMON);
-        LootCategory utilities = new LootCategory("utilities", Rarity.RARE);
-        LootCategory components = new LootCategory("components", Rarity.UNCOMMON);
+        LootCategory food = new LootCategory("food", 45);
+        LootCategory armor = new LootCategory("armor", 17);
+        LootCategory weapons = new LootCategory("weapons", 17);
+        LootCategory consumables = new LootCategory("consumables", 17);
+        LootCategory utilities = new LootCategory("utilities", 8);
+        LootCategory components = new LootCategory("components", 17);
     
         addCategory(food);
         addCategory(armor);
@@ -20,22 +20,22 @@ public class TierFourLootTable extends LootTable {
         addCategory(utilities);
         addCategory(components);
     
-        food.addEntries(Rarity.COMMON, Items.PORKCHOP, Items.STEAK, Items.GRILLED_CHICKEN, Items.PUMPKIN_PIE);
-        food.addEntry(Rarity.UNCOMMON, Items.GOLDEN_CARROT);
-        food.addEntry(Rarity.RARE, Items.GOLDEN_MUNCHIE);
+        food.addEntries(45, Items.PORKCHOP, Items.STEAK, Items.GRILLED_CHICKEN, Items.PUMPKIN_PIE);
+        food.addEntry(17, Items.GOLDEN_CARROT);
+        food.addEntry(8, Items.GOLDEN_MUNCHIE);
     
-        armor.addEntries(Rarity.COMMON, Items.IRON_HELMET, Items.IRON_CHESTPLATE, Items.IRON_LEGGINGS, Items.IRON_BOOTS);
+        armor.addEntries(45, Items.IRON_HELMET, Items.IRON_CHESTPLATE, Items.IRON_LEGGINGS, Items.IRON_BOOTS);
     
-        weapons.addEntry(Rarity.COMMON, Items.STONE_SWORD);
-        weapons.addEntry(Rarity.RARE, Items.IRON_SWORD);
+        weapons.addEntry(45, Items.STONE_SWORD);
+        weapons.addEntry(8, Items.IRON_SWORD);
     
-        consumables.addEntries(Rarity.COMMON, Items.EGG_OF_DOOM, Items.SLOWBALL);
-        consumables.addEntries(Rarity.UNCOMMON, Items.COBWEB, Items.XP_BOTTLE);
-        consumables.addEntry(new LootEntry(Items.ARROW, 10, Rarity.RARE.getMax()));
-        consumables.addEntries(Rarity.RARE, Items.TNT, Items.WET_NODDLE, Items.ENDER_PEARL);
+        consumables.addEntries(45, Items.EGG_OF_DOOM, Items.SLOWBALL);
+        consumables.addEntries(17, Items.COBWEB, Items.XP_BOTTLE);
+        consumables.addEntry(new LootEntry(Items.ARROW, 10, 11));
+        consumables.addEntries(8, Items.TNT, Items.WET_NODDLE, Items.ENDER_PEARL);
     
-        utilities.addEntries(Rarity.COMMON, Items.PLAYER_TRACKER, Items.FLINT_AND_STEEL, Items.FISHING_ROD);
+        utilities.addEntries(45, Items.PLAYER_TRACKER, Items.FLINT_AND_STEEL, Items.FISHING_ROD);
     
-        components.addEntries(Rarity.COMMON, Items.FEATHER, Items.FLINT, Items.STICK, Items.GOLD_INGOT, Items.IRON_INGOT, Items.DIAMOND);
+        components.addEntries(45, Items.FEATHER, Items.FLINT, Items.STICK, Items.GOLD_INGOT, Items.IRON_INGOT, Items.DIAMOND);
     }
 }
