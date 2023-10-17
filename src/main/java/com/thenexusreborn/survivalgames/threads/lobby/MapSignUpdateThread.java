@@ -36,7 +36,7 @@ public class MapSignUpdateThread extends NexusThread<SurvivalGames> {
         }
         
         for (Entry<Integer, Location> entry : lobby.getMapSigns().entrySet()) {
-            GameMap map = lobby.getMapOptions().get(entry.getKey() + 1);
+            GameMap map = lobby.getMapOptions().get(entry.getKey());
             if (map == null) {
                 continue;
             }
@@ -64,7 +64,7 @@ public class MapSignUpdateThread extends NexusThread<SurvivalGames> {
                             continue;
                         }
                         if (player.getMapVote() == entry.getKey()) {
-                            sign.setLine(0, MCUtils.color("&n#" + entry.getKey() + 1));
+                            sign.setLine(0, MCUtils.color("&n#" + entry.getKey()));
                             sign.setLine(2, MCUtils.color("&2&lVOTED!"));
                         } else {
                             sign.setLine(0, MCUtils.color("&nClick to Vote"));
