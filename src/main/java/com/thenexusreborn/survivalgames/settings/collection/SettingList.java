@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames.settings.collection;
 
+import com.thenexusreborn.survivalgames.settings.object.ChangeListener;
 import com.thenexusreborn.survivalgames.settings.object.Setting;
 import me.firestar311.starlib.api.Value;
 
@@ -32,7 +33,7 @@ public abstract class SettingList<T extends Setting> implements Cloneable {
         if (!settingsMap.containsKey(name)) {
             add(setting);
         }
-        setting.getValue().set(value);
+        setting.setValue(value);
     }
     
     public Value getValue(String name) {

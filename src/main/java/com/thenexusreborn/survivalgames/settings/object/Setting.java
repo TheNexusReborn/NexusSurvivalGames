@@ -3,23 +3,29 @@ package com.thenexusreborn.survivalgames.settings.object;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import me.firestar311.starlib.api.Value;
 import me.firestar311.starsql.api.annotations.column.ColumnCodec;
+import me.firestar311.starsql.api.annotations.column.ColumnIgnored;
 import me.firestar311.starsql.api.annotations.column.ColumnName;
 import me.firestar311.starsql.api.annotations.column.ColumnType;
 import me.firestar311.starsql.api.annotations.table.TableName;
 import me.firestar311.starsql.api.objects.SqlCodec;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public abstract class Setting implements Cloneable {
-    private long id;
+    protected long id;
     
     @ColumnName("name")
     @ColumnType("varchar(100)")
     @ColumnCodec(InfoCodec.class)
-    private Info info;
-    private String category;
+    protected Info info;
+    protected String category;
     @ColumnType("varchar(1000)")
-    private Value value;
+    protected Value value;
+
+    @ColumnIgnored
+    protected List<ChangeListener> changeListeners = new ArrayList<>();
     
     protected Setting() {}
     
@@ -45,11 +51,24 @@ public abstract class Setting implements Cloneable {
         return info;
     }
     
+    public void addChangeListener(ChangeListener listener) {
+        this.changeListeners.add(listener);
+    }
+    
+    public void setValue(Object value) {
+        if (!this.changeListeners.isEmpty()) {
+            for (ChangeListener changeListener : this.changeListeners) {
+                changeListener.onChange(this, this.value.getType(), this.value.get(), value);
+            }
+        }
+        this.value.set(value);
+    }
+    
     public Value getValue() {
         if (this.value == null || this.value.get() == null) {
             return this.info.getDefaultValue();
         }
-        return value;
+        return value.clone();
     }
     
     @Override
