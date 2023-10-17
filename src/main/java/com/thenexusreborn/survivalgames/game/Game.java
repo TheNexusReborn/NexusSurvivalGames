@@ -15,7 +15,6 @@ import com.thenexusreborn.disguise.disguisetypes.MobDisguise;
 import com.thenexusreborn.nexuscore.util.ArmorType;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
-import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.ControlType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -40,7 +39,10 @@ import com.thenexusreborn.survivalgames.sponsoring.SponsorManager;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import me.firestar311.starlib.api.time.TimeFormat;
 import me.firestar311.starlib.api.time.TimeUnit;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.Inventory;
@@ -1156,42 +1158,7 @@ public class Game {
 
     public void giveSpectatorItems(Player p) {
         GamePlayer gamePlayer = getPlayer(p.getUniqueId());
-        ItemStack tributesBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&a&lTributes &7&o(Right Click)").build();
-        ItemStack mutationsBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&d&lMutations &7&o(Right Click)").build();
-        ItemStack spectatorsBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&c&lSpectators &7&o(Right Click)").build();
-        String mutateName;
-        if (!getSettings().isAllowMutations()) {
-            mutateName = "&cMutations Disabled";
-        } else if (!(getState() == INGAME || getState() == INGAME_DEATHMATCH)) {
-            mutateName = "&cCannot mutate.";
-        } else if (gamePlayer.hasMutated()) {
-            mutateName = "&cCan't mutate again.";
-        } else {
-            if (!gamePlayer.canMutate().firstValue()) {
-                mutateName = "&cCannot mutate.";
-            } else {
-                GamePlayer killer = getPlayer(gamePlayer.getKiller());
-                String passes;
-                if (getSettings().isUnlimitedPasses()) {
-                    passes = "Unlimited";
-                } else {
-                    passes = gamePlayer.getStatValue("sg_mutation_passes").getAsInt() + "";
-                }
-                mutateName = "&c&lTAKE REVENGE   &eTarget: " + killer.getColoredName() + "   &ePasses: &b" + passes;
-            }
-        }
-        ItemStack mutateItem = ItemBuilder.start(Material.ROTTEN_FLESH).displayName(mutateName).build();
-        ItemStack compass = ItemBuilder.start(Material.COMPASS).displayName("&fPlayer Tracker").build();
-        ItemStack tpCenter = ItemBuilder.start(Material.WATCH).displayName("&e&lTeleport to Map Center &7&o(Right Click)").build();
-        ItemStack hubItem = ItemBuilder.start(Material.WOOD_DOOR).displayName("&e&lReturn to Hub &7(Right Click)").build();
-        PlayerInventory inv = p.getInventory();
-        inv.setItem(0, tributesBook);
-        inv.setItem(1, mutationsBook);
-        inv.setItem(2, spectatorsBook);
-        inv.setItem(5, mutateItem);
-        inv.setItem(6, compass);
-        inv.setItem(7, tpCenter);
-        inv.setItem(8, hubItem);
+        gamePlayer.giveSpectatorItems(this);
     }
 
     public void checkGameEnd() {

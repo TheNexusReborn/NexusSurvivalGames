@@ -5,6 +5,7 @@ import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.stats.StatChange;
 import com.thenexusreborn.api.stats.StatOperator;
+import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
@@ -13,11 +14,17 @@ import com.thenexusreborn.survivalgames.scoreboard.game.GameBoard;
 import me.firestar311.starlib.api.Pair;
 import me.firestar311.starlib.api.Value;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 import java.text.DecimalFormat;
 import java.util.*;
+
+import static com.thenexusreborn.survivalgames.game.GameState.INGAME;
+import static com.thenexusreborn.survivalgames.game.GameState.INGAME_DEATHMATCH;
 
 public class GamePlayer {
     private final NexusPlayer nexusPlayer;
@@ -353,6 +360,52 @@ public class GamePlayer {
 
     public void applyActionBar() {
         nexusPlayer.setActionBar(new GameActionBar(Game.getPlugin(), this));
+    }
+
+    public void clearInventory() {
+        Player player = Bukkit.getPlayer(getUniqueId());
+        player.getInventory().clear();
+        player.getInventory().setArmorContents(null);
+    }
+    
+    public void giveSpectatorItems(Game game) {
+        ItemStack tributesBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&a&lTributes &7&o(Right Click)").build();
+        ItemStack mutationsBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&d&lMutations &7&o(Right Click)").build();
+        ItemStack spectatorsBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&c&lSpectators &7&o(Right Click)").build();
+        String mutateName;
+        if (!game.getSettings().isAllowMutations()) {
+            mutateName = "&cMutations Disabled";
+        } else if (!(game.getState() == INGAME || game.getState() == INGAME_DEATHMATCH)) {
+            mutateName = "&cCannot mutate.";
+        } else if (hasMutated()) {
+            mutateName = "&cCan't mutate again.";
+        } else {
+            if (!canMutate().firstValue()) {
+                mutateName = "&cCannot mutate.";
+            } else {
+                GamePlayer killer = game.getPlayer(getKiller());
+                String passes;
+                if (game.getSettings().isUnlimitedPasses()) {
+                    passes = "Unlimited";
+                } else {
+                    passes = getStatValue("sg_mutation_passes").getAsInt() + "";
+                }
+                mutateName = "&c&lTAKE REVENGE   &eTarget: " + killer.getColoredName() + "   &ePasses: &b" + passes;
+            }
+        }
+        ItemStack mutateItem = ItemBuilder.start(Material.ROTTEN_FLESH).displayName(mutateName).build();
+        ItemStack compass = ItemBuilder.start(Material.COMPASS).displayName("&fPlayer Tracker").build();
+        ItemStack tpCenter = ItemBuilder.start(Material.WATCH).displayName("&e&lTeleport to Map Center &7&o(Right Click)").build();
+        ItemStack hubItem = ItemBuilder.start(Material.WOOD_DOOR).displayName("&e&lReturn to Hub &7(Right Click)").build();
+        Player p = Bukkit.getPlayer(getUniqueId());
+        PlayerInventory inv = p.getInventory();
+        inv.setItem(0, tributesBook);
+        inv.setItem(1, mutationsBook);
+        inv.setItem(2, spectatorsBook);
+        inv.setItem(5, mutateItem);
+        inv.setItem(6, compass);
+        inv.setItem(7, tpCenter);
+        inv.setItem(8, hubItem);
     }
 
     public enum Status {
