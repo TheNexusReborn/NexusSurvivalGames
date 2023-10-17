@@ -7,6 +7,7 @@ import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.mutations.*;
+import me.firestar311.starlib.api.Pair;
 import me.firestar311.starui.element.Element;
 import me.firestar311.starui.element.button.Button;
 import me.firestar311.starui.gui.InventoryGUI;
@@ -61,53 +62,9 @@ public class MutateGui extends InventoryGUI {
                         }
 
                         GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
-
-                        if (gamePlayer.hasMutated()) {
-                            player.sendMessage(MsgType.WARN + "You have already mutated, you cannot mutate again.");
-                            return;
-                        }
-
-                        if (gamePlayer.getTeam() != GameTeam.SPECTATORS) {
-                            player.sendMessage(MsgType.WARN + "You must be a spectator to mutate.");
-                            return;
-                        }
-
-                        if (!gamePlayer.isSpectatorByDeath()) {
-                            player.sendMessage(MsgType.WARN + "You can only mutate if you have died.");
-                            return;
-                        }
-
-                        if (!gamePlayer.killedByPlayer()) {
-                            player.sendMessage(MsgType.WARN + "You can only mutate if you died to a player.");
-                            return;
-                        }
-
-                        UUID killerUUID = gamePlayer.getKiller();
-                        GamePlayer killer = game.getPlayer(killerUUID);
-                        if (killer == null) {
-                            player.sendMessage(MsgType.WARN + "Your killer left, you cannot mutate.");
-                            return;
-                        }
-
-                        if (killer.getTeam() != GameTeam.TRIBUTES) {
-                            player.sendMessage(MsgType.WARN + "Your killer has died, you cannot mutate.");
-                            return;
-                        }
-
-                        int passes = player.getStatValue("sg_mutation_passes").getAsInt();
-
-                        if (passes <= 0 && !game.getSettings().isUnlimitedPasses()) {
-                            player.sendMessage(MsgType.WARN + "You do not have any mutation passes.");
-                            return;
-                        }
-
-                        if (player.getTotalTimesMutated() >= game.getSettings().getMaxMutationAmount()) {
-                            player.sendMessage(MsgType.WARN + "You cannot mutate more than " + game.getSettings().getMaxMutationAmount() + " times in this game.");
-                            return;
-                        }
-
-                        if (game.getTeamCount(GameTeam.MUTATIONS) >= game.getSettings().getMaxMutationsAllowed()) {
-                            player.sendMessage(MsgType.WARN + "You cannot mutate as there are too many mutations in the game already.");
+                        Pair<Boolean, String> canMutateResult = gamePlayer.canMutate();
+                        if (!canMutateResult.firstValue()) {
+                            player.sendMessage(MsgType.WARN + canMutateResult.secondValue());
                             return;
                         }
 
@@ -122,7 +79,7 @@ public class MutateGui extends InventoryGUI {
 
                         player.changeStat("sg_times_mutated", 1, StatOperator.ADD);
 
-                        Mutation mutation = Mutation.createInstance(type, player.getUniqueId(), killerUUID);
+                        Mutation mutation = Mutation.createInstance(type, player.getUniqueId(), gamePlayer.getKiller());
                         gamePlayer.setMutation(mutation);
                         mutation.startCountdown();
                         e.getWhoClicked().closeInventory();
