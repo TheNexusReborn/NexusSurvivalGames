@@ -1100,9 +1100,9 @@ public class Game {
             GamePlayer assisterPlayer = assister.getGamePlayer();
             assisterPlayer.sendMessage("&2&l>> &a+1 &aAssist");
             String multiplierMsg = assisterPlayer.getRank().getColor() + "&l * x" + MCUtils.formatNumber(assisterPlayer.getRank().getMultiplier()) + " " + assisterPlayer.getRank().getPrefix() + " Bonus";
-            String xpMsg = "&2&l>> &a&l+" + assister.getXp() + " &2&lXP&a&l!" + (settings.isMultiplier() ? " " + multiplierMsg : "");
-            String creditsMsg = "&2&l>> &a&l+" + assister.getCredits() + " &3&lCREDITS&a&l!" + (settings.isMultiplier() ? " " + multiplierMsg : "");
-            String nexitesMsg = "&2&l>> &a&l" + assister.getNexites() + " &9&lNEXITES&a&l!" + (settings.isMultiplier() && assisterPlayer.getRank().isNexiteBoost() ? " " + multiplierMsg : "");
+            String xpMsg = "&2&l>> &a&l+" + (int) assister.getXp() + " &2&lXP&a&l!" + (settings.isMultiplier() ? " " + multiplierMsg : "");
+            String creditsMsg = "&2&l>> &a&l+" + (int) assister.getCredits() + " &3&lCREDITS&a&l!" + (settings.isMultiplier() ? " " + multiplierMsg : "");
+            String nexitesMsg = "&2&l>> &a&l" + (int) assister.getNexites() + " &9&lNEXITES&a&l!" + (settings.isMultiplier() && assisterPlayer.getRank().isNexiteBoost() ? " " + multiplierMsg : "");
             if (assister.getXp() > 0) {
                 assisterPlayer.sendMessage(xpMsg);
             }
