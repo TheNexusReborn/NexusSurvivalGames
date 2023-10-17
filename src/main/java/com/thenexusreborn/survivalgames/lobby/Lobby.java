@@ -737,9 +737,9 @@ public class Lobby {
                 }
 
                 if (player.getMapVote() > -1) {
-                    player.sendMessage("&6&l>> &eYou changed your vote to &b" + this.mapOptions.get(entry.getKey() + 1).getName());
+                    player.sendMessage("&6&l>> &eYou changed your vote to &b" + this.mapOptions.get(entry.getKey()).getName());
                 } else {
-                    player.sendMessage("&6&l>> &eYou voted for the map &b" + this.mapOptions.get(entry.getKey() + 1).getName());
+                    player.sendMessage("&6&l>> &eYou voted for the map &b" + this.mapOptions.get(entry.getKey()).getName());
                 }
                 player.setMapVote(entry.getKey());
                 return;
