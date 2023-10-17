@@ -1327,6 +1327,7 @@ public class Game {
         for (PotionEffect effect : player.getActivePotionEffects()) {
             player.removePotionEffect(effect.getType());
         }
+        giveSpectatorItems(player);
     }
 
     public GamePlayer getPlayer(String name) {
