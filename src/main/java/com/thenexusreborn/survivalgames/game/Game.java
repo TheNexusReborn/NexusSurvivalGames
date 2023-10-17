@@ -11,6 +11,7 @@ import com.thenexusreborn.api.player.CachedPlayer;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.server.Environment;
+import com.thenexusreborn.api.stats.StatChange;
 import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.api.tags.Tag;
 import com.thenexusreborn.disguise.DisguiseAPI;
@@ -412,13 +413,11 @@ public class Game {
     public void assignStartingTeams() {
             setState(ASSIGN_TEAMS);
             this.assignTeamsPhase.beginphase(); //TODO Temporary until it can be replaced.
-            setState(TEAMS_ASSIGNED);
     }
 
     public void setup() {
         setState(SETTING_UP);
         this.setupPhase.beginphase(); //TODO Temporary until it can be fully replaced
-        setState(SETUP_COMPLETE);
     }
 
     public void handleError(String message) {
@@ -788,6 +787,14 @@ public class Game {
                             NexusAPI.getApi().getPrimaryDatabase().saveSilent(nexusPlayer);
                         });
                     }
+                }
+            }
+        });
+
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            for (GamePlayer gamePlayer : this.players.values()) {
+                for (StatChange change : gamePlayer.getNexusPlayer().getStats().findAllChanges()) {
+                    NexusAPI.getApi().getPrimaryDatabase().saveSilent(change);
                 }
             }
         });
