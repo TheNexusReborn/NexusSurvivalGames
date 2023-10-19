@@ -40,7 +40,12 @@ public class CombatTagBoard extends SpigotScoreboardView {
             if (combatTag == null || combatTag.getOther() == null) {
                 team.setSuffix("No one");
             } else {
-                team.setSuffix(game.getPlayer(combatTag.getOther()).getName());
+                GamePlayer otherGamePlayer = game.getPlayer(combatTag.getOther());
+                if (otherGamePlayer == null) {
+                    team.setSuffix("No one");
+                } else {
+                    team.setSuffix(otherGamePlayer.getName());
+                }
             }
         }));
         
