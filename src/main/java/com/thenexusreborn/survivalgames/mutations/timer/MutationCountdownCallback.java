@@ -8,6 +8,7 @@ import com.thenexusreborn.nexuscore.util.timer.TimerSnapshot;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
+import com.thenexusreborn.survivalgames.game.GameState;
 import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
 import org.bukkit.Bukkit;
@@ -42,6 +43,11 @@ public class MutationCountdownCallback implements ReturnableCallback<TimerSnapsh
 
         Game game = plugin.getGame();
         if (game == null) {
+            return false;
+        }
+        
+        if (!(game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_DEATHMATCH)) {
+            p.sendMessage(MCUtils.color(MsgType.WARN + "You are no longer allowed to mutate due to the game's current progress."));
             return false;
         }
 
