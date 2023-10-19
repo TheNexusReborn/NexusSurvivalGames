@@ -2,48 +2,39 @@ package com.thenexusreborn.survivalgames.loot.tables;
 
 import com.thenexusreborn.survivalgames.loot.*;
 
-public class TierOneLootTable extends LootTable {
+public class TierOneLootTable extends CommonLootTable {
     public TierOneLootTable() {
         super("tierOne");
+        cookedFood = new LootCategory("cookedfood", 1, 4);
+        rawFood = new LootCategory("rawfood", 1, 4);
+        miscFood = new LootCategory("miscfood", 1, 4);
+        armor = new LootCategory("armor", 1);
+        weapons = new LootCategory("weapons", 1);
+        components = new LootCategory("components", 1);
+        throwables = new LootCategory("throwables", 1);
+        placeables = new LootCategory("placeables", 1);
+        tools = new LootCategory("tools", 1);
+        
+        registerCategories();
     
-        LootCategory food = new LootCategory("food", 45, 4);
-        LootCategory armor = new LootCategory("armor", 17);
-        LootCategory weapons = new LootCategory("weapons", 17);
-        LootCategory consumables = new LootCategory("consumables", 17);
-        LootCategory utilities = new LootCategory("utilities", 8);
-        LootCategory components = new LootCategory("components", 17);
+        cookedFood.addEntries(1, Items.PORKCHOP, Items.STEAK, Items.GRILLED_CHICKEN, Items.VILE_CREATURE, Items.BAKED_POTATO, Items.PUMPKIN_PIE);
+        rawFood.addEntries(1, Items.RAW_PORKCHOP, Items.RAW_BEEF, Items.POTATO, Items.RAW_FISH, Items.RAW_CHICKEN);
+        miscFood.addEntries(1, Items.CAKE, Items.MELON, Items.CARROT, Items.APPLE, Items.COOKIE, Items.MUSHROOM_SOUP, Items.GOLDEN_CARROT, Items.GOLDEN_MUNCHIE, Items.WET_NODDLE);
     
-        addCategory(food);
-        addCategory(armor);
-        addCategory(weapons);
-        addCategory(consumables);
-        addCategory(utilities);
-        addCategory(components);
+        armor.addEntries(1, Items.LEATHER_HELMET, Items.LEATHER_CHESTPLATE, Items.LEATHER_LEGGINGS, Items.LEATHER_BOOTS);
+        armor.addEntries(1, Items.THE_CROWN, Items.GOLD_CHESTPLATE, Items.GOLD_LEGGINGS, Items.GOLD_BOOTS, Items.LINGERIE_HELMET, Items.LINGERIE_CHESTPLATE, Items.LINGERIE_LEGGINGS, Items.LINGERIE_BOOTS);
+        armor.addEntries(1, Items.IRON_HELMET, Items.IRON_CHESTPLATE, Items.IRON_LEGGINGS, Items.IRON_BOOTS);
     
-        food.addEntries(8, Items.PORKCHOP, Items.STEAK, Items.GRILLED_CHICKEN, Items.CAKE, Items.PUMPKIN_PIE, Items.VILE_CREATURE);
-        food.addEntries(45, Items.RAW_PORKCHOP, Items.RAW_BEEF, Items.CARROT, Items.POTATO, Items.RAW_FISH, Items.MELON);
-        food.addEntries(17, Items.RAW_CHICKEN, Items.BAKED_POTATO, Items.APPLE, Items.COOKIE, Items.MUSHROOM_SOUP);
-        food.addEntry(3, Items.GOLDEN_CARROT);
-        food.addEntry(1, Items.GOLDEN_MUNCHIE);
+        weapons.addEntry(1, Items.WOOD_AXE);
+        weapons.addEntries(1, Items.WOOD_SWORD, Items.STONE_AXE, Items.BOW);
+        weapons.addEntry(1, Items.STONE_SWORD);
+        
+        throwables.addEntries(1, Items.EGG_OF_DOOM, Items.SLOWBALL, Items.XP_BOTTLE, Items.ENDER_PEARL);
+        placeables.addEntries(1, Items.COBWEB, Items.TNT);
     
-        armor.addEntries(45, Items.LEATHER_HELMET, Items.LEATHER_CHESTPLATE, Items.LEATHER_LEGGINGS, Items.LEATHER_BOOTS);
-        armor.addEntries(17, Items.THE_CROWN, Items.GOLD_CHESTPLATE, Items.GOLD_LEGGINGS, Items.GOLD_BOOTS, Items.LINGERIE_HELMET, Items.LINGERIE_CHESTPLATE, Items.LINGERIE_LEGGINGS, Items.LINGERIE_BOOTS);
-        armor.addEntries(8, Items.IRON_HELMET, Items.IRON_CHESTPLATE, Items.IRON_LEGGINGS, Items.IRON_BOOTS);
+        tools.addEntry(new LootEntry(Items.ARROW, 5, 1));
+        tools.addEntries(1, Items.PLAYER_TRACKER, Items.FLINT_AND_STEEL, Items.FISHING_ROD);
     
-        weapons.addEntry(45, Items.WOOD_AXE);
-        weapons.addEntries(17, Items.WOOD_SWORD, Items.STONE_AXE, Items.BOW);
-        weapons.addEntry(8, Items.STONE_SWORD);
-    
-        consumables.addEntries(17, Items.EGG_OF_DOOM, Items.SLOWBALL, Items.COBWEB);
-        consumables.addEntry(new LootEntry(Items.ARROW, 5, 11));
-        consumables.addEntries(8, Items.TNT, Items.WET_NODDLE);
-        consumables.addEntries(8, Items.TNT, Items.WET_NODDLE, Items.XP_BOTTLE);
-        consumables.addEntry(1, Items.ENDER_PEARL);
-    
-        utilities.addEntries(45, Items.PLAYER_TRACKER, Items.FLINT_AND_STEEL, Items.FISHING_ROD);
-    
-        components.addEntries(45, Items.FEATHER, Items.FLINT, Items.STICK);
-        components.addEntries(17, Items.GOLD_INGOT, Items.IRON_INGOT);
-        components.addEntry(8, Items.DIAMOND);
+        components.addEntries(1, Items.FEATHER, Items.FLINT, Items.STICK, Items.GOLD_INGOT, Items.IRON_INGOT, Items.DIAMOND);
     }
 }
