@@ -226,7 +226,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         new TributeSignUpdateThread(this).start();
         new EndermanWaterDamageThread(this).start();
         new ChickenMutationThread(this).start();
-        new SpectatorUpdateThread(this).start();
+        new PlayerUpdateThread(this).start();
         new ServerStatusThread(this).start();
         new CombatTagThread(this).start();
         new PlayerScoreboardThread(this).start();

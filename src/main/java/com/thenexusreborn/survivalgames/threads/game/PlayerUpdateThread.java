@@ -8,8 +8,8 @@ import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.Bukkit;
 
-public class SpectatorUpdateThread extends NexusThread<SurvivalGames> {
-    public SpectatorUpdateThread(SurvivalGames plugin) {
+public class PlayerUpdateThread extends NexusThread<SurvivalGames> {
+    public PlayerUpdateThread(SurvivalGames plugin) {
         super(plugin, 20L, false);
     }
     
@@ -19,6 +19,8 @@ public class SpectatorUpdateThread extends NexusThread<SurvivalGames> {
             for (GamePlayer player : game.getPlayers().values()) {
                 if (player.getTeam() == GameTeam.SPECTATORS) {
                     SGUtils.updatePlayerHealthAndFood(Bukkit.getPlayer(player.getUniqueId()));
+                } else if (player.getTeam() == GameTeam.MUTATIONS) {
+                    player.setFood(20F, 20F);
                 }
             }
         }
