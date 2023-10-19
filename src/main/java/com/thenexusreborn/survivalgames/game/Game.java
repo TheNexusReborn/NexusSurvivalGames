@@ -237,7 +237,9 @@ public class Game {
         
         gamePlayer.setStatus(GamePlayer.Status.SETTING_UP_SCOREBOARD);
         gamePlayer.applyScoreboard();
+        gamePlayer.setStatus(GamePlayer.Status.SETTING_UP_ACTIONBAR);
         gamePlayer.applyActionBar();
+        gamePlayer.setStatus(GamePlayer.Status.READY);
         recalculateVisibility();
     }
 
