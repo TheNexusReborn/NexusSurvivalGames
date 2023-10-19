@@ -194,6 +194,11 @@ public class Game {
     }
 
     public Timer getRestockTimer() {
+        if (this.restockTimer != null) {
+            if (this.restockTimer.getTimeLeft() <= 0) {
+                this.restockTimer = null;
+            }
+        }
         return restockTimer;
     }
 
@@ -471,9 +476,8 @@ public class Game {
         }
         this.restockTimer = new Timer(new RestockTimerCallback(this)).run(TimeUnit.MINUTES.toMilliseconds(restockLength) + 50L);
         sendMessage("&6&l>> &a&lMAY THE ODDS BE EVER IN YOUR FAVOR.");
-        sendMessage("&6&l>> &c&lCLICKING MORE THAN 16 CPS WILL LIKELY RESULT IN A BAN.");
         if (this.settings.isTeamingAllowed()) {
-            sendMessage("&6&l>> &d&lTHERE IS A MAXIUMUM OF " + this.settings.getMaxTeamAmount() + " PLAYER TEAMS.");
+            sendMessage("&6&l>> &d&lTHERE IS A MAX OF " + this.settings.getMaxTeamAmount() + " PLAYER TEAMS.");
         } else {
             sendMessage("&6&l>> &d&lTEAMING IS NOT ALLOWED IN THIS GAME.");
         }
@@ -488,19 +492,6 @@ public class Game {
 
     public void restockChests() {
         this.lootedChests.clear();
-        if (state == INGAME) {
-            int secondsLeft = this.timer.getSecondsLeft();
-            int minutesLeft = secondsLeft / 60;
-            if (minutesLeft > 10) {
-                long restockLength;
-                if (settings.isChestRestockRelative()) {
-                    restockLength = settings.getGameLength() / settings.getChestRestockDenomination();
-                } else {
-                    restockLength = settings.getChestRestockInterval();
-                }
-                this.restockTimer = new Timer(new RestockTimerCallback(this)).run(TimeUnit.MINUTES.toMilliseconds(restockLength + 50));
-            }
-        }
     }
 
     public void warmupComplete() {
