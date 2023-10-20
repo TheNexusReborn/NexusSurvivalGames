@@ -143,7 +143,9 @@ public class EntityListener implements Listener {
                 GamePlayer targetPlayer = game.getPlayer(target.getUniqueId());
                 damagerPlayer.setCombat(targetPlayer);
                 targetPlayer.setCombat(damagerPlayer);
-                targetPlayer.getDamageInfo().addDamager(damagerPlayer.getUniqueId());
+                if (targetPlayer.getUniqueId() != damagerPlayer.getUniqueId()) {
+                    targetPlayer.getDamageInfo().addDamager(damagerPlayer.getUniqueId());
+                }
                 
                 checkMutationDamage(game.getPlayer(shooter.getUniqueId()), game.getPlayer(e.getEntity().getUniqueId()), e);
                 if (e.isCancelled()) {
@@ -178,7 +180,9 @@ public class EntityListener implements Listener {
                         }
                         GamePlayer targetPlayer = game.getPlayer(target.getUniqueId());
                         GamePlayer damagerPlayer = game.getPlayer(sourcePlayer.getUniqueId());
-                        targetPlayer.getDamageInfo().addDamager(damagerPlayer.getUniqueId());
+                        if (targetPlayer.getUniqueId() != damagerPlayer.getUniqueId()) {
+                            targetPlayer.getDamageInfo().addDamager(damagerPlayer.getUniqueId());
+                        }
                         damagerPlayer.setCombat(targetPlayer);
                         targetPlayer.setCombat(damagerPlayer);
                     }
