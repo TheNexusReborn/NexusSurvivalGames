@@ -111,8 +111,11 @@ public class DeathInfo {
                 String itemName = "air";
                 ItemStack handItem = killer.getHandItem();
                 if (handItem != null) {
+                    String displayName = "";
                     ItemMeta itemMeta = handItem.getItemMeta();
-                    String displayName = itemMeta.getDisplayName();
+                    if (itemMeta != null) {
+                        displayName = itemMeta.getDisplayName();
+                    }
                     if (displayName != null && !displayName.equals("")) {
                         itemName = ChatColor.stripColor(displayName);
                     } else {
@@ -134,5 +137,18 @@ public class DeathInfo {
     
     public long getTime() {
         return this.time;
+    }
+
+    @Override
+    public String toString() {
+        return "DeathInfo{" +
+                "game=" + game +
+                ", player=" + player +
+                ", type=" + type +
+                ", teamColor='" + teamColor + '\'' +
+                ", killer=" + killer +
+                ", team=" + team +
+                ", time=" + time +
+                '}';
     }
 }

@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.loot;
 
-import com.starmediadev.starlib.util.Range;
+import me.firestar311.starlib.api.range.Range;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
@@ -21,6 +21,9 @@ public class LootTable {
     public void generateNewProbabilities(Random random) {
         int index = 0;
         for (LootCategory category : this.categories) {
+            if (category.getEntries().isEmpty()) {
+                continue;
+            }
             category.generateNewProbabilities(random);
             int min = index;
             index += category.getWeight();

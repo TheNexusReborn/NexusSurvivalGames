@@ -28,7 +28,7 @@ public class PlayerScoreboardThread extends NexusThread<SurvivalGames> {
                     scoreboard.setView(new CombatTagBoard(scoreboard, plugin));
                 }
             } else if (gamePlayer.getTeam() == GameTeam.MUTATIONS) {
-                if (!(view instanceof MutationBoard mutationBoard)) {
+                if (!(view instanceof MutationBoard)) {
                     scoreboard.setView(new MutationBoard(scoreboard, plugin));
                 }
             } else if (!game.isDebug()) {

@@ -24,7 +24,7 @@ public class PlayerTrackerThread extends NexusThread<SurvivalGames> {
             return;
         }
 
-        if (!(game.getState().ordinal() >= GameState.INGAME_GRACEPERIOD.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal())) {
+        if (!(game.getState().ordinal() >= GameState.INGAME.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal())) {
             return;
         }
 
@@ -35,7 +35,9 @@ public class PlayerTrackerThread extends NexusThread<SurvivalGames> {
 
         for (UUID p : players) {
             Player player = Bukkit.getPlayer(p);
-            if (player == null) continue;
+            if (player == null) {
+                continue;
+            }
             boolean trackerInHotbar = false;
             boolean holdingTracker = false;
             for (int i = 0; i < 9; i++) {
@@ -121,6 +123,5 @@ public class PlayerTrackerThread extends NexusThread<SurvivalGames> {
         if (totalTime > 20) {
             plugin.getLogger().severe("Player Tracker task took " + totalTime);
         }
-
     }
 }

@@ -1,7 +1,5 @@
 package com.thenexusreborn.survivalgames.menu;
 
-import com.starmediadev.starui.element.button.Button;
-import com.starmediadev.starui.gui.InventoryGUI;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.nexuscore.util.MsgType;
@@ -10,6 +8,8 @@ import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.sponsoring.SponsorCategory;
 import com.thenexusreborn.survivalgames.sponsoring.SponsorManager;
+import me.firestar311.starui.element.button.Button;
+import me.firestar311.starui.gui.InventoryGUI;
 import org.bukkit.Bukkit;
 import org.bukkit.event.inventory.ClickType;
 
@@ -36,7 +36,7 @@ public class SponsorMenu extends InventoryGUI {
             lore.add("&6&lRight Click &fto use " + scoreCost + " &dScore");
             iconBuilder.lore(lore);
             
-            Button button = new Button().creator(p -> iconBuilder.build()).consumer(e -> {
+            Button button = new Button().iconCreator(p -> iconBuilder.build()).consumer(e -> {
                 String currency;
                 int cost;
                 

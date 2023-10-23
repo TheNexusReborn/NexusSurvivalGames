@@ -1,11 +1,11 @@
 package com.thenexusreborn.survivalgames.settings;
 
-import com.starmediadev.starsql.annotations.table.TableName;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.settings.collection.SettingList;
 import com.thenexusreborn.survivalgames.settings.object.Setting;
 import com.thenexusreborn.survivalgames.settings.object.enums.*;
 import com.thenexusreborn.survivalgames.settings.object.impl.*;
+import me.firestar311.starsql.api.annotations.table.TableName;
 
 @TableName("sggamesettings")
 public class GameSettings extends SettingList<GameSetting> {
@@ -237,6 +237,18 @@ public class GameSettings extends SettingList<GameSetting> {
     
     public boolean isAllowSwagShack() {
         return getValue("allow_swag_shack").getAsBoolean();
+    }
+    
+    public boolean isChestRestockRelative() {
+        return getValue("chest_restock_relative").getAsBoolean();
+    }
+    
+    public int getChestRestockDenomination() {
+        return getValue("chest_restock_denomination").getAsInt();
+    }
+    
+    public int getChestRestockInterval() {
+        return getValue("chest_restock_interval").getAsInt();
     }
     
     @Override

@@ -1,8 +1,8 @@
 package com.thenexusreborn.survivalgames.settings.object.impl;
 
-import com.starmediadev.starsql.annotations.table.TableName;
-import com.starmediadev.starlib.util.Value;
 import com.thenexusreborn.survivalgames.settings.object.Setting;
+import me.firestar311.starlib.api.Value;
+import me.firestar311.starsql.api.annotations.table.TableName;
 
 @TableName("sggamesettings")
 public class GameSetting extends Setting {

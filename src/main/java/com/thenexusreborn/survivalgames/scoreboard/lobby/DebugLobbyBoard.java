@@ -1,13 +1,13 @@
 package com.thenexusreborn.survivalgames.scoreboard.lobby;
 
-import com.starmediadev.starlib.util.TimeFormat;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.scoreboard.*;
 import com.thenexusreborn.nexuscore.scoreboard.SpigotScoreboardView;
 import com.thenexusreborn.nexuscore.util.MCUtils;
-import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.lobby.*;
 import com.thenexusreborn.survivalgames.util.SGUtils;
+import me.firestar311.starclock.api.clocks.Timer;
+import me.firestar311.starlib.api.time.TimeFormat;
 import org.bukkit.ChatColor;
 
 public class DebugLobbyBoard extends SpigotScoreboardView {
@@ -43,7 +43,7 @@ public class DebugLobbyBoard extends SpigotScoreboardView {
         createTeam(new TeamBuilder("timeValue").entry(ChatColor.DARK_GREEN).score(6).valueUpdater((player, team) -> {
             Timer timer = lobby.getTimer();
             if (timer != null) {
-                team.setSuffix("&f" + new TimeFormat("%*0m%%0s%").format(timer.getTimeLeft()));
+                team.setSuffix("&f" + new TimeFormat("%*0m%%0s%").format(timer.getTime()));
             } else {
                 team.setSuffix("&f0s");
             }

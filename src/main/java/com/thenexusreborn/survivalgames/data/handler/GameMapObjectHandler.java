@@ -1,14 +1,16 @@
 package com.thenexusreborn.survivalgames.data.handler;
 
-import com.starmediadev.starsql.objects.*;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.survivalgames.map.*;
+import me.firestar311.starsql.api.objects.ObjectHandler;
+import me.firestar311.starsql.api.objects.SQLDatabase;
+import me.firestar311.starsql.api.objects.Table;
 
 import java.sql.SQLException;
 import java.util.List;
 
 public class GameMapObjectHandler extends ObjectHandler {
-    public GameMapObjectHandler(Object object, Database database, Table table) {
+    public GameMapObjectHandler(Object object, SQLDatabase database, Table table) {
         super(object, database, table);
     }
     

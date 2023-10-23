@@ -29,4 +29,12 @@ public final class Bounty {
     public enum Type {
         CREDIT, SCORE
     }
+
+    @Override
+    public String toString() {
+        return "Bounty{" +
+                "player=" + player +
+                ", amounts=" + amounts +
+                '}';
+    }
 }

@@ -2,18 +2,30 @@ package com.thenexusreborn.survivalgames.listener;
 
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.*;
-import com.thenexusreborn.survivalgames.mutations.*;
-import com.thenexusreborn.survivalgames.mutations.impl.*;
+import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.GamePlayer;
+import com.thenexusreborn.survivalgames.game.GameState;
+import com.thenexusreborn.survivalgames.game.GameTeam;
+import com.thenexusreborn.survivalgames.mutations.Mutation;
+import com.thenexusreborn.survivalgames.mutations.MutationType;
+import com.thenexusreborn.survivalgames.mutations.impl.ChickenMutation;
+import com.thenexusreborn.survivalgames.mutations.impl.SkeletonMutation;
 import org.bukkit.entity.*;
-import org.bukkit.event.*;
-import org.bukkit.event.entity.*;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.hanging.HangingBreakEvent.RemoveCause;
-import org.bukkit.potion.*;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class EntityListener implements Listener {
     
@@ -58,7 +70,7 @@ public class EntityListener implements Listener {
                 }
             }
             
-            if (game.getState() == GameState.INGAME_GRACEPERIOD) {
+            if (game.isGraceperiod()) {
                 if (GRACE_DAMAGE_STOP.contains(e.getCause())) {
                     e.setCancelled(true);
                 }
@@ -92,7 +104,7 @@ public class EntityListener implements Listener {
             if (e.getDamager() instanceof Player damager && e.getEntity() instanceof Player target) {
                 GamePlayer damagerPlayer = game.getPlayer(damager.getUniqueId());
                 GamePlayer targetPlayer = game.getPlayer(target.getUniqueId());
-                if (game.getState() == GameState.INGAME_GRACEPERIOD) {
+                if (game.isGraceperiod()) {
                     e.setCancelled(true);
                     return;
                 }
@@ -121,7 +133,7 @@ public class EntityListener implements Listener {
                     return;
                 }
                 
-                if (game.getState() == GameState.INGAME_GRACEPERIOD) {
+                if (game.isGraceperiod()) {
                     shooter.sendMessage(MCUtils.color("&6&l>> &cYou cannot harm others during grace period!"));
                     e.setCancelled(true);
                     return;
@@ -131,7 +143,9 @@ public class EntityListener implements Listener {
                 GamePlayer targetPlayer = game.getPlayer(target.getUniqueId());
                 damagerPlayer.setCombat(targetPlayer);
                 targetPlayer.setCombat(damagerPlayer);
-                targetPlayer.getDamageInfo().addDamager(damagerPlayer.getUniqueId());
+                if (targetPlayer.getUniqueId() != damagerPlayer.getUniqueId()) {
+                    targetPlayer.getDamageInfo().addDamager(damagerPlayer.getUniqueId());
+                }
                 
                 checkMutationDamage(game.getPlayer(shooter.getUniqueId()), game.getPlayer(e.getEntity().getUniqueId()), e);
                 if (e.isCancelled()) {
@@ -166,7 +180,9 @@ public class EntityListener implements Listener {
                         }
                         GamePlayer targetPlayer = game.getPlayer(target.getUniqueId());
                         GamePlayer damagerPlayer = game.getPlayer(sourcePlayer.getUniqueId());
-                        targetPlayer.getDamageInfo().addDamager(damagerPlayer.getUniqueId());
+                        if (targetPlayer.getUniqueId() != damagerPlayer.getUniqueId()) {
+                            targetPlayer.getDamageInfo().addDamager(damagerPlayer.getUniqueId());
+                        }
                         damagerPlayer.setCombat(targetPlayer);
                         targetPlayer.setCombat(damagerPlayer);
                     }

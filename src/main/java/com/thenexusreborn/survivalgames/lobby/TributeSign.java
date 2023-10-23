@@ -46,7 +46,17 @@ public class TributeSign implements Comparable<TributeSign> {
     public void setPlayer(UUID player) {
         this.player = player;
     }
-    
+
+    @Override
+    public String toString() {
+        return "TributeSign{" +
+                "index=" + index +
+                ", signLocation=" + signLocation +
+                ", headLocation=" + headLocation +
+                ", player=" + player +
+                '}';
+    }
+
     @Override
     public int compareTo(TributeSign o) {
         return Integer.compare(this.index, o.index);

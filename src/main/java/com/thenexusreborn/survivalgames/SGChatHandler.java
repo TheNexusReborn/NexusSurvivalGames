@@ -33,7 +33,7 @@ public class SGChatHandler implements ChatHandler {
         if (game != null) {
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
             if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
-                format = "{score} &8[&cSpectators&8] {level} &r{displayName}&8: {message}";
+                format = "&8[&cSpectators&8] &r{displayName}&8: {message}";
                 nameColor = player.getRank().getColor();
             } else {
                 nameColor = gamePlayer.getTeam().getColor();
@@ -59,7 +59,7 @@ public class SGChatHandler implements ChatHandler {
         format = format.replace("{message}", chatColor + ChatColor.stripColor(e.getMessage()));
         
         if (game != null) {
-            if (game.getState().ordinal() >= GameState.INGAME_GRACEPERIOD.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal()) {
+            if (game.getState().ordinal() >= GameState.INGAME.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal()) {
                 if (game.getPlayer(player.getUniqueId()).getTeam() == GameTeam.SPECTATORS) {
                     for (GamePlayer p : game.getPlayers().values()) {
                         if (p.getTeam() == GameTeam.SPECTATORS) {

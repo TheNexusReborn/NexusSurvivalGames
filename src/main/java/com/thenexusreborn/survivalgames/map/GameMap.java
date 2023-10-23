@@ -1,21 +1,31 @@
 package com.thenexusreborn.survivalgames.map;
 
-import com.starmediadev.starsql.annotations.column.*;
-import com.starmediadev.starsql.annotations.table.*;
-import com.thenexusreborn.api.storage.codec.StringSetCodec;
 import com.thenexusreborn.api.helper.FileHelper;
-import com.thenexusreborn.nexuscore.data.codec.PositionCodec;
+import com.thenexusreborn.api.storage.codec.StringSetCodec;
 import com.thenexusreborn.nexuscore.util.Position;
 import com.thenexusreborn.nexuscore.util.region.Cuboid;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.data.handler.GameMapObjectHandler;
-import org.bukkit.*;
+import com.thenexusreborn.survivalgames.game.GameState;
+import me.firestar311.starsql.api.annotations.column.ColumnCodec;
+import me.firestar311.starsql.api.annotations.column.ColumnIgnored;
+import me.firestar311.starsql.api.annotations.column.ColumnType;
+import me.firestar311.starsql.api.annotations.table.TableHandler;
+import me.firestar311.starsql.api.annotations.table.TableName;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.WorldBorder;
+import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
 
-import java.io.*;
-import java.nio.file.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
-import java.util.zip.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 @TableName(value = "sgmaps")
 @TableHandler(GameMapObjectHandler.class)
@@ -24,9 +34,7 @@ public class GameMap {
     private String url;
     private String name;
     
-    @ColumnType("varchar(100)")
-    @ColumnCodec(PositionCodec.class)
-    private Position center = new Position(0, 0, 0);
+    private Position center;
     @ColumnIgnored
     private List<MapSpawn> spawns = new LinkedList<>();
     private int borderDistance, deathmatchBorderDistance;
@@ -36,9 +44,10 @@ public class GameMap {
     private boolean active;
     @ColumnIgnored
     private Map<UUID, MapRating> ratings = new HashMap<>();
-    @ColumnType("varchar(1000)")
-    @ColumnCodec(PositionCodec.class)
     private Position swagShack;
+    
+    //Analytics - Done via command /sg map analyze
+    private int chests, enchantTables, workbenches, furnaces, totalBlocks;
     
     @ColumnIgnored
     private UUID uniqueId;
@@ -55,6 +64,26 @@ public class GameMap {
     private Cuboid deathmatchArea;
     
     private GameMap() {
+    }
+    
+    public boolean isSetup() {
+        if (this.center == null) {
+            return false;
+        }
+        
+        if (this.spawns.size() != 24) {
+            return false;
+        }
+        
+        if (this.borderDistance == 0) {
+            return false;
+        }
+        
+        if (this.deathmatchBorderDistance == 0) {
+            return false;
+        }
+
+        return !creators.isEmpty();
     }
     
     public GameMap(String fileName, String name) {
@@ -93,7 +122,7 @@ public class GameMap {
         return lastIndex + 1;
     }
     
-    public void delete(SurvivalGames plugin) {
+    public void removeFromServer(SurvivalGames plugin) {
         try {
             uniqueId = null;
             if (downloadedZip != null) {
@@ -128,10 +157,12 @@ public class GameMap {
     }
     
     public boolean download(SurvivalGames plugin) {
-        Path downloadFolder = FileHelper.subPath(plugin.getDataFolder().toPath(), "mapdownloads");
-        FileHelper.createDirectoryIfNotExists(downloadFolder);
-        downloadedZip = FileHelper.downloadFile(url, downloadFolder, getName().toLowerCase().replace("'", "").replace(" ", "_"), true);
-        return true;
+        if (downloadedZip == null || !Files.exists(downloadedZip)) {
+            Path downloadFolder = FileHelper.subPath(plugin.getDataFolder().toPath(), "mapdownloads");
+            FileHelper.createDirectoryIfNotExists(downloadFolder);
+            downloadedZip = FileHelper.downloadFile(url, downloadFolder, getName().toLowerCase().replace("'", "").replace(" ", "_") + ".zip", true);
+        }
+        return downloadedZip != null && Files.exists(downloadedZip);
     }
     
     public void addCreator(String creator) {
@@ -156,9 +187,8 @@ public class GameMap {
         if (spawn.getIndex() == -1) {
             int index = getNextIndex();
             spawn.setIndex(index);
-        } else {
-            this.spawns.add(spawn);
         }
+        this.spawns.add(spawn);
         spawn.setMapId(this.getId());
         return spawn.getIndex();
     }
@@ -215,7 +245,7 @@ public class GameMap {
     }
     
     public int getDeathmatchBorderDistance() {
-        return deathmatchBorderDistance == 0 ? 30 : deathmatchBorderDistance;
+        return this.deathmatchBorderDistance;
     }
     
     public void setDeathmatchBorderDistance(int deathmatchBorderDistance) {
@@ -363,7 +393,11 @@ public class GameMap {
     }
     
     public void setActive(boolean active) {
-        this.active = active;
+        if (active) {
+            this.active = isSetup();
+        } else {
+            this.active = false;
+        }
     }
     
     public long getId() {
@@ -382,7 +416,7 @@ public class GameMap {
     public Cuboid getDeathmatchArea() {
         return deathmatchArea;
     }
-    
+
     @Override
     public String toString() {
         return "GameMap{" +
@@ -395,6 +429,8 @@ public class GameMap {
                 ", deathmatchBorderDistance=" + deathmatchBorderDistance +
                 ", creators=" + creators +
                 ", active=" + active +
+                ", ratings=" + ratings +
+                ", swagShack=" + swagShack +
                 ", uniqueId=" + uniqueId +
                 ", world=" + world +
                 ", downloadedZip=" + downloadedZip +
@@ -402,9 +438,10 @@ public class GameMap {
                 ", worldFolder=" + worldFolder +
                 ", editing=" + editing +
                 ", votes=" + votes +
+                ", deathmatchArea=" + deathmatchArea +
                 '}';
     }
-    
+
     public void setRatings(List<MapRating> ratings) {
         ratings.forEach(rating -> this.ratings.put(rating.getPlayer(), rating));
     }
@@ -419,5 +456,69 @@ public class GameMap {
     
     public void setSwagShack(Position swagShack) {
         this.swagShack = swagShack;
+    }
+
+    public void applyWorldBoarder(GameState state) {
+        applyWorldBoarder(state, 0);
+    }
+
+    public void applyWorldBoarder(GameState state, int seconds) {
+        World world = getWorld();
+        WorldBorder worldBorder = world.getWorldBorder();
+        worldBorder.setCenter(this.getCenter().toLocation(world));
+        if (state == GameState.DEATHMATCH) {
+            worldBorder.setSize(this.deathmatchBorderDistance);
+            if (seconds != 0) {
+                worldBorder.setSize(10, seconds);
+            }
+        } else if (state == GameState.INGAME || state == GameState.INGAME_DEATHMATCH) {
+            worldBorder.setSize(this.borderDistance);
+        }
+    }
+
+    public void disableWorldBorder() {
+        World world = getWorld();
+        WorldBorder worldBorder = world.getWorldBorder();
+        worldBorder.reset();
+    }
+
+    public int getChests() {
+        return chests;
+    }
+
+    public void setChests(int chests) {
+        this.chests = chests;
+    }
+
+    public int getEnchantTables() {
+        return enchantTables;
+    }
+
+    public void setEnchantTables(int enchantTables) {
+        this.enchantTables = enchantTables;
+    }
+
+    public int getWorkbenches() {
+        return workbenches;
+    }
+
+    public void setWorkbenches(int workbenches) {
+        this.workbenches = workbenches;
+    }
+
+    public int getTotalBlocks() {
+        return totalBlocks;
+    }
+
+    public void setTotalBlocks(int totalBlocks) {
+        this.totalBlocks = totalBlocks;
+    }
+
+    public int getFurnaces() {
+        return furnaces;
+    }
+
+    public void setFurnaces(int furnaces) {
+        this.furnaces = furnaces;
     }
 }

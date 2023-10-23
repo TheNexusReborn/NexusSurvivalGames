@@ -2,9 +2,9 @@ package com.thenexusreborn.survivalgames.lobby;
 
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.IActionBar;
-import com.thenexusreborn.nexuscore.util.timer.Timer;
-import com.thenexusreborn.survivalgames.*;
-import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.ControlType;
+import com.thenexusreborn.survivalgames.SurvivalGames;
+import me.firestar311.starclock.api.clocks.Timer;
 
 public class LobbyActionBar implements IActionBar {
     
@@ -24,13 +24,15 @@ public class LobbyActionBar implements IActionBar {
         if (lobby.getControlType() == ControlType.MANUAL) {
             return "&aThe lobby is currently in manual mode.";
         }
-        
-        if (lobby.getState() == LobbyState.WAITING || lobby.getTimer() == null) {
+
+        Timer timer = lobby.getTimer();
+        if (lobby.getState() == LobbyState.WAITING || timer == null) {
             return "&d&lNEXUS &7- &fPlaying on &f&l" + NexusAPI.getApi().getServerManager().getCurrentServer().getName();
         }
         
-        if (lobby.getState() == LobbyState.COUNTDOWN && lobby.getTimer() != null) {
-            return "&f&lVoting closes in &e&l" + Game.SHORT_TIME_FORMAT.format(lobby.getTimer().getTimeLeft());
+        if (lobby.getState() == LobbyState.COUNTDOWN) {
+            int remainingSeconds = (int) Math.ceil(timer.getTime() / 1000.0);
+            return "&f&lVoting closes in &e&l" + remainingSeconds + "s"/*Game.SHORT_TIME_FORMAT.format(TimeUnit.SECONDS.toMilliseconds(remainingSeconds)) */;
         }
         
         return "";

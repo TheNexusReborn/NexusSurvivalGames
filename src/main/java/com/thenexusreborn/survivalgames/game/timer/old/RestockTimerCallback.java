@@ -1,4 +1,4 @@
-package com.thenexusreborn.survivalgames.game.timer;
+package com.thenexusreborn.survivalgames.game.timer.old;
 
 import com.thenexusreborn.nexuscore.util.ReturnableCallback;
 import com.thenexusreborn.nexuscore.util.timer.TimerSnapshot;
@@ -17,7 +17,11 @@ public class RestockTimerCallback implements ReturnableCallback<TimerSnapshot, B
             return false;
         }
         
-        if (!(game.getState() == GameState.INGAME_GRACEPERIOD || game.getState() == GameState.INGAME)) {
+        if (game.getState() != GameState.INGAME) {
+            return false;
+        }
+        
+        if (game.getTimer().getTimeLeft() == 0) {
             return false;
         }
         

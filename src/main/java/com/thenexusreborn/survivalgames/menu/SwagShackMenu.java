@@ -1,7 +1,5 @@
 package com.thenexusreborn.survivalgames.menu;
 
-import com.starmediadev.starui.element.button.Button;
-import com.starmediadev.starui.gui.InventoryGUI;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.nexuscore.util.MCUtils;
@@ -11,6 +9,8 @@ import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.loot.Items;
 import com.thenexusreborn.survivalgames.loot.LootItem;
+import me.firestar311.starui.element.button.Button;
+import me.firestar311.starui.gui.InventoryGUI;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -58,7 +58,7 @@ public class SwagShackMenu extends InventoryGUI {
             itemMeta.setLore(lore);
             itemStack.setItemMeta(itemMeta);
             
-            Button button = new Button().creator(p -> itemStack).consumer(e -> {
+            Button button = new Button().iconCreator(p -> itemStack).consumer(e -> {
                 String currency;
                 int cost;
 

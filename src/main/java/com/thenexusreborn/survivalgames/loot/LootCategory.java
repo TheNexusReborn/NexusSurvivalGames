@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.loot;
 
-import com.starmediadev.starlib.util.Range;
 import com.thenexusreborn.survivalgames.SurvivalGames;
+import me.firestar311.starlib.api.range.Range;
 import org.bukkit.Material;
 
 import java.util.*;
@@ -30,27 +30,12 @@ public class LootCategory {
         this(name, weight, 2);
     }
     
-    @Deprecated
-    public LootCategory(String name, Rarity rarity, int maxAmountPerChest) {
-        this(name, rarity.getMax(), maxAmountPerChest, new ArrayList<>());
-    }
-    
-    @Deprecated
-    public LootCategory(String name, Rarity rarity) {
-        this(name, rarity.getMax());
-    }
-    
     public void addEntries(int weight, LootItem... items) {
         if (items != null) {
             for (LootItem item : items) {
                 this.entries.add(new LootEntry(item, weight));
             }
         }
-    }
-    
-    @Deprecated
-    public void addEntries(Rarity rarity, LootItem... items) {
-        addEntries(rarity.getMax(), items);
     }
     
     public LootEntry getEntry(String name) {
@@ -75,11 +60,6 @@ public class LootCategory {
     
     public void addEntry(int rarity, LootItem item) {
         this.entries.add(new LootEntry(item, rarity));
-    }
-    
-    @Deprecated
-    public void addEntry(Rarity rarity, LootItem item) {
-        addEntry(rarity.getMax(), item);
     }
     
     public void addEntry(LootEntry lootEntry) {

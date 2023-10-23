@@ -66,7 +66,7 @@ public abstract class Mutation {
         }
         
         this.countdownTimer = new Timer(new MutationCountdownCallback(this));
-        this.countdownTimer.setLength((plugin.getGame().getSettings().getMutationSpawnDelay() * 1000L) + 50);
+        this.countdownTimer.setLength(plugin.getGame().getSettings().getMutationSpawnDelay() * 1000L + 50);
         p.sendMessage(MCUtils.color("&6&l>> &eYou will mutate as a(n) " + getType().getDisplayName() + "!"));
         p.sendMessage(MCUtils.color("&6&l>> &eYou will be mutated in &l" + this.countdownTimer.getSecondsLeft() + " Seconds&e."));
         Player t = Bukkit.getPlayer(this.target);

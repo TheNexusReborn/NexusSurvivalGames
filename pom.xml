@@ -6,7 +6,7 @@
 
     <groupId>com.thenexusreborn</groupId>
     <artifactId>NexusSurvivalGames</artifactId>
-    <version>1.14.2-ALPHA</version>
+    <version>1.15-ALPHA</version>
 
     <properties>
         <java.version>17</java.version>
@@ -18,11 +18,8 @@
         <maven.plugin.jar.version>3.3.0</maven.plugin.jar.version>
         <maven.plugin.shade.version>3.4.1</maven.plugin.shade.version>
         <mysql.version>8.0.31</mysql.version>
-        <nexus.core.version>1.9.8-ALPHA</nexus.core.version>
+        <nexus.core.version>1.10-ALPHA</nexus.core.version>
         <nexus.disguises.version>1.0.1-ALPHA</nexus.disguises.version>
-        <starclock.version>1.1-SNAPSHOT</starclock.version>
-        <starcore.version>1.1-SNAPSHOT</starcore.version>
-        <starui.version>1.0-SNAPSHOT</starui.version>
     </properties>
 
     <build>
@@ -67,6 +64,11 @@
 
     <repositories>
         <repository>
+            <id>reposilite</id>
+            <name>Laptop Repo</name>
+            <url>http://localhost:8080/snapshots</url>
+        </repository>
+        <repository>
             <id>spigotmc-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
@@ -98,21 +100,27 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.starmediadev</groupId>
-            <artifactId>starclock</artifactId>
-            <version>${starclock.version}</version>
+            <groupId>me.firestar311.starlib</groupId>
+            <artifactId>starlib-spigot</artifactId>
+            <version>1.0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.starmediadev</groupId>
-            <artifactId>starui</artifactId>
-            <version>${starui.version}</version>
+            <groupId>me.firestar311.starsql</groupId>
+            <artifactId>starsql-mysql</artifactId>
+            <version>1.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.starmediadev.plugins</groupId>
-            <artifactId>starcore</artifactId>
-            <version>${starcore.version}</version>
+            <groupId>me.firestar311.starclock</groupId>
+            <artifactId>starclock-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>me.firestar311.starui</groupId>
+            <artifactId>StarUI</artifactId>
+            <version>1.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

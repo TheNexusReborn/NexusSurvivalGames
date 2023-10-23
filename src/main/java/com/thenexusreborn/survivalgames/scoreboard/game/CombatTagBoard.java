@@ -1,11 +1,11 @@
 package com.thenexusreborn.survivalgames.scoreboard.game;
 
-import com.starmediadev.starlib.util.TimeFormat;
 import com.thenexusreborn.api.scoreboard.*;
 import com.thenexusreborn.nexuscore.scoreboard.SpigotScoreboardView;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
+import me.firestar311.starlib.api.time.TimeFormat;
 import org.bukkit.ChatColor;
 
 import java.text.SimpleDateFormat;
@@ -33,11 +33,19 @@ public class CombatTagBoard extends SpigotScoreboardView {
         createTeam(new TeamBuilder("targetValue").entry(ChatColor.WHITE).score(13).valueUpdater((player, team) -> {
             Game game = plugin.getGame();
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
+            if (gamePlayer == null) {
+                return;
+            }
             CombatTag combatTag = gamePlayer.getCombatTag();
             if (combatTag == null || combatTag.getOther() == null) {
                 team.setSuffix("No one");
             } else {
-                team.setSuffix(game.getPlayer(combatTag.getOther()).getName());
+                GamePlayer otherGamePlayer = game.getPlayer(combatTag.getOther());
+                if (otherGamePlayer == null) {
+                    team.setSuffix("No one");
+                } else {
+                    team.setSuffix(otherGamePlayer.getName());
+                }
             }
         }));
         
@@ -46,6 +54,9 @@ public class CombatTagBoard extends SpigotScoreboardView {
         createTeam(new TeamBuilder("timeValue").entry(ChatColor.AQUA).score(10).valueUpdater((player, team) -> {
             Game game = plugin.getGame();
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
+            if (gamePlayer == null) {
+                return;
+            }
             CombatTag combatTag = gamePlayer.getCombatTag();
             if (combatTag == null || combatTag.getOther() == null || !combatTag.isInCombat()) {
                 team.setSuffix("0s");

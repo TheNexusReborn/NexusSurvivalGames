@@ -1,13 +1,13 @@
 package com.thenexusreborn.survivalgames.lobby;
 
-import com.starmediadev.starlib.util.Value;
 import com.thenexusreborn.api.player.*;
+import me.firestar311.starlib.api.Value;
 
 import java.util.UUID;
 
 public class LobbyPlayer {
     private final NexusPlayer player;
-    private boolean spectating = false, voteStart;
+    private boolean spectating, voteStart;
     private int mapVote = -1;
     
     public LobbyPlayer(NexusPlayer player) {
@@ -72,5 +72,15 @@ public class LobbyPlayer {
     
     public Value getStatValue(String statName) {
         return getPlayer().getStatValue(statName);
+    }
+
+    @Override
+    public String toString() {
+        return "LobbyPlayer{" +
+                "player=" + player +
+                ", spectating=" + spectating +
+                ", voteStart=" + voteStart +
+                ", mapVote=" + mapVote +
+                '}';
     }
 }

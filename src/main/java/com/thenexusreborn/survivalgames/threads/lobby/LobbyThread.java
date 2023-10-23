@@ -6,10 +6,13 @@ import com.thenexusreborn.nexuscore.util.ServerProperties;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.*;
 import com.thenexusreborn.survivalgames.util.SGUtils;
+import me.firestar311.starlib.api.time.TimeUnit;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 
 public class LobbyThread extends NexusThread<SurvivalGames> {
+    
+    private int secondsInPrepareGame;
     
     public LobbyThread(SurvivalGames plugin) {
         super(plugin, 20L, false);
@@ -27,7 +30,7 @@ public class LobbyThread extends NexusThread<SurvivalGames> {
                 entity.remove();
             }
         }
-    
+
         Lobby lobby = plugin.getLobby();
         for (LobbyPlayer player : lobby.getPlayers()) {
             SGUtils.updatePlayerHealthAndFood(Bukkit.getPlayer(player.getUniqueId()));
@@ -37,8 +40,9 @@ public class LobbyThread extends NexusThread<SurvivalGames> {
         world.setStorm(false);
         
         world.setGameRuleValue("doFireSpread", "false");
-        
-        if (lobby.getState() != LobbyState.MAP_EDITING) {
+
+        LobbyState state = lobby.getState();
+        if (state != LobbyState.MAP_EDITING) {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (player.getLocation().getBlockY() < lobby.getSpawnpoint().getBlockY() - 20) {
                     player.teleport(lobby.getSpawnpoint());
@@ -69,11 +73,18 @@ public class LobbyThread extends NexusThread<SurvivalGames> {
         }
         
         boolean resetLobby = false;
-        if (!(plugin.getLobby().getState() == LobbyState.WAITING || plugin.getLobby().getState() == LobbyState.MAP_EDITING)) {
+        if (!(state == LobbyState.WAITING || state == LobbyState.MAP_EDITING)) {
             if (lobby.getTimer() == null) {
                 resetLobby = true;
-            } else if (lobby.getTimer().getSecondsLeft() <= 0) {
-                resetLobby = true;
+            } else if (TimeUnit.SECONDS.fromMillis(lobby.getTimer().getTime()) <= 0) {
+                if (state == LobbyState.PREPARING_GAME || state == LobbyState.STARTING || state == LobbyState.GAME_PREPARED) {
+                    this.secondsInPrepareGame++;
+                    if (this.secondsInPrepareGame >= 10) {
+                        resetLobby = true;
+                    }
+                } else {
+                    resetLobby = true;
+                }
             }
             
             if (Bukkit.getOnlinePlayers().size() <= 1) {
@@ -82,7 +93,7 @@ public class LobbyThread extends NexusThread<SurvivalGames> {
         }
         
         if (resetLobby) {
-            lobby.resetInvalidState();
+            //lobby.resetInvalidState();
         }
     }
 }

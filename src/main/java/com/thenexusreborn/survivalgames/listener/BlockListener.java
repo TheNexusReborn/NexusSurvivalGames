@@ -9,6 +9,7 @@ import org.bukkit.event.block.*;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 import static org.bukkit.Material.*;
 
@@ -49,7 +50,7 @@ public class BlockListener implements Listener {
                 e.setCancelled(true);
                 return;
             }
-            if (game.getState() == GameState.INGAME_GRACEPERIOD || game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_DEATHMATCH || game.getState() == GameState.DEATHMATCH) {
+            if (Stream.of(GameState.INGAME, GameState.INGAME_DEATHMATCH, GameState.DEATHMATCH).anyMatch(gameState -> game.getState() == gameState)) {
                 if (e.getBlock().getType() == Material.TNT) {
                     SGUtils.spawnTNTWithSource(e.getBlock().getLocation(), e.getPlayer(), 20, 3.0F);
                     new BukkitRunnable() {
@@ -77,7 +78,7 @@ public class BlockListener implements Listener {
         }
         if (plugin.getGame() != null) {
             Game game = plugin.getGame();
-            if (game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_GRACEPERIOD || game.getState() == GameState.INGAME_DEATHMATCH || game.getState() == GameState.DEATHMATCH) {
+            if (Stream.of(GameState.INGAME, GameState.INGAME_DEATHMATCH, GameState.DEATHMATCH).anyMatch(gameState -> game.getState() == gameState)) {
                 if (game.getPlayer(e.getPlayer().getUniqueId()).getTeam() != GameTeam.TRIBUTES) {
                     e.setCancelled(true);
                     return;

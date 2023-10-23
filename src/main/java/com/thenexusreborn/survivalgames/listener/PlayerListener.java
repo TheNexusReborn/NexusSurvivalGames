@@ -2,7 +2,6 @@ package com.thenexusreborn.survivalgames.listener;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
-import com.starmediadev.starui.GuiManager;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
@@ -18,14 +17,20 @@ import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.game.death.DeathType;
 import com.thenexusreborn.survivalgames.game.death.KillerInfo;
-import com.thenexusreborn.survivalgames.lobby.*;
+import com.thenexusreborn.survivalgames.lobby.Lobby;
+import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
+import com.thenexusreborn.survivalgames.lobby.LobbyState;
 import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.loot.LootTable;
-import com.thenexusreborn.survivalgames.menu.*;
+import com.thenexusreborn.survivalgames.menu.MutateGui;
+import com.thenexusreborn.survivalgames.menu.SwagShackMenu;
+import com.thenexusreborn.survivalgames.menu.TeamMenu;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
 import com.thenexusreborn.survivalgames.mutations.impl.ChickenMutation;
 import com.thenexusreborn.survivalgames.mutations.impl.CreeperMutation;
 import com.thenexusreborn.survivalgames.util.SGUtils;
+import me.firestar311.starlib.api.Pair;
+import me.firestar311.starui.GuiManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -136,12 +141,15 @@ public class PlayerListener implements Listener {
                                 }
                                 
                                 if (team != null) {
-                                    player.openInventory(new TeamMenu(plugin, team).getInventory());
+                                    manager.openGUI(new TeamMenu(plugin, team), player);
                                 }
                             }
                         } else if (item.getType() == Material.ROTTEN_FLESH) {
-                            if (gamePlayer.canMutate()) {
+                            Pair<Boolean, String> canMutateResult = gamePlayer.canMutate();
+                            if (canMutateResult.firstValue()) {
                                 manager.openGUI(new MutateGui(plugin, gamePlayer), player);
+                            } else {
+                                player.sendMessage(MsgType.WARN + canMutateResult.secondValue());
                             }
                         } else if (item.getType() == Material.WATCH) {
                             player.teleport(game.getGameMap().getCenter().toLocation(game.getGameMap().getWorld()));
@@ -312,9 +320,7 @@ public class PlayerListener implements Listener {
                                 lootTable = lootManager.getLootTable("tierFour");
                             } else {
                                 boolean withinCenter = game.getGameMap().getDeathmatchArea().contains(player);
-                                if (game.getState() == GameState.INGAME_GRACEPERIOD) {
-                                    lootTable = lootManager.getLootTable("tierOne");
-                                } else if (game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_DEATHMATCH) {
+                                if (game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_DEATHMATCH) {
                                     boolean afterRestock = game.getRestockTimer() == null;
                                     if (withinCenter) {
                                         if (afterRestock) {
@@ -557,7 +563,7 @@ public class PlayerListener implements Listener {
                 e.setCancelled(true);
             }
             
-            if (e.getInventory() instanceof EnchantingInventory enchantingInventory) {
+            if (e.getInventory() instanceof EnchantingInventory) {
                 if (e.getCurrentItem() != null && e.getCurrentItem().getType() == Material.INK_SACK) {
                     e.setCancelled(true);
                 }
@@ -607,10 +613,7 @@ public class PlayerListener implements Listener {
             }
         }
         
-        if (game.getState() == GameState.WARMUP || game.getState() == GameState.WARMUP_DONE ||
-                game.getState() == GameState.DEATHMATCH_WARMUP || game.getState() == GameState.DEATHMATCH_WARMUP_DONE ||
-                game.getState() == GameState.TELEPORT_START || game.getState() == GameState.TELEPORT_DEATHMATCH ||
-                game.getState() == GameState.TELEPORT_START_DONE || game.getState() == GameState.TELEPORT_DEATHMATCH_DONE) {
+        if (Stream.of(GameState.WARMUP, GameState.WARMUP_DONE, GameState.DEATHMATCH_WARMUP, GameState.DEATHMATCH_WARMUP_DONE, GameState.TELEPORT_START, GameState.TELEPORT_DEATHMATCH, GameState.TELEPORT_START_DONE, GameState.TELEPORT_DEATHMATCH_DONE).anyMatch(gameState -> game.getState() == gameState)) {
             if (from.getBlockX() != to.getBlockX() || from.getBlockZ() != to.getBlockZ()) {
                 e.getPlayer().teleport(from);
             }
