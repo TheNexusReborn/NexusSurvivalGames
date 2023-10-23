@@ -292,7 +292,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         });
         createGameSetting("regeneration", "Regeneration", "This controls if regeneration is enabled. True means enabled and false means disabled", Type.BOOLEAN, true);
         createGameSetting("grace_period", "Grace Period", "This controls if the grace period is enabled or not.", Type.BOOLEAN, false);
-        createGameSetting("unlimited_mutation_passes", "Unlimited Mutation Passes", "This controls if players need a mutation pass to mutate. This does not allow more than the max mutations per game though.", Type.BOOLEAN, false);
+        createGameSetting("unlimited_mutation_passes", "Unlimited Mutation Passes", "This controls if players need a mutation pass to mutate. This does not allow more than the max mutations per game though.", Type.BOOLEAN, true);
         createGameSetting("time_progression", "Time Progression", "This controls if time is progressed in the world. True means it does, and false means it does not.", Type.BOOLEAN, false);
         createGameSetting("weather_progression", "Weather Progression", "This controls if weather is progressed in the world. True means it does, and false means it does not.", Type.BOOLEAN, false);
         createGameSetting("apply_multipliers", "Apply Multipliers", "This controls if rank based multipliers are to be applied.", Type.BOOLEAN, true);
@@ -301,7 +301,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         createGameSetting("earn_network_xp", "Earn XP", "Controls if Network XP is earned on certain actions", Type.BOOLEAN, true);
         createGameSetting("use_tiered_loot", "Use Tiered Loot", "Controls if tiered loot is to be used.", Type.BOOLEAN, true);
         createGameSetting("enderchests_enabled", "Enderchests Enabled", "Controls if Ender Chests produce loot. These follow the default tiering rules", Type.BOOLEAN, true);
-        createGameSetting("use_all_mutation_types", "Use All Mutation Types", "Controls if all mutation types are unlocked or not", Type.BOOLEAN, true); //Actual Default is false
+        createGameSetting("use_all_mutation_types", "Use All Mutation Types", "Controls if all mutation types are unlocked or not", Type.BOOLEAN, false); //Actual Default is false
         createGameSetting("color_mode", "Color Mode", "Controls what colors are displayed in death messages", Type.ENUM, ColorMode.RANK);
         createGameSetting("world_time", "World Time", "Controls the starting world time", Type.ENUM, Time.NOON);
         createGameSetting("world_weather", "World Weather", "Controls the starting world weather", Type.ENUM, Weather.CLEAR);
