@@ -630,6 +630,9 @@ public class Game {
                 player.showPlayer(p);
                 p.showPlayer(player);
             }
+
+            GamePlayer gamePlayer = this.getPlayer(player.getUniqueId());
+            gamePlayer.getCombatTag().setOther(null);
         }
 
         GamePlayer winner = null;
