@@ -976,6 +976,7 @@ public class Game {
                     assisterPlayer.setAssists(assisterPlayer.getAssists() + 1);
                     assisterPlayer.changeStat("sg_assists", 1, StatOperator.ADD);
                     assistors.add(new AssisterInfo(this, assisterPlayer));
+                    this.gameInfo.getActions().add(new GameAction(System.currentTimeMillis(), "assist", assisterPlayer.getName() + " assisted the death of " + gamePlayer.getName()));
                 }
             }
         }
