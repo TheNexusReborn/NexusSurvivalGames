@@ -81,7 +81,7 @@ public class Game {
     private Mode mode = Mode.CLASSIC; //This will be implemented later, this is mainly for some other checks to exist
     private boolean debugMode; //Debug Mode. This may be replaced with a class with other settings
     private Graceperiod graceperiod = Graceperiod.INACTIVE;
-    
+
     private GamePhase setupPhase, assignTeamsPhase;
 
     public Game(GameMap gameMap, GameSettings settings, Collection<LobbyPlayer> players) {
@@ -119,7 +119,7 @@ public class Game {
 //            }
 //        }
 //        gameInfo.setSettings(sb.substring(0, sb.length() - 1));
-        
+
         this.setupPhase = new SetupPhase(this);
         this.assignTeamsPhase = new AssignTeamsPhase(this);
     }
@@ -234,7 +234,7 @@ public class Game {
         } else {
             sendMessage("&a&l>> &b" + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined.");
         }
-        
+
         gamePlayer.setStatus(GamePlayer.Status.SETTING_UP_SCOREBOARD);
         gamePlayer.applyScoreboard();
         gamePlayer.setStatus(GamePlayer.Status.SETTING_UP_ACTIONBAR);
@@ -419,8 +419,8 @@ public class Game {
     }
 
     public void assignStartingTeams() {
-            setState(ASSIGN_TEAMS);
-            this.assignTeamsPhase.beginphase(); //TODO Temporary until it can be replaced.
+        setState(ASSIGN_TEAMS);
+        this.assignTeamsPhase.beginphase(); //TODO Temporary until it can be replaced.
     }
 
     public void setup() {
@@ -590,7 +590,7 @@ public class Game {
         sendMessage("&6&l>> &a&lALL CHESTS HAVE BEEN RESTOCKED.");
         sendMessage("&6&l>> &d&lTHERE IS NO TEAMING ALLOWED IN DEATHMATCH.");
         restockChests();
-        
+
         this.gameMap.applyWorldBoarder(this.state, settings.getDeathmatchLength() * 60);
 
         this.timer = new Timer(new GameEndTimerCallback(this)).run(TimeUnit.MINUTES.toMilliseconds(settings.getDeathmatchLength()) + 50);
@@ -826,11 +826,11 @@ public class Game {
 //                }
 //            }.runTaskLater(plugin, 100L);
 //        } else {
-            for (GamePlayer player : this.players.values()) {
-                resetPlayer(Bukkit.getPlayer(player.getUniqueId()));
-            }
+        for (GamePlayer player : this.players.values()) {
+            resetPlayer(Bukkit.getPlayer(player.getUniqueId()));
+        }
 
-            plugin.getLobby().fromGame(this);
+        plugin.getLobby().fromGame(this);
         //}
     }
 
@@ -1207,7 +1207,7 @@ public class Game {
     public void addLootedChest(Location location) {
         this.lootedChests.add(location);
     }
-    
+
     public void markGraceperiodDone() {
         this.graceperiod = Graceperiod.TIMER_DONE;
     }
