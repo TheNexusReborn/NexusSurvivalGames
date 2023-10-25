@@ -18,18 +18,12 @@ public class TeamMenu extends InventoryGUI {
         super(3, MCUtils.color(team.getColor() + team.getName()));
         GuiManager manager = plugin.getServer().getServicesManager().getRegistration(GuiManager.class).getProvider();
         
-        plugin.getLogger().info("Team Menu: " + team.name());
-        
         if (plugin.getGame() != null) {
-            plugin.getLogger().info("Game is not null.");
             int index = 0;
             for (GamePlayer player : plugin.getGame().getPlayers().values()) {
-                plugin.getLogger().info("Player: " + player.getName());
                 if (!player.getToggleValue("vanish")) {
-                    plugin.getLogger().info("Player is not in vanish.");
                     if (player.getTeam() == team) {
                         plugin.getLogger().info("Player is of team " + team.name());
-                        //ItemStack skull = SpigotUtils.getPlayerSkull(Bukkit.getPlayer(player.getUniqueId()));
                         Button button = new Button().iconCreator(p -> {
                             ItemStack skull = SpigotUtils.getPlayerSkull(Bukkit.getPlayer(player.getUniqueId()));
                             ItemMeta meta = skull.getItemMeta();

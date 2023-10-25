@@ -15,8 +15,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import javax.lang.model.element.TypeElement;
-
 public class BountyCmd implements CommandExecutor {
     
     private final SurvivalGames plugin;
