@@ -1110,7 +1110,7 @@ public class SGCommand implements CommandExecutor {
                         return true;
                     }
                     timer.setPaused(false);
-                    sender.sendMessage(MCUtils.color(MsgType.INFO + "You paused the timer."));
+                    sender.sendMessage(MCUtils.color(MsgType.INFO + "You resumed the timer."));
                 }
                 case "reset" -> {
                     timer.reset();
