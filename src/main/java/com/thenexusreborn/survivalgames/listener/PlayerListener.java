@@ -149,7 +149,7 @@ public class PlayerListener implements Listener {
                             if (canMutateResult.firstValue()) {
                                 manager.openGUI(new MutateGui(plugin, gamePlayer), player);
                             } else {
-                                player.sendMessage(MsgType.WARN + canMutateResult.secondValue());
+                                gamePlayer.sendMessage(MsgType.WARN + canMutateResult.secondValue());
                             }
                         } else if (item.getType() == Material.WATCH) {
                             player.teleport(game.getGameMap().getCenter().toLocation(game.getGameMap().getWorld()));
