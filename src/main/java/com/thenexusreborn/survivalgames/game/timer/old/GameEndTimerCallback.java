@@ -52,9 +52,8 @@ public class GameEndTimerCallback implements ReturnableCallback<TimerSnapshot, B
         }
         
         if (timerSnapshot.getTimeLeft() <= 0) {
-            if (Game.getControlType() == ControlType.AUTOMATIC) {
-                game.end();
-            } else {
+            game.gameComplete();
+            if (Game.getControlType() == ControlType.MANUAL) {
                 game.sendMessage("&eThe game end timer has concluded, but the mode is not automatic. Skipped automatically performing end of game tasks.");
             }
             return false;

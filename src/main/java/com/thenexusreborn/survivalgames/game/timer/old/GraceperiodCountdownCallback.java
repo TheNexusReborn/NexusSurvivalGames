@@ -1,13 +1,13 @@
 package com.thenexusreborn.survivalgames.game.timer.old;
 
 import com.thenexusreborn.nexuscore.util.ReturnableCallback;
-import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.nexuscore.util.timer.TimerSnapshot;
-import com.thenexusreborn.survivalgames.ControlType;
 import com.thenexusreborn.survivalgames.game.Game;
 import org.bukkit.Sound;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class GraceperiodCountdownCallback implements ReturnableCallback<TimerSnapshot, Boolean> {
     
@@ -24,13 +24,7 @@ public class GraceperiodCountdownCallback implements ReturnableCallback<TimerSna
     public Boolean callback(TimerSnapshot timerSnapshot) {
         int remainingSeconds = timerSnapshot.getSecondsLeft();
         if (remainingSeconds <= 0) {
-            if (Game.getControlType() == ControlType.AUTOMATIC) {
-                game.endGracePeriod();
-            } 
-//            else {
-//                game.gracePeriodComplete();
-//                game.sendMessage("&eThe graceperiod timer concluded but the mode is not automatic. Waiting for the command to start game.");
-//            }
+            game.endGracePeriod();
             return false;
         }
         

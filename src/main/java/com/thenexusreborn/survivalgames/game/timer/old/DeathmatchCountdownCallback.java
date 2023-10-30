@@ -1,13 +1,14 @@
 package com.thenexusreborn.survivalgames.game.timer.old;
 
 import com.thenexusreborn.nexuscore.util.ReturnableCallback;
-import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.nexuscore.util.timer.TimerSnapshot;
 import com.thenexusreborn.survivalgames.ControlType;
 import com.thenexusreborn.survivalgames.game.Game;
 import org.bukkit.Sound;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class DeathmatchCountdownCallback implements ReturnableCallback<TimerSnapshot, Boolean> {
     
@@ -24,10 +25,8 @@ public class DeathmatchCountdownCallback implements ReturnableCallback<TimerSnap
     public Boolean callback(TimerSnapshot timerSnapshot) {
         int remainingSeconds = timerSnapshot.getSecondsLeft();
         if (remainingSeconds <= 0) {
-            if (Game.getControlType() == ControlType.AUTOMATIC) {
-                game.startDeathmatch();
-            } else {
-                game.deathmatchWarmupDone();
+            game.deathmatchWarmupDone();
+            if (Game.getControlType() == ControlType.MANUAL) {
                 game.sendMessage("&eThe timer concluded but the mode is not automatic. Waiting for the command to start the deathmatch.");
             }
             return false;

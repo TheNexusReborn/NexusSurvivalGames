@@ -212,7 +212,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         
         getLogger().info("Registered commands");
         
-        new GameSetupThread(this).start();
+        new GameStateThread(this).start();
         new TimerCountdownCheckThread(this).start();
         new DeathmatchSetupThread(this).start();
         new GameWorldThread(this).start();

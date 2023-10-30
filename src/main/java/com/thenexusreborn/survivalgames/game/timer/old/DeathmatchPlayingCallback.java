@@ -37,9 +37,8 @@ public class DeathmatchPlayingCallback implements ReturnableCallback<TimerSnapsh
         }
         
         if (timerSnapshot.getTimeLeft() <= 0) {
-            if (Game.getControlType() == ControlType.AUTOMATIC) {
-                game.teleportDeathmatch();
-            } else {
+            game.ingameComplete();
+            if (Game.getControlType() == ControlType.MANUAL) {
                 game.sendMessage("&eThe deathmatch countdown timer has concluded, but the mode is set to manual. Automatic deathmatch setup has been skipped.");
             }
             return false;

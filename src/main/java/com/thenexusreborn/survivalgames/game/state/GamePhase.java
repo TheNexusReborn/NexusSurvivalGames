@@ -6,8 +6,8 @@ import com.thenexusreborn.survivalgames.game.GameState;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 public abstract class GamePhase {
     protected Game game;
@@ -15,7 +15,7 @@ public abstract class GamePhase {
     protected PhaseStatus status;
     
     //A status is only considered completed when it is replaced by a new status. The setStatus method handles this automatically.
-    protected Map<Long, PhaseStatus> completedStatuses = new TreeMap<>();
+    protected Map<PhaseStatus, Long> completedStatuses = new HashMap<>();
     
     public GamePhase(Game game, String name) {
         this.game = game;
@@ -46,7 +46,7 @@ public abstract class GamePhase {
     }
 
     protected void setStatus(PhaseStatus status) {
-        this.completedStatuses.put(System.currentTimeMillis(), this.status);
+        this.completedStatuses.put(this.status, System.currentTimeMillis());
         this.status = status;
     }
     

@@ -55,9 +55,8 @@ public class GameTimerCallback implements ReturnableCallback<TimerSnapshot, Bool
         }
         
         if (timerSnapshot.getTimeLeft() <= 0) {
-            if (Game.getControlType() == ControlType.AUTOMATIC) {
-                game.teleportDeathmatch();
-            } else {
+            game.ingameComplete();
+            if (Game.getControlType() == ControlType.MANUAL) {
                 game.sendMessage("&eThe game timer has concluded, but the mode is in manual, not starting deathmatch automatically.");
             }
             return false;

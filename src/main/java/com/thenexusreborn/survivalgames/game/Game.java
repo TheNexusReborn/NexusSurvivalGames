@@ -292,6 +292,10 @@ public class Game {
         }
     }
 
+    public void ingameComplete() {
+        setState(GameState.INGAME_DONE);
+    }
+
     private void teleportToGameSpawn(Player player, Location spawn, GameTeam gameTeam) {
         player.teleport(spawn);
         Bukkit.getScheduler().runTaskLater(plugin, () -> player.setGameMode(gameTeam.getGameMode()), 1L);
@@ -742,32 +746,11 @@ public class Game {
 
     public void nextGame() {
         setState(ENDED);
-
-//        if (plugin.restart()) {
-//            ByteArrayDataOutput out = ByteStreams.newDataOutput();
-//            out.writeUTF("Connect");
-//            out.writeUTF("H1");
-//            for (Player player : Bukkit.getOnlinePlayers()) {
-//                player.sendPluginMessage(plugin.getNexusCore(), "BungeeCord", out.toByteArray());
-//            }
-//
-//            new BukkitRunnable() {
-//                @Override
-//                public void run() {
-//                    if (NexusAPI.getApi().getEnvironment() != Environment.DEVELOPMENT) {
-//                        //MulticraftAPI.getInstance().restartServer(NexusAPI.getApi().getServerManager().getCurrentServer().getMulticraftId());
-//                    } else {
-//                        Bukkit.shutdown();
-//                    }
-//                }
-//            }.runTaskLater(plugin, 100L);
-//        } else {
-        for (GamePlayer player : this.players.values()) {
-            resetPlayer(Bukkit.getPlayer(player.getUniqueId()));
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            resetPlayer(player);
         }
 
         plugin.getLobby().fromGame(this);
-        //}
     }
 
     public void killPlayer(GamePlayer gamePlayer, DeathInfo deathInfo) {
@@ -1101,7 +1084,7 @@ public class Game {
             }
 
             if (totalTributes <= 1) {
-                this.end();
+                gameComplete();
             }
         }
     }
@@ -1133,7 +1116,6 @@ public class Game {
         }
 
         sendMessage("&6&l>> &4&lTHE DEATHMATCH COUNTDOWN HAS STARTED");
-
         this.timer = new Timer(new DeathmatchPlayingCallback(this)).run(TimeUnit.SECONDS.toMilliseconds(settings.getDeathmatchTimerLength()) + 50);
     }
 
@@ -1253,6 +1235,14 @@ public class Game {
 
     public void setSpawn(int index, UUID uuid) {
         this.spawns.put(index, uuid);
+    }
+
+    public void gameComplete() {
+        setState(GameState.GAME_COMPLETE);
+    }
+
+    public void nextGameReady() {
+        setState(GameState.NEXT_GAME_READY);
     }
 
     public static SurvivalGames getPlugin() {

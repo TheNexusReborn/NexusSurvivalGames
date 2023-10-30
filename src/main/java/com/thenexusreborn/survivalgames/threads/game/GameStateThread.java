@@ -6,8 +6,8 @@ import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GameState;
 
-public class GameSetupThread extends NexusThread<SurvivalGames> {
-    public GameSetupThread(SurvivalGames plugin) {
+public class GameStateThread extends NexusThread<SurvivalGames> {
+    public GameStateThread(SurvivalGames plugin) {
         super(plugin, 1L, false);
     }
     
@@ -28,6 +28,18 @@ public class GameSetupThread extends NexusThread<SurvivalGames> {
             game.teleportStart();
         } else if (game.getState() == GameState.TELEPORT_START_DONE) {
             game.startWarmup();
+        } else if (game.getState() == GameState.WARMUP_DONE) {
+            game.startGame();
+        } else if (game.getState() == GameState.INGAME_DONE) {
+            game.teleportDeathmatch();
+        } else if (game.getState() == GameState.TELEPORT_DEATHMATCH_DONE) {
+            game.teleportDeathmatch();
+        } else if (game.getState() == GameState.DEATHMATCH_WARMUP_DONE) {
+            game.startDeathmatch();
+        } else if (game.getState() == GameState.GAME_COMPLETE) {
+            game.end();
+        } else if (game.getState() == GameState.NEXT_GAME_READY) {
+            game.nextGame();
         }
     }
 }
