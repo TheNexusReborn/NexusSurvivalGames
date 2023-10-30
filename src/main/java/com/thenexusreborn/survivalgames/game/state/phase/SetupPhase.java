@@ -26,36 +26,54 @@ public class SetupPhase extends GamePhase {
             SurvivalGames plugin = Game.getPlugin();
             GameSettings settings = game.getSettings();
 
+            if (checkPlayerCount()) {
+                return;
+            }
             setStatus(Status.SETTING_SCOREBOARDS);
             for (GamePlayer player : game.getPlayers().values()) {
                 player.getScoreboard().setView(new GameBoard(player.getScoreboard(), plugin));
             }
 
+            if (checkPlayerCount()) {
+                return;
+            }
             setStatus(Status.DOWNLOADING_MAP);
             if (!gameMap.download(plugin)) {
                 game.handleError("There was an error downloading the map.");
                 return;
             }
 
+            if (checkPlayerCount()) {
+                return;
+            }
             setStatus(Status.UNZIPPING_MAP);
             if (!gameMap.unzip(plugin)) {
                 game.handleError("There was an error extracting the map files.");
                 return;
             }
 
+            if (checkPlayerCount()) {
+                return;
+            }
             setStatus(Status.COPYING_MAP);
             if (!gameMap.copyFolder(plugin, false)) {
                 game.handleError("There was an error copying the map files.");
                 return;
             }
 
+            if (checkPlayerCount()) {
+                return;
+            }
             Bukkit.getScheduler().runTask(Game.getPlugin(), () -> {
                 setStatus(Status.LOADING_MAP);
                 if (!gameMap.load(plugin)) {
                     game.handleError("There was an error loading the world.");
                     return;
                 }
-
+                
+                if (checkPlayerCount()) {
+                    return;
+                }
                 setStatus(Status.CALCULATE_DM_AREA);
                 int radius = gameMap.getDeathmatchBorderDistance();
                 Location center = gameMap.getCenter().toLocation(gameMap.getWorld());
@@ -66,6 +84,9 @@ public class SetupPhase extends GamePhase {
                 gameMap.setDeathmatchArea(new Cuboid(corner1, corner2));
 
                 try {
+                    if (checkPlayerCount()) {
+                        return;
+                    }
                     setStatus(Status.SETUP_SPAWNS);
                     for (int i = 0; i < gameMap.getSpawns().size(); i++) {
                         game.setSpawn(i, null);
@@ -82,6 +103,7 @@ public class SetupPhase extends GamePhase {
                     gameMap.getWorld().setDifficulty(Difficulty.EASY);
                     plugin.getLobby().resetLobby();
                     setStatus(Status.COMPLETE);
+                    checkPlayerCount();
                     game.setState(GameState.SETUP_COMPLETE); //TODO
                 } catch (Exception e) {
                     e.printStackTrace();

@@ -22,6 +22,9 @@ public class AssignTeamsPhase extends GamePhase {
     @Override
     public void beginphase() {
         try {
+            if (checkPlayerCount()) {
+                return;
+            }
             setStatus(Status.SET_TEAMS);
             UUID uuid;
             Queue<UUID> tributes = new LinkedList<>(), spectators = new LinkedList<>();
@@ -44,24 +47,37 @@ public class AssignTeamsPhase extends GamePhase {
                 player.sendMessage(player.getTeam().getJoinMessage());
             }
 
+            if (checkPlayerCount()) {
+                return;
+            }
             setStatus(Status.OFFER_SPECTATORS);
             UUID spectator;
             while ((spectator = spectators.poll()) != null) {
                 SurvivalGames.PLAYER_QUEUE.offer(spectator);
             }
 
+            if (checkPlayerCount()) {
+                return;
+            }
             setStatus(Status.OFFER_TRIBUTES);
             UUID tribute;
             while ((tribute = tributes.poll()) != null) {
                 SurvivalGames.PLAYER_QUEUE.offer(tribute);
             }
 
+            if (checkPlayerCount()) {
+                return;
+            }
             setStatus(Status.SET_TABLIST_HANDLER);
             for (GamePlayer player : new ArrayList<>(game.getPlayers().values())) {
                 player.getScoreboard().setTablistHandler(new GameTablistHandler(player.getScoreboard(), Game.getPlugin()));
             }
-            
+
+            if (checkPlayerCount()) {
+                return;
+            }
             setStatus(Status.COMPLETE);
+            checkPlayerCount();
             game.setState(GameState.TEAMS_ASSIGNED);
         } catch (Exception e) {
             e.printStackTrace();

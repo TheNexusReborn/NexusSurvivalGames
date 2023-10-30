@@ -1,6 +1,10 @@
 package com.thenexusreborn.survivalgames.game.state;
 
+import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.GameState;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -44,6 +48,19 @@ public abstract class GamePhase {
     protected void setStatus(PhaseStatus status) {
         this.completedStatuses.put(System.currentTimeMillis(), this.status);
         this.status = status;
+    }
+    
+    protected boolean checkPlayerCount() {
+        if (game.getPlayers().size() <= 1) {
+            game.setState(GameState.ENDING);
+            Game.getPlugin().getLobby().fromGame(game);
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                player.sendMessage(MsgType.WARN.formatMsg("Detected only one player left in the game, resetting back to lobby."));
+            }
+            return true;
+        }
+        
+        return false;
     }
 
     @Override
