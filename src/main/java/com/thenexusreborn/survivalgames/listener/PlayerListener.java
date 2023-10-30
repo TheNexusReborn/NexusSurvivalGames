@@ -236,7 +236,6 @@ public class PlayerListener implements Listener {
                     lobbyPlayer.getPlayer().setToggleValue("allowsponsors", !sponsorsValue);
                     sponsorsValue = lobbyPlayer.getToggleValue("allowsponsors");
                     Material sponsorsItemMaterial = sponsorsValue ? Material.GLOWSTONE_DUST : Material.SULPHUR;
-                    //TODO For some reason it does not update properly
                     player.getInventory().setItem(0, ItemBuilder.start(sponsorsItemMaterial).displayName("&e&lSponsors &7&o(Right click to toggle)").build());
                 } else if (e.getItem().getItemMeta().getDisplayName().contains("Return to Hub")) {
                     SGUtils.sendToHub(player);
@@ -477,6 +476,7 @@ public class PlayerListener implements Listener {
         }
         if (e.getRightClicked() instanceof ArmorStand || e.getRightClicked() instanceof ItemFrame || e.getRightClicked() instanceof Painting) {
             e.setCancelled(true);
+            return;
         }
         
         if (e.getRightClicked() instanceof Villager villager) {
@@ -499,12 +499,7 @@ public class PlayerListener implements Listener {
                     return;
                 }
                 
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        manager.openGUI(new SwagShackMenu(plugin, game, gamePlayer), e.getPlayer());
-                    }
-                }.runTaskLater(plugin, 1L);
+                manager.openGUI(new SwagShackMenu(plugin, game, gamePlayer), e.getPlayer());
             }
         }
     }
