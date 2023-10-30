@@ -21,50 +21,42 @@ public class SetupPhase extends GamePhase {
 
     @Override
     public void beginphase() {
+        if (checkPlayerCount()) {
+            return;
+        }
         Bukkit.getScheduler().runTaskAsynchronously(Game.getPlugin(), () -> {
             GameMap gameMap = game.getGameMap();
             SurvivalGames plugin = Game.getPlugin();
             GameSettings settings = game.getSettings();
 
-            if (checkPlayerCount()) {
-                return;
-            }
             setStatus(Status.SETTING_SCOREBOARDS);
             for (GamePlayer player : game.getPlayers().values()) {
                 player.getScoreboard().setView(new GameBoard(player.getScoreboard(), plugin));
             }
 
-            if (checkPlayerCount()) {
-                return;
-            }
             setStatus(Status.DOWNLOADING_MAP);
             if (!gameMap.download(plugin)) {
                 game.handleError("There was an error downloading the map.");
                 return;
             }
 
-            if (checkPlayerCount()) {
-                return;
-            }
             setStatus(Status.UNZIPPING_MAP);
             if (!gameMap.unzip(plugin)) {
                 game.handleError("There was an error extracting the map files.");
                 return;
             }
 
-            if (checkPlayerCount()) {
-                return;
-            }
             setStatus(Status.COPYING_MAP);
             if (!gameMap.copyFolder(plugin, false)) {
                 game.handleError("There was an error copying the map files.");
                 return;
             }
 
-            if (checkPlayerCount()) {
-                return;
-            }
             Bukkit.getScheduler().runTask(Game.getPlugin(), () -> {
+                if (checkPlayerCount()) {
+                    return;
+                }
+                
                 setStatus(Status.LOADING_MAP);
                 if (!gameMap.load(plugin)) {
                     game.handleError("There was an error loading the world.");
