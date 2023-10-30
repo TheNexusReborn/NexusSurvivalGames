@@ -20,7 +20,7 @@ public class PlayerUpdateThread extends NexusThread<SurvivalGames> {
                 if (player.getTeam() == GameTeam.SPECTATORS) {
                     SGUtils.updatePlayerHealthAndFood(Bukkit.getPlayer(player.getUniqueId()));
                 } else if (player.getTeam() == GameTeam.MUTATIONS) {
-                    player.setFood(20F, 20F);
+                    player.setFood(20, 20F);
                 }
             }
         }
