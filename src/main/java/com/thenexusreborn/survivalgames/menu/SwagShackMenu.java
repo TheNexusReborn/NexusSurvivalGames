@@ -79,7 +79,7 @@ public class SwagShackMenu extends InventoryGUI {
                 }
 
                 player.changeStat(currency, cost, StatOperator.SUBTRACT).push();
-                e.getWhoClicked().getInventory().addItem(itemStack);
+                e.getWhoClicked().getInventory().addItem(item.getItem().getItemStack());
             });
             
             setElement(item.getPosition(), button);
