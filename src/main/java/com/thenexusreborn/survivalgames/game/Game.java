@@ -24,6 +24,7 @@ import com.thenexusreborn.survivalgames.game.death.KillerInfo;
 import com.thenexusreborn.survivalgames.game.state.GamePhase;
 import com.thenexusreborn.survivalgames.game.state.phase.AssignTeamsPhase;
 import com.thenexusreborn.survivalgames.game.state.phase.SetupPhase;
+import com.thenexusreborn.survivalgames.game.state.phase.TeleportToMapPhase;
 import com.thenexusreborn.survivalgames.game.timer.old.*;
 import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
 import com.thenexusreborn.survivalgames.loot.Items;
@@ -81,7 +82,7 @@ public class Game {
     private boolean debugMode; //Debug Mode. This may be replaced with a class with other settings
     private Graceperiod graceperiod = Graceperiod.INACTIVE;
 
-    private GamePhase setupPhase, assignTeamsPhase;
+    private GamePhase setupPhase, assignTeamsPhase, teleportToMapPhase;
 
     public Game(GameMap gameMap, GameSettings settings, Collection<LobbyPlayer> players) {
         this.gameMap = gameMap;
@@ -107,20 +108,10 @@ public class Game {
         }
         gameInfo.setPlayerCount(tributeCount);
         gameInfo.setPlayers(playerNames.toArray(new String[0]));
-        //TODO Parse settings, or just get rid of the settings from the GameInfo
-//        StringBuilder sb = new StringBuilder();
-//        for (Field field : this.settings.getClass().getDeclaredFields()) {
-//            field.setAccessible(true);
-//            try {
-//                sb.append(field.getName()).append("=").append(field.get(this.settings).toString()).append(",");
-//            } catch (IllegalAccessException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//        gameInfo.setSettings(sb.substring(0, sb.length() - 1));
 
         this.setupPhase = new SetupPhase(this);
         this.assignTeamsPhase = new AssignTeamsPhase(this);
+        this.teleportToMapPhase = new TeleportToMapPhase(this);
     }
 
     public void setState(GameState state) {
@@ -134,6 +125,10 @@ public class Game {
 
     public GamePhase getAssignTeamsPhase() {
         return assignTeamsPhase;
+    }
+
+    public GamePhase getTeleportToMapPhase() {
+        return teleportToMapPhase;
     }
 
     public void handleShutdown() {
@@ -377,44 +372,8 @@ public class Game {
     }
 
     public void teleportStart() {
-        try {
-            setState(TELEPORT_START);
-
-            List<UUID> tributes = new LinkedList<>(), spectators = new LinkedList<>();
-            for (GamePlayer player : this.players.values()) {
-                Player p = Bukkit.getPlayer(player.getUniqueId());
-                p.getInventory().clear();
-                p.getInventory().setArmorContents(null);
-                p.setFlying(false);
-                p.setAllowFlight(false);
-                p.setSaturation(settings.getStartingSaturation());
-                if (player.getTeam() == GameTeam.TRIBUTES) {
-                    tributes.add(player.getUniqueId());
-                } else if (player.getTeam() == GameTeam.SPECTATORS) {
-                    spectators.add(player.getUniqueId());
-                    giveSpectatorItems(Bukkit.getPlayer(player.getUniqueId()));
-                }
-                for (PotionEffect potionEffect : p.getActivePotionEffects()) {
-                    p.removePotionEffect(potionEffect.getType());
-                }
-            }
-            resetSpawns();
-            Location mapSpawn = gameMap.getCenter().toLocation(gameMap.getWorld());
-            teleportTributes(tributes, mapSpawn);
-            teleportSpectators(spectators, mapSpawn);
-            for (Entity entity : this.gameMap.getWorld().getEntities()) {
-                if (entity instanceof Monster) {
-                    entity.remove();
-                }
-            }
-
-            recalculateVisibility();
-
-            setState(TELEPORT_START_DONE);
-        } catch (Exception e) {
-            e.printStackTrace();
-            handleError("There was an error teleporting players to their starting positions.");
-        }
+        setState(TELEPORT_START);
+        this.teleportToMapPhase.beginphase(); //TODO Temporary until it can be fully implemented
     }
 
     public void assignStartingTeams() {
