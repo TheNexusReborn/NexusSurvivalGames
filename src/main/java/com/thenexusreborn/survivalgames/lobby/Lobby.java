@@ -389,9 +389,6 @@ public class Lobby {
         Game game = new Game(gameMap, this.gameSettings, getPlayers());
         this.players.clear();
         plugin.setGame(game);
-        if (plugin.getGamesPlayed() + 1 >= this.lobbySettings.getMaxGames()) {
-            plugin.setRestart(true);
-        }
         if (Game.getControlType() == ControlType.AUTOMATIC) {
             this.state = LobbyState.STARTING;
             game.setup();

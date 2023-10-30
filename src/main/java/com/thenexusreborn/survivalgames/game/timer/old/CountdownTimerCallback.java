@@ -1,13 +1,14 @@
 package com.thenexusreborn.survivalgames.game.timer.old;
 
 import com.thenexusreborn.nexuscore.util.ReturnableCallback;
-import com.thenexusreborn.nexuscore.util.timer.Timer;
-import com.thenexusreborn.nexuscore.util.timer.*;
-import com.thenexusreborn.survivalgames.*;
+import com.thenexusreborn.nexuscore.util.timer.TimerSnapshot;
+import com.thenexusreborn.survivalgames.ControlType;
 import com.thenexusreborn.survivalgames.game.Game;
 import org.bukkit.Sound;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class CountdownTimerCallback implements ReturnableCallback<TimerSnapshot, Boolean> {
     
@@ -16,7 +17,7 @@ public class CountdownTimerCallback implements ReturnableCallback<TimerSnapshot,
     private final Game game;
     private final Set<Integer> announced = new HashSet<>();
     private final Set<Integer> soundPlayed = new HashSet<>();
-    private boolean announcedInfo = false, announcedRestart = false;
+    private boolean announcedInfo, announcedRestart;
     
     public CountdownTimerCallback(Game game) {
         this.game = game;
@@ -61,15 +62,6 @@ public class CountdownTimerCallback implements ReturnableCallback<TimerSnapshot,
                 }
                 
                 announcedInfo = true;
-            }
-        }
-        
-        if (remainingSeconds == game.getSettings().getWarmupLength() - 10) {
-            if (!announcedRestart) {
-                if (SurvivalGames.getPlugin(SurvivalGames.class).restart()) {
-                    game.sendMessage("&6&l>> &e&lTHE SERVER WILL RESTART AFTER THIS GAME.");
-                    this.announcedRestart = true;
-                }
             }
         }
         

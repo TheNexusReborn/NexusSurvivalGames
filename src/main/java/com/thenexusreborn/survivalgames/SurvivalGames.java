@@ -69,7 +69,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
     private int gamesPlayed;
     
     private SGChatHandler chatHandler;
-    private boolean restart;
     
     private final Map<String, LobbySettings> lobbySettings = new HashMap<>();
     private final Map<String, GameSettings> gameSettings = new HashMap<>();
@@ -432,14 +431,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
     public SGChatHandler getChatHandler() {
         return chatHandler;
-    }
-    
-    public boolean restart() {
-        return restart;
-    }
-    
-    public void setRestart(boolean restart) {
-        this.restart = restart;
     }
     
     public LobbySettings getLobbySettings(String type) {
