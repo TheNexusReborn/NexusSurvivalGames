@@ -1,7 +1,9 @@
 package com.thenexusreborn.survivalgames.map;
 
+import com.thenexusreborn.survivalgames.util.SGUtils;
 import me.firestar311.starsql.api.annotations.table.TableName;
 import org.bukkit.*;
+import org.bukkit.util.Vector;
 
 import java.util.Objects;
 
@@ -52,6 +54,10 @@ public class MapSpawn implements Comparable<MapSpawn> {
     
     public Location toLocation(World world) {
         return new Location(world, x, y, z);
+    }
+    
+    public Location toGameLocation(World world, Location mapCenter) {
+        return new Location(world, x + 0.5, y + 2, z + 0.5, SGUtils.getAngle(new Vector(x, y, z), mapCenter.toVector()), 0);
     }
     
     @Override

@@ -36,7 +36,6 @@ import com.thenexusreborn.survivalgames.mutations.MutationItem;
 import com.thenexusreborn.survivalgames.mutations.MutationType;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.sponsoring.SponsorManager;
-import com.thenexusreborn.survivalgames.util.SGUtils;
 import me.firestar311.starlib.api.time.TimeFormat;
 import me.firestar311.starlib.api.time.TimeUnit;
 import org.bukkit.Bukkit;
@@ -285,37 +284,25 @@ public class Game {
                 int index = new Random().nextInt(spawns.size());
                 Entry<Integer, UUID> entry = spawns.get(index);
                 MapSpawn spawnPosition = this.gameMap.getSpawns().get(entry.getKey());
-                Location spawn = spawnPosition.toLocation(gameMap.getWorld());
-                teleportTribute(player, mapSpawn, spawn);
+                Location spawn = spawnPosition.toGameLocation(gameMap.getWorld(), mapSpawn);
+                teleportTribute(player, spawn);
                 this.spawns.put(entry.getKey(), player.getUniqueId());
                 spawns.remove(index);
             }
         }
     }
 
-    private void teleportToGameSpawn(Player player, Location mapSpawn, Location spawn, GameTeam gameTeam) {
-        spawn.setX(spawn.getX() + 0.5);
-        spawn.setY(spawn.getY() + 2.0);
-        spawn.setZ(spawn.getZ() + 0.5);
-        spawn.setPitch(0);
-        spawn.setYaw(SGUtils.getAngle(spawn.toVector(), mapSpawn.toVector()));
+    private void teleportToGameSpawn(Player player, Location spawn, GameTeam gameTeam) {
         player.teleport(spawn);
-        player.setAllowFlight(false);
-        player.setFlying(false);
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                player.setGameMode(gameTeam.getGameMode());
-            }
-        }.runTaskLater(plugin, 1L);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> player.setGameMode(gameTeam.getGameMode()), 1L);
     }
 
-    public void teleportTribute(Player tribute, Location mapSpawn, Location spawn) {
-        teleportToGameSpawn(tribute, mapSpawn, spawn, GameTeam.TRIBUTES);
+    public void teleportTribute(Player tribute, Location spawn) {
+        teleportToGameSpawn(tribute, spawn, GameTeam.TRIBUTES);
     }
 
-    public void teleportMutation(Player mutation, Location mapSpawn, Location spawn) {
-        teleportToGameSpawn(mutation, mapSpawn, spawn, GameTeam.MUTATIONS);
+    public void teleportMutation(Player mutation, Location spawn) {
+        teleportToGameSpawn(mutation, spawn, GameTeam.MUTATIONS);
     }
 
     public void teleportSpectator(Player spectator, Location mapSpawn) {
@@ -1176,7 +1163,7 @@ public class Game {
         sendMessage("&6&l>> " + gamePlayer.getColoredName() + " &6has &lMUTATED &6as a(n) &l" + mutation.getType().getDisplayName() + " &6and seeks revenge on &a" + Bukkit.getPlayer(mutation.getTarget()).getName() + "&6!");
 
         MapSpawn spawn = gameMap.getSpawns().get(new Random().nextInt(gameMap.getSpawns().size()));
-        Location location = spawn.toLocation(this.gameMap.getWorld());
+        Location location = spawn.toGameLocation(this.gameMap.getWorld(), gameMap.getCenter().toLocation(gameMap.getWorld()));
         Player player = Bukkit.getPlayer(gamePlayer.getUniqueId());
 
         gamePlayer.sendMessage(gamePlayer.getTeam().getLeaveMessage());
