@@ -5,7 +5,6 @@ import com.thenexusreborn.api.gamearchive.GameAction;
 import com.thenexusreborn.api.gamearchive.GameInfo;
 import com.thenexusreborn.api.helper.NumberHelper;
 import com.thenexusreborn.api.helper.StringHelper;
-import com.thenexusreborn.api.player.CachedPlayer;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.stats.StatOperator;
@@ -765,23 +764,11 @@ public class Game {
                 if (gameInfo.getId() % 1000 == 0) {
                     for (String p : gameInfo.getPlayers()) {
                         NexusAPI.getApi().getScheduler().runTaskAsynchronously(() -> {
-                            NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(p);
-                            if (nexusPlayer == null) {
-                                for (CachedPlayer cachedPlayer : NexusAPI.getApi().getPlayerManager().getCachedPlayers().values()) {
-                                    if (cachedPlayer.getName().equalsIgnoreCase(p)) {
-                                        try {
-                                            nexusPlayer = NexusAPI.getApi().getPrimaryDatabase().get(NexusPlayer.class, "name", p).get(0);
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                }
-                            }
+                            UUID uuid = NexusAPI.getApi().getPlayerManager().getUUIDFromName(p);
 
-                            Tag tag = new Tag(nexusPlayer.getUniqueId(), gameInfo.getId() + "th", System.currentTimeMillis());
-                            nexusPlayer.getTags().add(tag);
-                            nexusPlayer.sendMessage(MsgType.INFO + "Unlocked the tag " + tag.getDisplayName());
-                            NexusAPI.getApi().getPrimaryDatabase().saveSilent(nexusPlayer);
+                            Tag tag = new Tag(uuid, gameInfo.getId() + "th", System.currentTimeMillis());
+                            //TODO nexusPlayer.sendMessage(MsgType.INFO + "Unlocked the tag " + tag.getDisplayName());
+                            NexusAPI.getApi().getPrimaryDatabase().saveSilent(tag);
                         });
                     }
                 }
