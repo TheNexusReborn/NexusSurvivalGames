@@ -55,7 +55,7 @@ public class TeleportToMapPhase extends GamePhase {
 
             setStatus(Status.RECALCULATING_VISIBILITY);
             game.recalculateVisibility();
-            setStatus(Status.COMPLETE);
+            setStatus(PhaseStatus.COMPLETE);
             game.setState(TELEPORT_START_DONE);
         } catch (Exception e) {
             e.printStackTrace();
@@ -64,7 +64,7 @@ public class TeleportToMapPhase extends GamePhase {
     }
     
     public enum Status implements PhaseStatus {
-        RESETTING_SPAWNS, TELEPORTING_TRIBUTES, TELEPORTING_SPECTATORS, REMOVING_MONSTERS, RECALCULATING_VISIBILITY, COMPLETE, RESETTING_PLAYERS
+        RESETTING_SPAWNS, TELEPORTING_TRIBUTES, TELEPORTING_SPECTATORS, REMOVING_MONSTERS, RECALCULATING_VISIBILITY, RESETTING_PLAYERS
 
     }
 }

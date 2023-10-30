@@ -102,7 +102,7 @@ public class SetupPhase extends GamePhase {
                     gameMap.getWorld().setGameRuleValue("keepInventory", "false");
                     gameMap.getWorld().setDifficulty(Difficulty.EASY);
                     plugin.getLobby().resetLobby();
-                    setStatus(Status.COMPLETE);
+                    setStatus(PhaseStatus.COMPLETE);
                     checkPlayerCount();
                     game.setState(GameState.SETUP_COMPLETE); //TODO
                 } catch (Exception e) {
@@ -122,6 +122,5 @@ public class SetupPhase extends GamePhase {
         CALCULATE_DM_AREA,
         SETUP_SPAWNS,
         SET_GAMERULES,
-        COMPLETE
     }
 }

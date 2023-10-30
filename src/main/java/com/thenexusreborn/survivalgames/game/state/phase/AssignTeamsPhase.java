@@ -76,7 +76,7 @@ public class AssignTeamsPhase extends GamePhase {
             if (checkPlayerCount()) {
                 return;
             }
-            setStatus(Status.COMPLETE);
+            setStatus(PhaseStatus.COMPLETE);
             checkPlayerCount();
             game.setState(GameState.TEAMS_ASSIGNED);
         } catch (Exception e) {
@@ -86,6 +86,6 @@ public class AssignTeamsPhase extends GamePhase {
     }
     
     public enum Status implements PhaseStatus {
-        OFFER_SPECTATORS, OFFER_TRIBUTES, SET_TABLIST_HANDLER, COMPLETE, SET_TEAMS
+        OFFER_SPECTATORS, OFFER_TRIBUTES, SET_TABLIST_HANDLER, SET_TEAMS
     }
 }

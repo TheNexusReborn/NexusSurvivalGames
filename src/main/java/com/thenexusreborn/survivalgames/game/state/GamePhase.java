@@ -12,7 +12,7 @@ import java.util.Map;
 public abstract class GamePhase {
     protected Game game;
     protected String name;
-    protected PhaseStatus status;
+    protected PhaseStatus status = PhaseStatus.STARTING;
     
     //A status is only considered completed when it is replaced by a new status. The setStatus method handles this automatically.
     protected Map<PhaseStatus, Long> completedStatuses = new HashMap<>();
