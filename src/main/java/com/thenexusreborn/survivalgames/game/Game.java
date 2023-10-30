@@ -11,7 +11,6 @@ import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.api.tags.Tag;
 import com.thenexusreborn.disguise.DisguiseAPI;
 import com.thenexusreborn.disguise.disguisetypes.MobDisguise;
-import com.thenexusreborn.nexuscore.util.ArmorType;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
@@ -43,9 +42,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
-import org.bukkit.entity.*;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Villager;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -365,12 +365,12 @@ public class Game {
 
     public void assignStartingTeams() {
         setState(ASSIGN_TEAMS);
-        this.assignTeamsPhase.beginphase(); //TODO Temporary until it can be replaced.
+        this.assignTeamsPhase.beginphase(); //TODO Temporary until it can be fully implemented
     }
 
     public void setup() {
         setState(SETTING_UP);
-        this.setupPhase.beginphase(); //TODO Temporary until it can be fully replaced
+        this.setupPhase.beginphase(); //TODO Temporary until it can be fully fully implemented
     }
 
     public void handleError(String message) {
@@ -1172,26 +1172,22 @@ public class Game {
         DisguiseAPI.disguiseEntity(player, new MobDisguise(mutation.getType().getDisguiseType()));
 
         gamePlayer.setMutated(true);
-        teleportMutation(player, this.gameMap.getCenter().toLocation(gameMap.getWorld()), location);
+        teleportMutation(player, location);
         recalculateVisibility();
         gamePlayer.clearInventory();
         gamePlayer.setFlight(false, false);
         gamePlayer.setCollisions(true);
-        gamePlayer.setFood(20F, 20F);
+        gamePlayer.setFood(20, 20F);
 
         MutationType type = mutation.getType();
+        gamePlayer.setHealth(20, type.getHealth());
         PlayerInventory inv = player.getInventory();
         inv.setItem(0, type.getWeapon());
         inv.setItem(1, Items.PLAYER_TRACKER.getItemStack());
         for (MutationItem item : type.getItems()) {
             inv.setItem(1 + item.slotOffset(), item.itemStack());
         }
-        ArmorType armorType = type.getArmorType();
-        inv.setHelmet(new ItemStack(armorType.getHelmet()));
-        inv.setChestplate(new ItemStack(armorType.getChestplate()));
-        inv.setLeggings(new ItemStack(armorType.getLeggings()));
-        inv.setBoots(new ItemStack(armorType.getBoots()));
-        player.setMaxHealth(type.getHealth());
+        gamePlayer.setArmor(type.getArmorType());
         for (MutationEffect effect : type.getEffects()) {
             player.addPotionEffect(new PotionEffect(effect.getPotionType(), Integer.MAX_VALUE, effect.getAmplifier(), false, false));
         }

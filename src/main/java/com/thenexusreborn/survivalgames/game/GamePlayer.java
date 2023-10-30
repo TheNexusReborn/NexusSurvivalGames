@@ -5,6 +5,7 @@ import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.stats.StatChange;
 import com.thenexusreborn.api.stats.StatOperator;
+import com.thenexusreborn.nexuscore.util.ArmorType;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
@@ -19,6 +20,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.potion.PotionEffect;
 
 import java.text.DecimalFormat;
 import java.util.*;
@@ -428,9 +430,40 @@ public class GamePlayer {
         callPlayerMethod(player -> player.spigot().setCollidesWithEntities(collisions));
     }
 
-    public void setFood(float food, float saturation) {
+    public void setFood(int food, float saturation) {
         Player player = Bukkit.getPlayer(getUniqueId());
-        
+        if (player != null) {
+            player.setFoodLevel(food);
+            player.setSaturation(saturation);
+        }
+    }
+
+    public void clearPotionEffects() {
+        Player player = Bukkit.getPlayer(getUniqueId());
+        if (player != null) {
+            for (PotionEffect potionEffect : player.getActivePotionEffects()) {
+                player.removePotionEffect(potionEffect.getType());
+            }
+        }
+    }
+
+    public void setHealth(int health, double maxHealth) {
+        Player player = Bukkit.getPlayer(getUniqueId());
+        if (player != null) {
+            player.setMaxHealth(maxHealth);
+            player.setHealth(Math.min(health, maxHealth));
+        }
+    }
+
+    public void setArmor(ArmorType armorType) {
+        Player player = Bukkit.getPlayer(getUniqueId());
+        if (player != null) {
+            PlayerInventory inv = player.getInventory();
+            inv.setHelmet(new ItemStack(armorType.getHelmet()));
+            inv.setChestplate(new ItemStack(armorType.getChestplate()));
+            inv.setLeggings(new ItemStack(armorType.getLeggings()));
+            inv.setBoots(new ItemStack(armorType.getBoots()));
+        }
     }
 
     public enum Status {
