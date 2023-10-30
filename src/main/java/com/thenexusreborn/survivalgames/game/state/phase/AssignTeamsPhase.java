@@ -77,7 +77,6 @@ public class AssignTeamsPhase extends GamePhase {
                 return;
             }
             setStatus(PhaseStatus.COMPLETE);
-            checkPlayerCount();
             game.setState(GameState.TEAMS_ASSIGNED);
         } catch (Exception e) {
             e.printStackTrace();
