@@ -4,9 +4,10 @@ import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.stats.Stat;
 import com.thenexusreborn.api.stats.StatHelper;
+import com.thenexusreborn.gamemaps.model.MapSpawn;
+import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
-import com.thenexusreborn.nexuscore.util.Position;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.ControlType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -16,8 +17,6 @@ import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
 import com.thenexusreborn.survivalgames.lobby.StatSign;
 import com.thenexusreborn.survivalgames.lobby.TributeSign;
-import com.thenexusreborn.survivalgames.map.GameMap;
-import com.thenexusreborn.survivalgames.map.MapSpawn;
 import com.thenexusreborn.survivalgames.map.tasks.AnalyzeThread;
 import com.thenexusreborn.survivalgames.settings.SettingRegistry;
 import com.thenexusreborn.survivalgames.settings.collection.SettingList;
@@ -27,6 +26,7 @@ import com.thenexusreborn.survivalgames.util.Operator;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import me.firestar311.starlib.api.Value;
 import me.firestar311.starlib.api.Value.Type;
+import me.firestar311.starlib.spigot.utils.Position;
 import me.firestar311.starsql.api.objects.typehandlers.ValueHandler;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.HoverEvent.Action;
@@ -294,7 +294,7 @@ public class SGCommand implements CommandExecutor {
                         sender.sendMessage(MCUtils.color(MsgType.WARN + "The server has a game in progress."));
                         return true;
                     }
-                    GameMap gameMap = plugin.getMapManager().getMap(SGUtils.getMapNameFromCommand(args, 2));
+                    SGMap gameMap = plugin.getMapManager().getMap(SGUtils.getMapNameFromCommand(args, 2));
                     if (gameMap == null) {
                         sender.sendMessage(MCUtils.color(MsgType.WARN + "Could not find a map with that name."));
                         return true;
@@ -751,20 +751,20 @@ public class SGCommand implements CommandExecutor {
                     return true;
                 }
 
-                GameMap gameMap = new GameMap(url, mapName);
+                SGMap gameMap = new SGMap(url, mapName);
                 plugin.getMapManager().addMap(gameMap);
                 sender.sendMessage(MCUtils.color(MsgType.INFO + "Created a map with the name " + MsgType.INFO.getVariableColor() + gameMap.getName() + MsgType.INFO.getBaseColor() + "."));
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        plugin.getMapManager().saveToDatabase(gameMap);
+                        plugin.getMapManager().saveMap(gameMap);
                         sender.sendMessage(MCUtils.color(MsgType.VERBOSE + "The map has been saved to the database."));
                     }
                 }.runTaskAsynchronously(plugin);
             } else {
-                GameMap gameMap = null;
+                SGMap gameMap = null;
                 boolean mapFromArgument = false;
-                for (GameMap map : plugin.getMapManager().getMaps()) {
+                for (SGMap map : plugin.getMapManager().getMaps()) {
                     if (map.getWorld() != null) {
                         if (map.getWorld().getName().equalsIgnoreCase(player.getWorld().getName())) {
                             gameMap = map;
@@ -785,7 +785,7 @@ public class SGCommand implements CommandExecutor {
 
                 switch (mapSubCommand) {
                     case "download", "dl" -> {
-                        GameMap finalGameMap = gameMap;
+                        SGMap finalGameMap = gameMap;
                         plugin.getLobby().setGameMap(finalGameMap);
                         player.sendMessage(MCUtils.color(MsgType.VERBOSE + "Please wait, downloading the map " + MsgType.VERBOSE.getVariableColor() + finalGameMap.getName() + MsgType.VERBOSE.getBaseColor() + "."));
                         NexusAPI.getApi().getScheduler().runTaskAsynchronously(() -> {
@@ -825,7 +825,7 @@ public class SGCommand implements CommandExecutor {
                         return true;
                     }
                     case "save", "s" -> {
-                        plugin.getMapManager().saveToDatabase(gameMap);
+                        plugin.getMapManager().saveMap(gameMap);
                         player.sendMessage(MCUtils.color(MsgType.INFO + "Saved the settings for the map " + MsgType.INFO.getVariableColor() + gameMap.getName()));
                     }
                     case "removefromserver", "rfs" -> {
@@ -893,7 +893,7 @@ public class SGCommand implements CommandExecutor {
 
                         gameMap.setBorderDistance(radius);
                         if (this.viewingWorldBorder) {
-                            gameMap.applyWorldBoarder(GameState.INGAME);
+                            gameMap.applyWorldBoarder("game");
                         }
                         sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the border radius on map &b" + gameMap.getName() + " &eto &b" + radius));
                     }
@@ -920,7 +920,7 @@ public class SGCommand implements CommandExecutor {
 
                         gameMap.setDeathmatchBorderDistance(radius);
                         if (this.viewingWorldBorder) {
-                            gameMap.applyWorldBoarder(GameState.DEATHMATCH);
+                            gameMap.applyWorldBoarder("deathmatch");
                         }
                         sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the deathmatch border radius on map &b" + gameMap.getName() + " &eto &b" + radius));
                     }
@@ -996,7 +996,7 @@ public class SGCommand implements CommandExecutor {
                             return true;
                         }
 
-                        gameMap.applyWorldBoarder(state);
+                        gameMap.applyWorldBoarder(args[2]);
                         this.viewingWorldBorder = true;
                         player.sendMessage(MCUtils.color(MsgType.INFO + "You are now viewing the world border as " + args[2].toLowerCase()));
                         return true;
@@ -1031,7 +1031,7 @@ public class SGCommand implements CommandExecutor {
                         return true;
                     }
                     case "downloadloadteleport", "dlltp" -> {
-                        GameMap finalGameMap = gameMap;
+                        SGMap finalGameMap = gameMap;
                         plugin.getLobby().setGameMap(finalGameMap);
                         player.sendMessage(MCUtils.color(MsgType.VERBOSE + "Please wait, setting up the map, then teleporting you to " + MsgType.VERBOSE.getVariableColor() + finalGameMap.getName() + MsgType.VERBOSE.getBaseColor() + "."));
                         NexusAPI.getApi().getScheduler().runTaskAsynchronously(() -> {
@@ -1064,11 +1064,11 @@ public class SGCommand implements CommandExecutor {
                         return true;
                     }
                 }
-                GameMap finalGameMap = gameMap;
+                SGMap finalGameMap = gameMap;
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        plugin.getMapManager().saveToDatabase(finalGameMap);
+                        plugin.getMapManager().saveMap(finalGameMap);
                         sender.sendMessage(MCUtils.color(MsgType.VERBOSE + "The map has been saved to the database."));
                     }
                 }.runTaskAsynchronously(plugin);

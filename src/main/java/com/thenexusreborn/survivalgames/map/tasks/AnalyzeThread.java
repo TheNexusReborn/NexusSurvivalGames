@@ -1,11 +1,11 @@
 package com.thenexusreborn.survivalgames.map.tasks;
 
+import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
-import com.thenexusreborn.nexuscore.util.Position;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.map.GameMap;
 import me.firestar311.starlib.spigot.utils.Cuboid;
+import me.firestar311.starlib.spigot.utils.Position;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -17,13 +17,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class AnalyzeThread implements Runnable {
 
     private SurvivalGames plugin;
-    private GameMap gameMap;
+    private SGMap gameMap;
     private Player player;
     private Cuboid cuboid;
 
     private AtomicInteger totalBlocks = new AtomicInteger(), chests = new AtomicInteger(), enchantTables = new AtomicInteger(), workbenches = new AtomicInteger(), furnaces = new AtomicInteger();
 
-    public AnalyzeThread(SurvivalGames plugin, GameMap map, Player player) {
+    public AnalyzeThread(SurvivalGames plugin, SGMap map, Player player) {
         this.plugin = plugin;
         this.gameMap = map;
         this.player = player;
@@ -57,7 +57,7 @@ public class AnalyzeThread implements Runnable {
         return plugin;
     }
 
-    public GameMap getGameMap() {
+    public SGMap getGameMap() {
         return gameMap;
     }
 

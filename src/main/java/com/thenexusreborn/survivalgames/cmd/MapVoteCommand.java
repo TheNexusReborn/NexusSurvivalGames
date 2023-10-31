@@ -2,10 +2,10 @@ package com.thenexusreborn.survivalgames.cmd;
 
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
+import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
-import com.thenexusreborn.survivalgames.map.GameMap;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
@@ -64,13 +64,13 @@ public class MapVoteCommand implements CommandExecutor {
                 sb.append(arg).append(" ");
             }
     
-            GameMap gameMap = SGUtils.getGameMapFromInput(sb.toString().trim(), sender);
+            SGMap gameMap = SGUtils.getGameMapFromInput(sb.toString().trim(), sender);
             if (gameMap == null) {
                 sender.sendMessage(MCUtils.color(MsgType.WARN + "Could not find a game map."));
                 return true;
             }
     
-            for (Entry<Integer, GameMap> entry : plugin.getLobby().getMapOptions().entrySet()) {
+            for (Entry<Integer, SGMap> entry : plugin.getLobby().getMapOptions().entrySet()) {
                 if (gameMap.getName().equalsIgnoreCase(entry.getValue().getName())) {
                     plugin.getLobby().addMapVote(nexusPlayer, plugin.getLobby().getMapSigns().get(entry.getKey()));
                     return true;

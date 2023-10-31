@@ -1,16 +1,15 @@
 package com.thenexusreborn.survivalgames.map.tasks;
 
-import com.thenexusreborn.nexuscore.util.Position;
-import com.thenexusreborn.survivalgames.map.GameMap;
+import com.thenexusreborn.gamemaps.model.SGMap;
+import me.firestar311.starlib.spigot.utils.Position;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class BlockAnalyzeThread implements Runnable {
     private final AnalyzeThread analyzeThread;
-    private GameMap map;
+    private SGMap map;
     private List<Position> blocks;
 
     public BlockAnalyzeThread(AnalyzeThread analyzeThread, List<Position> blocks) {

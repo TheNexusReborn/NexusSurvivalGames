@@ -8,6 +8,9 @@ import com.thenexusreborn.api.registry.NetworkCommandRegistry;
 import com.thenexusreborn.api.registry.StatRegistry;
 import com.thenexusreborn.api.registry.ToggleRegistry;
 import com.thenexusreborn.api.stats.StatType;
+import com.thenexusreborn.gamemaps.model.MapRating;
+import com.thenexusreborn.gamemaps.model.MapSpawn;
+import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.NexusCore;
 import com.thenexusreborn.nexuscore.api.NexusSpigotPlugin;
 import com.thenexusreborn.nexuscore.util.ServerProperties;
@@ -21,10 +24,7 @@ import com.thenexusreborn.survivalgames.listener.PlayerListener;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
 import com.thenexusreborn.survivalgames.loot.LootManager;
-import com.thenexusreborn.survivalgames.map.GameMap;
-import com.thenexusreborn.survivalgames.map.MapManager;
-import com.thenexusreborn.survivalgames.map.MapRating;
-import com.thenexusreborn.survivalgames.map.MapSpawn;
+import com.thenexusreborn.survivalgames.map.SQLMapManager;
 import com.thenexusreborn.survivalgames.mutations.PlayerMutations;
 import com.thenexusreborn.survivalgames.mutations.UnlockedMutation;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
@@ -60,7 +60,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
     private NexusCore nexusCore;
     
-    private MapManager mapManager;
+    private SQLMapManager mapManager;
     private Lobby lobby;
     private LootManager lootManager;
     
@@ -158,7 +158,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         
         getLogger().info("Settings Loaded");
         
-        mapManager = new MapManager(this);
+        mapManager = new SQLMapManager(this);
         getLogger().info("Loaded Maps");
         lobby = new Lobby(this);
         getLogger().info("Loaded Lobby Settings");
@@ -405,7 +405,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         saveConfig();
     }
     
-    public MapManager getMapManager() {
+    public SQLMapManager getMapManager() {
         return mapManager;
     }
     
@@ -468,7 +468,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
                 database.registerClass(LobbySetting.class);
                 database.registerClass(UnlockedMutation.class);
                 database.registerClass(MapRating.class);
-                database.registerClass(GameMap.class);
+                database.registerClass(SGMap.class);
                 database.registerClass(MapSpawn.class);
             }
         }

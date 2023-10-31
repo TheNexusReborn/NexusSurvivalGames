@@ -1,17 +1,17 @@
 package com.thenexusreborn.survivalgames.game.state.phase;
 
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
-import com.thenexusreborn.nexuscore.util.region.Cuboid;
+import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.game.GameState;
 import com.thenexusreborn.survivalgames.game.state.GamePhase;
 import com.thenexusreborn.survivalgames.game.state.PhaseStatus;
-import com.thenexusreborn.survivalgames.map.GameMap;
 import com.thenexusreborn.survivalgames.scoreboard.GameTablistHandler;
 import com.thenexusreborn.survivalgames.scoreboard.game.GameBoard;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
+import me.firestar311.starlib.spigot.utils.Cuboid;
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.Location;
@@ -27,7 +27,7 @@ public class SetupPhase extends GamePhase {
             return;
         }
         Bukkit.getScheduler().runTaskAsynchronously(Game.getPlugin(), () -> {
-            GameMap gameMap = game.getGameMap();
+            SGMap gameMap = game.getGameMap();
             SurvivalGames plugin = Game.getPlugin();
             GameSettings settings = game.getSettings();
 

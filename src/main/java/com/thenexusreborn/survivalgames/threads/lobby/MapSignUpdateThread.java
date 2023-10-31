@@ -1,10 +1,10 @@
 package com.thenexusreborn.survivalgames.threads.lobby;
 
+import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.*;
-import com.thenexusreborn.survivalgames.map.GameMap;
 import org.bukkit.*;
 import org.bukkit.block.*;
 import org.bukkit.entity.Player;
@@ -36,7 +36,7 @@ public class MapSignUpdateThread extends NexusThread<SurvivalGames> {
         }
         
         for (Entry<Integer, Location> entry : lobby.getMapSigns().entrySet()) {
-            GameMap map = lobby.getMapOptions().get(entry.getKey());
+            SGMap map = lobby.getMapOptions().get(entry.getKey());
             if (map == null) {
                 continue;
             }

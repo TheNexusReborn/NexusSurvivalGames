@@ -1,29 +1,26 @@
 package com.thenexusreborn.survivalgames.map;
 
 import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.nexuscore.util.*;
+import com.thenexusreborn.gamemaps.MapManager;
+import com.thenexusreborn.gamemaps.model.SGMap;
+import com.thenexusreborn.nexuscore.util.Config;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.SQLException;
 import java.util.logging.Level;
 
-public class MapManager {
-    private final SurvivalGames plugin;
-
+public class SQLMapManager extends MapManager {
     private Config mapsConfig;
 
-    private final List<GameMap> gameMaps = new ArrayList<>();
-
-    public MapManager(SurvivalGames plugin) {
-        this.plugin = plugin;
-        load();
+    public SQLMapManager(SurvivalGames plugin) {
+        super(plugin);
+        loadMaps();
     }
 
-    public void load() {
+    public void loadMaps() {
         plugin.getLogger().info("Loading the Maps...");
         try {
-            this.gameMaps.addAll(NexusAPI.getApi().getPrimaryDatabase().get(GameMap.class));
+            this.gameMaps.addAll(NexusAPI.getApi().getPrimaryDatabase().get(SGMap.class));
         } catch (SQLException e) {
             plugin.getLogger().log(Level.SEVERE, "Could not get the maps from the database", e);
             plugin.getServer().getPluginManager().disablePlugin(plugin);
@@ -31,7 +28,7 @@ public class MapManager {
         }
 
         //This runs the checks to see if a map has the minimum requirements for a map to work.
-        for (GameMap gameMap : this.gameMaps) {
+        for (SGMap gameMap : this.gameMaps) {
             boolean oldValue = gameMap.isActive();
             gameMap.setActive(oldValue);
             //Only save the map if the old value was true and the new one is false
@@ -43,24 +40,15 @@ public class MapManager {
         plugin.getLogger().info("Total Maps: " + gameMaps.size());
     }
 
-    public GameMap getMap(String mapName) {
-        for (GameMap gameMap : this.gameMaps) {
-            if (gameMap.getName().equalsIgnoreCase(mapName)) {
-                return gameMap;
-            }
-
-            if (gameMap.getName().replace(" ", "_").replace("'", "").equalsIgnoreCase(mapName)) {
-                return gameMap;
-            }
-
-            if (gameMap.getUrl().equalsIgnoreCase(mapName)) {
-                return gameMap;
-            }
+    @Override
+    public void saveMaps() {
+        for (SGMap gameMap : this.gameMaps) {
+            saveMap(gameMap);
         }
-        return null;
     }
 
-    public void saveToDatabase(GameMap gameMap) {
+    @Override
+    public void saveMap(SGMap gameMap) {
         try {
             NexusAPI.getApi().getPrimaryDatabase().save(gameMap);
         } catch (SQLException e) {
@@ -68,11 +56,13 @@ public class MapManager {
         }
     }
 
-    public void addMap(GameMap gameMap) {
-        this.gameMaps.add(gameMap);
+    @Override
+    public SGMap loadMap(String name) {
+        return null;
     }
 
-    public List<GameMap> getMaps() {
-        return this.gameMaps;
+    @Deprecated
+    public void saveToDatabase(SGMap gameMap) {
+        saveMap(gameMap);
     }
 }

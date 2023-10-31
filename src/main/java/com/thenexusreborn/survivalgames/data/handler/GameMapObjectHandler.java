@@ -1,7 +1,9 @@
 package com.thenexusreborn.survivalgames.data.handler;
 
 import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.survivalgames.map.*;
+import com.thenexusreborn.gamemaps.model.MapRating;
+import com.thenexusreborn.gamemaps.model.MapSpawn;
+import com.thenexusreborn.gamemaps.model.SGMap;
 import me.firestar311.starsql.api.objects.ObjectHandler;
 import me.firestar311.starsql.api.objects.SQLDatabase;
 import me.firestar311.starsql.api.objects.Table;
@@ -16,7 +18,7 @@ public class GameMapObjectHandler extends ObjectHandler {
     
     @Override
     public void afterLoad() {
-        GameMap gameMap = (GameMap) object;
+        SGMap gameMap = (SGMap) object;
         try {
             List<MapSpawn> mapSpawns = database.get(MapSpawn.class, "mapId", gameMap.getId());
             gameMap.setSpawns(mapSpawns);
@@ -33,7 +35,7 @@ public class GameMapObjectHandler extends ObjectHandler {
     
     @Override
     public void afterSave() {
-        GameMap gameMap = (GameMap) object;
+        SGMap gameMap = (SGMap) object;
     
         for (MapSpawn spawn : gameMap.getSpawns()) {
             if (spawn.getMapId() != gameMap.getId()) {

@@ -2,9 +2,9 @@ package com.thenexusreborn.survivalgames.util;
 
 import com.google.common.io.*;
 import com.thenexusreborn.api.scoreboard.wrapper.ITeam;
+import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.map.GameMap;
 import net.minecraft.server.v1_8_R3.EntityTNTPrimed;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
@@ -19,7 +19,7 @@ public final class SGUtils {
     
     private static final SurvivalGames plugin = SurvivalGames.getPlugin(SurvivalGames.class);
     
-    public static void setMapNameForScoreboard(GameMap map, ITeam team) {
+    public static void setMapNameForScoreboard(SGMap map, ITeam team) {
         if (map != null) {
             setTeamValueForString(map.getName(), team);
         } else {
@@ -78,8 +78,8 @@ public final class SGUtils {
         return sb.toString().trim();
     }
     
-    public static GameMap getLoadedGameMap(String input, CommandSender actor) {
-        GameMap gameMap = getGameMapFromInput(input, actor);
+    public static SGMap getLoadedGameMap(String input, CommandSender actor) {
+        SGMap gameMap = getGameMapFromInput(input, actor);
         if (gameMap == null) {
             return null;
         }
@@ -91,9 +91,9 @@ public final class SGUtils {
         return gameMap;
     }
     
-    public static GameMap getGameMapFromInput(String input, CommandSender actor) {
-        GameMap gameMap = null;
-        for (GameMap map : plugin.getMapManager().getMaps()) {
+    public static SGMap getGameMapFromInput(String input, CommandSender actor) {
+        SGMap gameMap = null;
+        for (SGMap map : plugin.getMapManager().getMaps()) {
             if (map.getName().toLowerCase().replace(" ", "_").replace("'", "").equalsIgnoreCase(input) || map.getUrl().equalsIgnoreCase(input)) {
                 gameMap = map;
             }

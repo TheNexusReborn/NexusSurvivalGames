@@ -20,6 +20,7 @@
         <mysql.version>8.0.31</mysql.version>
         <nexus.core.version>1.10-ALPHA</nexus.core.version>
         <nexus.disguises.version>1.0.1-ALPHA</nexus.disguises.version>
+        <nexus.maps.version>1.0-ALPHA</nexus.maps.version>
     </properties>
 
     <build>
@@ -97,6 +98,12 @@
             <groupId>com.thenexusreborn</groupId>
             <artifactId>NexusDisguises</artifactId>
             <version>${nexus.disguises.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.thenexusreborn</groupId>
+            <artifactId>NexusMaps</artifactId>
+            <version>${nexus.maps.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

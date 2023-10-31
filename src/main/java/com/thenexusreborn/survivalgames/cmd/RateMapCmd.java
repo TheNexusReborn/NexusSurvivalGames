@@ -1,11 +1,15 @@
 package com.thenexusreborn.survivalgames.cmd;
 
 import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.nexuscore.util.*;
+import com.thenexusreborn.gamemaps.model.MapRating;
+import com.thenexusreborn.gamemaps.model.SGMap;
+import com.thenexusreborn.nexuscore.util.MCUtils;
+import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.map.*;
 import me.firestar311.starlib.api.time.TimeUnit;
-import org.bukkit.command.*;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class RateMapCmd implements CommandExecutor {
@@ -32,7 +36,7 @@ public class RateMapCmd implements CommandExecutor {
             return true;
         }
     
-        GameMap gameMap = plugin.getGame().getGameMap();
+        SGMap gameMap = plugin.getGame().getGameMap();
         
         int rating;
         try {

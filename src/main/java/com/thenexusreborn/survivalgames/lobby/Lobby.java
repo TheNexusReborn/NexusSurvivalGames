@@ -3,6 +3,8 @@ package com.thenexusreborn.survivalgames.lobby;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
+import com.thenexusreborn.gamemaps.model.MapRating;
+import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.scoreboard.impl.RankTablistHandler;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
@@ -14,8 +16,6 @@ import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.lobby.timer.LobbyTimerCallback;
 import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.loot.LootTable;
-import com.thenexusreborn.survivalgames.map.GameMap;
-import com.thenexusreborn.survivalgames.map.MapRating;
 import com.thenexusreborn.survivalgames.scoreboard.lobby.DebugLobbyBoard;
 import com.thenexusreborn.survivalgames.scoreboard.lobby.LobbyBoard;
 import com.thenexusreborn.survivalgames.scoreboard.lobby.MapEditingBoard;
@@ -50,9 +50,9 @@ public class Lobby {
     private GameSettings gameSettings;
     private LobbySettings lobbySettings;
     private Location spawnpoint;
-    private GameMap gameMap;
+    private SGMap gameMap;
     private final Map<Integer, Location> mapSigns = new HashMap<>();
-    private final Map<Integer, GameMap> mapOptions = new HashMap<>();
+    private final Map<Integer, SGMap> mapOptions = new HashMap<>();
     private boolean forceStarted;
     private final List<StatSign> statSigns = new ArrayList<>();
     private final List<TributeSign> tributeSigns = new ArrayList<>();
@@ -145,7 +145,7 @@ public class Lobby {
 
     public void sendMapOptions(NexusPlayer nexusPlayer) {
         nexusPlayer.sendMessage(MsgType.INFO + "&e&lVOTING OPTIONS - &7Click an option to vote!");
-        for (Entry<Integer, GameMap> entry : mapOptions.entrySet()) {
+        for (Entry<Integer, SGMap> entry : mapOptions.entrySet()) {
             String mapName = entry.getValue().getName();
             StringBuilder creatorBuilder = new StringBuilder();
             for (String creator : entry.getValue().getCreators()) {
@@ -172,7 +172,7 @@ public class Lobby {
         }
     }
 
-    public Map<Integer, GameMap> getMapOptions() {
+    public Map<Integer, SGMap> getMapOptions() {
         return mapOptions;
     }
 
@@ -231,9 +231,9 @@ public class Lobby {
         if (plugin.getMapManager().getMaps().size() == 1 && !this.mapSigns.isEmpty()) {
             this.mapOptions.put(1, plugin.getMapManager().getMaps().get(0));
         } else if (plugin.getMapManager().getMaps().size() >= this.mapSigns.size()) {
-            List<GameMap> maps = new ArrayList<>(plugin.getMapManager().getMaps());
+            List<SGMap> maps = new ArrayList<>(plugin.getMapManager().getMaps());
             for (Integer position : new HashSet<>(this.mapSigns.keySet())) {
-                GameMap map;
+                SGMap map;
                 int index;
                 do {
                     index = new Random().nextInt(maps.size());
@@ -340,9 +340,9 @@ public class Lobby {
         this.state = LobbyState.PREPARING_GAME;
         int mapVotes = 0;
         if (this.gameMap == null) {
-            GameMap mostVoted = null;
+            SGMap mostVoted = null;
             int mostVotedVotes = 0;
-            for (Entry<Integer, GameMap> entry : this.mapOptions.entrySet()) {
+            for (Entry<Integer, SGMap> entry : this.mapOptions.entrySet()) {
                 if (mostVoted == null) {
                     mostVoted = entry.getValue();
                     mostVotedVotes = getTotalMapVotes(entry.getKey());
@@ -424,7 +424,7 @@ public class Lobby {
         return lobbySettings;
     }
 
-    public GameMap getGameMap() {
+    public SGMap getGameMap() {
         return gameMap;
     }
 
@@ -599,7 +599,7 @@ public class Lobby {
         return getPlayers().stream().filter(LobbyPlayer::isSpectating).map(LobbyPlayer::getUniqueId).collect(Collectors.toList());
     }
 
-    public void setGameMap(GameMap gameMap) {
+    public void setGameMap(SGMap gameMap) {
         this.gameMap = gameMap;
     }
 

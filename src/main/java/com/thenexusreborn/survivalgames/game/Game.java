@@ -11,6 +11,8 @@ import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.api.tags.Tag;
 import com.thenexusreborn.disguise.DisguiseAPI;
 import com.thenexusreborn.disguise.disguisetypes.MobDisguise;
+import com.thenexusreborn.gamemaps.model.MapSpawn;
+import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
@@ -27,8 +29,6 @@ import com.thenexusreborn.survivalgames.game.state.phase.TeleportToMapPhase;
 import com.thenexusreborn.survivalgames.game.timer.old.*;
 import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
 import com.thenexusreborn.survivalgames.loot.Items;
-import com.thenexusreborn.survivalgames.map.GameMap;
-import com.thenexusreborn.survivalgames.map.MapSpawn;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
 import com.thenexusreborn.survivalgames.mutations.MutationEffect;
 import com.thenexusreborn.survivalgames.mutations.MutationItem;
@@ -65,7 +65,7 @@ public class Game {
     public static final TimeFormat TIME_FORMAT = new TimeFormat("%*00h%%#0m%%00s%");
     public static final TimeFormat LONG_TIME_FORMAT = new TimeFormat("%*00h%%00m%%00s%");
 
-    private final GameMap gameMap;
+    private final SGMap gameMap;
     private final GameSettings settings;
     private final Map<UUID, GamePlayer> players = new HashMap<>();
     private final Map<Integer, UUID> spawns = new HashMap<>();
@@ -83,7 +83,7 @@ public class Game {
 
     private GamePhase setupPhase, assignTeamsPhase, teleportToMapPhase;
 
-    public Game(GameMap gameMap, GameSettings settings, Collection<LobbyPlayer> players) {
+    public Game(SGMap gameMap, GameSettings settings, Collection<LobbyPlayer> players) {
         this.gameMap = gameMap;
         this.settings = settings;
         this.gameInfo = new GameInfo();
@@ -175,7 +175,7 @@ public class Game {
         }
     }
 
-    public GameMap getGameMap() {
+    public SGMap getGameMap() {
         return gameMap;
     }
 
@@ -541,7 +541,7 @@ public class Game {
         sendMessage("&6&l>> &d&lTHERE IS NO TEAMING ALLOWED IN DEATHMATCH.");
         restockChests();
 
-        this.gameMap.applyWorldBoarder(this.state, settings.getDeathmatchLength() * 60);
+        this.gameMap.applyWorldBoarder("deathmatch", settings.getDeathmatchLength() * 60);
 
         this.timer = new Timer(new GameEndTimerCallback(this)).run(TimeUnit.MINUTES.toMilliseconds(settings.getDeathmatchLength()) + 50);
     }
