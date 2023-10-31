@@ -1,0 +1,9 @@
+{
+    "configurations": [
+        {
+            "type": "maven",
+            "name": "NexusSurvivalGames Build",
+            "tasks": ["clean", "package", "install"],
+        },
+    ]
+}
