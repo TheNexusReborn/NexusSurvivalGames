@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames.game.state.phase;
 
+import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.nexuscore.util.region.Cuboid;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
@@ -8,6 +9,7 @@ import com.thenexusreborn.survivalgames.game.GameState;
 import com.thenexusreborn.survivalgames.game.state.GamePhase;
 import com.thenexusreborn.survivalgames.game.state.PhaseStatus;
 import com.thenexusreborn.survivalgames.map.GameMap;
+import com.thenexusreborn.survivalgames.scoreboard.GameTablistHandler;
 import com.thenexusreborn.survivalgames.scoreboard.game.GameBoard;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import org.bukkit.Bukkit;
@@ -31,7 +33,9 @@ public class SetupPhase extends GamePhase {
 
             setStatus(Status.SETTING_SCOREBOARDS);
             for (GamePlayer player : game.getPlayers().values()) {
-                player.getScoreboard().setView(new GameBoard(player.getScoreboard(), plugin));
+                NexusScoreboard scoreboard = player.getScoreboard();
+                scoreboard.setView(new GameBoard(scoreboard, plugin));
+                scoreboard.setTablistHandler(new GameTablistHandler(scoreboard, plugin));
             }
 
             setStatus(Status.DOWNLOADING_MAP);

@@ -14,7 +14,7 @@ import java.util.*;
 
 public class GameTablistHandler extends TablistHandler {
     
-    private static final Map<GameTeam, String> BEGIN_CHARS = new HashMap<>();
+    private static final Map<GameTeam, String> BEGIN_CHARS = new EnumMap<>(GameTeam.class);
     
     static {
         BEGIN_CHARS.put(GameTeam.TRIBUTES, "a");

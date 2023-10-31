@@ -99,6 +99,7 @@ public class Game {
             if (player.isSpectating()) {
                 gamePlayer.setTeam(GameTeam.SPECTATORS);
             } else {
+                gamePlayer.setTeam(GameTeam.TRIBUTES);
                 playerNames.add(player.getName());
                 tributeCount++;
             }

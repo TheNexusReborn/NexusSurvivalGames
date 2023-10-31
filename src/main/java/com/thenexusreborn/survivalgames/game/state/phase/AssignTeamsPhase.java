@@ -7,9 +7,7 @@ import com.thenexusreborn.survivalgames.game.GameState;
 import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.game.state.GamePhase;
 import com.thenexusreborn.survivalgames.game.state.PhaseStatus;
-import com.thenexusreborn.survivalgames.scoreboard.GameTablistHandler;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.UUID;
@@ -68,10 +66,6 @@ public class AssignTeamsPhase extends GamePhase {
             if (checkPlayerCount()) {
                 return;
             }
-            setStatus(Status.SET_TABLIST_HANDLER);
-            for (GamePlayer player : new ArrayList<>(game.getPlayers().values())) {
-                player.getScoreboard().setTablistHandler(new GameTablistHandler(player.getScoreboard(), Game.getPlugin()));
-            }
 
             if (checkPlayerCount()) {
                 return;
@@ -85,6 +79,6 @@ public class AssignTeamsPhase extends GamePhase {
     }
     
     public enum Status implements PhaseStatus {
-        OFFER_SPECTATORS, OFFER_TRIBUTES, SET_TABLIST_HANDLER, SET_TEAMS
+        OFFER_SPECTATORS, OFFER_TRIBUTES, SET_TEAMS
     }
 }
