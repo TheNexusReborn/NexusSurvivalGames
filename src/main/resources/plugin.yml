@@ -2,8 +2,8 @@ main: com.thenexusreborn.survivalgames.SurvivalGames
 version: ${project.version}
 name: SurvivalGames
 description: The Survival Games plugin for The Nexus Reborn
-depend: [NexusCore, NexusDisguises, StarUI]
-softdepend: [Spartan]
+depend: [NexusCore, NexusDisguises, StarUI, NexusMaps]
+softdepend: [Vulcan]
 author: Firestar311
 commands:
   votestart:
