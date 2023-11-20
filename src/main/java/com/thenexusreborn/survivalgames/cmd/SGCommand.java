@@ -4,6 +4,8 @@ import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.stats.Stat;
 import com.thenexusreborn.api.stats.StatHelper;
+import com.thenexusreborn.gamemaps.MapManager;
+import com.thenexusreborn.gamemaps.YamlMapManager;
 import com.thenexusreborn.gamemaps.model.MapSpawn;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.util.MCUtils;
@@ -44,11 +46,8 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import static me.firestar311.starlib.api.Value.Type.INTEGER;
@@ -87,14 +86,14 @@ public class SGCommand implements CommandExecutor {
 
             String gameSubCommand = args[1].toLowerCase();
 
-            if (List.of("automatic", "auto", "manual", "mnl").contains(gameSubCommand)) {
+            if (List.of("automatic", "auto", "manual", "man").contains(gameSubCommand)) {
                 ControlType controlType = null;
                 try {
                     controlType = ControlType.valueOf(gameSubCommand.toUpperCase());
                 } catch (Exception e) {
                     if (gameSubCommand.equals("auto")) {
                         controlType = ControlType.AUTOMATIC;
-                    } else if (gameSubCommand.equals("mnl")) {
+                    } else if (gameSubCommand.equals("man")) {
                         controlType = ControlType.MANUAL;
                     }
                 }
@@ -761,6 +760,40 @@ public class SGCommand implements CommandExecutor {
                         sender.sendMessage(MCUtils.color(MsgType.VERBOSE + "The map has been saved to the database."));
                     }
                 }.runTaskAsynchronously(plugin);
+            } else if (mapSubCommand.equals("import")) {
+                if (!(args.length > 2)) {
+                    MsgType.WARN.sendMessage(sender, "You must either provide a map name or 'all' to import maps.");
+                    return true;
+                }
+
+                YamlMapManager importManager = plugin.getImportMapManager();
+                List<SGMap> maps = new ArrayList<>(importManager.getMaps());
+                if (maps.isEmpty()) {
+                    MsgType.WARN.sendMessage(sender, "There are no maps that can be imported.");
+                    return true;
+                }
+                
+                List<String> messages = new ArrayList<>();
+
+                if (args[2].equalsIgnoreCase("all")) {
+                    for (SGMap map : maps) {
+                        importMap(importManager, map, sender);
+                    }
+                    return true;
+                }
+
+                SGMap map = importManager.getMap(args[2]);
+                if (map == null) {
+                    MsgType.WARN.sendMessage(sender, "Could not find a map with the name &vc" + args[2]);
+                    return true;
+                }
+                
+                map.setId(0);
+                plugin.getMapManager().addMap(map);
+                plugin.getMapManager().saveMap(map);
+                if (map.getId() != 0) {
+                    importMap(importManager, map, sender);
+                }
             } else {
                 SGMap gameMap = null;
                 boolean mapFromArgument = false;
@@ -834,7 +867,8 @@ public class SGCommand implements CommandExecutor {
                         player.sendMessage(MCUtils.color(MsgType.INFO + "Removed the map " + MsgType.INFO.getVariableColor() + gameMap.getName() + MsgType.INFO.getBaseColor() + " from the server."));
                         return true;
                     }
-                    case "delete" -> player.sendMessage(MCUtils.color(MsgType.WARN + "This command is not yet implemented."));
+                    case "delete" ->
+                            player.sendMessage(MCUtils.color(MsgType.WARN + "This command is not yet implemented."));
                     case "addspawn", "as" -> {
                         Location location = player.getLocation();
                         int position = gameMap.addSpawn(new MapSpawn(0, -1, location.getBlockX(), location.getBlockY(), location.getBlockZ()));
@@ -1189,5 +1223,17 @@ public class SGCommand implements CommandExecutor {
         }
 
         return true;
+    }
+    
+    private void importMap(MapManager importManager, SGMap map, CommandSender sender) {
+        map.setId(0);
+        plugin.getMapManager().addMap(map);
+        plugin.getMapManager().saveMap(map);
+        if (map.getId() != 0) {
+            importManager.deleteMap(map);
+            MsgType.SUCCESS.sendMessage(sender, "Successfully imported &vc" + map.getName() + "&bc.");
+        } else {
+            MsgType.WARN.sendMessage(sender, "Could not import &vc" + map.getName() + "&bc.");
+        }
     }
 }

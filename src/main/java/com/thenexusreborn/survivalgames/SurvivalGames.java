@@ -8,6 +8,7 @@ import com.thenexusreborn.api.registry.NetworkCommandRegistry;
 import com.thenexusreborn.api.registry.StatRegistry;
 import com.thenexusreborn.api.registry.ToggleRegistry;
 import com.thenexusreborn.api.stats.StatType;
+import com.thenexusreborn.gamemaps.YamlMapManager;
 import com.thenexusreborn.gamemaps.model.MapRating;
 import com.thenexusreborn.gamemaps.model.MapSpawn;
 import com.thenexusreborn.gamemaps.model.SGMap;
@@ -61,6 +62,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
     private NexusCore nexusCore;
     
     private SQLMapManager mapManager;
+    private YamlMapManager importMapManager;
     private Lobby lobby;
     private LootManager lootManager;
     
@@ -159,6 +161,9 @@ public class SurvivalGames extends NexusSpigotPlugin {
         getLogger().info("Settings Loaded");
         
         mapManager = new SQLMapManager(this);
+        mapManager.loadMaps();
+        importMapManager = new YamlMapManager(this);
+        importMapManager.loadMaps();
         getLogger().info("Loaded Maps");
         lobby = new Lobby(this);
         getLogger().info("Loaded Lobby Settings");
@@ -494,5 +499,9 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
     public SettingRegistry getGameSettingRegistry() {
         return gameSettingRegistry;
+    }
+
+    public YamlMapManager getImportMapManager() {
+        return importMapManager;
     }
 }
