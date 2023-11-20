@@ -65,9 +65,8 @@
 
     <repositories>
         <repository>
-            <id>reposilite</id>
-            <name>Laptop Repo</name>
-            <url>http://localhost:8080/snapshots</url>
+            <id>jitpack.io</id>
+            <url>https://www.jitpack.io</url>
         </repository>
         <repository>
             <id>spigotmc-repo</id>
@@ -76,6 +75,12 @@
     </repositories>
 
     <dependencies>
+        <dependency>
+            <groupId>com.github.StarDevelopmentLLC</groupId>
+            <artifactId>StarLib</artifactId>
+            <version>1.0.0-alpha.1</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
@@ -90,12 +95,6 @@
         </dependency>
         <dependency>
             <groupId>com.thenexusreborn</groupId>
-            <artifactId>NexusCore</artifactId>
-            <version>${nexus.core.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.thenexusreborn</groupId>
             <artifactId>NexusDisguises</artifactId>
             <version>${nexus.disguises.version}</version>
             <scope>provided</scope>
@@ -103,7 +102,7 @@
         <dependency>
             <groupId>com.thenexusreborn</groupId>
             <artifactId>NexusMaps</artifactId>
-            <version>${nexus.maps.version}</version>
+            <version>1.0-ALPHA</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -129,6 +128,12 @@
             <artifactId>StarUI</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.thenexusreborn</groupId>
+            <artifactId>NexusCore</artifactId>
+            <version>1.10.1-ALPHA</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>
