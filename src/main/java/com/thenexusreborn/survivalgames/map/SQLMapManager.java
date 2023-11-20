@@ -14,7 +14,6 @@ public class SQLMapManager extends MapManager {
 
     public SQLMapManager(SurvivalGames plugin) {
         super(plugin);
-        loadMaps();
     }
 
     public void loadMaps() {
@@ -38,6 +37,16 @@ public class SQLMapManager extends MapManager {
         }
         
         plugin.getLogger().info("Total Maps: " + gameMaps.size());
+    }
+
+    @Override
+    public void deleteMap(SGMap map) {
+        try {
+            NexusAPI.getApi().getPrimaryDatabase().delete(map);
+            this.getMaps().remove(map);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
