@@ -6,7 +6,7 @@
 
     <groupId>com.thenexusreborn</groupId>
     <artifactId>NexusSurvivalGames</artifactId>
-    <version>1.15-ALPHA</version>
+    <version>1.15.1-ALPHA</version>
 
     <properties>
         <java.version>17</java.version>
@@ -106,34 +106,28 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>me.firestar311.starlib</groupId>
-            <artifactId>starlib-spigot</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <groupId>com.github.Firestar311.StarSQL</groupId>
+            <artifactId>mysql</artifactId>
+            <version>09988aece6</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>me.firestar311.starsql</groupId>
-            <artifactId>starsql-mysql</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <groupId>com.github.Firestar311.StarClock</groupId>
+            <artifactId>api</artifactId>
+            <version>ff3b94d2ce</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>me.firestar311.starclock</groupId>
-            <artifactId>starclock-api</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>me.firestar311.starui</groupId>
+            <groupId>com.github.Firestar311</groupId>
             <artifactId>StarUI</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>9aba138ce9</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.thenexusreborn</groupId>
             <artifactId>NexusCore</artifactId>
             <version>1.10.1-ALPHA</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>
