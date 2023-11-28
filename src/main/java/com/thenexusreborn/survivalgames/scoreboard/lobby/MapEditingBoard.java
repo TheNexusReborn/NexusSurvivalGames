@@ -1,11 +1,12 @@
 package com.thenexusreborn.survivalgames.scoreboard.lobby;
 
-import com.thenexusreborn.api.scoreboard.*;
+import com.stardevllc.starmclib.Position;
+import com.thenexusreborn.api.scoreboard.NexusScoreboard;
+import com.thenexusreborn.api.scoreboard.TeamBuilder;
 import com.thenexusreborn.nexuscore.scoreboard.SpigotScoreboardView;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.util.SGUtils;
-import me.firestar311.starlib.spigot.utils.Position;
 import org.bukkit.ChatColor;
 
 public class MapEditingBoard extends SpigotScoreboardView {

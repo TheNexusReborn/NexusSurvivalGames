@@ -1,13 +1,13 @@
 package com.thenexusreborn.survivalgames.menu;
 
+import com.stardevllc.starui.GuiManager;
+import com.stardevllc.starui.element.button.Button;
+import com.stardevllc.starui.gui.InventoryGUI;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.SpigotUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.game.GameTeam;
-import me.firestar311.starui.GuiManager;
-import me.firestar311.starui.element.button.Button;
-import me.firestar311.starui.gui.InventoryGUI;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;

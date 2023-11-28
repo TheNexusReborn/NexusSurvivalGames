@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.loot;
 
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import me.firestar311.starlib.api.range.Range;
+import com.thenexusreborn.survivalgames.util.Range;
 import org.bukkit.Material;
 
 import java.util.*;
@@ -98,10 +98,10 @@ public class LootCategory {
         int rand = random.nextInt(entryTotal + 1);
         for (Range<LootEntry> range : entryProbabilties) {
             if (range.contains(rand)) {
-                if (range.object() == null) {
+                if (range.value() == null) {
                     SurvivalGames.getPlugin(SurvivalGames.class).getLogger().severe("A range has a null object " + range.min() + " - " + range.max());
                 }
-                return range.object();
+                return range.value();
             }
         }
         

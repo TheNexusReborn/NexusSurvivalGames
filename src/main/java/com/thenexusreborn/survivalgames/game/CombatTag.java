@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.game;
 
+import com.stardevllc.starlib.time.TimeUnit;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import me.firestar311.starlib.api.time.TimeUnit;
 
 import java.util.UUID;
 
@@ -53,7 +53,7 @@ public final class CombatTag {
     }
     
     public boolean isInCombat() {
-        return this.other != null && System.currentTimeMillis() < this.timestamp + TimeUnit.SECONDS.toMilliseconds(SurvivalGames.getPlugin(SurvivalGames.class).getGame().getSettings().getCombatTagLength());
+        return this.other != null && System.currentTimeMillis() < this.timestamp + TimeUnit.SECONDS.toMillis(SurvivalGames.getPlugin(SurvivalGames.class).getGame().getSettings().getCombatTagLength());
     }
 
     @Override

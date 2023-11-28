@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.settings.object;
 
+import com.stardevllc.starlib.Value;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import me.firestar311.starlib.api.Value;
 import me.firestar311.starsql.api.annotations.column.ColumnCodec;
 import me.firestar311.starsql.api.annotations.column.ColumnIgnored;
 import me.firestar311.starsql.api.annotations.column.ColumnName;

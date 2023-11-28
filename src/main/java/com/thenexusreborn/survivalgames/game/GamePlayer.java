@@ -1,5 +1,7 @@
 package com.thenexusreborn.survivalgames.game;
 
+import com.stardevllc.starlib.Pair;
+import com.stardevllc.starlib.Value;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
@@ -12,8 +14,6 @@ import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
 import com.thenexusreborn.survivalgames.scoreboard.GameTablistHandler;
 import com.thenexusreborn.survivalgames.scoreboard.game.GameBoard;
-import me.firestar311.starlib.api.Pair;
-import me.firestar311.starlib.api.Value;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;

@@ -1,17 +1,21 @@
 package com.thenexusreborn.survivalgames.menu;
 
-import com.thenexusreborn.nexuscore.util.*;
+import com.stardevllc.starui.GuiManager;
+import com.stardevllc.starui.element.Element;
+import com.stardevllc.starui.element.button.Button;
+import com.stardevllc.starui.gui.InventoryGUI;
+import com.thenexusreborn.nexuscore.util.MCUtils;
+import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.*;
-import me.firestar311.starui.GuiManager;
-import me.firestar311.starui.element.Element;
-import me.firestar311.starui.element.button.Button;
-import me.firestar311.starui.gui.InventoryGUI;
-import org.bukkit.*;
+import com.thenexusreborn.survivalgames.game.GamePlayer;
+import com.thenexusreborn.survivalgames.game.GameTeam;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class PlayerMenu extends InventoryGUI {

@@ -1,10 +1,10 @@
 package com.thenexusreborn.survivalgames.lobby;
 
+import com.stardevllc.starclock.clocks.Timer;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.IActionBar;
 import com.thenexusreborn.survivalgames.ControlType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import me.firestar311.starclock.api.clocks.Timer;
 
 public class LobbyActionBar implements IActionBar {
     

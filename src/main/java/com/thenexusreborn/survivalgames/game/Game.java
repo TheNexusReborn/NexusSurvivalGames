@@ -1,5 +1,7 @@
 package com.thenexusreborn.survivalgames.game;
 
+import com.stardevllc.starlib.time.TimeFormat;
+import com.stardevllc.starlib.time.TimeUnit;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.gamearchive.GameAction;
 import com.thenexusreborn.api.gamearchive.GameInfo;
@@ -35,8 +37,6 @@ import com.thenexusreborn.survivalgames.mutations.MutationItem;
 import com.thenexusreborn.survivalgames.mutations.MutationType;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.sponsoring.SponsorManager;
-import me.firestar311.starlib.api.time.TimeFormat;
-import me.firestar311.starlib.api.time.TimeUnit;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -399,11 +399,11 @@ public class Game {
 
     public void startWarmup() {
         setState(WARMUP);
-        this.timer = new Timer(new CountdownTimerCallback(this)).run(TimeUnit.SECONDS.toMilliseconds(settings.getWarmupLength()) + 50L);
+        this.timer = new Timer(new CountdownTimerCallback(this)).run(TimeUnit.SECONDS.toMillis(settings.getWarmupLength()) + 50L);
     }
 
     public void startGame() {
-        this.timer = new Timer(new GameTimerCallback(this)).run(TimeUnit.MINUTES.toMilliseconds(settings.getGameLength()) + 50);
+        this.timer = new Timer(new GameTimerCallback(this)).run(TimeUnit.MINUTES.toMillis(settings.getGameLength()) + 50);
         this.ratingPromptTimer = new Timer(snapshot -> {
             if (snapshot.getSecondsLeft() == 0) {
                 sendMessage("");
@@ -413,10 +413,10 @@ public class Game {
                 return false;
             }
             return true;
-        }).run(TimeUnit.MINUTES.toMilliseconds(settings.getGameLength()) / 4);
+        }).run(TimeUnit.MINUTES.toMillis(settings.getGameLength()) / 4);
         this.start = System.currentTimeMillis();
         if (this.settings.isGracePeriod()) {
-            this.graceperiodTimer = new Timer(new GraceperiodCountdownCallback(this)).run(TimeUnit.SECONDS.toMilliseconds(settings.getGracePeriodLength()) + 50L);
+            this.graceperiodTimer = new Timer(new GraceperiodCountdownCallback(this)).run(TimeUnit.SECONDS.toMillis(settings.getGracePeriodLength()) + 50L);
             this.graceperiod = Graceperiod.ACTIVE;
         }
         setState(INGAME);
@@ -426,7 +426,7 @@ public class Game {
         } else {
             restockLength = settings.getChestRestockInterval();
         }
-        this.restockTimer = new Timer(new RestockTimerCallback(this)).run(TimeUnit.MINUTES.toMilliseconds(restockLength) + 50L);
+        this.restockTimer = new Timer(new RestockTimerCallback(this)).run(TimeUnit.MINUTES.toMillis(restockLength) + 50L);
         sendMessage("&6&l>> &a&lMAY THE ODDS BE EVER IN YOUR FAVOR.");
         if (this.settings.isTeamingAllowed()) {
             sendMessage("&6&l>> &d&lTHERE IS A MAX OF " + this.settings.getMaxTeamAmount() + " PLAYER TEAMS.");
@@ -520,7 +520,7 @@ public class Game {
             }
         }
 
-        this.timer = new Timer(new DeathmatchCountdownCallback(this)).run(TimeUnit.SECONDS.toMilliseconds(settings.getDeathmatchWarmupLength()) + 50L);
+        this.timer = new Timer(new DeathmatchCountdownCallback(this)).run(TimeUnit.SECONDS.toMillis(settings.getDeathmatchWarmupLength()) + 50L);
     }
 
     public void startDeathmatch() {
@@ -543,7 +543,7 @@ public class Game {
 
         this.gameMap.applyWorldBoarder("deathmatch", settings.getDeathmatchLength() * 60);
 
-        this.timer = new Timer(new GameEndTimerCallback(this)).run(TimeUnit.MINUTES.toMilliseconds(settings.getDeathmatchLength()) + 50);
+        this.timer = new Timer(new GameEndTimerCallback(this)).run(TimeUnit.MINUTES.toMillis(settings.getDeathmatchLength()) + 50);
     }
 
     public void deathmatchWarmupDone() {
@@ -727,7 +727,7 @@ public class Game {
         });
 
         if (!(this.players.isEmpty() || Bukkit.getOnlinePlayers().isEmpty())) {
-            this.timer = new Timer(new NextGameTimerCallback(this)).run(TimeUnit.SECONDS.toMilliseconds(settings.getNextGameStart()));
+            this.timer = new Timer(new NextGameTimerCallback(this)).run(TimeUnit.SECONDS.toMillis(settings.getNextGameStart()));
         } else {
             this.nextGame();
         }
@@ -1117,7 +1117,7 @@ public class Game {
         }
 
         sendMessage("&6&l>> &4&lTHE DEATHMATCH COUNTDOWN HAS STARTED");
-        this.timer = new Timer(new DeathmatchPlayingCallback(this)).run(TimeUnit.SECONDS.toMilliseconds(settings.getDeathmatchTimerLength()) + 50);
+        this.timer = new Timer(new DeathmatchPlayingCallback(this)).run(TimeUnit.SECONDS.toMillis(settings.getDeathmatchTimerLength()) + 50);
     }
 
     public boolean isLootedChest(Block block) {

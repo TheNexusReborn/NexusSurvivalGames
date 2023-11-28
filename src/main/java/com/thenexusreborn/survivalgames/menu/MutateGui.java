@@ -1,19 +1,25 @@
 package com.thenexusreborn.survivalgames.menu;
 
+import com.stardevllc.starlib.Pair;
+import com.stardevllc.starui.element.Element;
+import com.stardevllc.starui.element.button.Button;
+import com.stardevllc.starui.gui.InventoryGUI;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.*;
-import com.thenexusreborn.survivalgames.mutations.*;
-import me.firestar311.starlib.api.Pair;
-import me.firestar311.starui.element.Element;
-import me.firestar311.starui.element.button.Button;
-import me.firestar311.starui.gui.InventoryGUI;
+import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.GamePlayer;
+import com.thenexusreborn.survivalgames.mutations.Mutation;
+import com.thenexusreborn.survivalgames.mutations.MutationType;
+import com.thenexusreborn.survivalgames.mutations.PlayerMutations;
+import com.thenexusreborn.survivalgames.mutations.UnlockedMutation;
 import org.bukkit.Material;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class MutateGui extends InventoryGUI {
     public MutateGui(SurvivalGames plugin, GamePlayer player) {

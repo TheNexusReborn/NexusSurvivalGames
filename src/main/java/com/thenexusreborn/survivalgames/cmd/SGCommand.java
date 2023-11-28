@@ -1,5 +1,7 @@
 package com.thenexusreborn.survivalgames.cmd;
 
+import com.stardevllc.starlib.Value;
+import com.stardevllc.starmclib.Position;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.stats.Stat;
@@ -26,9 +28,6 @@ import com.thenexusreborn.survivalgames.settings.object.Setting;
 import com.thenexusreborn.survivalgames.settings.object.Setting.Info;
 import com.thenexusreborn.survivalgames.util.Operator;
 import com.thenexusreborn.survivalgames.util.SGUtils;
-import me.firestar311.starlib.api.Value;
-import me.firestar311.starlib.api.Value.Type;
-import me.firestar311.starlib.spigot.utils.Position;
 import me.firestar311.starsql.api.objects.typehandlers.ValueHandler;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.HoverEvent.Action;
@@ -50,7 +49,8 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
 
-import static me.firestar311.starlib.api.Value.Type.INTEGER;
+import static com.stardevllc.starlib.Value.Type;
+import static com.stardevllc.starlib.Value.Type.INTEGER;
 
 public class SGCommand implements CommandExecutor {
 
@@ -629,7 +629,7 @@ public class SGCommand implements CommandExecutor {
                     default -> null;
                 };
 
-                for (Info setting : settingRegistry.getRegisteredObjects().values()) {
+                for (Info setting : settingRegistry.getObjects().values()) {
                     TextComponent component = new TextComponent(TextComponent.fromLegacyText(MCUtils.color(" &8- &a" + setting.getName())));
                     StringBuilder sb = new StringBuilder();
                     sb.append("&dName: &e").append(setting.getDisplayName()).append("\n");

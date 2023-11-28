@@ -1,5 +1,7 @@
 package com.thenexusreborn.survivalgames;
 
+import com.stardevllc.starlib.Value;
+import com.stardevllc.starlib.Value.Type;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.network.cmd.NetworkCommand;
 import com.thenexusreborn.api.player.Rank;
@@ -41,7 +43,6 @@ import com.thenexusreborn.survivalgames.settings.object.impl.LobbySetting;
 import com.thenexusreborn.survivalgames.threads.ServerStatusThread;
 import com.thenexusreborn.survivalgames.threads.game.*;
 import com.thenexusreborn.survivalgames.threads.lobby.*;
-import me.firestar311.starlib.api.Value;
 import me.firestar311.starsql.api.objects.SQLDatabase;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -51,8 +52,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.*;
-
-import static me.firestar311.starlib.api.Value.Type;
 
 public class SurvivalGames extends NexusSpigotPlugin {
     
@@ -124,8 +123,8 @@ public class SurvivalGames extends NexusSpigotPlugin {
         registerDefaultSettings();
         
         Set<Setting.Info> allSettingInfos = new HashSet<>();
-        allSettingInfos.addAll(gameSettingRegistry.getRegisteredObjects().values());
-        allSettingInfos.addAll(lobbySettingRegistry.getRegisteredObjects().values());
+        allSettingInfos.addAll(gameSettingRegistry.getObjects().values());
+        allSettingInfos.addAll(lobbySettingRegistry.getObjects().values());
         
         allSettingInfos.forEach(database::queue);
         database.flush();
@@ -466,7 +465,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
 
     @Override
     public void registerDatabases(DatabaseRegistry registry) {
-        for (SQLDatabase database : registry.getRegisteredObjects().values()) {
+        for (SQLDatabase database : registry.getObjects().values()) {
             if (database.getName().toLowerCase().contains("nexus")) { //TODO Temporary
                 database.registerClass(Setting.Info.class);
                 database.registerClass(GameSetting.class);

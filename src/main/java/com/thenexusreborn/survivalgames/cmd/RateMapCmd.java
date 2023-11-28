@@ -1,12 +1,12 @@
 package com.thenexusreborn.survivalgames.cmd;
 
+import com.stardevllc.starlib.time.TimeUnit;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.gamemaps.model.MapRating;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import me.firestar311.starlib.api.time.TimeUnit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -53,7 +53,7 @@ public class RateMapCmd implements CommandExecutor {
     
         MapRating mapRating = gameMap.getRatings().get(player.getUniqueId());
         if (mapRating != null) {
-            if (mapRating.getTimestamp() + TimeUnit.DAYS.toMilliseconds(7) > System.currentTimeMillis()) {
+            if (mapRating.getTimestamp() + TimeUnit.DAYS.toMillis(7) > System.currentTimeMillis()) {
                 player.sendMessage(MCUtils.color(MsgType.WARN + "You can only rate the same map only once every 7 days"));
                 return true;
             }

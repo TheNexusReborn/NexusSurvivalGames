@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.loot;
 
-import me.firestar311.starlib.api.range.Range;
+import com.thenexusreborn.survivalgames.util.Range;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
@@ -57,7 +57,7 @@ public class LootTable {
             int rand = random.nextInt(categoryTotal + 1);
             for (Range<LootCategory> range : categoryProbabilities) {
                 if (range.contains(rand)) {
-                    LootCategory category = range.object();
+                    LootCategory category = range.value();
                     int current = categoryAmounts.getOrDefault(category, 0);
                     if (current < category.getMaxAmountPerChest()) {
                         categoryAmounts.put(category, current + 1);
