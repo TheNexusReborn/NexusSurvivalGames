@@ -77,8 +77,14 @@
     <dependencies>
         <dependency>
             <groupId>com.github.StarDevelopmentLLC</groupId>
-            <artifactId>StarLib</artifactId>
+            <artifactId>StarCore</artifactId>
             <version>1.0.0-alpha.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.thenexusreborn</groupId>
+            <artifactId>NexusCore</artifactId>
+            <version>1.10.1-ALPHA</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -113,21 +119,10 @@
         </dependency>
         <dependency>
             <groupId>com.github.StarDevelopmentLLC</groupId>
-            <artifactId>StarClock</artifactId>
-            <version>1.0.0-alpha.1</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.StarDevelopmentLLC</groupId>
             <artifactId>StarUI</artifactId>
             <version>1.0.0-alpha.1</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>com.thenexusreborn</groupId>
-            <artifactId>NexusCore</artifactId>
-            <version>1.10.1-ALPHA</version>
-            <scope>provided</scope>
-        </dependency>
+        
     </dependencies>
 </project>
