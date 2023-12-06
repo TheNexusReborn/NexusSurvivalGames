@@ -631,7 +631,7 @@ public class Game {
             if (settings.isGiveXp()) {
                 double xp = settings.getWinXPBaseGain();
                 xp *= multiplier;
-                winner.changeStat("xp", xp, StatOperator.ADD);
+                winner.getNexusPlayer().addXp(xp);
                 String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(xp) + " &2&lXP&a&l!";
                 if (multiplier > 1) {
                     winner.sendMessage(baseMessage + multiplierMessage);
@@ -842,7 +842,7 @@ public class Game {
                 if (getSettings().isMultiplier()) {
                     xpGain *= (int) killerRank.getMultiplier();
                 }
-                killerPlayer.changeStat("xp", xpGain, StatOperator.ADD);
+                killerPlayer.getNexusPlayer().addXp(xpGain);
             }
 
             if (getSettings().isGiveCredits()) {
