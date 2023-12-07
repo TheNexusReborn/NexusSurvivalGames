@@ -1,5 +1,7 @@
 package com.thenexusreborn.survivalgames.game;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.stardevllc.starlib.time.TimeFormat;
 import com.stardevllc.starlib.time.TimeUnit;
 import com.thenexusreborn.api.NexusAPI;
@@ -68,7 +70,7 @@ public class Game {
     private final SGMap gameMap;
     private final GameSettings settings;
     private final Map<UUID, GamePlayer> players = new HashMap<>();
-    private final Map<Integer, UUID> spawns = new HashMap<>();
+    private final BiMap<Integer, UUID> spawns = HashBiMap.create();
     private GameState state = UNDEFINED;
     private Timer timer, graceperiodTimer, restockTimer, ratingPromptTimer;
     private final List<Location> lootedChests = new ArrayList<>();
@@ -1248,6 +1250,10 @@ public class Game {
 
     public static SurvivalGames getPlugin() {
         return plugin;
+    }
+
+    public BiMap<Integer, UUID> getSpawns() {
+        return spawns;
     }
 
     @Override

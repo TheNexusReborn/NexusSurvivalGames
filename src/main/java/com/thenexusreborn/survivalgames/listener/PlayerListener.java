@@ -589,7 +589,7 @@ public class PlayerListener implements Listener {
         }
     }
     
-    @EventHandler
+    //@EventHandler
     public void onPlayerMove(PlayerMoveEvent e) {
         if (plugin.getLobby().checkMapEditing(e.getPlayer())) {
             return;
