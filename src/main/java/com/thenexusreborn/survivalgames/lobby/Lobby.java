@@ -379,7 +379,7 @@ public class Lobby {
                 rating += playerRating.getRating();
             }
 
-            ratingMsg = "&7Rating: " + new ProgressBar(rating / totalRatings, rating, 5, "✦ ", "&a", "&7").display() + " &7&o(rating: " + rating / totalRatings + " star(s), based on: " + totalRatings + " vote(s))";
+            ratingMsg = "&7Rating: " + new ProgressBar(rating / totalRatings, 100, 5, "✦ ", "&a", "&7").display() + " &7&o(rating: " + rating / totalRatings + " star(s), based on: " + totalRatings + " vote(s))";
         }
 
         sendMessage("&6&l> " + ratingMsg);
