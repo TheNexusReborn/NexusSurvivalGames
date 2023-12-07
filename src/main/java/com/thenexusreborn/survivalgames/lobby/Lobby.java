@@ -378,8 +378,11 @@ public class Lobby {
             for (MapRating playerRating : gameMap.getRatings().values()) {
                 rating += playerRating.getRating();
             }
+            
+            double ratingRatio = rating * 1.0 / totalRatings;
+            int ratingPercent = (int) (ratingRatio * 100);
 
-            ratingMsg = "&7Rating: " + new ProgressBar(rating / totalRatings, 100, 5, "✦ ", "&a", "&7").display() + " &7&o(rating: " + rating / totalRatings + " star(s), based on: " + totalRatings + " vote(s))";
+            ratingMsg = "&7Rating: " + new ProgressBar(ratingPercent, 100, 5, "✦ ", "&a", "&7").display() + " &7&o(rating: " + rating / totalRatings + " star(s), based on: " + totalRatings + " vote(s))";
         }
 
         sendMessage("&6&l> " + ratingMsg);
