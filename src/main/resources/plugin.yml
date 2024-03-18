@@ -20,3 +20,4 @@ commands:
   ratemap:
   allowsponsors:
     aliases: [sponsors]
+  sgmaps:
