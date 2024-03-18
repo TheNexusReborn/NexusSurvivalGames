@@ -10,7 +10,7 @@ import com.thenexusreborn.api.registry.NetworkCommandRegistry;
 import com.thenexusreborn.api.registry.StatRegistry;
 import com.thenexusreborn.api.registry.ToggleRegistry;
 import com.thenexusreborn.api.stats.StatType;
-import com.thenexusreborn.gamemaps.YamlMapManager;
+import com.thenexusreborn.gamemaps.MapManager;
 import com.thenexusreborn.gamemaps.model.MapRating;
 import com.thenexusreborn.gamemaps.model.MapSpawn;
 import com.thenexusreborn.gamemaps.model.SGMap;
@@ -26,7 +26,6 @@ import com.thenexusreborn.survivalgames.listener.EntityListener;
 import com.thenexusreborn.survivalgames.listener.PlayerListener;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
-import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.map.SQLMapManager;
 import com.thenexusreborn.survivalgames.mutations.PlayerMutations;
 import com.thenexusreborn.survivalgames.mutations.UnlockedMutation;
@@ -60,10 +59,8 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
     private NexusCore nexusCore;
     
-    private SQLMapManager mapManager;
-    private YamlMapManager importMapManager;
+    private MapManager mapManager;
     private Lobby lobby;
-    private LootManager lootManager;
     
     private Game game;
     
@@ -161,8 +158,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
         
         mapManager = new SQLMapManager(this);
         mapManager.loadMaps();
-        importMapManager = new YamlMapManager(this);
-        importMapManager.loadMaps();
         getLogger().info("Loaded Maps");
         lobby = new Lobby(this);
         getLogger().info("Loaded Lobby Settings");
@@ -410,16 +405,12 @@ public class SurvivalGames extends NexusSpigotPlugin {
         saveConfig();
     }
     
-    public SQLMapManager getMapManager() {
+    public MapManager getMapManager() {
         return mapManager;
     }
     
     public Lobby getLobby() {
         return lobby;
-    }
-    
-    public LootManager getLootManager() {
-        return lootManager;
     }
     
     public NexusCore getNexusCore() {
@@ -499,9 +490,5 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
     public SettingRegistry getGameSettingRegistry() {
         return gameSettingRegistry;
-    }
-
-    public YamlMapManager getImportMapManager() {
-        return importMapManager;
     }
 }
