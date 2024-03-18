@@ -730,15 +730,17 @@ public class SGCommand implements CommandExecutor {
                 if (option.equalsIgnoreCase("sql")) {
                     SQLMapManager sqlMapManager = new SQLMapManager(plugin);
                     for (SGMap map : plugin.getMapManager().getMaps()) {
-                        sqlMapManager.saveMap(map);
+                        sqlMapManager.addMap(map);
                     }
-                    sender.sendMessage(MsgType.INFO + "Exported " + sqlMapManager.getMaps().size() + " to SQL.");
+                    sqlMapManager.saveMaps();
+                    sender.sendMessage(ColorUtils.color(MsgType.INFO + "Exported " + sqlMapManager.getMaps().size() + " maps to SQL."));
                 } else {
                     YamlMapManager yamlMapManager = new YamlMapManager(plugin);
                     for (SGMap map : plugin.getMapManager().getMaps()) {
-                        yamlMapManager.saveMap(map);
+                        yamlMapManager.addMap(map);
                     }
-                    sender.sendMessage(MsgType.INFO + "Exported " + yamlMapManager.getMaps().size() + " to YML.");
+                    yamlMapManager.saveMaps();
+                    sender.sendMessage(ColorUtils.color(MsgType.INFO + "Exported " + yamlMapManager.getMaps().size() + " maps to YML."));
                 }
             } else if (args[1].equalsIgnoreCase("import")) {
                 MapManager importManager;
@@ -751,7 +753,7 @@ public class SGCommand implements CommandExecutor {
 
                 importManager.loadMaps();
                 if (importManager.getMaps().isEmpty()) {
-                    sender.sendMessage(MsgType.WARN + "No maps could be loaded from " + option.toUpperCase());
+                    sender.sendMessage(ColorUtils.color(MsgType.WARN + "No maps could be loaded from " + option.toUpperCase()));
                     return true;
                 }
 
@@ -760,7 +762,7 @@ public class SGCommand implements CommandExecutor {
                     SGMap existingMap = plugin.getMapManager().getMap(map.getName());
                     if (existingMap == null) {
                         plugin.getMapManager().addMap(map);
-                        sender.sendMessage(MsgType.INFO + "Added " + map.getName() + " as a new map.");
+                        sender.sendMessage(ColorUtils.color(MsgType.INFO + "Added " + map.getName() + " as a new map."));
                     } else {
                         existingMap.setCreators(map.getCreators());
                         existingMap.setCenter(map.getCenter());
@@ -769,11 +771,11 @@ public class SGCommand implements CommandExecutor {
                         existingMap.setSpawns(map.getSpawns());
                         existingMap.setRatings(new ArrayList<>(map.getRatings().values()));
                         existingMap.setActive(map.isActive());
-                        sender.sendMessage(MsgType.INFO + "Replaced " + map.getName() + " with new values from imported data.");
+                        sender.sendMessage(ColorUtils.color(MsgType.INFO + "Replaced " + map.getName() + " with new values from imported data."));
                     }
                 }
 
-                sender.sendMessage(MsgType.INFO + "Added " + newMaps + " new map(s) and didn't add " + duplicateMaps + " duplicate map(s).");
+                sender.sendMessage(ColorUtils.color(MsgType.INFO + "Added " + newMaps + " new map(s) and didn't add " + duplicateMaps + " duplicate map(s)."));
             }
         } else if (subCommand.equals("timer") || subCommand.equals("t")) {
             if (!(args.length > 1)) {
