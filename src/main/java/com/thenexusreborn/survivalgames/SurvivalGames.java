@@ -11,6 +11,8 @@ import com.thenexusreborn.api.registry.StatRegistry;
 import com.thenexusreborn.api.registry.ToggleRegistry;
 import com.thenexusreborn.api.stats.StatType;
 import com.thenexusreborn.gamemaps.MapManager;
+import com.thenexusreborn.gamemaps.NexusGameMaps;
+import com.thenexusreborn.gamemaps.SGMapCommand;
 import com.thenexusreborn.gamemaps.model.MapRating;
 import com.thenexusreborn.gamemaps.model.MapSpawn;
 import com.thenexusreborn.gamemaps.model.SGMap;
@@ -158,6 +160,10 @@ public class SurvivalGames extends NexusSpigotPlugin {
         
         mapManager = new SQLMapManager(this);
         mapManager.loadMaps();
+
+        NexusGameMaps nexusMapsPlugin = (NexusGameMaps) getServer().getPluginManager().getPlugin("NexusMaps");
+        nexusMapsPlugin.getCommand("sgmaps").setExecutor(new SGMapCommand(this, mapManager));
+
         getLogger().info("Loaded Maps");
         lobby = new Lobby(this);
         getLogger().info("Loaded Lobby Settings");
