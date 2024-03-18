@@ -78,7 +78,7 @@
         <dependency>
             <groupId>com.github.StarDevelopmentLLC</groupId>
             <artifactId>StarCore</artifactId>
-            <version>1.0.0-alpha.2</version>
+            <version>1.0.0-alpha.12</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -114,7 +114,7 @@
         <dependency>
             <groupId>com.github.Firestar311.StarSQL</groupId>
             <artifactId>mysql</artifactId>
-            <version>09988aece6</version>
+            <version>15dd9f0c77</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
