@@ -55,7 +55,7 @@ public abstract class GamePhase {
             game.setState(GameState.ENDING);
             Game.getPlugin().getLobby().fromGame(game);
             for (Player player : Bukkit.getOnlinePlayers()) {
-                player.sendMessage(MsgType.WARN.formatMsg("Detected only one player left in the game, resetting back to lobby."));
+                player.sendMessage(MsgType.WARN + "Detected only one player left in the game, resetting back to lobby.");
             }
             return true;
         }
