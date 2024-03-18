@@ -160,7 +160,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         mapManager = new SQLMapManager(this);
         mapManager.loadMaps();
 
-        getCommand("sgmaps").setExecutor(new SGMapCommand(this, mapManager));
+        getCommand("sgmap").setExecutor(new SGMapCommand(this, mapManager));
 
         getLogger().info("Loaded Maps");
         lobby = new Lobby(this);
