@@ -14,12 +14,10 @@ public class SQLMapManager extends MapManager {
     }
 
     public void loadMaps() {
-        plugin.getLogger().info("Loading the Maps...");
         try {
             this.gameMaps.addAll(NexusAPI.getApi().getPrimaryDatabase().get(SGMap.class));
         } catch (SQLException e) {
             plugin.getLogger().log(Level.SEVERE, "Could not get the maps from the database", e);
-            plugin.getServer().getPluginManager().disablePlugin(plugin);
             return;
         }
 
@@ -32,8 +30,6 @@ public class SQLMapManager extends MapManager {
                 NexusAPI.getApi().getPrimaryDatabase().saveSilent(gameMap); 
             }
         }
-        
-        plugin.getLogger().info("Total Maps: " + gameMaps.size());
     }
 
     @Override
