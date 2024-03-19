@@ -3,27 +3,21 @@ package com.thenexusreborn.survivalgames.map;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.gamemaps.MapManager;
 import com.thenexusreborn.gamemaps.model.SGMap;
-import com.thenexusreborn.nexuscore.util.Config;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 
 import java.sql.SQLException;
 import java.util.logging.Level;
 
 public class SQLMapManager extends MapManager {
-    private Config mapsConfig;
-
     public SQLMapManager(SurvivalGames plugin) {
         super(plugin);
-        loadMaps();
     }
 
     public void loadMaps() {
-        plugin.getLogger().info("Loading the Maps...");
         try {
             this.gameMaps.addAll(NexusAPI.getApi().getPrimaryDatabase().get(SGMap.class));
         } catch (SQLException e) {
             plugin.getLogger().log(Level.SEVERE, "Could not get the maps from the database", e);
-            plugin.getServer().getPluginManager().disablePlugin(plugin);
             return;
         }
 
@@ -36,8 +30,16 @@ public class SQLMapManager extends MapManager {
                 NexusAPI.getApi().getPrimaryDatabase().saveSilent(gameMap); 
             }
         }
-        
-        plugin.getLogger().info("Total Maps: " + gameMaps.size());
+    }
+
+    @Override
+    public void deleteMap(SGMap map) {
+        try {
+            NexusAPI.getApi().getPrimaryDatabase().delete(map);
+            this.getMaps().remove(map);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

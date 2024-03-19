@@ -2,6 +2,8 @@ package com.thenexusreborn.survivalgames.listener;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import com.stardevllc.starlib.Pair;
+import com.stardevllc.starui.GuiManager;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
@@ -29,8 +31,6 @@ import com.thenexusreborn.survivalgames.mutations.Mutation;
 import com.thenexusreborn.survivalgames.mutations.impl.ChickenMutation;
 import com.thenexusreborn.survivalgames.mutations.impl.CreeperMutation;
 import com.thenexusreborn.survivalgames.util.SGUtils;
-import me.firestar311.starlib.api.Pair;
-import me.firestar311.starui.GuiManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -589,7 +589,7 @@ public class PlayerListener implements Listener {
         }
     }
     
-    @EventHandler
+    //@EventHandler
     public void onPlayerMove(PlayerMoveEvent e) {
         if (plugin.getLobby().checkMapEditing(e.getPlayer())) {
             return;

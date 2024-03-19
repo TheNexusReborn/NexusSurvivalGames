@@ -1,5 +1,7 @@
 package com.thenexusreborn.survivalgames.menu;
 
+import com.stardevllc.starui.element.button.Button;
+import com.stardevllc.starui.gui.InventoryGUI;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.nexuscore.util.MsgType;
@@ -8,8 +10,6 @@ import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.sponsoring.SponsorCategory;
 import com.thenexusreborn.survivalgames.sponsoring.SponsorManager;
-import me.firestar311.starui.element.button.Button;
-import me.firestar311.starui.gui.InventoryGUI;
 import org.bukkit.Bukkit;
 import org.bukkit.event.inventory.ClickType;
 

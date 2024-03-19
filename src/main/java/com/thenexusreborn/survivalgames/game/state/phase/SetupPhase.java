@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames.game.state.phase;
 
+import com.stardevllc.starmclib.Cuboid;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -11,7 +12,6 @@ import com.thenexusreborn.survivalgames.game.state.PhaseStatus;
 import com.thenexusreborn.survivalgames.scoreboard.GameTablistHandler;
 import com.thenexusreborn.survivalgames.scoreboard.game.GameBoard;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
-import me.firestar311.starlib.spigot.utils.Cuboid;
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.Location;

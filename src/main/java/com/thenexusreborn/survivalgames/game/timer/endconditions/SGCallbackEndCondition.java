@@ -1,10 +1,10 @@
 package com.thenexusreborn.survivalgames.game.timer.endconditions;
 
+import com.stardevllc.starclock.condition.ClockEndCondition;
+import com.stardevllc.starclock.snapshot.TimerSnapshot;
 import com.thenexusreborn.survivalgames.ControlType;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GameState;
-import me.firestar311.starclock.api.condition.ClockEndCondition;
-import me.firestar311.starclock.api.snapshot.TimerSnapshot;
 
 import java.util.Arrays;
 import java.util.HashSet;

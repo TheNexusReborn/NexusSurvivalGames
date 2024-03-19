@@ -1,10 +1,12 @@
 package com.thenexusreborn.survivalgames.cmd;
 
-import com.thenexusreborn.api.NexusAPI;
+import com.stardevllc.starlib.Value;
+import com.stardevllc.starmclib.color.ColorUtils;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.stats.Stat;
 import com.thenexusreborn.api.stats.StatHelper;
-import com.thenexusreborn.gamemaps.model.MapSpawn;
+import com.thenexusreborn.gamemaps.MapManager;
+import com.thenexusreborn.gamemaps.YamlMapManager;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
@@ -17,21 +19,17 @@ import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
 import com.thenexusreborn.survivalgames.lobby.StatSign;
 import com.thenexusreborn.survivalgames.lobby.TributeSign;
-import com.thenexusreborn.survivalgames.map.tasks.AnalyzeThread;
+import com.thenexusreborn.survivalgames.map.SQLMapManager;
 import com.thenexusreborn.survivalgames.settings.SettingRegistry;
 import com.thenexusreborn.survivalgames.settings.collection.SettingList;
 import com.thenexusreborn.survivalgames.settings.object.Setting;
 import com.thenexusreborn.survivalgames.settings.object.Setting.Info;
 import com.thenexusreborn.survivalgames.util.Operator;
 import com.thenexusreborn.survivalgames.util.SGUtils;
-import me.firestar311.starlib.api.Value;
-import me.firestar311.starlib.api.Value.Type;
-import me.firestar311.starlib.spigot.utils.Position;
 import me.firestar311.starsql.api.objects.typehandlers.ValueHandler;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.HoverEvent.Action;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -44,20 +42,16 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Stream;
 
-import static me.firestar311.starlib.api.Value.Type.INTEGER;
+import static com.stardevllc.starlib.Value.Type;
+import static com.stardevllc.starlib.Value.Type.INTEGER;
 
 public class SGCommand implements CommandExecutor {
 
     private final SurvivalGames plugin;
-
-    private boolean viewingWorldBorder;
 
     public SGCommand(SurvivalGames plugin) {
         this.plugin = plugin;
@@ -87,14 +81,14 @@ public class SGCommand implements CommandExecutor {
 
             String gameSubCommand = args[1].toLowerCase();
 
-            if (List.of("automatic", "auto", "manual", "mnl").contains(gameSubCommand)) {
+            if (List.of("automatic", "auto", "manual", "man").contains(gameSubCommand)) {
                 ControlType controlType = null;
                 try {
                     controlType = ControlType.valueOf(gameSubCommand.toUpperCase());
                 } catch (Exception e) {
                     if (gameSubCommand.equals("auto")) {
                         controlType = ControlType.AUTOMATIC;
-                    } else if (gameSubCommand.equals("mnl")) {
+                    } else if (gameSubCommand.equals("man")) {
                         controlType = ControlType.MANUAL;
                     }
                 }
@@ -630,7 +624,7 @@ public class SGCommand implements CommandExecutor {
                     default -> null;
                 };
 
-                for (Info setting : settingRegistry.getRegisteredObjects().values()) {
+                for (Info setting : settingRegistry.getObjects().values()) {
                     TextComponent component = new TextComponent(TextComponent.fromLegacyText(MCUtils.color(" &8- &a" + setting.getName())));
                     StringBuilder sb = new StringBuilder();
                     sb.append("&dName: &e").append(setting.getDisplayName()).append("\n");
@@ -720,358 +714,86 @@ public class SGCommand implements CommandExecutor {
             }
 
             sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the &b" + type.toLowerCase() + " &esetting &b" + settingName + " &eto &b" + value.get()));
-        } else if (subCommand.equals("map") || subCommand.equals("m")) {
-            if (!(args.length > 1)) {
-                sender.sendMessage(MCUtils.color(MsgType.WARN + "You must provide a sub command."));
+        } else if (subCommand.equals("maps") || subCommand.equals("m")) {
+            if (!(args.length > 2)) {
+                sender.sendMessage(ColorUtils.color(MsgType.WARN + "Usage: /" + label + " " + subCommand + " <export|import|setsource> <sql|yml>"));
                 return true;
             }
-
-            if (!(sender instanceof Player player)) {
-                sender.sendMessage(MCUtils.color(MsgType.WARN + "Only players can use that command."));
+            
+            String option = args[2];
+            if (!(option.equalsIgnoreCase("sql") || option.equalsIgnoreCase("yml"))) {
+                sender.sendMessage(ColorUtils.color(MsgType.WARN + "Invalid option, only valid options are sql and yml."));
                 return true;
             }
+            
+            if (args[1].equalsIgnoreCase("export")) {
+                if (option.equalsIgnoreCase("sql")) {
+                    SQLMapManager sqlMapManager = new SQLMapManager(plugin);
+                    for (SGMap map : plugin.getMapManager().getMaps()) {
+                        sqlMapManager.addMap(map);
+                    }
+                    sqlMapManager.saveMaps();
+                    sender.sendMessage(ColorUtils.color(MsgType.INFO + "Exported " + sqlMapManager.getMaps().size() + " maps to SQL."));
+                } else {
+                    YamlMapManager yamlMapManager = new YamlMapManager(plugin);
+                    for (SGMap map : plugin.getMapManager().getMaps()) {
+                        yamlMapManager.addMap(map);
+                    }
+                    yamlMapManager.saveMaps();
+                    sender.sendMessage(ColorUtils.color(MsgType.INFO + "Exported " + yamlMapManager.getMaps().size() + " maps to YML."));
+                }
+            } else if (args[1].equalsIgnoreCase("import")) {
+                MapManager importManager;
+                
+                if (option.equalsIgnoreCase("sql")) {
+                    importManager = new SQLMapManager(plugin);
+                } else {
+                    importManager = new YamlMapManager(plugin);
+                }
 
-            String mapSubCommand = args[1].toLowerCase();
-
-            if (plugin.getLobby().getState() != LobbyState.MAP_EDITING) {
-                sender.sendMessage(MCUtils.color(MsgType.WARN + "You can only use that command when the lobby is in the map editing mode."));
-                return true;
-            }
-
-            if (mapSubCommand.equals("create") || mapSubCommand.equals("c")) {
-                if (!(args.length > 3)) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "Usage: /" + label + " " + subCommand + " " + mapSubCommand + " <url> <name>"));
+                importManager.loadMaps();
+                if (importManager.getMaps().isEmpty()) {
+                    sender.sendMessage(ColorUtils.color(MsgType.WARN + "No maps could be loaded from " + option.toUpperCase()));
                     return true;
                 }
 
-                String url = args[2].replace("{url}", SurvivalGames.MAP_URL);
-                String mapName = SGUtils.getMapNameFromCommand(args, 3);
-                if (plugin.getMapManager().getMap(mapName) != null) {
-                    sender.sendMessage(MCUtils.color(MsgType.WARN + "A map with that name already exists."));
-                    return true;
-                }
-
-                SGMap gameMap = new SGMap(url, mapName);
-                plugin.getMapManager().addMap(gameMap);
-                sender.sendMessage(MCUtils.color(MsgType.INFO + "Created a map with the name " + MsgType.INFO.getVariableColor() + gameMap.getName() + MsgType.INFO.getBaseColor() + "."));
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        plugin.getMapManager().saveMap(gameMap);
-                        sender.sendMessage(MCUtils.color(MsgType.VERBOSE + "The map has been saved to the database."));
-                    }
-                }.runTaskAsynchronously(plugin);
-            } else {
-                SGMap gameMap = null;
-                boolean mapFromArgument = false;
-                for (SGMap map : plugin.getMapManager().getMaps()) {
-                    if (map.getWorld() != null) {
-                        if (map.getWorld().getName().equalsIgnoreCase(player.getWorld().getName())) {
-                            gameMap = map;
-                            break;
-                        }
+                int newMaps = 0, duplicateMaps = 1;
+                for (SGMap map : importManager.getMaps()) {
+                    SGMap existingMap = plugin.getMapManager().getMap(map.getName());
+                    if (existingMap == null) {
+                        plugin.getMapManager().addMap(map);
+                        sender.sendMessage(ColorUtils.color(MsgType.INFO + "Added " + map.getName() + " as a new map."));
+                    } else {
+                        existingMap.setCreators(map.getCreators());
+                        existingMap.setCenter(map.getCenter());
+                        existingMap.setBorderDistance(map.getBorderDistance());
+                        existingMap.setDeathmatchBorderDistance(map.getDeathmatchBorderDistance());
+                        existingMap.setSpawns(map.getSpawns());
+                        existingMap.setRatings(new ArrayList<>(map.getRatings().values()));
+                        existingMap.setActive(map.isActive());
+                        sender.sendMessage(ColorUtils.color(MsgType.INFO + "Replaced " + map.getName() + " with new values from imported data."));
                     }
                 }
 
-                if (args.length > 2 && gameMap == null) {
-                    gameMap = plugin.getMapManager().getMap(args[2]);
-                    mapFromArgument = true;
+                sender.sendMessage(ColorUtils.color(MsgType.INFO + "Added " + newMaps + " new map(s) and didn't add " + duplicateMaps + " duplicate map(s)."));
+            } else if (args[1].equalsIgnoreCase("setsource")) {
+                if (option.equalsIgnoreCase("sql")) {
+                    if (plugin.getMapManager() instanceof SQLMapManager) {
+                        sender.sendMessage(ColorUtils.color(MsgType.WARN + "The map souce is already set to SQL."));
+                        return true;
+                    }
+                    
+                    plugin.setMapManager(new SQLMapManager(plugin));
+                    sender.sendMessage(ColorUtils.color(MsgType.INFO + "You set the map source to SQL."));
+                } else {
+                    if (plugin.getMapManager() instanceof YamlMapManager) {
+                        sender.sendMessage(ColorUtils.color(MsgType.WARN + "The Map Souce is already set to YML."));
+                        return true;
+                    }
+
+                    plugin.setMapManager(new YamlMapManager(plugin));
+                    sender.sendMessage(ColorUtils.color(MsgType.INFO + "You set the map source to YML."));
                 }
-
-                if (gameMap == null) {
-                    player.sendMessage(MCUtils.color(MsgType.WARN + "Could not find a valid map."));
-                    return true;
-                }
-
-                switch (mapSubCommand) {
-                    case "download", "dl" -> {
-                        SGMap finalGameMap = gameMap;
-                        plugin.getLobby().setGameMap(finalGameMap);
-                        player.sendMessage(MCUtils.color(MsgType.VERBOSE + "Please wait, downloading the map " + MsgType.VERBOSE.getVariableColor() + finalGameMap.getName() + MsgType.VERBOSE.getBaseColor() + "."));
-                        NexusAPI.getApi().getScheduler().runTaskAsynchronously(() -> {
-                            boolean successful = finalGameMap.download(plugin);
-                            if (successful) {
-                                player.sendMessage(MCUtils.color(MsgType.INFO + "Downloaded the map " + MsgType.INFO.getVariableColor() + finalGameMap.getName() + MsgType.INFO.getBaseColor() + "."));
-                            } else {
-                                player.sendMessage(MCUtils.color(MsgType.ERROR + "Failed to download the map " + MsgType.ERROR.getVariableColor() + finalGameMap.getName()));
-                            }
-                        });
-                        return true;
-                    }
-                    case "load", "l" -> {
-                        gameMap.unzip(plugin);
-                        gameMap.copyFolder(plugin, false);
-                        gameMap.load(plugin);
-                        if (gameMap.getWorld() != null) {
-                            sender.sendMessage(MCUtils.color(MsgType.INFO + "Successfully loaded the map " + MsgType.INFO.getVariableColor() + gameMap.getName() + MsgType.INFO.getBaseColor() + "."));
-                        } else {
-                            sender.sendMessage(MCUtils.color(MsgType.ERROR + "Could not load the map " + MsgType.ERROR.getVariableColor() + gameMap.getName() + MsgType.ERROR.getBaseColor() + ". Please report as a bug."));
-                        }
-                        return true;
-                    }
-                    case "teleport", "tp" -> {
-                        Location spawn;
-                        if (gameMap.getWorld() == null) {
-                            sender.sendMessage(MCUtils.color(MsgType.WARN + "That map is not loaded. Please load before teleporting."));
-                            return true;
-                        }
-                        if (gameMap.getCenter() != null) {
-                            spawn = gameMap.getCenter().toLocation(gameMap.getWorld());
-                        } else {
-                            spawn = gameMap.getWorld().getSpawnLocation();
-                        }
-                        player.teleport(spawn);
-                        player.sendMessage(MCUtils.color(MsgType.INFO + "Teleported to the map " + MsgType.INFO.getVariableColor() + gameMap.getName()));
-                        return true;
-                    }
-                    case "save", "s" -> {
-                        plugin.getMapManager().saveMap(gameMap);
-                        player.sendMessage(MCUtils.color(MsgType.INFO + "Saved the settings for the map " + MsgType.INFO.getVariableColor() + gameMap.getName()));
-                    }
-                    case "removefromserver", "rfs" -> {
-                        plugin.getLobby().setGameMap(null);
-                        gameMap.removeFromServer(plugin);
-                        player.sendMessage(MCUtils.color(MsgType.INFO + "Removed the map " + MsgType.INFO.getVariableColor() + gameMap.getName() + MsgType.INFO.getBaseColor() + " from the server."));
-                        return true;
-                    }
-                    case "delete" -> player.sendMessage(MCUtils.color(MsgType.WARN + "This command is not yet implemented."));
-                    case "addspawn", "as" -> {
-                        Location location = player.getLocation();
-                        int position = gameMap.addSpawn(new MapSpawn(0, -1, location.getBlockX(), location.getBlockY(), location.getBlockZ()));
-                        sender.sendMessage(MCUtils.color(MsgType.INFO + "You added a spawn with index &b" + (position + 1) + " &eto the map &b" + gameMap.getName()));
-                    }
-                    case "setspawn", "sp" -> {
-                        int argIndex;
-                        if (mapFromArgument) {
-                            argIndex = 3;
-                        } else {
-                            argIndex = 2;
-                        }
-
-                        if (!(args.length > argIndex)) {
-                            sender.sendMessage(MCUtils.color(MsgType.WARN + "You must provide an index for the spawn."));
-                            return true;
-                        }
-
-                        int position;
-                        try {
-                            position = Integer.parseInt(args[argIndex]);
-                        } catch (NumberFormatException e) {
-                            sender.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid number for the spawn index."));
-                            return true;
-                        }
-
-                        Location location = player.getLocation();
-                        gameMap.setSpawn(position, new MapSpawn(gameMap.getId(), position, location.getBlockX(), location.getBlockY(), location.getBlockZ()));
-                        sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the spawn at position &b" + position + " &eto your location in the map &b" + gameMap.getName()));
-                    }
-                    case "setcenter", "sc" -> {
-                        Location location = player.getPlayer().getLocation();
-                        gameMap.setCenter(new Position(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
-                        player.sendMessage(MCUtils.color(MsgType.INFO + "You set the center of the map &b" + gameMap.getName() + " &eto your current location."));
-                    }
-                    case "setborderradius", "sbr" -> {
-                        int argIndex;
-                        if (mapFromArgument) {
-                            argIndex = 3;
-                        } else {
-                            argIndex = 2;
-                        }
-
-                        if (!(args.length > argIndex)) {
-                            sender.sendMessage(MCUtils.color(MsgType.WARN + "You must provide a radius."));
-                            return true;
-                        }
-
-                        int radius;
-                        try {
-                            radius = Integer.parseInt(args[argIndex]);
-                        } catch (NumberFormatException e) {
-                            sender.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid number for the radius."));
-                            return true;
-                        }
-
-                        gameMap.setBorderDistance(radius);
-                        if (this.viewingWorldBorder) {
-                            gameMap.applyWorldBoarder("game");
-                        }
-                        sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the border radius on map &b" + gameMap.getName() + " &eto &b" + radius));
-                    }
-                    case "setdeathmatchborderradius", "sdmbr" -> {
-                        int argIndex;
-                        if (mapFromArgument) {
-                            argIndex = 3;
-                        } else {
-                            argIndex = 2;
-                        }
-
-                        if (!(args.length > argIndex)) {
-                            sender.sendMessage(MCUtils.color(MsgType.WARN + "You must provide a radius."));
-                            return true;
-                        }
-
-                        int radius;
-                        try {
-                            radius = Integer.parseInt(args[argIndex]);
-                        } catch (NumberFormatException e) {
-                            sender.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid number for the radius."));
-                            return true;
-                        }
-
-                        gameMap.setDeathmatchBorderDistance(radius);
-                        if (this.viewingWorldBorder) {
-                            gameMap.applyWorldBoarder("deathmatch");
-                        }
-                        sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the deathmatch border radius on map &b" + gameMap.getName() + " &eto &b" + radius));
-                    }
-                    case "creators", "cs" -> {
-                        int argIndex;
-                        if (mapFromArgument) {
-                            argIndex = 3;
-                        } else {
-                            argIndex = 2;
-                        }
-
-                        if (!(args.length > argIndex)) {
-                            sender.sendMessage(MCUtils.color(MsgType.WARN + "You must provide the creators."));
-                            return true;
-                        }
-
-                        StringBuilder cb = new StringBuilder();
-                        for (int i = argIndex; i < args.length; i++) {
-                            cb.append(args[i]).append(" ");
-                        }
-
-                        String[] creators = cb.toString().trim().split(",");
-                        if (creators.length == 0) {
-                            sender.sendMessage(MCUtils.color(MsgType.WARN + "You must separate the creators with commas."));
-                            return true;
-                        }
-
-                        for (String creator : creators) {
-                            gameMap.addCreator(creator);
-                            sender.sendMessage(MCUtils.color(MsgType.INFO + "You added " + MsgType.INFO.getVariableColor() + creator + MsgType.INFO.getBaseColor() + " as a creator on map " + MsgType.INFO.getVariableColor() + gameMap.getName()));
-                        }
-                    }
-                    case "setactive", "sa" -> {
-                        int argIndex;
-                        if (mapFromArgument) {
-                            argIndex = 3;
-                        } else {
-                            argIndex = 2;
-                        }
-
-                        if (!(args.length > argIndex)) {
-                            sender.sendMessage(MCUtils.color(MsgType.WARN + "You must provide a true or false value."));
-                            return true;
-                        }
-
-                        boolean value = Boolean.parseBoolean(args[argIndex]);
-                        gameMap.setActive(value);
-                        if (value && !gameMap.isActive()) {
-                            sender.sendMessage(MCUtils.color(MsgType.WARN + "Failed to set the map to an active status, there are required elements missing."));
-                        } else {
-                            sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the status of the map to " + MsgType.INFO.getVariableColor() + value));
-                        }
-                    }
-                    case "setswagshack", "sss" -> {
-                        Location location = player.getPlayer().getLocation();
-                        gameMap.setSwagShack(new Position(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
-                        player.sendMessage(MCUtils.color(MsgType.INFO + "You set the swag shack of the map &b" + gameMap.getName() + " &eto your current location."));
-                    }
-                    case "viewborder", "vb" -> {
-                        if (!(args.length > 2)) {
-                            player.sendMessage(MCUtils.color(MsgType.WARN + "You must say if it is for the game or deathmatch."));
-                            return true;
-                        }
-
-                        GameState state = switch (args[2].toLowerCase()) {
-                            case "game" -> GameState.INGAME;
-                            case "deathmatch" -> GameState.DEATHMATCH;
-                            default -> null;
-                        };
-
-                        if (state == null) {
-                            player.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid type."));
-                            return true;
-                        }
-
-                        gameMap.applyWorldBoarder(args[2]);
-                        this.viewingWorldBorder = true;
-                        player.sendMessage(MCUtils.color(MsgType.INFO + "You are now viewing the world border as " + args[2].toLowerCase()));
-                        return true;
-                    }
-                    case "disableworldborder", "dwb" -> {
-                        if (this.viewingWorldBorder) {
-                            this.viewingWorldBorder = false;
-                            gameMap.disableWorldBorder();
-                            player.sendMessage(MCUtils.color(MsgType.INFO + "You disabled the world border preview."));
-                        } else {
-                            player.sendMessage(MCUtils.color(MsgType.WARN + "The world border is not being previewed."));
-                        }
-                        return true;
-                    }
-                    case "analyze" -> {
-                        gameMap.setChests(0);
-                        gameMap.setEnchantTables(0);
-                        gameMap.setWorkbenches(0);
-                        gameMap.setTotalBlocks(0);
-                        gameMap.setFurnaces(0);
-                        player.sendMessage(MCUtils.color(MsgType.INFO + "Performing map analysis on " + gameMap.getName()));
-                        Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(plugin, new AnalyzeThread(plugin, gameMap, player), 1L);
-                        return true;
-                    }
-                    case "analysis" -> {
-                        player.sendMessage(MCUtils.color(MsgType.INFO + "Map analysis results for &b" + gameMap.getName()));
-                        player.sendMessage(MCUtils.color(MsgType.INFO + "Total Blocks: &b" + gameMap.getTotalBlocks()));
-                        player.sendMessage(MCUtils.color(MsgType.INFO + "Total Chests: &b" + gameMap.getChests()));
-                        player.sendMessage(MCUtils.color(MsgType.INFO + "Total Workbenches: &b" + gameMap.getWorkbenches()));
-                        player.sendMessage(MCUtils.color(MsgType.INFO + "Total Enchantment Tables: &b" + gameMap.getEnchantTables()));
-                        player.sendMessage(MCUtils.color(MsgType.INFO + "Total Furnaces: &b" + gameMap.getFurnaces()));
-                        return true;
-                    }
-                    case "downloadloadteleport", "dlltp" -> {
-                        SGMap finalGameMap = gameMap;
-                        plugin.getLobby().setGameMap(finalGameMap);
-                        player.sendMessage(MCUtils.color(MsgType.VERBOSE + "Please wait, setting up the map, then teleporting you to " + MsgType.VERBOSE.getVariableColor() + finalGameMap.getName() + MsgType.VERBOSE.getBaseColor() + "."));
-                        NexusAPI.getApi().getScheduler().runTaskAsynchronously(() -> {
-                            if (!finalGameMap.download(plugin)) {
-                                player.sendMessage(MCUtils.color(MsgType.WARN + "Failed to download the map " + finalGameMap.getName()));
-                                return;
-                            }
-
-                            finalGameMap.unzip(plugin);
-                            finalGameMap.copyFolder(plugin, false);
-                            NexusAPI.getApi().getScheduler().runTask(() -> {
-                                if (!finalGameMap.load(plugin)) {
-                                    sender.sendMessage(MCUtils.color(MsgType.ERROR + "Could not load the map " + MsgType.ERROR.getVariableColor() + finalGameMap.getName() + MsgType.ERROR.getBaseColor() + ". Please report as a bug."));
-                                    return;
-                                }
-
-                                Location spawn;
-                                if (finalGameMap.getCenter() != null) {
-                                    spawn = finalGameMap.getCenter().toLocation(finalGameMap.getWorld());
-                                } else {
-                                    spawn = finalGameMap.getWorld().getSpawnLocation();
-                                }
-                                player.teleport(spawn);
-                                player.sendMessage(MCUtils.color(MsgType.INFO + "Successfully setup and teleported you to the map " + MsgType.INFO.getVariableColor() + finalGameMap.getName()));
-                            });
-                        });
-                        return true;
-                    }
-                    default -> {
-                        return true;
-                    }
-                }
-                SGMap finalGameMap = gameMap;
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        plugin.getMapManager().saveMap(finalGameMap);
-                        sender.sendMessage(MCUtils.color(MsgType.VERBOSE + "The map has been saved to the database."));
-                    }
-                }.runTaskAsynchronously(plugin);
             }
         } else if (subCommand.equals("timer") || subCommand.equals("t")) {
             if (!(args.length > 1)) {

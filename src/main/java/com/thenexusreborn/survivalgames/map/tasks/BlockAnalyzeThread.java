@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.map.tasks;
 
+import com.stardevllc.starmclib.Position;
 import com.thenexusreborn.gamemaps.model.SGMap;
-import me.firestar311.starlib.spigot.utils.Position;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
@@ -20,7 +20,7 @@ public class BlockAnalyzeThread implements Runnable {
 
     public void run() {
         for (Position pos : blocks) {
-            Block block = map.getWorld().getBlockAt(pos.getX(), pos.getY(), pos.getZ());
+            Block block = map.getWorld().getBlockAt(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
             if (block.getType() != Material.AIR) {
                 switch (block.getType()) {
                     case CHEST, TRAPPED_CHEST -> analyzeThread.incrementChests();

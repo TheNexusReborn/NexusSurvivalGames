@@ -1,14 +1,18 @@
 package com.thenexusreborn.survivalgames.threads.lobby;
 
-import com.thenexusreborn.api.player.*;
+import com.stardevllc.starlib.time.TimeUnit;
+import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.nexuscore.util.ServerProperties;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.lobby.*;
+import com.thenexusreborn.survivalgames.lobby.Lobby;
+import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
+import com.thenexusreborn.survivalgames.lobby.LobbyState;
 import com.thenexusreborn.survivalgames.util.SGUtils;
-import me.firestar311.starlib.api.time.TimeUnit;
-import org.bukkit.*;
-import org.bukkit.entity.*;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 
 public class LobbyThread extends NexusThread<SurvivalGames> {
     

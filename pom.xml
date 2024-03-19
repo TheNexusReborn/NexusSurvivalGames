@@ -6,7 +6,7 @@
 
     <groupId>com.thenexusreborn</groupId>
     <artifactId>NexusSurvivalGames</artifactId>
-    <version>1.15-ALPHA</version>
+    <version>1.15.1-ALPHA</version>
 
     <properties>
         <java.version>17</java.version>
@@ -77,8 +77,14 @@
     <dependencies>
         <dependency>
             <groupId>com.github.StarDevelopmentLLC</groupId>
-            <artifactId>StarLib</artifactId>
-            <version>1.0.0-alpha.1</version>
+            <artifactId>StarCore</artifactId>
+            <version>1.0.0-alpha.12</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.thenexusreborn</groupId>
+            <artifactId>NexusCore</artifactId>
+            <version>1.10.1-ALPHA</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -106,34 +112,17 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>me.firestar311.starlib</groupId>
-            <artifactId>starlib-spigot</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <groupId>com.github.Firestar311.StarSQL</groupId>
+            <artifactId>mysql</artifactId>
+            <version>15dd9f0c77</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>me.firestar311.starsql</groupId>
-            <artifactId>starsql-mysql</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>me.firestar311.starclock</groupId>
-            <artifactId>starclock-api</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>me.firestar311.starui</groupId>
+            <groupId>com.github.StarDevelopmentLLC</groupId>
             <artifactId>StarUI</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0.0-alpha.1</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>com.thenexusreborn</groupId>
-            <artifactId>NexusCore</artifactId>
-            <version>1.10.1-ALPHA</version>
-            <scope>compile</scope>
-        </dependency>
+        
     </dependencies>
 </project>

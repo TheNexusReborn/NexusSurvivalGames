@@ -1,8 +1,8 @@
 package com.thenexusreborn.survivalgames.game.timer.callbacks;
 
+import com.stardevllc.starclock.callback.ClockCallback;
+import com.stardevllc.starclock.snapshot.TimerSnapshot;
 import com.thenexusreborn.survivalgames.game.Game;
-import me.firestar311.starclock.api.callback.ClockCallback;
-import me.firestar311.starclock.api.snapshot.TimerSnapshot;
 import org.bukkit.Sound;
 
 import java.util.Arrays;
@@ -21,20 +21,18 @@ public class GameSecondsCallback implements ClockCallback<TimerSnapshot> {
     }
 
     @Override
-    public boolean callback(TimerSnapshot timerSnapshot) {
-        int remainingSeconds = (int) Math.ceil(timerSnapshot.getTime() * 1.0 / getInterval());
+    public void callback(TimerSnapshot timerSnapshot) {
+        int remainingSeconds = (int) Math.ceil(timerSnapshot.getTime() * 1.0 / getPeriod());
         if (ANNOUNCE.contains(remainingSeconds)) {
             game.sendMessage(message.replace("{time}", Game.LONG_TIME_FORMAT.format(timerSnapshot.getTime())));
             if (game.getSettings().isSounds()) {
                 game.playSound(Sound.CLICK);
             }
         }
-
-        return true;
     }
 
     @Override
-    public long getInterval() {
+    public long getPeriod() {
         return 1000L;
     }
 }

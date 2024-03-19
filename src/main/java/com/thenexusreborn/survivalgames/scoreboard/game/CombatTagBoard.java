@@ -1,11 +1,14 @@
 package com.thenexusreborn.survivalgames.scoreboard.game;
 
-import com.thenexusreborn.api.scoreboard.*;
+import com.stardevllc.starlib.time.TimeFormat;
+import com.thenexusreborn.api.scoreboard.NexusScoreboard;
+import com.thenexusreborn.api.scoreboard.TeamBuilder;
 import com.thenexusreborn.nexuscore.scoreboard.SpigotScoreboardView;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.*;
-import me.firestar311.starlib.api.time.TimeFormat;
+import com.thenexusreborn.survivalgames.game.CombatTag;
+import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.GamePlayer;
 import org.bukkit.ChatColor;
 
 import java.text.SimpleDateFormat;

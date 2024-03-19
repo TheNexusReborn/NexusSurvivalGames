@@ -1,11 +1,11 @@
 package com.thenexusreborn.survivalgames.map.tasks;
 
+import com.stardevllc.starmclib.Cuboid;
+import com.stardevllc.starmclib.Position;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import me.firestar311.starlib.spigot.utils.Cuboid;
-import me.firestar311.starlib.spigot.utils.Position;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

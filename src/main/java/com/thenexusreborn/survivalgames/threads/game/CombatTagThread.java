@@ -1,12 +1,12 @@
 package com.thenexusreborn.survivalgames.threads.game;
 
+import com.stardevllc.starlib.time.TimeUnit;
 import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.CombatTag;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.game.GameTeam;
-import me.firestar311.starlib.api.time.TimeUnit;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -40,7 +40,7 @@ public class CombatTagThread extends NexusThread<SurvivalGames> {
                 continue;
             }
             
-            if (combatTag.getTimestamp() + TimeUnit.SECONDS.toMilliseconds(game.getSettings().getCombatTagLength()) > System.currentTimeMillis()) {
+            if (combatTag.getTimestamp() + TimeUnit.SECONDS.toMillis(game.getSettings().getCombatTagLength()) > System.currentTimeMillis()) {
                 continue;
             }
             

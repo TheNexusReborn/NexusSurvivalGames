@@ -1,5 +1,7 @@
 package com.thenexusreborn.survivalgames;
 
+import com.stardevllc.starlib.Value;
+import com.stardevllc.starlib.Value.Type;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.network.cmd.NetworkCommand;
 import com.thenexusreborn.api.player.Rank;
@@ -8,6 +10,9 @@ import com.thenexusreborn.api.registry.NetworkCommandRegistry;
 import com.thenexusreborn.api.registry.StatRegistry;
 import com.thenexusreborn.api.registry.ToggleRegistry;
 import com.thenexusreborn.api.stats.StatType;
+import com.thenexusreborn.gamemaps.MapManager;
+import com.thenexusreborn.gamemaps.SGMapCommand;
+import com.thenexusreborn.gamemaps.YamlMapManager;
 import com.thenexusreborn.gamemaps.model.MapRating;
 import com.thenexusreborn.gamemaps.model.MapSpawn;
 import com.thenexusreborn.gamemaps.model.SGMap;
@@ -23,7 +28,6 @@ import com.thenexusreborn.survivalgames.listener.EntityListener;
 import com.thenexusreborn.survivalgames.listener.PlayerListener;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
-import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.map.SQLMapManager;
 import com.thenexusreborn.survivalgames.mutations.PlayerMutations;
 import com.thenexusreborn.survivalgames.mutations.UnlockedMutation;
@@ -40,7 +44,6 @@ import com.thenexusreborn.survivalgames.settings.object.impl.LobbySetting;
 import com.thenexusreborn.survivalgames.threads.ServerStatusThread;
 import com.thenexusreborn.survivalgames.threads.game.*;
 import com.thenexusreborn.survivalgames.threads.lobby.*;
-import me.firestar311.starlib.api.Value;
 import me.firestar311.starsql.api.objects.SQLDatabase;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -51,8 +54,6 @@ import java.io.File;
 import java.sql.SQLException;
 import java.util.*;
 
-import static me.firestar311.starlib.api.Value.Type;
-
 public class SurvivalGames extends NexusSpigotPlugin {
     
     public static final String MAP_URL = "https://starmediadev.com/files/nexusreborn/sgmaps/";
@@ -60,9 +61,8 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
     private NexusCore nexusCore;
     
-    private SQLMapManager mapManager;
+    private MapManager mapManager;
     private Lobby lobby;
-    private LootManager lootManager;
     
     private Game game;
     
@@ -122,8 +122,8 @@ public class SurvivalGames extends NexusSpigotPlugin {
         registerDefaultSettings();
         
         Set<Setting.Info> allSettingInfos = new HashSet<>();
-        allSettingInfos.addAll(gameSettingRegistry.getRegisteredObjects().values());
-        allSettingInfos.addAll(lobbySettingRegistry.getRegisteredObjects().values());
+        allSettingInfos.addAll(gameSettingRegistry.getObjects().values());
+        allSettingInfos.addAll(lobbySettingRegistry.getObjects().values());
         
         allSettingInfos.forEach(database::queue);
         database.flush();
@@ -157,9 +157,18 @@ public class SurvivalGames extends NexusSpigotPlugin {
         }
         
         getLogger().info("Settings Loaded");
+
+        String mapSource = getConfig().getString("map-source");
+        if (mapSource == null || mapSource.equalsIgnoreCase("sql")) {
+            mapManager = new SQLMapManager(this);
+        } else if (mapSource != null && mapSource.equalsIgnoreCase("yml")) {
+            mapManager = new YamlMapManager(this);
+        }
         
-        mapManager = new SQLMapManager(this);
-        getLogger().info("Loaded Maps");
+        mapManager.loadMaps();
+        getCommand("sgmap").setExecutor(new SGMapCommand(this, mapManager));
+
+        getLogger().info("Loaded " + mapManager.getMaps().size() + " Maps");
         lobby = new Lobby(this);
         getLogger().info("Loaded Lobby Settings");
         
@@ -229,6 +238,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         new ServerStatusThread(this).start();
         new CombatTagThread(this).start();
         new PlayerScoreboardThread(this).start();
+        new WarmupSpawnThread(this).start();
         
         getLogger().info("Registered Tasks");
         
@@ -402,19 +412,21 @@ public class SurvivalGames extends NexusSpigotPlugin {
         getConfig().set("spawnpoint.yaw", lobby.getSpawnpoint().getYaw() + "");
         getConfig().set("spawnpoint.pitch", lobby.getSpawnpoint().getPitch() + "");
         
+        if (mapManager instanceof SQLMapManager) {
+            getConfig().set("map-source", "sql");
+        } else if (mapManager instanceof YamlMapManager) {
+            getConfig().set("map-source", "yml");
+        }
+        
         saveConfig();
     }
     
-    public SQLMapManager getMapManager() {
+    public MapManager getMapManager() {
         return mapManager;
     }
     
     public Lobby getLobby() {
         return lobby;
-    }
-    
-    public LootManager getLootManager() {
-        return lootManager;
     }
     
     public NexusCore getNexusCore() {
@@ -461,7 +473,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
 
     @Override
     public void registerDatabases(DatabaseRegistry registry) {
-        for (SQLDatabase database : registry.getRegisteredObjects().values()) {
+        for (SQLDatabase database : registry.getObjects().values()) {
             if (database.getName().toLowerCase().contains("nexus")) { //TODO Temporary
                 database.registerClass(Setting.Info.class);
                 database.registerClass(GameSetting.class);
@@ -494,5 +506,11 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
     public SettingRegistry getGameSettingRegistry() {
         return gameSettingRegistry;
+    }
+
+    public void setMapManager(MapManager mapManager) {
+        this.mapManager = mapManager;
+        getCommand("sgmap").setExecutor(new SGMapCommand(this, mapManager));
+        this.mapManager.loadMaps();
     }
 }

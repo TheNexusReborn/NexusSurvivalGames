@@ -1,5 +1,7 @@
 package com.thenexusreborn.survivalgames.lobby;
 
+import com.stardevllc.starlib.time.TimeUnit;
+import com.stardevllc.starclock.clocks.Timer;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
@@ -21,8 +23,6 @@ import com.thenexusreborn.survivalgames.scoreboard.lobby.LobbyBoard;
 import com.thenexusreborn.survivalgames.scoreboard.lobby.MapEditingBoard;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.settings.LobbySettings;
-import me.firestar311.starclock.api.clocks.Timer;
-import me.firestar311.starlib.api.time.TimeUnit;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ClickEvent.Action;
@@ -304,8 +304,8 @@ public class Lobby {
 
     public void startTimer() {
         this.state = LobbyState.COUNTDOWN;
-        this.timer = NexusAPI.getApi().getClockManager().createTimer(TimeUnit.SECONDS.toMilliseconds(lobbySettings.getTimerLength()));
-        this.timer.addCallback(new LobbyTimerCallback(this), TimeUnit.SECONDS.toMilliseconds(1));
+        this.timer = NexusAPI.getApi().getClockManager().createTimer(TimeUnit.SECONDS.toMillis(lobbySettings.getTimerLength()));
+        this.timer.addRepeatingCallback(new LobbyTimerCallback(this), TimeUnit.SECONDS.toMillis(1));
         this.timer.start();
     }
 
@@ -378,8 +378,11 @@ public class Lobby {
             for (MapRating playerRating : gameMap.getRatings().values()) {
                 rating += playerRating.getRating();
             }
+            
+            double ratingRatio = rating * 1.0 / totalRatings;
+            int ratingPercent = (int) (ratingRatio * 100);
 
-            ratingMsg = "&7Rating: " + new ProgressBar(rating / totalRatings, rating, 5, "✦ ", "&a", "&7").display() + " &7&o(rating: " + rating / totalRatings + " star(s), based on: " + totalRatings + " vote(s))";
+            ratingMsg = "&7Rating: " + new ProgressBar(ratingPercent, 100, 5, "✦ ", "&a", "&7").display() + " &7&o(rating: " + rating / totalRatings + " star(s), based on: " + totalRatings + " vote(s))";
         }
 
         sendMessage("&6&l> " + ratingMsg);
@@ -612,7 +615,7 @@ public class Lobby {
         return false;
     }
 
-    public void setTimer(me.firestar311.starclock.api.clocks.Timer timer) {
+    public void setTimer(Timer timer) {
         this.timer = timer;
     }
 
@@ -760,7 +763,7 @@ public class Lobby {
                 }
             }
             
-            this.timer.setLengthAndReset(TimeUnit.SECONDS.toMilliseconds(settings.getTimerLength()));
+            this.timer.setLengthAndReset(TimeUnit.SECONDS.toMillis(settings.getTimerLength()));
 
             if (playerCount < this.lobbySettings.getMinPlayers()) {
                 if (!this.forceStarted) {
