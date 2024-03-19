@@ -1,6 +1,7 @@
 package com.thenexusreborn.survivalgames.lobby;
 
 import com.stardevllc.starclock.clocks.Timer;
+import com.stardevllc.starlib.time.TimeUnit;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.IActionBar;
 import com.thenexusreborn.survivalgames.ControlType;
@@ -31,7 +32,7 @@ public class LobbyActionBar implements IActionBar {
         }
         
         if (lobby.getState() == LobbyState.COUNTDOWN) {
-            int remainingSeconds = (int) Math.ceil(timer.getTime() / 1000.0);
+            int remainingSeconds = (int) TimeUnit.SECONDS.fromMillis(timer.getTime()) + 1;
             return "&f&lVoting closes in &e&l" + remainingSeconds + "s"/*Game.SHORT_TIME_FORMAT.format(TimeUnit.SECONDS.toMilliseconds(remainingSeconds)) */;
         }
         
