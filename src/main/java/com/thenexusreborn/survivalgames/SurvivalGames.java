@@ -12,6 +12,7 @@ import com.thenexusreborn.api.registry.ToggleRegistry;
 import com.thenexusreborn.api.stats.StatType;
 import com.thenexusreborn.gamemaps.MapManager;
 import com.thenexusreborn.gamemaps.SGMapCommand;
+import com.thenexusreborn.gamemaps.YamlMapManager;
 import com.thenexusreborn.gamemaps.model.MapRating;
 import com.thenexusreborn.gamemaps.model.MapSpawn;
 import com.thenexusreborn.gamemaps.model.SGMap;
@@ -156,13 +157,18 @@ public class SurvivalGames extends NexusSpigotPlugin {
         }
         
         getLogger().info("Settings Loaded");
-        
-        mapManager = new SQLMapManager(this);
-        mapManager.loadMaps();
 
+        String mapSource = getConfig().getString("map-source");
+        if (mapSource == null || mapSource.equalsIgnoreCase("sql")) {
+            mapManager = new SQLMapManager(this);
+        } else if (mapSource != null && mapSource.equalsIgnoreCase("yml")) {
+            mapManager = new YamlMapManager(this);
+        }
+        
+        mapManager.loadMaps();
         getCommand("sgmap").setExecutor(new SGMapCommand(this, mapManager));
 
-        getLogger().info("Loaded Maps");
+        getLogger().info("Loaded " + mapManager.getMaps().size() + " Maps");
         lobby = new Lobby(this);
         getLogger().info("Loaded Lobby Settings");
         
@@ -406,6 +412,12 @@ public class SurvivalGames extends NexusSpigotPlugin {
         getConfig().set("spawnpoint.yaw", lobby.getSpawnpoint().getYaw() + "");
         getConfig().set("spawnpoint.pitch", lobby.getSpawnpoint().getPitch() + "");
         
+        if (mapManager instanceof SQLMapManager) {
+            getConfig().set("map-source", "sql");
+        } else if (mapManager instanceof YamlMapManager) {
+            getConfig().set("map-source", "yml");
+        }
+        
         saveConfig();
     }
     
@@ -494,5 +506,11 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
     public SettingRegistry getGameSettingRegistry() {
         return gameSettingRegistry;
+    }
+
+    public void setMapManager(MapManager mapManager) {
+        this.mapManager = mapManager;
+        getCommand("sgmap").setExecutor(new SGMapCommand(this, mapManager));
+        this.mapManager.loadMaps();
     }
 }
