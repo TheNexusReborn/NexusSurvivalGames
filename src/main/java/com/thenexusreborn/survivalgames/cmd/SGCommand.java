@@ -716,7 +716,7 @@ public class SGCommand implements CommandExecutor {
             sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the &b" + type.toLowerCase() + " &esetting &b" + settingName + " &eto &b" + value.get()));
         } else if (subCommand.equals("maps") || subCommand.equals("m")) {
             if (!(args.length > 2)) {
-                sender.sendMessage(ColorUtils.color(MsgType.WARN + "Usage: /" + label + " " + subCommand + " <export|import> <sql|yml>"));
+                sender.sendMessage(ColorUtils.color(MsgType.WARN + "Usage: /" + label + " " + subCommand + " <export|import|setsource> <sql|yml>"));
                 return true;
             }
             
@@ -776,6 +776,24 @@ public class SGCommand implements CommandExecutor {
                 }
 
                 sender.sendMessage(ColorUtils.color(MsgType.INFO + "Added " + newMaps + " new map(s) and didn't add " + duplicateMaps + " duplicate map(s)."));
+            } else if (args[1].equalsIgnoreCase("setsource")) {
+                if (option.equalsIgnoreCase("sql")) {
+                    if (plugin.getMapManager() instanceof SQLMapManager) {
+                        sender.sendMessage(ColorUtils.color(MsgType.WARN + "The map souce is already set to SQL."));
+                        return true;
+                    }
+                    
+                    plugin.setMapManager(new SQLMapManager(plugin));
+                    sender.sendMessage(ColorUtils.color(MsgType.INFO + "You set the map source to SQL."));
+                } else {
+                    if (plugin.getMapManager() instanceof YamlMapManager) {
+                        sender.sendMessage(ColorUtils.color(MsgType.WARN + "The Map Souce is already set to YML."));
+                        return true;
+                    }
+
+                    plugin.setMapManager(new YamlMapManager(plugin));
+                    sender.sendMessage(ColorUtils.color(MsgType.INFO + "You set the map source to YML."));
+                }
             }
         } else if (subCommand.equals("timer") || subCommand.equals("t")) {
             if (!(args.length > 1)) {
