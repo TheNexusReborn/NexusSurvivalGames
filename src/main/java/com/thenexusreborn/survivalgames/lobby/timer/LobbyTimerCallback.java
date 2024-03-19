@@ -24,6 +24,7 @@ public class LobbyTimerCallback implements ClockCallback<TimerSnapshot> {
     public void callback(TimerSnapshot snapshot) {
         //lobby.getPlugin().getLogger().info("Timer Time: " + snapshot.getTime());
         int remainingSeconds = (int) TimeUnit.SECONDS.fromMillis(snapshot.getTime());
+        //lobby.getPlugin().getLogger().info("Remaining Seconds: " + remainingSeconds);
         if (remainingSeconds <= 0) {
             lobby.prepareGame();
             return;
