@@ -305,7 +305,7 @@ public class Lobby {
     public void startTimer() {
         this.state = LobbyState.COUNTDOWN;
         this.timer = NexusAPI.getApi().getClockManager().createTimer(TimeUnit.SECONDS.toMillis(lobbySettings.getTimerLength()));
-        this.timer.addCallback(new LobbyTimerCallback(this), TimeUnit.SECONDS.toMillis(1));
+        this.timer.addRepeatingCallback(new LobbyTimerCallback(this), TimeUnit.SECONDS.toMillis(1));
         this.timer.start();
     }
 
