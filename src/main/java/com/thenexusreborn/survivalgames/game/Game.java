@@ -1,7 +1,10 @@
 package com.thenexusreborn.survivalgames.game;
 
+import com.stardevllc.starchat.rooms.ChatRoom;
+import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.starlib.time.TimeFormat;
 import com.stardevllc.starlib.time.TimeUnit;
+import com.stardevllc.starmclib.actor.Actor;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.gamearchive.GameAction;
 import com.thenexusreborn.api.gamearchive.GameInfo;
@@ -65,10 +68,12 @@ public class Game {
     public static final TimeFormat TIME_FORMAT = new TimeFormat("%*00h%%#0m%%00s%");
     public static final TimeFormat LONG_TIME_FORMAT = new TimeFormat("%*00h%%00m%%00s%");
 
+    private final int localId;
     private final SGMap gameMap;
     private final GameSettings settings;
     private final Map<UUID, GamePlayer> players = new HashMap<>();
     private final Map<Integer, UUID> spawns = new HashMap<>();
+    private final ChatRoom gameChatroom;
     private GameState state = UNDEFINED;
     private Timer timer, graceperiodTimer, restockTimer, ratingPromptTimer;
     private final List<Location> lootedChests = new ArrayList<>();
@@ -89,6 +94,10 @@ public class Game {
         this.gameMap = gameMap;
         this.settings = settings;
         this.gameInfo = new GameInfo();
+        
+        this.gameChatroom = new ChatRoom(plugin, "room-game-" + this.localId + "-main", Actor.getServerActor(), "{message}", "{message}");
+        plugin.getStarChat().getRoomRegistry().register(gameChatroom.getSimplifiedName(), gameChatroom);
+        
         gameInfo.setMapName(this.gameMap.getName().replace("'", "''"));
         gameInfo.setServerName(NexusAPI.getApi().getServerManager().getCurrentServer().getName());
         for (MapSpawn spawn : this.gameMap.getSpawns()) {
@@ -107,6 +116,7 @@ public class Game {
             }
             player.setActionBar(new GameActionBar(plugin, gamePlayer));
             this.players.put(gamePlayer.getUniqueId(), gamePlayer);
+            this.gameChatroom.addMember(player.getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
         }
         gameInfo.setPlayerCount(tributeCount);
         gameInfo.setPlayers(playerNames.toArray(new String[0]));
@@ -210,6 +220,7 @@ public class Game {
         this.players.put(nexusPlayer.getUniqueId(), gamePlayer);
         gamePlayer.setStatus(GamePlayer.Status.SETTING_UP_PLAYER);
         Player player = Bukkit.getPlayer(nexusPlayer.getUniqueId());
+        this.gameChatroom.addMember(player.getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
         player.getInventory().clear();
         player.getInventory().setArmorContents(null);
         player.setAllowFlight(false);
@@ -248,6 +259,7 @@ public class Game {
             return;
         }
         GamePlayer gamePlayer = this.players.get(nexusPlayer.getUniqueId());
+        this.gameChatroom.removeMember(gamePlayer.getUniqueId());
         EnumSet<GameState> ignoreStates = EnumSet.of(UNDEFINED, SETTING_UP, SETUP_COMPLETE, ASSIGN_TEAMS, TEAMS_ASSIGNED, TELEPORT_START, TELEPORT_START_DONE, ERROR, ENDING, ENDED);
         if (!ignoreStates.contains(this.state)) {
             if (gamePlayer.getTeam() == GameTeam.TRIBUTES || gamePlayer.getTeam() == GameTeam.MUTATIONS) {
