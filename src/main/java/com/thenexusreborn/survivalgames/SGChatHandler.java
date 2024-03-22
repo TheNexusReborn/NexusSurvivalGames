@@ -23,7 +23,6 @@ public class SGChatHandler implements ChatHandler {
         String nameColor;
         String score = "&8<&3" + MCUtils.formatNumber(player.getStatValue("sg_score").getAsInt()) + "&8>";
         String level = "&8(&2&l" + player.getStatValue("level").getAsInt() + "&8)";
-        String spectators = "&8[&cSpectators&8]";
         String tag = "";
         if (player.getTags().hasActiveTag()) {
             tag = " " + player.getTags().getActive().getDisplayName();
