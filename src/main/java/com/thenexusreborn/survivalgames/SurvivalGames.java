@@ -70,6 +70,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
     private Game game;
     
     private int gamesPlayed;
+    private int lastLocalGameId;
     
     private SGChatHandler chatHandler;
     
@@ -520,6 +521,15 @@ public class SurvivalGames extends NexusSpigotPlugin {
     public StarChat getStarChat() {
         return starChat;
     }
+
+    public int getLastLocalGameId() {
+        return lastLocalGameId;
+    }
+
+    public void setLastLocalGameId(int lastLocalGameId) {
+        this.lastLocalGameId = lastLocalGameId;
+    }
+
     public void setMapManager(MapManager mapManager) {
         this.mapManager = mapManager;
         getCommand("sgmap").setExecutor(new SGMapCommand(this, mapManager));

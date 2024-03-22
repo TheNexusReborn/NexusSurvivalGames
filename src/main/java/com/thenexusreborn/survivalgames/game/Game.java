@@ -84,6 +84,8 @@ public class Game {
     private GamePhase setupPhase, assignTeamsPhase, teleportToMapPhase;
 
     public Game(SGMap gameMap, GameSettings settings, Collection<LobbyPlayer> players) {
+        this.localId = plugin.getLastLocalGameId();
+        plugin.setLastLocalGameId(plugin.getLastLocalGameId() + 1);
         this.gameMap = gameMap;
         this.settings = settings;
         this.gameInfo = new GameInfo();
@@ -112,6 +114,10 @@ public class Game {
         this.setupPhase = new SetupPhase(this);
         this.assignTeamsPhase = new AssignTeamsPhase(this);
         this.teleportToMapPhase = new TeleportToMapPhase(this);
+    }
+
+    public int getLocalId() {
+        return localId;
     }
 
     public void setState(GameState state) {
