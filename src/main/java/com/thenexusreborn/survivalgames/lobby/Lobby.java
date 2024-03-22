@@ -454,6 +454,7 @@ public class Lobby {
 
         this.players.put(nexusPlayer.getUniqueId(), new LobbyPlayer(nexusPlayer));
         this.lobbyChatRoom.addMember(nexusPlayer.getUniqueId(), DefaultPermissions.VIEW_MESSAGES, DefaultPermissions.SEND_MESSAGES);
+        this.plugin.getStarChat().setPlayerFocus(Bukkit.getPlayer(nexusPlayer.getUniqueId()), this.lobbyChatRoom);
 
         int totalPlayers = 0;
         for (LobbyPlayer player : getPlayers()) {
