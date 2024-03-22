@@ -3,6 +3,7 @@ package com.thenexusreborn.survivalgames.game;
 import com.stardevllc.starlib.Pair;
 import com.stardevllc.starlib.Value;
 import com.thenexusreborn.api.player.NexusPlayer;
+import com.thenexusreborn.api.player.PlayerTags;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.stats.StatChange;
@@ -50,6 +51,10 @@ public class GamePlayer {
         this.bounty = new Bounty(nexusPlayer.getUniqueId());
         this.combatTag = new CombatTag(nexusPlayer.getUniqueId());
         this.damageInfo = new DamageInfo(nexusPlayer.getUniqueId());
+    }
+    
+    public PlayerTags getTags() {
+        return this.nexusPlayer.getTags();
     }
 
     public StatChange changeStat(String statName, Object value, StatOperator operator) {
