@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames;
 
+import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starlib.Value;
 import com.stardevllc.starlib.Value.Type;
 import com.thenexusreborn.api.NexusAPI;
@@ -61,6 +62,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
     public static final Queue<UUID> PLAYER_QUEUE = new LinkedList<>();
     
     private NexusCore nexusCore;
+    private StarChat starChat;
     
     private MapManager mapManager;
     private Lobby lobby;
@@ -93,6 +95,9 @@ public class SurvivalGames extends NexusSpigotPlugin {
     public void onEnable() {
         getLogger().info("Loading NexusSurvivalGames v" + getDescription().getVersion());
         saveDefaultConfig();
+        
+        this.starChat = (StarChat) getServer().getPluginManager().getPlugin("StarChat");
+        getLogger().info("Hooked into StarChat");
         
         new SGPAPIExpansion(this).register();
         getLogger().info("Hooked into PlaceholderAPI");
@@ -512,6 +517,9 @@ public class SurvivalGames extends NexusSpigotPlugin {
         return gameSettingRegistry;
     }
 
+    public StarChat getStarChat() {
+        return starChat;
+    }
     public void setMapManager(MapManager mapManager) {
         this.mapManager = mapManager;
         getCommand("sgmap").setExecutor(new SGMapCommand(this, mapManager));
