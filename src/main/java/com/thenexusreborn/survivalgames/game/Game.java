@@ -2,6 +2,7 @@ package com.thenexusreborn.survivalgames.game;
 
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
+import com.stardevllc.starlib.registry.StringRegistry;
 import com.stardevllc.starlib.time.TimeFormat;
 import com.stardevllc.starlib.time.TimeUnit;
 import com.stardevllc.starmclib.actor.Actor;
@@ -773,6 +774,12 @@ public class Game {
         setState(ENDED);
         for (Player player : Bukkit.getOnlinePlayers()) {
             resetPlayer(player);
+        }
+
+        StringRegistry<ChatRoom> roomRegistry = plugin.getStarChat().getRoomRegistry();
+        roomRegistry.deregister(this.gameChatroom.getSimplifiedName());
+        for (GameTeamChatroom chatroom : this.getChatRooms().values()) {
+            roomRegistry.deregister(chatroom.getSimplifiedName());
         }
 
         plugin.getLobby().fromGame(this);
