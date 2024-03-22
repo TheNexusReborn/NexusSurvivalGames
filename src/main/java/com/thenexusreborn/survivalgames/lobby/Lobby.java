@@ -149,7 +149,7 @@ public class Lobby {
             String mapName = entry.getValue().getName();
             StringBuilder creatorBuilder = new StringBuilder();
             for (String creator : entry.getValue().getCreators()) {
-                if (creator != null && !creator.equals("") && !creator.equals(" ")) {
+                if (creator != null && !creator.isEmpty() && !creator.equals(" ")) {
                     creatorBuilder.append(creator).append(", ");
                 }
             }
@@ -338,7 +338,6 @@ public class Lobby {
 
     public void prepareGame() {
         this.state = LobbyState.PREPARING_GAME;
-        int mapVotes = 0;
         if (this.gameMap == null) {
             SGMap mostVoted = null;
             int mostVotedVotes = 0;
