@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames.game;
 
+import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.starlib.Pair;
 import com.stardevllc.starlib.Value;
 import com.thenexusreborn.api.player.NexusPlayer;
@@ -11,6 +12,7 @@ import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.nexuscore.util.ArmorType;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.survivalgames.SurvivalGames;
+import com.thenexusreborn.survivalgames.chat.GameTeamChatroom;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
 import com.thenexusreborn.survivalgames.scoreboard.GameTablistHandler;
@@ -112,7 +114,14 @@ public class GamePlayer {
     }
     
     public void setTeam(GameTeam team) {
+        if (this.team != null) {
+            this.game.getChatRooms().get(this.team).removeMember(getUniqueId());
+        }
+        
         this.team = team;
+        GameTeamChatroom chatroom = game.getChatRooms().get(this.team);
+        chatroom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES, DefaultPermissions.SEND_MESSAGES);
+        Game.getPlugin().getStarChat().setPlayerFocus(Bukkit.getPlayer(getUniqueId()), chatroom);
     }
     
     public GameTeam getTeam() {

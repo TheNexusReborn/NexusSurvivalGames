@@ -23,6 +23,7 @@ import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.ControlType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
+import com.thenexusreborn.survivalgames.chat.GameTeamChatroom;
 import com.thenexusreborn.survivalgames.game.Bounty.Type;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.game.death.DeathType;
@@ -74,6 +75,7 @@ public class Game {
     private final Map<UUID, GamePlayer> players = new HashMap<>();
     private final Map<Integer, UUID> spawns = new HashMap<>();
     private final ChatRoom gameChatroom;
+    private final Map<GameTeam, GameTeamChatroom> chatRooms = new HashMap<>();
     private GameState state = UNDEFINED;
     private Timer timer, graceperiodTimer, restockTimer, ratingPromptTimer;
     private final List<Location> lootedChests = new ArrayList<>();
@@ -120,6 +122,12 @@ public class Game {
         }
         gameInfo.setPlayerCount(tributeCount);
         gameInfo.setPlayers(playerNames.toArray(new String[0]));
+
+        for (GameTeam team : GameTeam.values()) {
+            GameTeamChatroom chatroom = new GameTeamChatroom(plugin, this, team);
+            this.chatRooms.put(team, chatroom);
+            plugin.getStarChat().getRoomRegistry().register(chatroom.getSimplifiedName(), chatroom);
+        }
 
         this.setupPhase = new SetupPhase(this);
         this.assignTeamsPhase = new AssignTeamsPhase(this);
@@ -259,6 +267,7 @@ public class Game {
             return;
         }
         GamePlayer gamePlayer = this.players.get(nexusPlayer.getUniqueId());
+        this.chatRooms.get(gamePlayer.getTeam()).removeMember(gamePlayer.getUniqueId());
         this.gameChatroom.removeMember(gamePlayer.getUniqueId());
         EnumSet<GameState> ignoreStates = EnumSet.of(UNDEFINED, SETTING_UP, SETUP_COMPLETE, ASSIGN_TEAMS, TEAMS_ASSIGNED, TELEPORT_START, TELEPORT_START_DONE, ERROR, ENDING, ENDED);
         if (!ignoreStates.contains(this.state)) {
@@ -404,10 +413,7 @@ public class Game {
     }
 
     public void sendMessage(String message) {
-        for (GamePlayer player : this.players.values()) {
-            player.sendMessage(message);
-        }
-
+        this.gameChatroom.sendMessage(message);
         Bukkit.getConsoleSender().sendMessage(MCUtils.color(message));
     }
 
@@ -1270,6 +1276,10 @@ public class Game {
 
     public Map<Integer, UUID> getSpawns() {
         return spawns;
+    }
+
+    public Map<GameTeam, GameTeamChatroom> getChatRooms() {
+        return chatRooms;
     }
 
     @Override
