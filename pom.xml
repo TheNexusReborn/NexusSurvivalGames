@@ -72,6 +72,10 @@
             <id>spigotmc-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
+        <repository>
+            <id>placeholderapi</id>
+            <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -91,6 +95,12 @@
             <groupId>com.github.StarDevelopmentLLC</groupId>
             <artifactId>StarChat</artifactId>
             <version>1.0.0-alpha.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>me.clip</groupId>
+            <artifactId>placeholderapi</artifactId>
+            <version>2.11.5</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

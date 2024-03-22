@@ -23,6 +23,7 @@ import com.thenexusreborn.survivalgames.cmd.*;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.game.GameTeam;
+import com.thenexusreborn.survivalgames.hooks.SGPAPIExpansion;
 import com.thenexusreborn.survivalgames.listener.BlockListener;
 import com.thenexusreborn.survivalgames.listener.EntityListener;
 import com.thenexusreborn.survivalgames.listener.PlayerListener;
@@ -92,6 +93,9 @@ public class SurvivalGames extends NexusSpigotPlugin {
     public void onEnable() {
         getLogger().info("Loading NexusSurvivalGames v" + getDescription().getVersion());
         saveDefaultConfig();
+        
+        new SGPAPIExpansion(this).register();
+        getLogger().info("Hooked into PlaceholderAPI");
         
         deathMessagesFile = new File(getDataFolder(), "deathmessages.yml");
         
