@@ -97,13 +97,13 @@ public class SGCommand implements CommandExecutor {
                     sender.sendMessage(MCUtils.color(MsgType.SEVERE + "Invalid control type detection. This is a bug, please report to Firestar311"));
                     return true;
                 }
-
-                if (Game.getControlType() == controlType) {
+                
+                if (game.getControlType() == controlType) {
                     sender.sendMessage(MCUtils.color(MsgType.WARN + "The game is already in " + controlType.name().toLowerCase() + " "));
                     return true;
                 }
 
-                Game.setControlType(controlType);
+                game.setControlType(controlType);
                 sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the game to " + MsgType.INFO.getVariableColor() + controlType.name().toLowerCase() + MsgType.INFO.getBaseColor() + " control."));
                 return true;
             }

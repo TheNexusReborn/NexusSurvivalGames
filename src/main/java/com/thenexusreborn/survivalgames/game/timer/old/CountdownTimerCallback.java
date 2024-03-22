@@ -28,7 +28,7 @@ public class CountdownTimerCallback implements ReturnableCallback<TimerSnapshot,
         int remainingSeconds = timerSnapshot.getSecondsLeft();
         if (remainingSeconds <= 0) {
             game.warmupComplete();
-            if (Game.getControlType() == ControlType.MANUAL) {
+            if (game.getControlType() == ControlType.MANUAL) {
                 game.sendMessage("&eThe timer concluded but the mode is not automatic. Waiting for the command to start game.");
             }
             return false;

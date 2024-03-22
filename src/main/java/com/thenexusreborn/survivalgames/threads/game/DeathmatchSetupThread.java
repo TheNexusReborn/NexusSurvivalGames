@@ -17,10 +17,12 @@ public class DeathmatchSetupThread extends NexusThread<SurvivalGames> {
             return;
         }
         
-        if (Game.getControlType() == ControlType.MANUAL) {
+        Game game = plugin.getGame();
+        
+        if (game.getControlType() == ControlType.MANUAL) {
             return;
         }
-        Game game = plugin.getGame();
+        
         if (game.getState() == GameState.TELEPORT_DEATHMATCH_DONE) {
             game.startDeathmatchWarmup();
         }

@@ -65,13 +65,13 @@ import static com.thenexusreborn.survivalgames.game.GameState.*;
 @SuppressWarnings("unused")
 public class Game {
     private static final SurvivalGames plugin = SurvivalGames.getPlugin(SurvivalGames.class);
-    private static ControlType controlType = ControlType.MANUAL;
     public static final TimeFormat SHORT_TIME_FORMAT = new TimeFormat("%*00h%%*#0m%%*#0s%");
     public static final TimeFormat TIME_FORMAT = new TimeFormat("%*00h%%#0m%%00s%");
     public static final TimeFormat LONG_TIME_FORMAT = new TimeFormat("%*00h%%00m%%00s%");
 
     private final int localId;
     private final SGMap gameMap;
+    private ControlType controlType = ControlType.AUTOMATIC;
     private final GameSettings settings;
     private final Map<UUID, GamePlayer> players = new HashMap<>();
     private final Map<Integer, UUID> spawns = new HashMap<>();
@@ -180,12 +180,12 @@ public class Game {
         }
     }
 
-    public static ControlType getControlType() {
+    public ControlType getControlType() {
         return controlType;
     }
 
-    public static void setControlType(ControlType controlType) {
-        Game.controlType = controlType;
+    public void setControlType(ControlType controlType) {
+        this.controlType = controlType;
         if (controlType == ControlType.MANUAL) {
             if (plugin.getGame() != null) {
                 if (plugin.getGame().getTimer() != null) {

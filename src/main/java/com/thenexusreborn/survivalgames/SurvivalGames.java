@@ -183,7 +183,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
         getLogger().info("Loaded Lobby Settings");
         
         lobby.setControlType(ControlType.AUTOMATIC);
-        Game.setControlType(ControlType.AUTOMATIC);
         
         if (this.getConfig().contains("spawnpoint")) {
             String worldName = this.getConfig().getString("spawnpoint.world");

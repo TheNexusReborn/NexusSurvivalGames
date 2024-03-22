@@ -26,7 +26,7 @@ public class DeathmatchCountdownCallback implements ReturnableCallback<TimerSnap
         int remainingSeconds = timerSnapshot.getSecondsLeft();
         if (remainingSeconds <= 0) {
             game.deathmatchWarmupDone();
-            if (Game.getControlType() == ControlType.MANUAL) {
+            if (game.getControlType() == ControlType.MANUAL) {
                 game.sendMessage("&eThe timer concluded but the mode is not automatic. Waiting for the command to start the deathmatch.");
             }
             return false;

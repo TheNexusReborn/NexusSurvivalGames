@@ -391,7 +391,7 @@ public class Lobby {
         Game game = new Game(gameMap, this.gameSettings, getPlayers());
         this.players.clear();
         plugin.setGame(game);
-        if (Game.getControlType() == ControlType.AUTOMATIC) {
+        if (game.getControlType() == ControlType.AUTOMATIC) {
             this.state = LobbyState.STARTING;
             game.setup();
         } else {
