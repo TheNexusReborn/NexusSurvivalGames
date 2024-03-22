@@ -32,6 +32,7 @@ import static com.thenexusreborn.survivalgames.game.GameState.INGAME_DEATHMATCH;
 
 public class GamePlayer {
     private final NexusPlayer nexusPlayer;
+    private Game game;
     private GameTeam team;
     private boolean spectatorByDeath, newPersonalBestNotified;
     private TrackerInfo trackerInfo;
@@ -46,8 +47,9 @@ public class GamePlayer {
     private Map<Long, DeathInfo> deaths = new TreeMap<>();
     private Status status;
     
-    public GamePlayer(NexusPlayer nexusPlayer) {
+    public GamePlayer(NexusPlayer nexusPlayer, Game game) {
         this.nexusPlayer = nexusPlayer;
+        this.game = game;
         this.bounty = new Bounty(nexusPlayer.getUniqueId());
         this.combatTag = new CombatTag(nexusPlayer.getUniqueId());
         this.damageInfo = new DamageInfo(nexusPlayer.getUniqueId());

@@ -106,7 +106,7 @@ public class Game {
         List<String> playerNames = new ArrayList<>();
         int tributeCount = 0;
         for (LobbyPlayer player : players) {
-            GamePlayer gamePlayer = new GamePlayer(player.getPlayer());
+            GamePlayer gamePlayer = new GamePlayer(player.getPlayer(), this);
             if (player.isSpectating()) {
                 gamePlayer.setTeam(GameTeam.SPECTATORS);
             } else {
@@ -213,7 +213,7 @@ public class Game {
     }
 
     public void addPlayer(NexusPlayer nexusPlayer) {
-        GamePlayer gamePlayer = new GamePlayer(nexusPlayer);
+        GamePlayer gamePlayer = new GamePlayer(nexusPlayer, this);
         gamePlayer.setStatus(GamePlayer.Status.ADDING_TO_GAME);
         gamePlayer.setTeam(GameTeam.SPECTATORS);
         gamePlayer.sendMessage(GameTeam.SPECTATORS.getJoinMessage());
