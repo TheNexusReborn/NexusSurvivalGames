@@ -71,8 +71,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
     private int gamesPlayed;
     private int lastLocalGameId;
     
-    private SGChatHandler chatHandler;
-    
     private final Map<String, LobbySettings> lobbySettings = new HashMap<>();
     private final Map<String, GameSettings> gameSettings = new HashMap<>();
     
@@ -215,9 +213,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
         }
         getLogger().info("Unlocked mutations loaded.");
 
-        this.chatHandler = new SGChatHandler(this);
-        nexusCore.getChatManager().setHandler(chatHandler);
-        
         getCommand("votestart").setExecutor(new VoteStartCommand(this));
         getCommand("stats").setExecutor(new StatsCommand(this));
         getCommand("survivalgames").setExecutor(new SGCommand(this));
@@ -448,10 +443,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
     public void setGame(Game game) {
         this.game = game;
-    }
-    
-    public SGChatHandler getChatHandler() {
-        return chatHandler;
     }
     
     public LobbySettings getLobbySettings(String type) {
