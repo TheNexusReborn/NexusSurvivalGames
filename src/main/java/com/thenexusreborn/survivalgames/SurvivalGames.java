@@ -36,7 +36,6 @@ import com.thenexusreborn.survivalgames.mutations.UnlockedMutation;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.settings.LobbySettings;
 import com.thenexusreborn.survivalgames.settings.SettingRegistry;
-import com.thenexusreborn.survivalgames.settings.object.Setting;
 import com.thenexusreborn.survivalgames.settings.object.Setting.Info;
 import com.thenexusreborn.survivalgames.settings.object.enums.ColorMode;
 import com.thenexusreborn.survivalgames.settings.object.enums.Time;
@@ -84,6 +83,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
     private final SettingRegistry lobbySettingRegistry = new SettingRegistry();
     private final SettingRegistry gameSettingRegistry = new SettingRegistry();
+    private int lastLocalLobbyId;
 
     @Override
     public void onLoad() {
@@ -115,7 +115,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
         SQLDatabase database = NexusAPI.getApi().getPrimaryDatabase();
         try {
-            List<Setting.Info> settingInfos = database.get(Info.class);
+            List<Info> settingInfos = database.get(Info.class);
             settingInfos.forEach(settingInfo -> {
                 if (settingInfo.getType().equalsIgnoreCase("lobby")) {
                     lobbySettingRegistry.register(settingInfo.getName(), settingInfo);
@@ -131,7 +131,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         
         registerDefaultSettings();
         
-        Set<Setting.Info> allSettingInfos = new HashSet<>();
+        Set<Info> allSettingInfos = new HashSet<>();
         allSettingInfos.addAll(gameSettingRegistry.getObjects().values());
         allSettingInfos.addAll(lobbySettingRegistry.getObjects().values());
         
@@ -484,7 +484,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
     public void registerDatabases(DatabaseRegistry registry) {
         for (SQLDatabase database : registry.getObjects().values()) {
             if (database.getName().toLowerCase().contains("nexus")) { //TODO Temporary
-                database.registerClass(Setting.Info.class);
+                database.registerClass(Info.class);
                 database.registerClass(GameSetting.class);
                 database.registerClass(LobbySetting.class);
                 database.registerClass(UnlockedMutation.class);
@@ -533,5 +533,13 @@ public class SurvivalGames extends NexusSpigotPlugin {
         this.mapManager = mapManager;
         getCommand("sgmap").setExecutor(new SGMapCommand(this, mapManager));
         this.mapManager.loadMaps();
+    }
+
+    public int getLastLocalLobbyId() {
+        return lastLocalLobbyId;
+    }
+
+    public void setLastLocalLobbyId(int lastLocalLobbyId) {
+        this.lastLocalLobbyId = lastLocalLobbyId;
     }
 }

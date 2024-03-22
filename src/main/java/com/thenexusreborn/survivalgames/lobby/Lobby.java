@@ -1,7 +1,10 @@
 package com.thenexusreborn.survivalgames.lobby;
 
+import com.stardevllc.starchat.rooms.ChatRoom;
+import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.starlib.time.TimeUnit;
 import com.stardevllc.starclock.clocks.Timer;
+import com.stardevllc.starmclib.actor.Actor;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
@@ -43,8 +46,10 @@ import java.util.stream.Collectors;
 @SuppressWarnings("DuplicatedCode")
 public class Lobby {
     private final SurvivalGames plugin;
+    private int localId;
     private ControlType controlType = ControlType.MANUAL;
     private LobbyState state = LobbyState.WAITING;
+    private ChatRoom lobbyChatRoom;
     private Timer timer;
     private final Map<UUID, LobbyPlayer> players = new HashMap<>();
     private GameSettings gameSettings;
@@ -61,6 +66,9 @@ public class Lobby {
     public Lobby(SurvivalGames plugin) {
         this.plugin = plugin;
         plugin.getLogger().info("Setting up the lobby.");
+        
+        this.localId = plugin.getLastLocalLobbyId();
+        plugin.setLastLocalLobbyId(plugin.getLastLocalLobbyId() + 1);
 
         if (plugin.getConfig().contains("mapsigns")) {
             plugin.getLogger().info("Loading Map Signs");
@@ -115,12 +123,19 @@ public class Lobby {
 
         this.lobbySettings = plugin.getLobbySettings("default");
         this.gameSettings = plugin.getGameSettings("default");
+        
+        this.lobbyChatRoom = new ChatRoom(plugin, "room-lobby-" + getLocalId(), Actor.getServerActor(), "&8<&3%nexussg_score%&8> &8(&2&l%nexuscore_level%&8) &r%nexuscore_displayname%%nexuscore_tag%&8: {message}", "{message}");
+        plugin.getStarChat().getRoomRegistry().register(this.lobbyChatRoom.getSimplifiedName(), this.lobbyChatRoom);
 
         generateMapOptions();
 
         for (LootTable lootTable : LootManager.getInstance().getLootTables()) {
             lootTable.generateNewProbabilities(new Random());
         }
+    }
+
+    public int getLocalId() {
+        return localId;
     }
 
     public void resetInvalidState() {
@@ -258,9 +273,7 @@ public class Lobby {
     }
 
     public void sendMessage(String message) {
-        for (LobbyPlayer player : getPlayers()) {
-            player.sendMessage(message);
-        }
+        this.lobbyChatRoom.sendMessage(message);
         Bukkit.getConsoleSender().sendMessage(MCUtils.color(message));
     }
 
@@ -440,6 +453,7 @@ public class Lobby {
         }
 
         this.players.put(nexusPlayer.getUniqueId(), new LobbyPlayer(nexusPlayer));
+        this.lobbyChatRoom.addMember(nexusPlayer.getUniqueId(), DefaultPermissions.VIEW_MESSAGES, DefaultPermissions.SEND_MESSAGES);
 
         int totalPlayers = 0;
         for (LobbyPlayer player : getPlayers()) {
@@ -533,6 +547,7 @@ public class Lobby {
         if (!this.players.containsKey(nexusPlayer.getUniqueId())) {
             return;
         }
+        this.lobbyChatRoom.removeMember(nexusPlayer.getUniqueId());
         this.players.remove(nexusPlayer.getUniqueId());
         int totalPlayers = 0;
         for (LobbyPlayer player : getPlayers()) {
