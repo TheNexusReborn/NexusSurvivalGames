@@ -100,6 +100,12 @@ public class Game {
         
         this.gameChatroom = new ChatRoom(plugin, "room-game-" + this.localId + "-main", Actor.getServerActor(), "{message}", "{message}");
         plugin.getStarChat().getRoomRegistry().register(gameChatroom.getSimplifiedName(), gameChatroom);
+
+        for (GameTeam team : GameTeam.values()) {
+            GameTeamChatroom chatroom = new GameTeamChatroom(plugin, this, team);
+            this.chatRooms.put(team, chatroom);
+            plugin.getStarChat().getRoomRegistry().register(chatroom.getSimplifiedName(), chatroom);
+        }
         
         gameInfo.setMapName(this.gameMap.getName().replace("'", "''"));
         gameInfo.setServerName(NexusAPI.getApi().getServerManager().getCurrentServer().getName());
@@ -123,12 +129,6 @@ public class Game {
         }
         gameInfo.setPlayerCount(tributeCount);
         gameInfo.setPlayers(playerNames.toArray(new String[0]));
-
-        for (GameTeam team : GameTeam.values()) {
-            GameTeamChatroom chatroom = new GameTeamChatroom(plugin, this, team);
-            this.chatRooms.put(team, chatroom);
-            plugin.getStarChat().getRoomRegistry().register(chatroom.getSimplifiedName(), chatroom);
-        }
 
         this.setupPhase = new SetupPhase(this);
         this.assignTeamsPhase = new AssignTeamsPhase(this);
