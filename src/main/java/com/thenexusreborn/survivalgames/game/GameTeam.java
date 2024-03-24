@@ -3,10 +3,10 @@ package com.thenexusreborn.survivalgames.game;
 import org.bukkit.*;
 
 public enum GameTeam {
-    TRIBUTES("Tributes", "&a", "&c", GameMode.SURVIVAL, Sound.WITHER_SPAWN, "&8<&3%nexussg_score%&8> &8(&2&l%nexuscore_level%&8) &r%nexussg_displayname%&8: {message}"), 
-    SPECTATORS("Spectators", "&c", GameMode.ADVENTURE, Sound.ARROW_HIT, "&8[&cSpectators&8] &r%nexussg_displayname%&8: {message}"), 
-    MUTATIONS("Mutations", "&d", GameMode.SURVIVAL, Sound.ZOMBIE_PIG_DEATH, "&8<&3%nexussg_score%&8> &8(&2&l%nexuscore_level%&8) &r%nexussg_displayname%&8: {message}"), 
-    ZOMBIES("Zombies", "&2", GameMode.SURVIVAL, Sound.ZOMBIE_DEATH, "%&8<&3nexussg_score%&8> &8(&2&l%nexuscore_level%&8) &r%nexussg_displayname%&8: {message}");
+    TRIBUTES("Tributes", "&a", "&c", GameMode.SURVIVAL, Sound.WITHER_SPAWN, "&8<&3%nexussg_score%&8> &8(&2&l%nexuscore_level%&8) &r%nexussg_displayname%&8: %nexuscore_chatcolor%{message}"), 
+    SPECTATORS("Spectators", "&c", GameMode.ADVENTURE, Sound.ARROW_HIT, "&8[&cSpectators&8] &r%nexussg_displayname%&8: %nexuscore_chatcolor%{message}"), 
+    MUTATIONS("Mutations", "&d", GameMode.SURVIVAL, Sound.ZOMBIE_PIG_DEATH, "&8<&3%nexussg_score%&8> &8(&2&l%nexuscore_level%&8) &r%nexussg_displayname%&8: %nexuscore_chatcolor%{message}"), 
+    ZOMBIES("Zombies", "&2", GameMode.SURVIVAL, Sound.ZOMBIE_DEATH, "%&8<&3nexussg_score%&8> &8(&2&l%nexuscore_level%&8) &r%nexussg_displayname%&8: %nexuscore_chatcolor%{message}");
     private final String name, color, remainColor, chatFormat;
     private final GameMode gameMode;
     private final Sound deathSound;
