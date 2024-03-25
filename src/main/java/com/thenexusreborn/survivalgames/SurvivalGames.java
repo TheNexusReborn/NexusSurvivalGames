@@ -22,8 +22,6 @@ import com.thenexusreborn.nexuscore.api.NexusSpigotPlugin;
 import com.thenexusreborn.nexuscore.util.ServerProperties;
 import com.thenexusreborn.survivalgames.cmd.*;
 import com.thenexusreborn.survivalgames.game.Game;
-import com.thenexusreborn.survivalgames.game.GamePlayer;
-import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.hooks.SGPAPIExpansion;
 import com.thenexusreborn.survivalgames.listener.BlockListener;
 import com.thenexusreborn.survivalgames.listener.EntityListener;
@@ -36,12 +34,9 @@ import com.thenexusreborn.survivalgames.mutations.UnlockedMutation;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.settings.LobbySettings;
 import com.thenexusreborn.survivalgames.settings.SettingRegistry;
-import com.thenexusreborn.survivalgames.settings.object.Setting.Info;
 import com.thenexusreborn.survivalgames.settings.object.enums.ColorMode;
 import com.thenexusreborn.survivalgames.settings.object.enums.Time;
 import com.thenexusreborn.survivalgames.settings.object.enums.Weather;
-import com.thenexusreborn.survivalgames.settings.object.impl.GameSetting;
-import com.thenexusreborn.survivalgames.settings.object.impl.LobbySetting;
 import com.thenexusreborn.survivalgames.threads.ServerStatusThread;
 import com.thenexusreborn.survivalgames.threads.game.*;
 import com.thenexusreborn.survivalgames.threads.lobby.*;
@@ -110,59 +105,11 @@ public class SurvivalGames extends NexusSpigotPlugin {
         deathMessagesConfig = YamlConfiguration.loadConfiguration(deathMessagesFile);
 
         getLogger().info("Loading Game and Lobby Settings");
-
-        SQLDatabase database = NexusAPI.getApi().getPrimaryDatabase();
-        try {
-            List<Info> settingInfos = database.get(Info.class);
-            settingInfos.forEach(settingInfo -> {
-                if (settingInfo.getType().equalsIgnoreCase("lobby")) {
-                    lobbySettingRegistry.register(settingInfo.getName(), settingInfo);
-                } else if (settingInfo.getType().equalsIgnoreCase("game")) {
-                    gameSettingRegistry.register(settingInfo.getName(), settingInfo);
-                }
-            });
-        } catch (SQLException e) {
-            e.printStackTrace();
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
-
+        
         registerDefaultSettings();
 
-        Set<Info> allSettingInfos = new HashSet<>();
-        allSettingInfos.addAll(gameSettingRegistry.getObjects().values());
-        allSettingInfos.addAll(lobbySettingRegistry.getObjects().values());
-
-        allSettingInfos.forEach(database::queue);
-        database.flush();
-
-        try {
-            List<LobbySetting> lobbySettings = database.get(LobbySetting.class);
-            for (LobbySetting lobbySetting : lobbySettings) {
-                if (!this.lobbySettings.containsKey(lobbySetting.getCategory())) {
-                    this.lobbySettings.put(lobbySetting.getCategory(), new LobbySettings());
-                }
-                this.lobbySettings.get(lobbySetting.getCategory()).add(lobbySetting);
-            }
-
-            List<GameSetting> gameSettings = database.get(GameSetting.class);
-            for (GameSetting gameSetting : gameSettings) {
-                if (!this.gameSettings.containsKey(gameSetting.getCategory())) {
-                    this.gameSettings.put(gameSetting.getCategory(), new GameSettings());
-                }
-                this.gameSettings.get(gameSetting.getCategory()).add(gameSetting);
-            }
-
-            if (!this.lobbySettings.containsKey("default")) {
-                this.lobbySettings.put("default", new LobbySettings());
-            }
-
-            if (!this.gameSettings.containsKey("default")) {
-                this.gameSettings.put("default", new GameSettings());
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        this.lobbySettings.put("default", new LobbySettings());
+        this.gameSettings.put("default", new GameSettings());
 
         getLogger().info("Settings Loaded");
 
@@ -197,6 +144,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         }
 
         getLogger().info("Loading all unlocked mutations");
+        SQLDatabase database = NexusAPI.getApi().getPrimaryDatabase();
         try {
             List<UnlockedMutation> unlockedMutations = database.get(UnlockedMutation.class);
             for (UnlockedMutation unlockedMutation : unlockedMutations) {
@@ -293,16 +241,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
         createGameSetting("allow_teaming", "Allow Teaming", "This controls the Teaming message at the start of the game", Type.BOOLEAN, true);
         createGameSetting("max_team_amount", "Maximum Team Amount", "The maximum number in a team. This only controls the message at the start of the game", Type.INTEGER, 2);
         createGameSetting("mutations_enabled", "Mutations Enabled", "This controls if mutations are enabled.", Type.BOOLEAN, true);
-        this.gameSettingRegistry.get("mutations_enabled").addChangeListener((setting, type, oldValue, newValue) -> {
-            if (getGame() != null) {
-                for (GamePlayer gamePlayer : getGame().getPlayers().values()) {
-                    if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
-                        gamePlayer.clearInventory();
-                        gamePlayer.giveSpectatorItems(getGame());
-                    }
-                }
-            }
-        });
         createGameSetting("regeneration", "Regeneration", "This controls if regeneration is enabled. True means enabled and false means disabled", Type.BOOLEAN, true);
         createGameSetting("grace_period", "Grace Period", "This controls if the grace period is enabled or not.", Type.BOOLEAN, false);
         createGameSetting("unlimited_mutation_passes", "Unlimited Mutation Passes", "This controls if players need a mutation pass to mutate. This does not allow more than the max mutations per game though.", Type.BOOLEAN, true);
@@ -481,9 +419,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
     public void registerDatabases(DatabaseRegistry registry) {
         for (SQLDatabase database : registry.getObjects().values()) {
             if (database.getName().toLowerCase().contains("nexus")) { //TODO Temporary
-                database.registerClass(Info.class);
-                database.registerClass(GameSetting.class);
-                database.registerClass(LobbySetting.class);
                 database.registerClass(UnlockedMutation.class);
                 database.registerClass(MapRating.class);
                 database.registerClass(SGMap.class);
