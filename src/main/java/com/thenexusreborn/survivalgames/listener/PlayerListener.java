@@ -30,6 +30,7 @@ import com.thenexusreborn.survivalgames.menu.TeamMenu;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
 import com.thenexusreborn.survivalgames.mutations.impl.ChickenMutation;
 import com.thenexusreborn.survivalgames.mutations.impl.CreeperMutation;
+import com.thenexusreborn.survivalgames.util.SGPlayerStats;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -282,7 +283,7 @@ public class PlayerListener implements Listener {
                             return;
                         }
     
-                        game.getPlayer(player.getUniqueId()).changeStat("sg_chests_looted", 1, StatOperator.ADD);
+                        game.getPlayer(player.getUniqueId()).getStats().addChestsLooted(1);
                         
                         int maxAmount = 8;
                         
@@ -717,6 +718,16 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onNexusPlayerLoad(NexusPlayerLoadEvent e) {
         NexusPlayer nexusPlayer = e.getNexusPlayer();
+
+        SGPlayerStats stats;
+        try {
+            stats = NexusAPI.getApi().getPrimaryDatabase().get(SGPlayerStats.class, "uniqueid", e.getNexusPlayer().getUniqueId()).get(0);
+        } catch (Throwable ex) {
+            stats = new SGPlayerStats(e.getNexusPlayer().getUniqueId());
+        }
+        
+        SurvivalGames.PLAYER_STATS.put(nexusPlayer.getUniqueId(), stats);
+        
         if (plugin.getGame() == null) {
             if (plugin.getLobby().getPlayingCount() >= plugin.getLobby().getLobbySettings().getMaxPlayers()) {
                 boolean isStaff = nexusPlayer.getRank().ordinal() <= Rank.HELPER.ordinal();
@@ -737,7 +748,7 @@ public class PlayerListener implements Listener {
                 }
             }
         }
-        
+
         SurvivalGames.PLAYER_QUEUE.offer(e.getNexusPlayer().getUniqueId());
         if (plugin.getGame() != null) {
             GameState state = plugin.getGame().getState();
@@ -746,16 +757,16 @@ public class PlayerListener implements Listener {
                     @Override
                     public void run() {
                         if (plugin.getGame().getState() != GameState.ASSIGN_TEAMS) {
-                            plugin.getGame().addPlayer(nexusPlayer);
+                            plugin.getGame().addPlayer(nexusPlayer, SurvivalGames.PLAYER_STATS.get(nexusPlayer.getUniqueId()));
                             cancel();
                         }
                     }
                 }.runTaskTimer(plugin, 1L, 1L);
             } else {
-                plugin.getGame().addPlayer(nexusPlayer);
+                plugin.getGame().addPlayer(nexusPlayer, stats);
             }
         } else {
-            plugin.getLobby().addPlayer(nexusPlayer);
+            plugin.getLobby().addPlayer(nexusPlayer, stats);
         }
         e.setJoinMessage(null);
     }

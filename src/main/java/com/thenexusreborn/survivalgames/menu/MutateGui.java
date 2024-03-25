@@ -77,13 +77,13 @@ public class MutateGui extends InventoryGUI {
                         double passUseValue = new Random().nextDouble();
                         if (passUseValue <= game.getSettings().getPassUseChance()) {
                             if (!game.getSettings().isUnlimitedPasses()) {
-                                player.changeStat("sg_mutation_passes", 1, StatOperator.SUBTRACT);
+                                player.getStats().addMutationPasses(-1);
                             }
                         } else {
                             player.sendMessage(MsgType.INFO + "&aYou got lucky and you did not use a pass for this mutation!");
                         }
 
-                        player.changeStat("sg_times_mutated", 1, StatOperator.ADD);
+                        player.getStats().addTimesMutated(1);
 
                         Mutation mutation = Mutation.createInstance(type, player.getUniqueId(), gamePlayer.getKiller());
                         gamePlayer.setMutation(mutation);

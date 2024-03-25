@@ -1,13 +1,12 @@
 package com.thenexusreborn.survivalgames.hooks;
 
-import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.game.GameTeam;
+import com.thenexusreborn.survivalgames.util.SGPlayerStats;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 
@@ -25,10 +24,10 @@ public class SGPAPIExpansion extends PlaceholderExpansion {
      */
     @Override
     public String onPlaceholderRequest(Player player, String params) {
-        NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(player.getUniqueId());
+        SGPlayerStats stats = SurvivalGames.PLAYER_STATS.get(player.getUniqueId());
         
         if (params.equalsIgnoreCase("score")) {
-            return MCUtils.formatNumber(nexusPlayer.getStatValue("sg_score").getAsInt());
+            return MCUtils.formatNumber(stats.getScore());
         }
         
         if (params.equalsIgnoreCase("displayname")) {

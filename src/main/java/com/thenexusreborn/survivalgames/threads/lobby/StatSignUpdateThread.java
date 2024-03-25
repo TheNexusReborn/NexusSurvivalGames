@@ -37,7 +37,7 @@ public class StatSignUpdateThread extends NexusThread<SurvivalGames> {
                     continue;
                 }
                 
-                String[] lines = {MCUtils.color("&n" + statSign.getDisplayName()), "", lobbyPlayer.getStatValue(statSign.getStat()).get().toString(), ""};
+                String[] lines = {MCUtils.color("&n" + statSign.getDisplayName()), "", lobbyPlayer.getStats().getValue(statSign.getStat()) + "", ""};
                 player.sendSignChange(statSign.getLocation(), lines);
             }
         }

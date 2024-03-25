@@ -2,14 +2,11 @@ package com.thenexusreborn.survivalgames.game;
 
 import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.starlib.Pair;
-import com.stardevllc.starlib.Value;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.PlayerBalance;
 import com.thenexusreborn.api.player.PlayerTags;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
-import com.thenexusreborn.api.stats.StatChange;
-import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.nexuscore.util.ArmorType;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -18,6 +15,7 @@ import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
 import com.thenexusreborn.survivalgames.scoreboard.GameTablistHandler;
 import com.thenexusreborn.survivalgames.scoreboard.game.GameBoard;
+import com.thenexusreborn.survivalgames.util.SGPlayerStats;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -49,29 +47,27 @@ public class GamePlayer {
     private DamageInfo damageInfo;
     private Map<Long, DeathInfo> deaths = new TreeMap<>();
     private Status status;
+    private SGPlayerStats stats;
     
-    public GamePlayer(NexusPlayer nexusPlayer, Game game) {
+    public GamePlayer(NexusPlayer nexusPlayer, Game game, SGPlayerStats stats) {
         this.nexusPlayer = nexusPlayer;
         this.game = game;
         this.bounty = new Bounty(nexusPlayer.getUniqueId());
         this.combatTag = new CombatTag(nexusPlayer.getUniqueId());
         this.damageInfo = new DamageInfo(nexusPlayer.getUniqueId());
+        this.stats = stats;
     }
-    
+
+    public SGPlayerStats getStats() {
+        return stats;
+    }
+
     public PlayerBalance getBalance() {
         return this.nexusPlayer.getBalance();
     }
     
     public PlayerTags getTags() {
         return this.nexusPlayer.getTags();
-    }
-
-    public StatChange changeStat(String statName, Object value, StatOperator operator) {
-        return getNexusPlayer().changeStat(statName, value, operator).push(); //TODO Change how this works eventually
-    }
-
-    public Value getStatValue(String statName) {
-        return getNexusPlayer().getStatValue(statName);
     }
 
     public String getColoredName() {
@@ -241,7 +237,7 @@ public class GamePlayer {
             return new Pair<>(false, "You cannot mutate more than " + game.getSettings().getMaxMutationAmount() + " times.");
         }
 
-        if (getStatValue("sg_mutation_passes").getAsInt() <= 0 && !game.getSettings().isUnlimitedPasses()) {
+        if (getStats().getMutationPasses() <= 0 && !game.getSettings().isUnlimitedPasses()) {
             return new Pair<>(false, "You do not have any mutation passes.");
         }
 
@@ -346,22 +342,22 @@ public class GamePlayer {
     }
     
     private String generateStatLine(String title, String statName) {
-        return "&f" + title + ": &e" + getStatValue(statName).getAsInt();
+        return "&f" + title + ": &e" + getStats().getValue(statName); //TODO
     }
     
     public List<String> getMenuStats() {
         List<String> stats = new LinkedList<>();
-        stats.add(generateStatLine("Score", "sg_score"));
-        stats.add(generateStatLine("Players Killed", "sg_kills"));
-        stats.add(generateStatLine("Highest Killstreak", "sg_highest_kill_streak"));
-        stats.add(generateStatLine("Games Won", "sg_wins"));
-        stats.add(generateStatLine("Deaths", "sg_deaths"));
-        stats.add(generateStatLine("Passes Used", "sg_times_mutated"));
-        stats.add(generateStatLine("Mutation Kills", "sg_mutation_kills"));
-        stats.add(generateStatLine("Mutation Deaths", "sg_mutation_deaths"));
-        stats.add(generateStatLine("Deathmatches Reached", "sg_deathmatches_reached"));
-        stats.add(generateStatLine("Chests Looted", "sg_chests_looted"));
-        stats.add(generateStatLine("Mutation Passes", "sg_mutation_passes"));
+        stats.add(generateStatLine("Score", "score"));
+        stats.add(generateStatLine("Players Killed", "kills"));
+        stats.add(generateStatLine("Highest Killstreak", "highestkillstreak"));
+        stats.add(generateStatLine("Games Won", "wins"));
+        stats.add(generateStatLine("Deaths", "deaths"));
+        stats.add(generateStatLine("Passes Used", "timesmutated"));
+        stats.add(generateStatLine("Mutation Kills", "mutation_kills"));
+        stats.add(generateStatLine("Mutation Deaths", "mutationdeaths"));
+        stats.add(generateStatLine("Deathmatches Reached", "deathmatchesreached"));
+        stats.add(generateStatLine("Chests Looted", "chestslooted"));
+        stats.add(generateStatLine("Mutation Passes", "mutationpasses"));
         return stats;
     }
     
@@ -413,7 +409,7 @@ public class GamePlayer {
                 if (game.getSettings().isUnlimitedPasses()) {
                     passes = "Unlimited";
                 } else {
-                    passes = getStatValue("sg_mutation_passes").getAsInt() + "";
+                    passes = getStats().getMutationPasses() + "";
                 }
                 mutateName = "&c&lTAKE REVENGE   &eTarget: " + killer.getColoredName() + "   &ePasses: &b" + passes;
             }

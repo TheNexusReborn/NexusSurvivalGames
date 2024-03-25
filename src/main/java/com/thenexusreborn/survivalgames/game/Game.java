@@ -13,7 +13,6 @@ import com.thenexusreborn.api.helper.NumberHelper;
 import com.thenexusreborn.api.helper.StringHelper;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
-import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.api.tags.Tag;
 import com.thenexusreborn.disguise.DisguiseAPI;
 import com.thenexusreborn.disguise.disguisetypes.MobDisguise;
@@ -42,6 +41,7 @@ import com.thenexusreborn.survivalgames.mutations.MutationItem;
 import com.thenexusreborn.survivalgames.mutations.MutationType;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.sponsoring.SponsorManager;
+import com.thenexusreborn.survivalgames.util.SGPlayerStats;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -115,7 +115,7 @@ public class Game {
         List<String> playerNames = new ArrayList<>();
         int tributeCount = 0;
         for (LobbyPlayer player : players) {
-            GamePlayer gamePlayer = new GamePlayer(player.getPlayer(), this);
+            GamePlayer gamePlayer = new GamePlayer(player.getPlayer(), this, player.getStats());
             if (player.isSpectating()) {
                 gamePlayer.setTeam(GameTeam.SPECTATORS);
             } else {
@@ -221,8 +221,8 @@ public class Game {
         return restockTimer;
     }
 
-    public void addPlayer(NexusPlayer nexusPlayer) {
-        GamePlayer gamePlayer = new GamePlayer(nexusPlayer, this);
+    public void addPlayer(NexusPlayer nexusPlayer, SGPlayerStats stats) {
+        GamePlayer gamePlayer = new GamePlayer(nexusPlayer, this, stats);
         gamePlayer.setStatus(GamePlayer.Status.ADDING_TO_GAME);
         gamePlayer.setTeam(GameTeam.SPECTATORS);
         gamePlayer.sendMessage(GameTeam.SPECTATORS.getJoinMessage());
@@ -513,7 +513,7 @@ public class Game {
             for (GamePlayer player : this.players.values()) {
                 if (player.getTeam() == GameTeam.TRIBUTES) {
                     tributes.add(player.getUniqueId());
-                    player.changeStat("sg_deathmatches_reached", 1, StatOperator.ADD);
+                    player.getStats().addDeathmatchesReached(1);
                 } else {
                     spectators.add(player.getUniqueId());
                 }
@@ -613,7 +613,7 @@ public class Game {
         GamePlayer winner = null;
         for (GamePlayer player : this.players.values()) {
             if (player.getTeam() == GameTeam.TRIBUTES) {
-                player.changeStat("sg_games", 1, StatOperator.ADD);
+                player.getStats().addGames(1);
                 if (winner == null) {
                     winner = player;
                 } else {
@@ -633,10 +633,10 @@ public class Game {
         sendMessage("&6&l>> " + winnerName + " &a&lhas won Survival Games!");
 
         if (winner != null) {
-            winner.changeStat("sg_wins", 1, StatOperator.ADD);
-            winner.changeStat("sg_win_streak", 1, StatOperator.ADD);
+            winner.getStats().addWins(1);
+            winner.getStats().addWinStreak(1);
             double winGain = settings.getWinScoreBaseGain();
-            int currentScore = winner.getStatValue("sg_score").getAsInt();
+            int currentScore = winner.getStats().getScore();
             if (currentScore < 100 && currentScore > 50) {
                 winGain *= 1.25;
             } else if (currentScore <= 50 && currentScore > 25) {
@@ -648,7 +648,7 @@ public class Game {
             } else if (currentScore >= 1000) {
                 winGain *= .5;
             }
-            winner.changeStat("sg_score", (int) winGain, StatOperator.ADD);
+            winner.getStats().addScore((int) winGain);
             winner.sendMessage("&2&l>> &a+" + (int) winGain + " Score!");
             double multiplier = winner.getRank().getMultiplier();
             Rank rank = winner.getRank();
@@ -693,7 +693,7 @@ public class Game {
 
             double passWinValue = new Random().nextDouble();
             if (passWinValue <= getSettings().getPassRewardChance()) {
-                winner.changeStat("sg_mutation_passes", 1, StatOperator.ADD);
+                winner.getStats().addMutationPasses(1);
                 winner.sendMessage("&2&l>> &a&lYou won a mutation pass! Great job!");
             } else {
                 winner.sendMessage(MsgType.INFO + "You did not win a mutation pass this time.");
@@ -707,7 +707,7 @@ public class Game {
                     if (type == Type.CREDIT) {
                         winner.getBalance().addCredits(amount);
                     } else if (type == Type.SCORE) {
-                        winner.changeStat("sg_score", (int) amount, StatOperator.ADD);
+                        winner.getStats().addScore((int) amount);
                     }
                 }
             }
@@ -809,7 +809,7 @@ public class Game {
         gamePlayer.setDeathByMutation(killer != null && killer.isMutationKill());
 
         boolean deathByVanish = deathInfo.getType() == DeathType.VANISH;
-        int score = gamePlayer.getStatValue("sg_score").getAsInt();
+        int score = gamePlayer.getStats().getScore();
         int lost = (int) Math.ceil(score / settings.getScoreDivisor());
         if (score - lost < 0) {
             lost = 0;
@@ -817,13 +817,13 @@ public class Game {
 
         if (!(deathByVanish || deathByLeave)) {
             if (lost > 0) {
-                gamePlayer.changeStat("sg_score", lost, StatOperator.SUBTRACT);
+                gamePlayer.getStats().addScore(-lost);
             }
-            gamePlayer.changeStat("sg_games", 1, StatOperator.ADD);
-            gamePlayer.changeStat("sg_win_streak", 0, StatOperator.SET);
-            gamePlayer.changeStat("sg_deaths", 1, StatOperator.ADD);
+            gamePlayer.getStats().addGames(1);
+            gamePlayer.getStats().setWinStreak(0);
+            gamePlayer.getStats().addDeaths(1);
             if (oldTeam == GameTeam.MUTATIONS) {
-                gamePlayer.changeStat("sg_mutation_deaths", 1, StatOperator.ADD);
+                gamePlayer.getStats().addMutationDeaths(1);
             }
         }
 
@@ -857,15 +857,15 @@ public class Game {
                 bounty.remove(Bounty.Type.SCORE);
             }
 
-            killerPlayer.changeStat("sg_score", scoreGain, StatOperator.ADD);
+            killerPlayer.getStats().addScore(scoreGain);
 
             killerPlayer.setKillStreak(killerPlayer.getKillStreak() + 1);
             currentStreak = killerPlayer.getKillStreak();
             killerPlayer.setKills(killerPlayer.getKills() + 1);
-            personalBest = killerPlayer.getStatValue("sg_highest_kill_streak").getAsInt();
+            personalBest = killerPlayer.getStats().getHighestKillstreak();
 
             if (currentStreak > personalBest) {
-                killerPlayer.changeStat("sg_highest_kill_streak", currentStreak, StatOperator.SET);
+                killerPlayer.getStats().setHighestKillstreak(currentStreak);
             }
 
             if (getSettings().isGiveXp()) {
@@ -899,9 +899,9 @@ public class Game {
                 killerPlayer.getBalance().addNexites(nexiteGain);
             }
 
-            killerPlayer.changeStat("sg_kills", 1, StatOperator.ADD);
+            killerPlayer.getStats().addKills(1);
             if (killer.isMutationKill()) {
-                killerPlayer.changeStat("sg_mutation_kills", 1, StatOperator.ADD);
+                killerPlayer.getStats().addMutationKills(1);
                 removeMutation(killerPlayer.getMutation());
                 killerPlayer.sendMessage(killerPlayer.getTeam().getLeaveMessage());
                 killerPlayer.setTeam(GameTeam.TRIBUTES);
@@ -921,7 +921,7 @@ public class Game {
 
                     GamePlayer assisterPlayer = getPlayer(damager);
                     assisterPlayer.setAssists(assisterPlayer.getAssists() + 1);
-                    assisterPlayer.changeStat("sg_assists", 1, StatOperator.ADD);
+                    assisterPlayer.getStats().addAssists(1);
                     assistors.add(new AssisterInfo(this, assisterPlayer));
                     this.gameInfo.getActions().add(new GameAction(System.currentTimeMillis(), "assist", assisterPlayer.getName() + " assisted the death of " + gamePlayer.getName()));
                 }

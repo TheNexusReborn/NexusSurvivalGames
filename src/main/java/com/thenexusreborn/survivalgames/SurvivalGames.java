@@ -28,6 +28,7 @@ import com.thenexusreborn.survivalgames.listener.EntityListener;
 import com.thenexusreborn.survivalgames.listener.PlayerListener;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
+import com.thenexusreborn.survivalgames.lobby.StatSign;
 import com.thenexusreborn.survivalgames.map.SQLMapManager;
 import com.thenexusreborn.survivalgames.mutations.PlayerMutations;
 import com.thenexusreborn.survivalgames.mutations.UnlockedMutation;
@@ -40,6 +41,7 @@ import com.thenexusreborn.survivalgames.settings.object.enums.Weather;
 import com.thenexusreborn.survivalgames.threads.ServerStatusThread;
 import com.thenexusreborn.survivalgames.threads.game.*;
 import com.thenexusreborn.survivalgames.threads.lobby.*;
+import com.thenexusreborn.survivalgames.util.SGPlayerStats;
 import me.firestar311.starsql.api.objects.SQLDatabase;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -47,13 +49,18 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
+import java.lang.reflect.Field;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
 
 public class SurvivalGames extends NexusSpigotPlugin {
 
     public static final String MAP_URL = "https://starmediadev.com/files/nexusreborn/sgmaps/";
     public static final Queue<UUID> PLAYER_QUEUE = new LinkedList<>();
+    public static final Map<UUID, SGPlayerStats> PLAYER_STATS = new HashMap<>();
 
     private NexusCore nexusCore;
     private StarChat starChat;
@@ -105,7 +112,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         deathMessagesConfig = YamlConfiguration.loadConfiguration(deathMessagesFile);
 
         getLogger().info("Loading Game and Lobby Settings");
-        
+
         registerDefaultSettings();
 
         this.lobbySettings.put("default", new LobbySettings());
@@ -212,6 +219,71 @@ public class SurvivalGames extends NexusSpigotPlugin {
 
             return line1 + "\n" + line2;
         });
+
+        boolean migrate = false;
+        if (!getConfig().contains("migration")) {
+            migrate = true;
+        } else {
+            if (!getConfig().getString("migration").equals("1.16-ALPHA")) {
+                migrate = true;
+            }
+        }
+
+        if (migrate) {
+            getLogger().info("Detected that data migration is needed...");
+            
+            getConfig().set("statsigns", null);
+            saveConfig();
+
+            for (StatSign statSign : this.getLobby().getStatSigns()) {
+                statSign.setStat(statSign.getStat().toLowerCase().replace("sg_", "").replace("_", ""));
+            }
+            getLogger().info("Migrated stat signs to use the new stat naming scheme.");
+            
+            try {
+                Map<UUID, SGPlayerStats> playerStats = new HashMap<>();
+                for (SGPlayerStats stats : database.get(SGPlayerStats.class)) {
+                    playerStats.put(stats.getUniqueId(), stats);
+                }
+                
+                Map<String, Field> fields = SGPlayerStats.getFields();
+                
+                List<Integer> deleteIds = new ArrayList<>();
+
+                try (Connection connection = database.getConnection(); Statement statement = connection.createStatement()) {
+                    ResultSet resultSet = statement.executeQuery("SELECT `id`, `uuid`, `name`, `value` FROM `stats` WHERE `name` LIKE 'sg_%'");
+                    while (resultSet.next()) {
+                        UUID uuid = UUID.fromString(resultSet.getString("uuid"));
+                        SGPlayerStats stats = playerStats.computeIfAbsent(uuid, SGPlayerStats::new);
+                        String statName = resultSet.getString("name").toLowerCase().replace("sg_", "").replace("_", "");
+                        int value = Integer.parseInt(resultSet.getString("value").split(":")[1]);
+                        try {
+                            fields.get(statName).set(stats, value);
+                            deleteIds.add(resultSet.getInt("id"));
+                        } catch (Exception e) {
+                            getLogger().severe("Could not set field for stat " + statName + " for player " + uuid);
+                            getLogger().severe(e.getClass().getSimpleName() + ": " + e.getMessage());
+                        }
+                    }
+
+                    for (Integer id : deleteIds) {
+                        statement.execute("DELETE FROM `stats` WHERE `id`='" + id + "';");
+                    }
+                    getLogger().info("Deleted " + deleteIds.size() + " stats from old stat system.");
+                }
+
+                for (SGPlayerStats stats : playerStats.values()) {
+                    database.save(stats);
+                }
+                getLogger().info("Migrated new stats from the old system.");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            
+            getLogger().info("Migration complete.");
+            getConfig().set("migration", getDescription().getVersion());
+            saveConfig();
+        }
     }
 
     private void registerDefaultSettings() {
@@ -311,22 +383,22 @@ public class SurvivalGames extends NexusSpigotPlugin {
 
     @Override
     public void registerStats(StatRegistry registry) {
-        registry.register("sg_score", "Score", StatType.INTEGER, 100);
-        registry.register("sg_kills", "Kills", StatType.INTEGER, 0);
-        registry.register("sg_highest_kill_streak", "Highest Kill Streak", StatType.INTEGER, 0);
-        registry.register("sg_games", "Total Games", StatType.INTEGER, 0);
-        registry.register("sg_wins", "Total Wins", StatType.INTEGER, 0);
-        registry.register("sg_win_streak", "Winstreak", StatType.INTEGER, 0);
-        registry.register("sg_deaths", "Deaths", StatType.INTEGER, 0);
-        registry.register("sg_deathmatches_reached", "Deathmatches Reached", StatType.INTEGER, 0);
-        registry.register("sg_chests_looted", "Chests Looted", StatType.INTEGER, 0);
-        registry.register("sg_assists", "Kill Assists", StatType.INTEGER, 0);
-        registry.register("sg_times_mutated", "Times Mutated", StatType.INTEGER, 0);
-        registry.register("sg_mutation_kills", "Kills as a Mutation", StatType.INTEGER, 0);
-        registry.register("sg_mutation_deaths", "Deaths as a Mutation", StatType.INTEGER, 0);
-        registry.register("sg_mutation_passes", "Mutation Passes", StatType.INTEGER, 0);
-        registry.register("sg_sponsored_others", "Times Sponsored Others", StatType.INTEGER, 0);
-        registry.register("sg_sponsors_received", "Times Sponsored By Others", StatType.INTEGER, 0);
+        registry.register("sg_score", "Score", StatType.INTEGER, 100); //TODO Remove after migration
+        registry.register("sg_kills", "Kills", StatType.INTEGER, 0); //TODO Remove after migration
+        registry.register("sg_highest_kill_streak", "Highest Kill Streak", StatType.INTEGER, 0); //TODO Remove after migration
+        registry.register("sg_games", "Total Games", StatType.INTEGER, 0); //TODO Remove after migration
+        registry.register("sg_wins", "Total Wins", StatType.INTEGER, 0); //TODO Remove after migration
+        registry.register("sg_win_streak", "Winstreak", StatType.INTEGER, 0); //TODO Remove after migration
+        registry.register("sg_deaths", "Deaths", StatType.INTEGER, 0); //TODO Remove after migration
+        registry.register("sg_deathmatches_reached", "Deathmatches Reached", StatType.INTEGER, 0); //TODO Remove after migration
+        registry.register("sg_chests_looted", "Chests Looted", StatType.INTEGER, 0); //TODO Remove after migration
+        registry.register("sg_assists", "Kill Assists", StatType.INTEGER, 0); //TODO Remove after migration
+        registry.register("sg_times_mutated", "Times Mutated", StatType.INTEGER, 0); //TODO Remove after migration
+        registry.register("sg_mutation_kills", "Kills as a Mutation", StatType.INTEGER, 0); //TODO Remove after migration
+        registry.register("sg_mutation_deaths", "Deaths as a Mutation", StatType.INTEGER, 0); //TODO Remove after migration
+        registry.register("sg_mutation_passes", "Mutation Passes", StatType.INTEGER, 0); //TODO Remove after migration
+        registry.register("sg_sponsored_others", "Times Sponsored Others", StatType.INTEGER, 0); //TODO Remove after migration
+        registry.register("sg_sponsors_received", "Times Sponsored By Others", StatType.INTEGER, 0); //TODO Remove after migration
     }
 
     @Override
@@ -419,6 +491,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
     public void registerDatabases(DatabaseRegistry registry) {
         for (SQLDatabase database : registry.getObjects().values()) {
             if (database.getName().toLowerCase().contains("nexus")) { //TODO Temporary
+                database.registerClass(SGPlayerStats.class);
                 database.registerClass(UnlockedMutation.class);
                 database.registerClass(MapRating.class);
                 database.registerClass(SGMap.class);

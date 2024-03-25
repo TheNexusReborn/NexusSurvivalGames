@@ -130,7 +130,7 @@
         <dependency>
             <groupId>com.github.Firestar311.StarSQL</groupId>
             <artifactId>mysql</artifactId>
-            <version>4d10fd9f70</version>
+            <version>42863fe3e2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

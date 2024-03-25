@@ -3,7 +3,6 @@ package com.thenexusreborn.survivalgames.menu;
 import com.stardevllc.starui.element.button.Button;
 import com.stardevllc.starui.gui.InventoryGUI;
 import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -64,7 +63,7 @@ public class SponsorMenu extends InventoryGUI {
                 if (currency.equalsIgnoreCase("credits")) {
                     amount = (int) actor.getBalance().getCredits();
                 } else {
-                    amount = actor.getStatValue(currency).getAsInt();
+                    amount = actor.getStats().getScore();
                 }
                 if (amount < cost) {
                     actor.sendMessage(MsgType.WARN + "You do not have enough " + NexusAPI.getApi().getStatRegistry().get(currency).getDisplayName() + ".");
@@ -74,15 +73,16 @@ public class SponsorMenu extends InventoryGUI {
                 if (currency.equalsIgnoreCase("credits")) {
                     actor.getBalance().addCredits(-cost);
                 } else {
-                    actor.changeStat(currency, cost, StatOperator.SUBTRACT).push();
+                    actor.getStats().addScore(-cost);
                 }
                 actor.setSponsored(true);
 
                 Object chosen = category.getEntries().get(new Random().nextInt(category.getEntries().size()));
                 category.apply(Bukkit.getPlayer(target.getUniqueId()), chosen);
                 plugin.getGame().sendMessage("&6&l>> " + target.getColoredName() + " &awas &lSPONSORED &aa(n) &l" + category.getName() + " item &aby " + actor.getColoredName() + "&a!");
-                actor.changeStat("sg_sponsored_others", 1, StatOperator.ADD).push();
-                target.changeStat("sg_sponsors_received", 1, StatOperator.ADD).push();
+                
+                actor.getStats().addSponsoredOthers(1);
+                target.getStats().addSponsorsReceived(1);
             });
             addElement(button);
         }

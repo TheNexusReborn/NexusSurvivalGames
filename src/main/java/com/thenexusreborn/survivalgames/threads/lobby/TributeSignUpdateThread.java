@@ -75,13 +75,13 @@ public class TributeSignUpdateThread extends NexusThread<SurvivalGames> {
             } else {
                 name = lobbyPlayer.getName();
             }
-            int score = lobbyPlayer.getStatValue("sg_score").getAsInt();
-            int kills = lobbyPlayer.getStatValue("sg_kills").getAsInt();
-            int wins = lobbyPlayer.getStatValue("sg_wins").getAsInt();
+            int score = lobbyPlayer.getStats().getScore();
+            int kills = lobbyPlayer.getStats().getKills();
+            int wins = lobbyPlayer.getStats().getWins();
             skull.setOwner(player.getName());
             skull.update();
     
-            String[] lines = {name, "Score: " + score + "", "Kills: " + kills + "", "Wins: " + wins + ""};
+            String[] lines = {name, "Score: " + score, "Kills: " + kills, "Wins: " + wins};
     
             for (Player op : Bukkit.getOnlinePlayers()) {
                 if (op.getWorld() == tributeSign.getSignLocation().getWorld()) {

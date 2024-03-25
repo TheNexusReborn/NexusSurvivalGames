@@ -26,6 +26,7 @@ import com.thenexusreborn.survivalgames.scoreboard.lobby.LobbyBoard;
 import com.thenexusreborn.survivalgames.scoreboard.lobby.MapEditingBoard;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.settings.LobbySettings;
+import com.thenexusreborn.survivalgames.util.SGPlayerStats;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ClickEvent.Action;
@@ -124,7 +125,7 @@ public class Lobby {
         this.lobbySettings = plugin.getLobbySettings("default");
         this.gameSettings = plugin.getGameSettings("default");
         
-        this.lobbyChatRoom = new ChatRoom(plugin, "room-lobby-" + getLocalId(), Actor.getServerActor(), "&8<&3%nexussg_score%&8> &8(&2&l%nexuscore_level%&8) &r%nexuscore_displayname%%nexuscore_tag%&8: {message}", "{message}");
+        this.lobbyChatRoom = new ChatRoom(plugin, "room-lobby-" + getLocalId(), Actor.getServerActor(), "&8<&3%nexussg_score%&8> &8(&2&l%nexuscore_level%&8) &r%nexuscore_displayname%%nexuscore_tag%&8: %nexuscore_chatcolor%{message}", "{message}");
         plugin.getStarChat().getRoomRegistry().register(this.lobbyChatRoom.getSimplifiedName(), this.lobbyChatRoom);
 
         generateMapOptions();
@@ -443,7 +444,7 @@ public class Lobby {
         return gameMap;
     }
 
-    public void addPlayer(NexusPlayer nexusPlayer) {
+    public void addPlayer(NexusPlayer nexusPlayer, SGPlayerStats stats) {
         if (nexusPlayer == null) {
             return;
         }
@@ -451,8 +452,8 @@ public class Lobby {
         if (nexusPlayer.getPlayer() == null) {
             return;
         }
-
-        this.players.put(nexusPlayer.getUniqueId(), new LobbyPlayer(nexusPlayer));
+        
+        this.players.put(nexusPlayer.getUniqueId(), new LobbyPlayer(nexusPlayer, stats));
         this.lobbyChatRoom.addMember(nexusPlayer.getUniqueId(), DefaultPermissions.VIEW_MESSAGES, DefaultPermissions.SEND_MESSAGES);
         this.plugin.getStarChat().setPlayerFocus(Bukkit.getPlayer(nexusPlayer.getUniqueId()), this.lobbyChatRoom);
 
@@ -643,7 +644,7 @@ public class Lobby {
 
         for (Player player : Bukkit.getOnlinePlayers()) {
             NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(player.getUniqueId());
-            addPlayer(nexusPlayer);
+            addPlayer(nexusPlayer, SurvivalGames.PLAYER_STATS.get(player.getUniqueId()));
         }
 
         plugin.getGame().getGameMap().removeFromServer(plugin);

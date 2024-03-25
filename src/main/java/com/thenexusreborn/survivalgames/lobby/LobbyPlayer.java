@@ -1,21 +1,27 @@
 package com.thenexusreborn.survivalgames.lobby;
 
-import com.stardevllc.starlib.Value;
 import com.thenexusreborn.api.player.IActionBar;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
+import com.thenexusreborn.survivalgames.util.SGPlayerStats;
 
 import java.util.UUID;
 
 public class LobbyPlayer {
     private final NexusPlayer player;
+    private SGPlayerStats stats;
     private boolean spectating, voteStart;
     private int mapVote = -1;
     
-    public LobbyPlayer(NexusPlayer player) {
+    public LobbyPlayer(NexusPlayer player, SGPlayerStats stats) {
         this.player = player;
+        this.stats = stats;
     }
-    
+
+    public SGPlayerStats getStats() {
+        return stats;
+    }
+
     public void setSpectating(boolean spectating) {
         this.spectating = spectating;
     }
@@ -72,10 +78,6 @@ public class LobbyPlayer {
         this.player.setActionBar(actionBar);
     }
     
-    public Value getStatValue(String statName) {
-        return getPlayer().getStatValue(statName);
-    }
-
     @Override
     public String toString() {
         return "LobbyPlayer{" +
