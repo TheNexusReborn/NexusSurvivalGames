@@ -31,7 +31,7 @@ public class MutateGui extends InventoryGUI {
             unlockedMutations.add(new UnlockedMutation(player.getUniqueId(), "pig_zombie", player.getStatValue("firstjoined").getAsLong()));
         }
 
-        double credits = player.getStatValue("credits").getAsDouble();
+        double credits = player.getBalance().getCredits();
     
         List<String> purchased = new ArrayList<>(), available = new ArrayList<>(), locked = new ArrayList<>();
         for (MutationType type : MutationType.TYPES) {

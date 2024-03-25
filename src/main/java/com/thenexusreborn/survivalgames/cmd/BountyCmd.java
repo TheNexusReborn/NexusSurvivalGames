@@ -81,11 +81,11 @@ public class BountyCmd implements CommandExecutor {
             }
             max = game.getSettings().getMaxScoreBounty();
         } else if (type == Type.CREDIT) {
-            if (senderPlayer.getStatValue("credits").getAsInt() < amount) {
+            if (senderPlayer.getBalance().getCredits() < amount) {
                 senderPlayer.sendMessage(MsgType.WARN + "You do not have enough credits to set a bounty of " + amount);
                 return true;
             } else {
-                senderPlayer.changeStat("credits", amount, StatOperator.SUBTRACT);
+                senderPlayer.getBalance().setCredits(senderPlayer.getBalance().getCredits() - amount);
             }
             max = game.getSettings().getMaxCreditBounty();
         }

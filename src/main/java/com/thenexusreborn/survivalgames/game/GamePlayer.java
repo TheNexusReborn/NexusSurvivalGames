@@ -4,6 +4,7 @@ import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.starlib.Pair;
 import com.stardevllc.starlib.Value;
 import com.thenexusreborn.api.player.NexusPlayer;
+import com.thenexusreborn.api.player.PlayerBalance;
 import com.thenexusreborn.api.player.PlayerTags;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
@@ -55,6 +56,10 @@ public class GamePlayer {
         this.bounty = new Bounty(nexusPlayer.getUniqueId());
         this.combatTag = new CombatTag(nexusPlayer.getUniqueId());
         this.damageInfo = new DamageInfo(nexusPlayer.getUniqueId());
+    }
+    
+    public PlayerBalance getBalance() {
+        return this.nexusPlayer.getBalance();
     }
     
     public PlayerTags getTags() {

@@ -60,13 +60,22 @@ public class SponsorMenu extends InventoryGUI {
                     return;
                 }
 
-                int amount = actor.getStatValue(currency).getAsInt();
+                int amount;
+                if (currency.equalsIgnoreCase("credits")) {
+                    amount = (int) actor.getBalance().getCredits();
+                } else {
+                    amount = actor.getStatValue(currency).getAsInt();
+                }
                 if (amount < cost) {
                     actor.sendMessage(MsgType.WARN + "You do not have enough " + NexusAPI.getApi().getStatRegistry().get(currency).getDisplayName() + ".");
                     return;
                 }
-
-                actor.changeStat(currency, cost, StatOperator.SUBTRACT).push();
+                
+                if (currency.equalsIgnoreCase("credits")) {
+                    actor.getBalance().setCredits(actor.getBalance().getCredits() - cost);
+                } else {
+                    actor.changeStat(currency, cost, StatOperator.SUBTRACT).push();
+                }
                 actor.setSponsored(true);
 
                 Object chosen = category.getEntries().get(new Random().nextInt(category.getEntries().size()));

@@ -71,14 +71,23 @@ public class SwagShackMenu extends InventoryGUI {
                 } else {
                     return;
                 }
-                
-                int amount = player.getStatValue(currency).getAsInt();
+
+                int amount;
+                if (currency.equalsIgnoreCase("credits")) {
+                    amount = (int) player.getBalance().getCredits();
+                } else {
+                    amount = player.getStatValue(currency).getAsInt();
+                }
                 if (amount < cost) {
                     player.sendMessage(MsgType.WARN + "You do not have enough " + NexusAPI.getApi().getStatRegistry().get(currency).getDisplayName() + " to buy this item.");
                     return;
                 }
 
-                player.changeStat(currency, cost, StatOperator.SUBTRACT).push();
+                if (currency.equalsIgnoreCase("credits")) {
+                    player.getBalance().setCredits(player.getBalance().getCredits() - cost);
+                } else {
+                    player.changeStat(currency, cost, StatOperator.SUBTRACT).push();
+                }
                 e.getWhoClicked().getInventory().addItem(item.getItem().getItemStack());
             });
             
