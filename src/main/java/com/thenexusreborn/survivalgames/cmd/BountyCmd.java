@@ -85,7 +85,7 @@ public class BountyCmd implements CommandExecutor {
                 senderPlayer.sendMessage(MsgType.WARN + "You do not have enough credits to set a bounty of " + amount);
                 return true;
             } else {
-                senderPlayer.getBalance().setCredits(senderPlayer.getBalance().getCredits() - amount);
+                senderPlayer.getBalance().addCredits(-amount);
             }
             max = game.getSettings().getMaxCreditBounty();
         }

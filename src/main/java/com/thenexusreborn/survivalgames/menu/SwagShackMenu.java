@@ -84,7 +84,7 @@ public class SwagShackMenu extends InventoryGUI {
                 }
 
                 if (currency.equalsIgnoreCase("credits")) {
-                    player.getBalance().setCredits(player.getBalance().getCredits() - cost);
+                    player.getBalance().addCredits(-cost);
                 } else {
                     player.changeStat(currency, cost, StatOperator.SUBTRACT).push();
                 }

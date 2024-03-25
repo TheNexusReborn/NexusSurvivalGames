@@ -28,7 +28,7 @@ public class MutateGui extends InventoryGUI {
         PlayerMutations unlockedMutations = plugin.getUnlockedMutations(player.getUniqueId());
 
         if (!unlockedMutations.isUnlocked("pig_zombie")) {
-            unlockedMutations.add(new UnlockedMutation(player.getUniqueId(), "pig_zombie", player.getStatValue("firstjoined").getAsLong()));
+            unlockedMutations.add(new UnlockedMutation(player.getUniqueId(), "pig_zombie", player.getNexusPlayer().getPlayerTime().getFirstJoined()));
         }
 
         double credits = player.getBalance().getCredits();

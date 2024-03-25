@@ -72,7 +72,7 @@ public class SponsorMenu extends InventoryGUI {
                 }
                 
                 if (currency.equalsIgnoreCase("credits")) {
-                    actor.getBalance().setCredits(actor.getBalance().getCredits() - cost);
+                    actor.getBalance().addCredits(-cost);
                 } else {
                     actor.changeStat(currency, cost, StatOperator.SUBTRACT).push();
                 }

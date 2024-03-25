@@ -668,7 +668,7 @@ public class Game {
             if (settings.isGiveCredits()) {
                 double credits = settings.getWinCreditsBaseGain();
                 credits *= multiplier;
-                winner.getBalance().setCredits(winner.getBalance().getCredits() + credits);
+                winner.getBalance().addCredits(credits);
                 String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(credits) + " &3&lCREDITS&a&l!";
                 if (multiplier > 1) {
                     winner.sendMessage(baseMessage + multiplierMessage);
@@ -705,7 +705,7 @@ public class Game {
                 if (amount > 0) {
                     sendMessage("&6&l>> For winning the game, " + winner.getColoredName() + " &6&l has kept their &b&l" + NumberHelper.formatNumber(amount) + " " + StringHelper.capitalizeEveryWord(type.name()) + " &6&lbounty!");
                     if (type == Type.CREDIT) {
-                        winner.getBalance().setCredits(winner.getBalance().getCredits() + amount);
+                        winner.getBalance().addCredits(amount);
                     } else if (type == Type.SCORE) {
                         winner.changeStat("sg_score", (int) amount, StatOperator.ADD);
                     }
@@ -887,7 +887,7 @@ public class Game {
                     bounty.remove(Bounty.Type.CREDIT);
                     claimedCreditBounty = true;
                 }
-                killerPlayer.getBalance().setCredits(killerPlayer.getBalance().getCredits() + creditGain);
+                killerPlayer.getBalance().addCredits(creditGain);
             }
 
             if (getSettings().isEarnNexites()) {
@@ -896,7 +896,7 @@ public class Game {
                     nexiteGain *= (int) killerRank.getMultiplier();
                 }
 
-                killerPlayer.getBalance().setNexites(killerPlayer.getBalance().getNexites() + nexiteGain);
+                killerPlayer.getBalance().addNexites(nexiteGain);
             }
 
             killerPlayer.changeStat("sg_kills", 1, StatOperator.ADD);
