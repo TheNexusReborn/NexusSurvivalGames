@@ -15,6 +15,7 @@ import org.bukkit.event.vehicle.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 
+@SuppressWarnings("DuplicatedCode")
 public class DisguiseListener implements Listener {
 
     private SurvivalGames plugin;

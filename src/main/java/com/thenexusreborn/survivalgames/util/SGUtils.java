@@ -1,6 +1,5 @@
 package com.thenexusreborn.survivalgames.util;
 
-import com.google.common.io.*;
 import com.thenexusreborn.api.scoreboard.wrapper.ITeam;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.util.*;
@@ -11,7 +10,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_8_R3.entity.*;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
 
 import java.lang.reflect.Field;
 
@@ -64,10 +62,7 @@ public final class SGUtils {
     }
     
     public static void sendToHub(Player player) {
-        ByteArrayDataOutput out = ByteStreams.newDataOutput();
-        out.writeUTF("Connect");
-        out.writeUTF("H1");
-        player.sendPluginMessage(plugin.getNexusCore(), "BungeeCord", out.toByteArray());
+        //TODO Handle this
     }
     
     public static String getMapNameFromCommand(String[] args, int startIndex) {
@@ -104,16 +99,6 @@ public final class SGUtils {
         }
         
         return gameMap;
-    }
-    
-    public static float getAngle(Vector point1, Vector point2) {
-        double dx = point2.getX() - point1.getX();
-        double dz = point2.getZ() - point1.getZ();
-        float angle = (float) Math.toDegrees(Math.atan2(dz, dx)) - 90;
-        if (angle < 0) {
-            angle += 360.0F;
-        }
-        return angle;
     }
     
     public static String getHandItemName(ItemStack handItem) {

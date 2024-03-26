@@ -1,14 +1,11 @@
 package com.thenexusreborn.survivalgames.listener;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import com.stardevllc.starlib.Pair;
 import com.stardevllc.starui.GuiManager;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.player.Toggle;
-import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.nexuscore.api.events.NexusPlayerLoadEvent;
 import com.thenexusreborn.nexuscore.api.events.ToggleChangeEvent;
 import com.thenexusreborn.nexuscore.util.MCUtils;
@@ -72,6 +69,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
 
+@SuppressWarnings("ExtractMethodRecommender")
 public class PlayerListener implements Listener {
     private final SurvivalGames plugin;
     private final GuiManager manager;
@@ -131,7 +129,7 @@ public class PlayerListener implements Listener {
                         if (item.getType() == Material.ENCHANTED_BOOK) {
                             ItemMeta itemMeta = item.getItemMeta();
                             String displayName = itemMeta.getDisplayName();
-                            if (displayName != null && !displayName.equals("")) {
+                            if (displayName != null && !displayName.isEmpty()) {
                                 GameTeam team = null;
                                 if (displayName.toLowerCase().contains("tributes")) {
                                     team = GameTeam.TRIBUTES;
@@ -734,16 +732,7 @@ public class PlayerListener implements Listener {
                 boolean isInVanish = nexusPlayer.getToggleValue("vanish");
                 if (!(isStaff && isInVanish)) {
                     nexusPlayer.sendMessage("&cThe lobby is full.");
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                            out.writeUTF("Connect");
-                            out.writeUTF("H1");
-                            Bukkit.getPlayer(nexusPlayer.getUniqueId()).sendPluginMessage(plugin.getNexusCore(), "BungeeCord", out.toByteArray());
-                        }
-                    }.runTaskLater(plugin, 10L);
-                    
+                    //TODO This will need to be handled.
                     return;
                 }
             }

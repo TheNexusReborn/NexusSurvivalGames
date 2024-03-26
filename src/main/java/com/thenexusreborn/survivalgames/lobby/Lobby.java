@@ -44,7 +44,6 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-@SuppressWarnings("DuplicatedCode")
 public class Lobby {
     private final SurvivalGames plugin;
     private int localId;

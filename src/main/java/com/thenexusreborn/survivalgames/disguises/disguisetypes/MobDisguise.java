@@ -9,6 +9,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
+@SuppressWarnings("DuplicatedCode")
 public class MobDisguise extends TargetedDisguise {
 
     private boolean isAdult;

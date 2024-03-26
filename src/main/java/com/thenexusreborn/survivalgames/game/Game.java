@@ -62,7 +62,7 @@ import java.util.stream.Stream;
 
 import static com.thenexusreborn.survivalgames.game.GameState.*;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "ExtractMethodRecommender"})
 public class Game {
     private static final SurvivalGames plugin = SurvivalGames.getPlugin(SurvivalGames.class);
     public static final TimeFormat SHORT_TIME_FORMAT = new TimeFormat("%*00h%%*#0m%%*#0s%");

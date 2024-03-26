@@ -76,7 +76,6 @@ public class EntityListener implements Listener {
                 }
             }
             
-            GameState state = game.getState();
             if (game.getState().ordinal() >= GameState.SETTING_UP.ordinal() && game.getState().ordinal() <= GameState.WARMUP_DONE.ordinal() ||
                     game.getState().ordinal() >= GameState.DEATHMATCH_WARMUP.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH_WARMUP_DONE.ordinal() ||
                     game.getState().ordinal() >= GameState.ENDING.ordinal() && game.getState().ordinal() <= GameState.ENDED.ordinal()) {
@@ -215,7 +214,7 @@ public class EntityListener implements Listener {
     public void onHealthRegen(EntityRegainHealthEvent e) {
         if (plugin.getGame() != null) {
             Game game = plugin.getGame();
-            if (e.getEntity() instanceof Player player) {
+            if (e.getEntity() instanceof Player) {
                 GamePlayer gamePlayer = game.getPlayer(e.getEntity().getUniqueId());
                 if (!game.getSettings().isRegeneration()) {
                     if (gamePlayer.getTeam() == GameTeam.TRIBUTES) {

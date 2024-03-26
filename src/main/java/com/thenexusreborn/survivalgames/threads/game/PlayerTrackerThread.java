@@ -109,7 +109,6 @@ public class PlayerTrackerThread extends NexusThread<SurvivalGames> {
 
             String health = NumberHelper.formatNumber(target.getHealth());
             String maxHealth = NumberHelper.formatNumber(target.getMaxHealth());
-            String targetName = "";
 
             if (holdingTracker) {
                 gamePlayer.setTrackerInfo(new TrackerInfo(target.getName(), (int) distance, health, maxHealth));

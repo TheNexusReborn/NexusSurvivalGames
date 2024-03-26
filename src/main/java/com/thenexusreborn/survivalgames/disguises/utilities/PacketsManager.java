@@ -49,6 +49,7 @@ import java.util.UUID;
 
 import static com.thenexusreborn.survivalgames.disguises.NexusDisguises.plugin;
 
+@SuppressWarnings({"DuplicatedCode", "ExtractMethodRecommender"})
 public class PacketsManager {
     /**
      * This is a fix for the stupidity that is
@@ -391,7 +392,7 @@ public class PacketsManager {
         switch (disguiseType) {
             case MINECART, MINECART_CHEST, MINECART_COMMAND, MINECART_FURNACE, MINECART_HOPPER, MINECART_MOB_SPAWNER, MINECART_TNT ->
                     value += 64;
-            case ENDER_DRAGON, WITHER_SKULL -> value -= 128;
+            case ENDER_DRAGON, WITHER_SKULL -> value -= (byte) 128;
             case ARROW -> value = (byte) -value;
             case PAINTING, ITEM_FRAME -> value = (byte) -(value + 128);
             default -> {
@@ -403,7 +404,7 @@ public class PacketsManager {
         switch (entityType) {
             case MINECART, MINECART_CHEST, MINECART_FURNACE, MINECART_HOPPER, MINECART_MOB_SPAWNER, MINECART_TNT ->
                     value -= 64;
-            case ENDER_DRAGON, WITHER_SKULL -> value += 128;
+            case ENDER_DRAGON, WITHER_SKULL -> value += (byte) 128;
             case ARROW -> value = (byte) -value;
             case PAINTING, ITEM_FRAME -> value = (byte) -(value - 128);
             default -> {

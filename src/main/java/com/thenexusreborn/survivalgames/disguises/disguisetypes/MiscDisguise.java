@@ -12,6 +12,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+@SuppressWarnings("DuplicatedCode")
 public class MiscDisguise extends TargetedDisguise {
 
     private int id, data;

@@ -24,7 +24,7 @@ import java.lang.reflect.*;
 import java.util.*;
 import java.util.regex.Pattern;
 
-@SuppressWarnings({"deprecation", "SuspiciousMethodCalls"})
+@SuppressWarnings({"deprecation", "SuspiciousMethodCalls", "DuplicatedCode", "ExtractMethodRecommender"})
 public class DisguiseUtilities {
 
     private static HashSet<String> addedByPlugins = new HashSet<>();

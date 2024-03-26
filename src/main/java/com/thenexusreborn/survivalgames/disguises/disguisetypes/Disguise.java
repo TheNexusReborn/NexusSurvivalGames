@@ -28,7 +28,7 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.reflect.StructureModifier;
 
-@SuppressWarnings("SuspiciousMethodCalls")
+@SuppressWarnings({"SuspiciousMethodCalls", "ExtractMethodRecommender"})
 public abstract class Disguise {
     
     private boolean disguiseInUse;
@@ -54,6 +54,7 @@ public abstract class Disguise {
     @Override
     public abstract Disguise clone();
     
+    @SuppressWarnings("ExtractMethodRecommender")
     protected void createDisguise(DisguiseType newType) {
         if (getWatcher() != null) {
             return;

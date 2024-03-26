@@ -208,7 +208,7 @@ public class MutationType {
         }
         
         public MutationType create() {
-            if (this.displayName == null || this.displayName.equals("")) {
+            if (this.displayName == null || this.displayName.isEmpty()) {
                 this.displayName = StringHelper.capitalizeEveryWord(this.id);
             }
             

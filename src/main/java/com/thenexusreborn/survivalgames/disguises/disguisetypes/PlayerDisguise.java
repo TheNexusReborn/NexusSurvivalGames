@@ -10,6 +10,7 @@ import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
+@SuppressWarnings("DuplicatedCode")
 public class PlayerDisguise extends TargetedDisguise {
 
     private LibsProfileLookup currentLookup;
