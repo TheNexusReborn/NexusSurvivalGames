@@ -4,9 +4,9 @@ import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.starlib.Pair;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.PlayerBalance;
-import com.thenexusreborn.api.player.PlayerTags;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
+import com.thenexusreborn.api.tags.Tag;
 import com.thenexusreborn.nexuscore.util.ArmorType;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -66,10 +66,6 @@ public class GamePlayer {
         return this.nexusPlayer.getBalance();
     }
     
-    public PlayerTags getTags() {
-        return this.nexusPlayer.getTags();
-    }
-
     public String getColoredName() {
         return getNexusPlayer().getColoredName();
     }
@@ -481,6 +477,14 @@ public class GamePlayer {
             inv.setLeggings(new ItemStack(armorType.getLeggings()));
             inv.setBoots(new ItemStack(armorType.getBoots()));
         }
+    }
+
+    public boolean hasActiveTag() {
+        return this.nexusPlayer.hasActiveTag();
+    }
+
+    public Tag getActiveTag() {
+        return this.nexusPlayer.getActiveTag();
     }
 
     public enum Status {

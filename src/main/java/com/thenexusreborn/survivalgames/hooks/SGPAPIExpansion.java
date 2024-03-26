@@ -54,8 +54,8 @@ public class SGPAPIExpansion extends PlaceholderExpansion {
             }
 
             String tag = "";
-            if (gamePlayer.getTags().hasActiveTag()) {
-                tag = " " + gamePlayer.getTags().getActive().getDisplayName();
+            if (gamePlayer.hasActiveTag()) {
+                tag = " " + gamePlayer.getActiveTag().getDisplayName();
             }
 
             return prefix + nameColor + player.getName() + tag;
