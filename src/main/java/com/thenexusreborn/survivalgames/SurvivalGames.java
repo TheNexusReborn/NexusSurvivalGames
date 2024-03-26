@@ -48,6 +48,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -88,7 +90,14 @@ public class SurvivalGames extends NexusSpigotPlugin {
 
     @Override
     public void onLoad() {
-        nexusCore = (NexusCore) Bukkit.getPluginManager().getPlugin("NexusCore");
+        Plugin nexusCorePlugin = Bukkit.getPluginManager().getPlugin("NexusCore");
+        if (nexusCorePlugin == null) {
+            getLogger().severe("NexusCore not found, disabling SurvivalGames.");
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
+        
+        nexusCore = (NexusCore) nexusCorePlugin;
         nexusCore.addNexusPlugin(this);
         getLogger().info("Loaded NexusCore");
     }
@@ -97,6 +106,31 @@ public class SurvivalGames extends NexusSpigotPlugin {
     public void onEnable() {
         getLogger().info("Loading NexusSurvivalGames v" + getDescription().getVersion());
         saveDefaultConfig();
+
+        PluginManager pluginManager = Bukkit.getPluginManager();
+        if (pluginManager.getPlugin("PlaceholderAPI") == null) {
+            getLogger().severe("PlaceholderAPI not found, disabling SurvivalGames.");
+            pluginManager.disablePlugin(this);
+            return;
+        }
+
+        if (pluginManager.getPlugin("ProtocolLib") == null) {
+            getLogger().severe("ProtocolLib not found, disabling SurvivalGames.");
+            pluginManager.disablePlugin(this);
+            return;
+        }
+
+        if (pluginManager.getPlugin("NexusMaps") == null) {
+            getLogger().severe("NexusMaps not found, disabling SurvivalGames.");
+            pluginManager.disablePlugin(this);
+            return;
+        }
+
+        if (pluginManager.getPlugin("StarUI") == null) {
+            getLogger().severe("StarUI not found, disabling SurvivalGames.");
+            pluginManager.disablePlugin(this);
+            return;
+        }
 
         this.starChat = (StarChat) getServer().getPluginManager().getPlugin("StarChat");
         getLogger().info("Hooked into StarChat");
@@ -494,7 +528,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
     @Override
     public void registerDatabases(DatabaseRegistry registry) {
         for (SQLDatabase database : registry.getObjects().values()) {
-            if (database.getName().toLowerCase().contains("nexus")) { //TODO Temporary
+            if (database.getName().toLowerCase().contains("nexus")) {
                 database.registerClass(SGPlayerStats.class);
                 database.registerClass(UnlockedMutation.class);
                 database.registerClass(MapRating.class);
