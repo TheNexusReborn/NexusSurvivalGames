@@ -23,9 +23,9 @@ public class NexusDisguises {
     private DisguiseListener listener;
     
     public void init(SurvivalGames plugin) {
+        NexusDisguises.plugin = plugin;
         PacketsManager.init(this);
         DisguiseUtilities.init(plugin);
-        NexusDisguises.plugin = plugin;
 
         PacketsManager.addPacketListeners();
         listener = new DisguiseListener(plugin);

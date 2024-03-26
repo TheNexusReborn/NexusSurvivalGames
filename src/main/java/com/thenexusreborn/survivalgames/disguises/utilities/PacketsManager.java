@@ -471,7 +471,7 @@ public class PacketsManager {
      */
     public static void init(NexusDisguises disguises) {
         libsDisguises = disguises;
-        soundsListener = new PacketAdapter(plugin, ListenerPriority.NORMAL, PacketType.Play.Server.NAMED_SOUND_EFFECT,
+        soundsListener = new PacketAdapter(NexusDisguises.plugin, ListenerPriority.NORMAL, PacketType.Play.Server.NAMED_SOUND_EFFECT,
                 PacketType.Play.Server.ENTITY_STATUS) {
             @Override
             public void onPacketSending(PacketEvent event) {
