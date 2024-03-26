@@ -21,6 +21,7 @@ import com.thenexusreborn.nexuscore.NexusCore;
 import com.thenexusreborn.nexuscore.api.NexusSpigotPlugin;
 import com.thenexusreborn.nexuscore.util.ServerProperties;
 import com.thenexusreborn.survivalgames.cmd.*;
+import com.thenexusreborn.survivalgames.disguises.NexusDisguises;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.hooks.SGPAPIExpansion;
 import com.thenexusreborn.survivalgames.listener.BlockListener;
@@ -284,6 +285,9 @@ public class SurvivalGames extends NexusSpigotPlugin {
             getConfig().set("migration", getDescription().getVersion());
             saveConfig();
         }
+        
+        new NexusDisguises().init(this);
+        getLogger().info("Loaded the disguises for mutations.");
     }
 
     private void registerDefaultSettings() {
