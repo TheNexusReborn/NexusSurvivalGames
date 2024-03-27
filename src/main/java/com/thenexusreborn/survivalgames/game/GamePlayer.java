@@ -119,6 +119,21 @@ public class GamePlayer {
         GameTeamChatroom chatroom = game.getChatRooms().get(this.team);
         chatroom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES, DefaultPermissions.SEND_MESSAGES);
         Game.getPlugin().getStarChat().setPlayerFocus(Bukkit.getPlayer(getUniqueId()), chatroom);
+        
+        if (this.team == GameTeam.TRIBUTES) {
+            game.getChatRooms().get(GameTeam.MUTATIONS).addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+            game.getChatRooms().get(GameTeam.ZOMBIES).addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+        } else if (this.team == GameTeam.MUTATIONS) {
+            game.getChatRooms().get(GameTeam.TRIBUTES).addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+            game.getChatRooms().get(GameTeam.ZOMBIES).addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+        } else if (this.team == GameTeam.ZOMBIES) {
+            game.getChatRooms().get(GameTeam.TRIBUTES).addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+            game.getChatRooms().get(GameTeam.MUTATIONS).addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+        } else if (this.team == GameTeam.SPECTATORS) {
+            game.getChatRooms().get(GameTeam.TRIBUTES).addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+            game.getChatRooms().get(GameTeam.MUTATIONS).addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+            game.getChatRooms().get(GameTeam.ZOMBIES).addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+        }
     }
     
     public GameTeam getTeam() {
