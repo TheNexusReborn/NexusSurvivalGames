@@ -124,7 +124,7 @@ public class Lobby {
         this.lobbySettings = plugin.getLobbySettings("default");
         this.gameSettings = plugin.getGameSettings("default");
         
-        this.lobbyChatRoom = new ChatRoom(plugin, "room-lobby-" + getLocalId(), Actor.getServerActor(), "&8<&3%nexussg_score%&8> &8(&2&l%nexuscore_level%&8) &r%nexuscore_displayname%%nexuscore_tag%&8: %nexuscore_chatcolor%{message}", "{message}");
+        this.lobbyChatRoom = new ChatRoom(plugin, "room-lobby-" + getLocalId(), Actor.getServerActor(), "&8<&3%nexussg_score%&8> &8(&2&l%nexuscore_level%&8) &r%nexuscore_displayname%&8: %nexuscore_chatcolor%{message}", "{message}");
         plugin.getStarChat().getRoomRegistry().register(this.lobbyChatRoom.getSimplifiedName(), this.lobbyChatRoom);
 
         generateMapOptions();
