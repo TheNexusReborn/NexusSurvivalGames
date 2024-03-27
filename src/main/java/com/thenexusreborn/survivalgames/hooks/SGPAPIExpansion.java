@@ -7,14 +7,21 @@ import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
+import com.thenexusreborn.survivalgames.game.CombatTag;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
+import com.thenexusreborn.survivalgames.mutations.Mutation;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
+
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
+
+import static com.thenexusreborn.survivalgames.scoreboard.game.CombatTagBoard.TIME_FORMAT;
 
 public class SGPAPIExpansion extends PlaceholderExpansion {
 
@@ -42,6 +49,19 @@ public class SGPAPIExpansion extends PlaceholderExpansion {
     nexussg_lobby_map_dmborderradius
     nexussg_lobby_map_creatorcount
     nexussg_lobby_map_swagshacklocation
+    nexussg_game_date
+    nexussg_game_map
+    nexussg_game_tributes
+    nexussg_game_spectators
+    nexussg_game_mutations
+    nexussg_game_zombies
+    nexussg_game_player_score
+    nexussg_game_player_kills
+    nexussg_game_player_assists
+    nexussg_game_mutation_target
+    nexussg_game_mutation_type
+    nexussg_game_combattag_target
+    nexussg_game_combattag_time
      */
     @Override
     public String onPlaceholderRequest(Player player, String params) {
@@ -186,6 +206,96 @@ public class SGPAPIExpansion extends PlaceholderExpansion {
                             return swagShack.getX() + "," + swagShack.getY() + "," + swagShack.getZ();
                         } else {
                             return "&fNot Set";
+                        }
+                    }
+                }
+            } else if (option.equalsIgnoreCase("game")) {
+                Game game = plugin.getGame();
+                if (game == null) {
+                    return "";
+                }
+                
+                String gameOption = params.split("_")[2];
+                if (gameOption.equalsIgnoreCase("date")) {
+                    SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+                    df.setTimeZone(TimeZone.getTimeZone("America/Chicago"));
+                    return "&7" + df.format(System.currentTimeMillis());
+                } else if (gameOption.equalsIgnoreCase("map")) {
+                    return game.getGameMap().getName();
+                } else if (gameOption.equalsIgnoreCase("tributes")) {
+                    return String.valueOf(game.getTeamCount(GameTeam.TRIBUTES));
+                } else if (gameOption.equalsIgnoreCase("spectators")) {
+                    return String.valueOf(game.getTeamCount(GameTeam.SPECTATORS));
+                } else if (gameOption.equalsIgnoreCase("mutations")) {
+                    return String.valueOf(game.getTeamCount(GameTeam.MUTATIONS));
+                } else if (gameOption.equalsIgnoreCase("zombies")) {
+                    return String.valueOf(game.getTeamCount(GameTeam.ZOMBIES));
+                } else if (gameOption.equalsIgnoreCase("player")) {
+                    String playerOption = params.split("_")[3];
+                    GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
+                    if (gamePlayer == null) {
+                        return "";
+                    }
+                    
+                    if (playerOption.equalsIgnoreCase("score")) {
+                        return String.valueOf(SurvivalGames.PLAYER_STATS.get(player.getUniqueId()).getScore());
+                    } else if (playerOption.equalsIgnoreCase("kills")) {
+                        int killStreak = gamePlayer.getKillStreak();
+                        int hks = gamePlayer.getStats().getHighestKillstreak();
+                        return killStreak + "/" + hks;
+                    } else if (playerOption.equalsIgnoreCase("assists")) {
+                        if (game.getSettings().isAllowAssists()) {
+                            return String.valueOf(gamePlayer.getAssists());
+                        }
+                    }
+                } else if (gameOption.equalsIgnoreCase("mutation")) {
+                    String mutationOption = params.split("_")[3];
+
+                    GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
+                    if (gamePlayer == null) {
+                        return "";
+                    }
+
+                    Mutation mutation = gamePlayer.getMutation();
+                    if (mutation == null) {
+                        return "";
+                    }
+
+                    if (mutationOption.equalsIgnoreCase("target")) {
+                        GamePlayer target = game.getPlayer(mutation.getTarget());
+                        if (target == null) {
+                            return "None";
+                        }
+                        return target.getName();
+                    } else if (mutationOption.equalsIgnoreCase("type")) {
+                        return mutation.getType().getDisplayName();
+                    }
+                } else if (gameOption.equalsIgnoreCase("combattag")) {
+                    GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
+                    if (gamePlayer == null) {
+                        return "";
+                    }
+
+                    CombatTag combatTag = gamePlayer.getCombatTag();
+                    String ctOption = params.split("_")[3];
+                    if (ctOption.equalsIgnoreCase("target")) {
+                        if (combatTag == null || combatTag.getOther() == null) {
+                            return "No one";
+                        } else {
+                            GamePlayer otherGamePlayer = game.getPlayer(combatTag.getOther());
+                            if (otherGamePlayer == null) {
+                                return "No one";
+                            } else {
+                                return otherGamePlayer.getName();
+                            }
+                        }
+                    } else if (ctOption.equalsIgnoreCase("time")) {
+                        if (combatTag == null || combatTag.getOther() == null || !combatTag.isInCombat()) {
+                            return "0s";
+                        } else {
+                            long combatTagLength = plugin.getGame().getSettings().getCombatTagLength() * 1000L;
+                            long timeRemaining = combatTag.getTimestamp() + combatTagLength - System.currentTimeMillis();
+                            return TIME_FORMAT.format(timeRemaining);
                         }
                     }
                 }
