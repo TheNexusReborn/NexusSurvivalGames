@@ -1,10 +1,10 @@
 package com.thenexusreborn.survivalgames.threads.lobby;
 
-import com.thenexusreborn.nexuscore.api.NexusThread;
+import com.stardevllc.starmclib.StarThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.*;
 
-public class MapChatOptionsMsgThread extends NexusThread<SurvivalGames> {
+public class MapChatOptionsMsgThread extends StarThread<SurvivalGames> {
     
     public MapChatOptionsMsgThread(SurvivalGames plugin) {
         super(plugin, 2400L, 60L, true);

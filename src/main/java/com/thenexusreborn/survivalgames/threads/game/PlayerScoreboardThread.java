@@ -1,14 +1,14 @@
 package com.thenexusreborn.survivalgames.threads.game;
 
+import com.stardevllc.starmclib.StarThread;
 import com.thenexusreborn.api.scoreboard.*;
-import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.scoreboard.game.*;
 
 import java.util.ArrayList;
 
-public class PlayerScoreboardThread extends NexusThread<SurvivalGames> {
+public class PlayerScoreboardThread extends StarThread<SurvivalGames> {
     public PlayerScoreboardThread(SurvivalGames plugin) {
         super(plugin, new ThreadOptions().repeating(true).period(1L));
     }

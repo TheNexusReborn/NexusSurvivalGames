@@ -1,13 +1,13 @@
 package com.thenexusreborn.survivalgames.threads;
 
+import com.stardevllc.starmclib.StarThread;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.server.ServerInfo;
-import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 
-public class ServerStatusThread extends NexusThread<SurvivalGames> {
+public class ServerStatusThread extends StarThread<SurvivalGames> {
     
     public ServerStatusThread(SurvivalGames plugin) {
         super(plugin, 20L, 1L, false);
