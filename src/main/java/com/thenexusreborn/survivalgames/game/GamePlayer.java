@@ -338,7 +338,7 @@ public class GamePlayer {
     }
     
     private String generateStatLine(String title, String statName) {
-        return "&f" + title + ": &e" + getStats().getValue(statName); //TODO
+        return "&f" + title + ": &e" + getStats().getValue(statName);
     }
     
     public List<String> getMenuStats() {

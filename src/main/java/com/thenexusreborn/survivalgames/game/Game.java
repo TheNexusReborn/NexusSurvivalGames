@@ -743,7 +743,10 @@ public class Game {
                             UUID uuid = NexusAPI.getApi().getPlayerManager().getUUIDFromName(p);
 
                             Tag tag = new Tag(uuid, gameInfo.getId() + "th", System.currentTimeMillis());
-                            //TODO nexusPlayer.sendMessage(MsgType.INFO + "Unlocked the tag " + tag.getDisplayName());
+                            NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(uuid);
+                            if (nexusPlayer != null) {
+                                nexusPlayer.sendMessage(MsgType.INFO + "Unlocked the tag " + tag.getDisplayName());
+                            }
                             NexusAPI.getApi().getPrimaryDatabase().saveSilent(tag);
                         });
                     }
