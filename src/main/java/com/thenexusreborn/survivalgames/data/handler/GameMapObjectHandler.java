@@ -1,12 +1,12 @@
 package com.thenexusreborn.survivalgames.data.handler;
 
 import com.thenexusreborn.api.NexusAPI;
+import com.thenexusreborn.api.sql.objects.ObjectHandler;
+import com.thenexusreborn.api.sql.objects.SQLDatabase;
+import com.thenexusreborn.api.sql.objects.Table;
 import com.thenexusreborn.gamemaps.model.MapRating;
 import com.thenexusreborn.gamemaps.model.MapSpawn;
 import com.thenexusreborn.gamemaps.model.SGMap;
-import me.firestar311.starsql.api.objects.ObjectHandler;
-import me.firestar311.starsql.api.objects.SQLDatabase;
-import me.firestar311.starsql.api.objects.Table;
 
 import java.sql.SQLException;
 import java.util.List;

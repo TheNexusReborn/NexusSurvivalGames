@@ -4,12 +4,11 @@ import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starlib.Value;
 import com.stardevllc.starlib.Value.Type;
 import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.api.network.cmd.NetworkCommand;
 import com.thenexusreborn.api.player.Rank;
-import com.thenexusreborn.api.registry.DatabaseRegistry;
-import com.thenexusreborn.api.registry.NetworkCommandRegistry;
 import com.thenexusreborn.api.registry.StatRegistry;
 import com.thenexusreborn.api.registry.ToggleRegistry;
+import com.thenexusreborn.api.sql.DatabaseRegistry;
+import com.thenexusreborn.api.sql.objects.SQLDatabase;
 import com.thenexusreborn.api.stats.StatType;
 import com.thenexusreborn.gamemaps.MapManager;
 import com.thenexusreborn.gamemaps.SGMapCommand;
@@ -43,7 +42,6 @@ import com.thenexusreborn.survivalgames.threads.ServerStatusThread;
 import com.thenexusreborn.survivalgames.threads.game.*;
 import com.thenexusreborn.survivalgames.threads.lobby.*;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
-import me.firestar311.starsql.api.objects.SQLDatabase;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -513,16 +511,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
             return settings.clone();
         }
         return null;
-    }
-
-    @Override
-    public void registerNetworkCommands(NetworkCommandRegistry registry) {
-        registry.register("unlockmutation", new NetworkCommand("unlockmutation", (cmd, origin, args) -> {
-            UUID uuid = UUID.fromString(args[0]);
-            String type = args[1];
-            long timestamp = Long.parseLong(args[2]);
-            getUnlockedMutations(uuid).add(new UnlockedMutation(uuid, type, timestamp));
-        }));
     }
 
     @Override

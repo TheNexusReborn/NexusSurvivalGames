@@ -5,7 +5,7 @@ import com.thenexusreborn.api.player.PlayerStats;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.stats.Stat;
 import com.thenexusreborn.api.stats.StatChange;
-import com.thenexusreborn.api.storage.codec.RanksCodec;
+import com.thenexusreborn.api.sql.objects.codecs.RanksCodec;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SurvivalGames;

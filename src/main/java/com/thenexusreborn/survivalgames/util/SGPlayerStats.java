@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.util;
 
-import me.firestar311.starsql.api.annotations.column.PrimaryKey;
-import me.firestar311.starsql.api.annotations.table.TableName;
+import com.thenexusreborn.api.sql.annotations.column.PrimaryKey;
+import com.thenexusreborn.api.sql.annotations.table.TableName;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;

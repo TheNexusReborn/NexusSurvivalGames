@@ -1,10 +1,10 @@
 package com.thenexusreborn.survivalgames.settings;
 
+import com.thenexusreborn.api.sql.annotations.table.TableName;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.settings.collection.SettingList;
 import com.thenexusreborn.survivalgames.settings.object.Setting;
 import com.thenexusreborn.survivalgames.settings.object.impl.LobbySetting;
-import me.firestar311.starsql.api.annotations.table.TableName;
 
 @TableName("sglobbysettings")
 public class LobbySettings extends SettingList<LobbySetting> {

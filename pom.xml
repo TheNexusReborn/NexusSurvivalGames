@@ -113,12 +113,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>${mysql.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot</artifactId>
             <version>${minecraft.version}</version>
@@ -131,17 +125,16 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.Firestar311.StarSQL</groupId>
-            <artifactId>mysql</artifactId>
-            <version>42863fe3e2</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>com.github.StarDevelopmentLLC</groupId>
             <artifactId>StarUI</artifactId>
             <version>1.0.0-alpha.1</version>
             <scope>provided</scope>
         </dependency>
-        
+        <dependency>
+            <groupId>com.thenexusreborn</groupId>
+            <artifactId>NexusAPI</artifactId>
+            <version>1.12-ALPHA</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 </project>
