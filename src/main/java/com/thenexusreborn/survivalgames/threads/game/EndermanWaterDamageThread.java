@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.threads.game;
 
-import com.stardevllc.starmclib.StarThread;
+import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.game.GameState;
@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 
-public class EndermanWaterDamageThread extends StarThread<SurvivalGames> {
+public class EndermanWaterDamageThread extends NexusThread<SurvivalGames> {
     
     public EndermanWaterDamageThread(SurvivalGames plugin) {
         super(plugin, 20L, 0L, false);

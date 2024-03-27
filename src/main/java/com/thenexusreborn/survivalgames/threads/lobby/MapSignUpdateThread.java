@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.threads.lobby;
 
-import com.stardevllc.starmclib.StarThread;
 import com.thenexusreborn.gamemaps.model.SGMap;
+import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.*;
@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Map.Entry;
 
-public class MapSignUpdateThread extends StarThread<SurvivalGames> {
+public class MapSignUpdateThread extends NexusThread<SurvivalGames> {
     
     public MapSignUpdateThread(SurvivalGames plugin) {
         super(plugin, 20L, false);
