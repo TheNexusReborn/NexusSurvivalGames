@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.threads.lobby;
 
 import com.mojang.authlib.GameProfile;
-import com.thenexusreborn.nexuscore.api.NexusThread;
+import com.stardevllc.starmclib.StarThread;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.*;
@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 import java.lang.reflect.Field;
 import java.util.*;
 
-public class TributeSignUpdateThread extends NexusThread<SurvivalGames> {
+public class TributeSignUpdateThread extends StarThread<SurvivalGames> {
     
     private UUID randomUUID = UUID.randomUUID();
     
