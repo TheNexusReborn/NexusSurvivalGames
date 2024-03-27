@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.threads.game;
 
-import com.stardevllc.starmclib.StarThread;
 import com.thenexusreborn.api.helper.NumberHelper;
+import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import org.bukkit.*;
@@ -11,7 +11,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
-public class PlayerTrackerThread extends StarThread<SurvivalGames> {
+public class PlayerTrackerThread extends NexusThread<SurvivalGames> {
 
     public PlayerTrackerThread(SurvivalGames plugin) {
         super(plugin, 2L, true);

@@ -1,8 +1,8 @@
 package com.thenexusreborn.survivalgames.threads.lobby;
 
 import com.stardevllc.starlib.time.TimeUnit;
-import com.stardevllc.starmclib.StarThread;
 import com.thenexusreborn.api.player.Rank;
+import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.nexuscore.util.ServerProperties;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
@@ -14,7 +14,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-public class LobbyThread extends StarThread<SurvivalGames> {
+public class LobbyThread extends NexusThread<SurvivalGames> {
     
     private int secondsInPrepareGame;
     

@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.threads.game;
 
 import com.stardevllc.starlib.time.TimeUnit;
-import com.stardevllc.starmclib.StarThread;
+import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.CombatTag;
 import com.thenexusreborn.survivalgames.game.Game;
@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 
 //TODO Use a Timer for combat tags
-public class CombatTagThread extends StarThread<SurvivalGames> {
+public class CombatTagThread extends NexusThread<SurvivalGames> {
     public CombatTagThread(SurvivalGames plugin) {
         super(plugin, 5L, 0L, false);
     }
