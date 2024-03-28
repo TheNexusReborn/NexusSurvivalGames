@@ -4,8 +4,6 @@ import com.stardevllc.starlib.Value;
 import com.stardevllc.starmclib.color.ColorUtils;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.sql.objects.typehandlers.ValueHandler;
-import com.thenexusreborn.api.stats.Stat;
-import com.thenexusreborn.api.stats.StatHelper;
 import com.thenexusreborn.gamemaps.MapManager;
 import com.thenexusreborn.gamemaps.YamlMapManager;
 import com.thenexusreborn.gamemaps.model.SGMap;
@@ -26,6 +24,7 @@ import com.thenexusreborn.survivalgames.settings.collection.SettingList;
 import com.thenexusreborn.survivalgames.settings.object.Setting;
 import com.thenexusreborn.survivalgames.settings.object.Setting.Info;
 import com.thenexusreborn.survivalgames.util.Operator;
+import com.thenexusreborn.survivalgames.util.SGPlayerStats;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.HoverEvent.Action;
@@ -42,6 +41,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
@@ -429,8 +429,8 @@ public class SGCommand implements CommandExecutor {
                         }
 
                         String stat = args[3];
-                        Stat.Info info = StatHelper.getInfo(stat);
-                        if (info == null) {
+                        Field field = SGPlayerStats.getFields().get(stat);
+                        if (field == null) {
                             player.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid stat name."));
                             return true;
                         }

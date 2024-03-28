@@ -2,7 +2,6 @@ package com.thenexusreborn.survivalgames.menu;
 
 import com.stardevllc.starui.element.button.Button;
 import com.stardevllc.starui.gui.InventoryGUI;
-import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -66,7 +65,7 @@ public class SponsorMenu extends InventoryGUI {
                     amount = actor.getStats().getScore();
                 }
                 if (amount < cost) {
-                    actor.sendMessage(MsgType.WARN + "You do not have enough " + NexusAPI.getApi().getStatRegistry().get(currency).getDisplayName() + ".");
+                    actor.sendMessage(MsgType.WARN + "You do not have enough " + currency + ".");
                     return;
                 }
                 

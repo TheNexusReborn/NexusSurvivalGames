@@ -5,11 +5,9 @@ import com.stardevllc.starlib.Value;
 import com.stardevllc.starlib.Value.Type;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.Rank;
-import com.thenexusreborn.api.registry.StatRegistry;
 import com.thenexusreborn.api.registry.ToggleRegistry;
 import com.thenexusreborn.api.sql.DatabaseRegistry;
 import com.thenexusreborn.api.sql.objects.SQLDatabase;
-import com.thenexusreborn.api.stats.StatType;
 import com.thenexusreborn.gamemaps.MapManager;
 import com.thenexusreborn.gamemaps.SGMapCommand;
 import com.thenexusreborn.gamemaps.YamlMapManager;
@@ -415,26 +413,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
         if (!(gameSettingRegistry.contains(name))) {
             gameSettingRegistry.register(name, displayName, description, "game", new Value(valueType, valueDefault), new Value(valueType, minValue), new Value(valueType, maxValue));
         }
-    }
-
-    @Override
-    public void registerStats(StatRegistry registry) {
-        registry.register("sg_score", "Score", StatType.INTEGER, 100); //TODO Remove after migration
-        registry.register("sg_kills", "Kills", StatType.INTEGER, 0); //TODO Remove after migration
-        registry.register("sg_highest_kill_streak", "Highest Kill Streak", StatType.INTEGER, 0); //TODO Remove after migration
-        registry.register("sg_games", "Total Games", StatType.INTEGER, 0); //TODO Remove after migration
-        registry.register("sg_wins", "Total Wins", StatType.INTEGER, 0); //TODO Remove after migration
-        registry.register("sg_win_streak", "Winstreak", StatType.INTEGER, 0); //TODO Remove after migration
-        registry.register("sg_deaths", "Deaths", StatType.INTEGER, 0); //TODO Remove after migration
-        registry.register("sg_deathmatches_reached", "Deathmatches Reached", StatType.INTEGER, 0); //TODO Remove after migration
-        registry.register("sg_chests_looted", "Chests Looted", StatType.INTEGER, 0); //TODO Remove after migration
-        registry.register("sg_assists", "Kill Assists", StatType.INTEGER, 0); //TODO Remove after migration
-        registry.register("sg_times_mutated", "Times Mutated", StatType.INTEGER, 0); //TODO Remove after migration
-        registry.register("sg_mutation_kills", "Kills as a Mutation", StatType.INTEGER, 0); //TODO Remove after migration
-        registry.register("sg_mutation_deaths", "Deaths as a Mutation", StatType.INTEGER, 0); //TODO Remove after migration
-        registry.register("sg_mutation_passes", "Mutation Passes", StatType.INTEGER, 0); //TODO Remove after migration
-        registry.register("sg_sponsored_others", "Times Sponsored Others", StatType.INTEGER, 0); //TODO Remove after migration
-        registry.register("sg_sponsors_received", "Times Sponsored By Others", StatType.INTEGER, 0); //TODO Remove after migration
     }
 
     @Override
