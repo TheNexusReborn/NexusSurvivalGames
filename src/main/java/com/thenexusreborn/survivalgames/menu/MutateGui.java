@@ -5,7 +5,6 @@ import com.stardevllc.starui.element.Element;
 import com.stardevllc.starui.element.button.Button;
 import com.stardevllc.starui.gui.InventoryGUI;
 import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -28,10 +27,10 @@ public class MutateGui extends InventoryGUI {
         PlayerMutations unlockedMutations = plugin.getUnlockedMutations(player.getUniqueId());
 
         if (!unlockedMutations.isUnlocked("pig_zombie")) {
-            unlockedMutations.add(new UnlockedMutation(player.getUniqueId(), "pig_zombie", player.getStatValue("firstjoined").getAsLong()));
+            unlockedMutations.add(new UnlockedMutation(player.getUniqueId(), "pig_zombie", player.getNexusPlayer().getPlayerTime().getFirstJoined()));
         }
 
-        double credits = player.getStatValue("credits").getAsDouble();
+        double credits = player.getBalance().getCredits();
     
         List<String> purchased = new ArrayList<>(), available = new ArrayList<>(), locked = new ArrayList<>();
         for (MutationType type : MutationType.TYPES) {
@@ -77,13 +76,13 @@ public class MutateGui extends InventoryGUI {
                         double passUseValue = new Random().nextDouble();
                         if (passUseValue <= game.getSettings().getPassUseChance()) {
                             if (!game.getSettings().isUnlimitedPasses()) {
-                                player.changeStat("sg_mutation_passes", 1, StatOperator.SUBTRACT);
+                                player.getStats().addMutationPasses(-1);
                             }
                         } else {
                             player.sendMessage(MsgType.INFO + "&aYou got lucky and you did not use a pass for this mutation!");
                         }
 
-                        player.changeStat("sg_times_mutated", 1, StatOperator.ADD);
+                        player.getStats().addTimesMutated(1);
 
                         Mutation mutation = Mutation.createInstance(type, player.getUniqueId(), gamePlayer.getKiller());
                         gamePlayer.setMutation(mutation);
@@ -101,7 +100,6 @@ public class MutateGui extends InventoryGUI {
                         player.removeCredits(type.getUnlockCost());
                         UnlockedMutation unlockedMutation = new UnlockedMutation(player.getUniqueId(), type.getId(), System.currentTimeMillis());
                         NexusAPI.getApi().getScheduler().runTaskAsynchronously(() -> NexusAPI.getApi().getPrimaryDatabase().saveSilent(unlockedMutation));
-                        NexusAPI.getApi().getNetworkManager().send("unlockmutation", player.getUniqueId().toString(), unlockedMutation.getType(), String.valueOf(unlockedMutation.getTimestamp()));
                         unlockedMutations.add(unlockedMutation);
                         player.sendMessage(MsgType.INFO + "You bought the mutation &b" + type.getDisplayName() + " &efor &b" + type.getUnlockCost() + " &ecredits.");
                         e.getWhoClicked().closeInventory();

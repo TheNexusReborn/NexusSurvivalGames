@@ -1,7 +1,10 @@
 package com.thenexusreborn.survivalgames.lobby;
 
+import com.stardevllc.starchat.rooms.ChatRoom;
+import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.starlib.time.TimeUnit;
 import com.stardevllc.starclock.clocks.Timer;
+import com.stardevllc.starmclib.actor.Actor;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
@@ -23,6 +26,7 @@ import com.thenexusreborn.survivalgames.scoreboard.lobby.LobbyBoard;
 import com.thenexusreborn.survivalgames.scoreboard.lobby.MapEditingBoard;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.settings.LobbySettings;
+import com.thenexusreborn.survivalgames.util.SGPlayerStats;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ClickEvent.Action;
@@ -40,11 +44,12 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-@SuppressWarnings("DuplicatedCode")
 public class Lobby {
     private final SurvivalGames plugin;
+    private int localId;
     private ControlType controlType = ControlType.MANUAL;
     private LobbyState state = LobbyState.WAITING;
+    private ChatRoom lobbyChatRoom;
     private Timer timer;
     private final Map<UUID, LobbyPlayer> players = new HashMap<>();
     private GameSettings gameSettings;
@@ -61,6 +66,9 @@ public class Lobby {
     public Lobby(SurvivalGames plugin) {
         this.plugin = plugin;
         plugin.getLogger().info("Setting up the lobby.");
+        
+        this.localId = plugin.getLastLocalLobbyId();
+        plugin.setLastLocalLobbyId(plugin.getLastLocalLobbyId() + 1);
 
         if (plugin.getConfig().contains("mapsigns")) {
             plugin.getLogger().info("Loading Map Signs");
@@ -115,12 +123,19 @@ public class Lobby {
 
         this.lobbySettings = plugin.getLobbySettings("default");
         this.gameSettings = plugin.getGameSettings("default");
+        
+        this.lobbyChatRoom = new ChatRoom(plugin, "room-lobby-" + getLocalId(), Actor.getServerActor(), "&8<&3%nexussg_score%&8> &8(&2&l%nexuscore_level%&8) &r%nexuscore_displayname%&8: %nexuscore_chatcolor%{message}", "{message}");
+        plugin.getStarChat().getRoomRegistry().register(this.lobbyChatRoom.getSimplifiedName(), this.lobbyChatRoom);
 
         generateMapOptions();
 
         for (LootTable lootTable : LootManager.getInstance().getLootTables()) {
             lootTable.generateNewProbabilities(new Random());
         }
+    }
+
+    public int getLocalId() {
+        return localId;
     }
 
     public void resetInvalidState() {
@@ -149,7 +164,7 @@ public class Lobby {
             String mapName = entry.getValue().getName();
             StringBuilder creatorBuilder = new StringBuilder();
             for (String creator : entry.getValue().getCreators()) {
-                if (creator != null && !creator.equals("") && !creator.equals(" ")) {
+                if (creator != null && !creator.isEmpty() && !creator.equals(" ")) {
                     creatorBuilder.append(creator).append(", ");
                 }
             }
@@ -258,9 +273,7 @@ public class Lobby {
     }
 
     public void sendMessage(String message) {
-        for (LobbyPlayer player : getPlayers()) {
-            player.sendMessage(message);
-        }
+        this.lobbyChatRoom.sendMessage(message);
         Bukkit.getConsoleSender().sendMessage(MCUtils.color(message));
     }
 
@@ -338,7 +351,6 @@ public class Lobby {
 
     public void prepareGame() {
         this.state = LobbyState.PREPARING_GAME;
-        int mapVotes = 0;
         if (this.gameMap == null) {
             SGMap mostVoted = null;
             int mostVotedVotes = 0;
@@ -392,7 +404,7 @@ public class Lobby {
         Game game = new Game(gameMap, this.gameSettings, getPlayers());
         this.players.clear();
         plugin.setGame(game);
-        if (Game.getControlType() == ControlType.AUTOMATIC) {
+        if (game.getControlType() == ControlType.AUTOMATIC) {
             this.state = LobbyState.STARTING;
             game.setup();
         } else {
@@ -431,7 +443,7 @@ public class Lobby {
         return gameMap;
     }
 
-    public void addPlayer(NexusPlayer nexusPlayer) {
+    public void addPlayer(NexusPlayer nexusPlayer, SGPlayerStats stats) {
         if (nexusPlayer == null) {
             return;
         }
@@ -439,8 +451,10 @@ public class Lobby {
         if (nexusPlayer.getPlayer() == null) {
             return;
         }
-
-        this.players.put(nexusPlayer.getUniqueId(), new LobbyPlayer(nexusPlayer));
+        
+        this.players.put(nexusPlayer.getUniqueId(), new LobbyPlayer(nexusPlayer, stats));
+        this.lobbyChatRoom.addMember(nexusPlayer.getUniqueId(), DefaultPermissions.VIEW_MESSAGES, DefaultPermissions.SEND_MESSAGES);
+        this.plugin.getStarChat().setPlayerFocus(Bukkit.getPlayer(nexusPlayer.getUniqueId()), this.lobbyChatRoom);
 
         int totalPlayers = 0;
         for (LobbyPlayer player : getPlayers()) {
@@ -534,6 +548,7 @@ public class Lobby {
         if (!this.players.containsKey(nexusPlayer.getUniqueId())) {
             return;
         }
+        this.lobbyChatRoom.removeMember(nexusPlayer.getUniqueId());
         this.players.remove(nexusPlayer.getUniqueId());
         int totalPlayers = 0;
         for (LobbyPlayer player : getPlayers()) {
@@ -628,7 +643,7 @@ public class Lobby {
 
         for (Player player : Bukkit.getOnlinePlayers()) {
             NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(player.getUniqueId());
-            addPlayer(nexusPlayer);
+            addPlayer(nexusPlayer, SurvivalGames.PLAYER_STATS.get(player.getUniqueId()));
         }
 
         plugin.getGame().getGameMap().removeFromServer(plugin);

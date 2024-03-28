@@ -2,8 +2,6 @@ package com.thenexusreborn.survivalgames.menu;
 
 import com.stardevllc.starui.element.button.Button;
 import com.stardevllc.starui.gui.InventoryGUI;
-import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -71,14 +69,23 @@ public class SwagShackMenu extends InventoryGUI {
                 } else {
                     return;
                 }
-                
-                int amount = player.getStatValue(currency).getAsInt();
+
+                int amount;
+                if (currency.equalsIgnoreCase("credits")) {
+                    amount = (int) player.getBalance().getCredits();
+                } else {
+                    amount = player.getStats().getScore();
+                }
                 if (amount < cost) {
-                    player.sendMessage(MsgType.WARN + "You do not have enough " + NexusAPI.getApi().getStatRegistry().get(currency).getDisplayName() + " to buy this item.");
+                    player.sendMessage(MsgType.WARN + "You do not have enough " + currency + " to buy this item.");
                     return;
                 }
 
-                player.changeStat(currency, cost, StatOperator.SUBTRACT).push();
+                if (currency.equalsIgnoreCase("credits")) {
+                    player.getBalance().addCredits(-cost);
+                } else {
+                    player.getStats().addScore(-cost);
+                }
                 e.getWhoClicked().getInventory().addItem(item.getItem().getItemStack());
             });
             

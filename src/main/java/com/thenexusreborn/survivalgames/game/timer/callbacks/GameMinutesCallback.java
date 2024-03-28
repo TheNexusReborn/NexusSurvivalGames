@@ -15,7 +15,6 @@ public class GameMinutesCallback implements ClockCallback<TimerSnapshot> {
     }
 
     public void callback(TimerSnapshot timerSnapshot) {
-        int remainingMinutes = (int) Math.ceil(timerSnapshot.getTime() * 1.0 / getPeriod());
         game.sendMessage(message.replace("{time}", Game.LONG_TIME_FORMAT.format(timerSnapshot.getTime())));
         if (game.getSettings().isSounds()) {
             game.playSound(Sound.CLICK);

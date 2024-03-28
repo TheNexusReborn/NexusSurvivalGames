@@ -1,9 +1,9 @@
 package com.thenexusreborn.survivalgames.mutations;
 
 import com.thenexusreborn.api.helper.StringHelper;
-import com.thenexusreborn.disguise.disguisetypes.DisguiseType;
 import com.thenexusreborn.nexuscore.util.ArmorType;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
+import com.thenexusreborn.survivalgames.disguises.disguisetypes.DisguiseType;
 import com.thenexusreborn.survivalgames.mutations.impl.*;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -208,7 +208,7 @@ public class MutationType {
         }
         
         public MutationType create() {
-            if (this.displayName == null || this.displayName.equals("")) {
+            if (this.displayName == null || this.displayName.isEmpty()) {
                 this.displayName = StringHelper.capitalizeEveryWord(this.id);
             }
             

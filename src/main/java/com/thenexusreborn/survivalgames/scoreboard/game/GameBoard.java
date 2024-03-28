@@ -71,12 +71,12 @@ public class GameBoard extends SpigotScoreboardView {
         createTeam(new TeamBuilder("undeadValue").entry(ChatColor.RED).score(8).valueUpdater(undeadCountUpdater));
         createTeam(new TeamBuilder("blank3").entry(ChatColor.DARK_BLUE.toString()).score(7));
         createTeam(new TeamBuilder("infoLabel").entry("&6&lINFO:").score(6));
-        createTeam(new TeamBuilder("scoreValue").entry("&fScore: ").score(5).valueUpdater((player, team) -> team.setSuffix("&e" + player.getStatValue("sg_score").getAsInt())));
+        createTeam(new TeamBuilder("scoreValue").entry("&fScore: ").score(5).valueUpdater((player, team) -> team.setSuffix("&e" + SurvivalGames.PLAYER_STATS.get(player.getUniqueId()).getScore())));
         createTeam(new TeamBuilder("killsValue").entry("&fKills: ").score(4).valueUpdater((player, team) -> {
             Game game = plugin.getGame();
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
             int killStreak = gamePlayer.getKillStreak();
-            int hks = player.getStatValue("sg_highest_kill_streak").getAsInt();
+            int hks = gamePlayer.getStats().getHighestKillstreak();
             team.setSuffix("&e" + killStreak + "/" + hks);
         }));
         createTeam(new TeamBuilder("assistsValue").entry("&fAssists: ").score(3).valueUpdater((player, team) -> {

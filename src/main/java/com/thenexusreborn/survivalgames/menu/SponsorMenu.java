@@ -2,8 +2,6 @@ package com.thenexusreborn.survivalgames.menu;
 
 import com.stardevllc.starui.element.button.Button;
 import com.stardevllc.starui.gui.InventoryGUI;
-import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -60,20 +58,30 @@ public class SponsorMenu extends InventoryGUI {
                     return;
                 }
 
-                int amount = actor.getStatValue(currency).getAsInt();
+                int amount;
+                if (currency.equalsIgnoreCase("credits")) {
+                    amount = (int) actor.getBalance().getCredits();
+                } else {
+                    amount = actor.getStats().getScore();
+                }
                 if (amount < cost) {
-                    actor.sendMessage(MsgType.WARN + "You do not have enough " + NexusAPI.getApi().getStatRegistry().get(currency).getDisplayName() + ".");
+                    actor.sendMessage(MsgType.WARN + "You do not have enough " + currency + ".");
                     return;
                 }
-
-                actor.changeStat(currency, cost, StatOperator.SUBTRACT).push();
+                
+                if (currency.equalsIgnoreCase("credits")) {
+                    actor.getBalance().addCredits(-cost);
+                } else {
+                    actor.getStats().addScore(-cost);
+                }
                 actor.setSponsored(true);
 
                 Object chosen = category.getEntries().get(new Random().nextInt(category.getEntries().size()));
                 category.apply(Bukkit.getPlayer(target.getUniqueId()), chosen);
                 plugin.getGame().sendMessage("&6&l>> " + target.getColoredName() + " &awas &lSPONSORED &aa(n) &l" + category.getName() + " item &aby " + actor.getColoredName() + "&a!");
-                actor.changeStat("sg_sponsored_others", 1, StatOperator.ADD).push();
-                target.changeStat("sg_sponsors_received", 1, StatOperator.ADD).push();
+                
+                actor.getStats().addSponsoredOthers(1);
+                target.getStats().addSponsorsReceived(1);
             });
             addElement(button);
         }

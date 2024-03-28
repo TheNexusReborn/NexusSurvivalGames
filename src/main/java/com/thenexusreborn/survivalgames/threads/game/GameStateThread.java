@@ -16,12 +16,13 @@ public class GameStateThread extends NexusThread<SurvivalGames> {
         if (plugin.getGame() == null) {
             return;
         }
+
+        Game game = plugin.getGame();
         
-        if (Game.getControlType() == ControlType.MANUAL) {
+        if (game.getControlType() == ControlType.MANUAL) {
             return;
         }
         
-        Game game = plugin.getGame();
         if (game.getState() == GameState.SETUP_COMPLETE) {
             game.assignStartingTeams();
         } else if (game.getState() == GameState.TEAMS_ASSIGNED) {

@@ -15,7 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
 public class CombatTagBoard extends SpigotScoreboardView {
-    private static final TimeFormat TIME_FORMAT = new TimeFormat("%0s%");
+    public static final TimeFormat TIME_FORMAT = new TimeFormat("%0s%");
     
     private SurvivalGames plugin;
     

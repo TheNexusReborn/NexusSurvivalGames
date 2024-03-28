@@ -116,7 +116,7 @@ public class DeathInfo {
                     if (itemMeta != null) {
                         displayName = itemMeta.getDisplayName();
                     }
-                    if (displayName != null && !displayName.equals("")) {
+                    if (displayName != null && !displayName.isEmpty()) {
                         itemName = ChatColor.stripColor(displayName);
                     } else {
                         itemName = handItem.getType().name().toLowerCase().replace("_", " ");

@@ -40,7 +40,7 @@ public class NextGameTimerCallback implements ReturnableCallback<TimerSnapshot, 
 
         if (timerSnapshot.getTimeLeft() <= 0) {
             game.nextGameReady();
-            if (Game.getControlType() == ControlType.MANUAL) {
+            if (game.getControlType() == ControlType.MANUAL) {
                 game.sendMessage("&eThe next game timer has concluded, but the mode is not automatic. Skipped automatically performing next game tasks.");
             }
             return false;

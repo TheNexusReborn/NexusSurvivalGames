@@ -3,10 +3,13 @@ package com.thenexusreborn.survivalgames.game.timer.old;
 import com.thenexusreborn.nexuscore.util.ReturnableCallback;
 import com.thenexusreborn.nexuscore.util.timer.TimerSnapshot;
 import com.thenexusreborn.survivalgames.ControlType;
-import com.thenexusreborn.survivalgames.game.*;
+import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.GameState;
 import org.bukkit.Sound;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class GameTimerCallback implements ReturnableCallback<TimerSnapshot, Boolean> {
     
@@ -56,7 +59,7 @@ public class GameTimerCallback implements ReturnableCallback<TimerSnapshot, Bool
         
         if (timerSnapshot.getTimeLeft() <= 0) {
             game.ingameComplete();
-            if (Game.getControlType() == ControlType.MANUAL) {
+            if (game.getControlType() == ControlType.MANUAL) {
                 game.sendMessage("&eThe game timer has concluded, but the mode is in manual, not starting deathmatch automatically.");
             }
             return false;

@@ -44,8 +44,6 @@ public class LootTable {
             return loot;
         }
         
-        long start = System.currentTimeMillis();
-        
         Random random = new Random();
         
         Set<Range<LootCategory>> categoryProbabilities = new HashSet<>(this.categoryProbabilities);
@@ -77,7 +75,6 @@ public class LootTable {
             }
         }
         
-        long end = System.currentTimeMillis();
         return loot;
     }
     

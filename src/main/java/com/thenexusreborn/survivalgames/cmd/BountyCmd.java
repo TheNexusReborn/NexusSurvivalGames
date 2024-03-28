@@ -1,7 +1,6 @@
 package com.thenexusreborn.survivalgames.cmd;
 
 import com.thenexusreborn.api.helper.NumberHelper;
-import com.thenexusreborn.api.stats.StatOperator;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -16,43 +15,43 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class BountyCmd implements CommandExecutor {
-    
+
     private final SurvivalGames plugin;
-    
+
     public BountyCmd(SurvivalGames plugin) {
         this.plugin = plugin;
     }
-    
+
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (!(sender instanceof Player player)) {
             sender.sendMessage(MCUtils.color(MsgType.WARN + "Only players can use that command."));
             return true;
         }
-    
+
         Game game = plugin.getGame();
-        
+
         if (game == null) {
             player.sendMessage(MCUtils.color(MsgType.WARN + "You can only bounty a player during a game."));
             return true;
         }
-    
+
         if (!(args.length > 1)) {
             player.sendMessage(MCUtils.color(MsgType.WARN + "Usage: /" + label + " <player> <amount> [type: default score]"));
             return true;
         }
-        
+
         GamePlayer senderPlayer = game.getPlayer(player.getUniqueId());
         GamePlayer gamePlayer = game.getPlayer(args[0]);
         if (gamePlayer == null) {
             player.sendMessage(MCUtils.color(MsgType.WARN + "The name you provided is not a player in the game."));
             return true;
         }
-    
+
         if (gamePlayer.getTeam() != GameTeam.TRIBUTES) {
             player.sendMessage(MCUtils.color(MsgType.WARN + "You can only set a bounty on a Tribute."));
             return true;
         }
-    
+
         int amount;
         try {
             amount = Integer.parseInt(args[1]);
@@ -60,7 +59,7 @@ public class BountyCmd implements CommandExecutor {
             player.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid number value."));
             return true;
         }
-    
+
         Bounty.Type type = Bounty.Type.SCORE;
         if (args.length > 2) {
             try {
@@ -70,34 +69,34 @@ public class BountyCmd implements CommandExecutor {
                 return true;
             }
         }
-    
+
         int max = 0;
         if (type == Type.SCORE) {
-            if (senderPlayer.getStatValue("sg_score").getAsInt() < amount) {
+            if (senderPlayer.getStats().getScore() < amount) {
                 senderPlayer.sendMessage(MsgType.WARN + "You do not have enough score to set a bounty of " + amount);
                 return true;
             } else {
-               senderPlayer.changeStat("sg_score", amount, StatOperator.SUBTRACT);
+                senderPlayer.getStats().addScore(-amount);
             }
             max = game.getSettings().getMaxScoreBounty();
         } else if (type == Type.CREDIT) {
-            if (senderPlayer.getStatValue("credits").getAsInt() < amount) {
+            if (senderPlayer.getBalance().getCredits() < amount) {
                 senderPlayer.sendMessage(MsgType.WARN + "You do not have enough credits to set a bounty of " + amount);
                 return true;
             } else {
-                senderPlayer.changeStat("credits", amount, StatOperator.SUBTRACT);
+                senderPlayer.getBalance().addCredits(-amount);
             }
             max = game.getSettings().getMaxCreditBounty();
         }
-        
+
         Bounty bounty = gamePlayer.getBounty();
-    
+
         double currentAmount = bounty.getAmount(type);
         if (currentAmount + amount >= max) {
             senderPlayer.sendMessage(MsgType.WARN + "You cannot set the bounty higher than " + max + " " + type.name().toLowerCase());
             return true;
         }
-        
+
         bounty.add(type, amount);
         String coloredName = senderPlayer.getColoredName();
         String formattedAmount = NumberHelper.formatNumber(amount);

@@ -3,8 +3,7 @@ package com.thenexusreborn.survivalgames.cmd;
 import com.stardevllc.starlib.Value;
 import com.stardevllc.starmclib.color.ColorUtils;
 import com.thenexusreborn.api.player.Rank;
-import com.thenexusreborn.api.stats.Stat;
-import com.thenexusreborn.api.stats.StatHelper;
+import com.thenexusreborn.api.sql.objects.typehandlers.ValueHandler;
 import com.thenexusreborn.gamemaps.MapManager;
 import com.thenexusreborn.gamemaps.YamlMapManager;
 import com.thenexusreborn.gamemaps.model.SGMap;
@@ -25,8 +24,8 @@ import com.thenexusreborn.survivalgames.settings.collection.SettingList;
 import com.thenexusreborn.survivalgames.settings.object.Setting;
 import com.thenexusreborn.survivalgames.settings.object.Setting.Info;
 import com.thenexusreborn.survivalgames.util.Operator;
+import com.thenexusreborn.survivalgames.util.SGPlayerStats;
 import com.thenexusreborn.survivalgames.util.SGUtils;
-import me.firestar311.starsql.api.objects.typehandlers.ValueHandler;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.HoverEvent.Action;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -42,6 +41,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
@@ -97,13 +97,13 @@ public class SGCommand implements CommandExecutor {
                     sender.sendMessage(MCUtils.color(MsgType.SEVERE + "Invalid control type detection. This is a bug, please report to Firestar311"));
                     return true;
                 }
-
-                if (Game.getControlType() == controlType) {
+                
+                if (game.getControlType() == controlType) {
                     sender.sendMessage(MCUtils.color(MsgType.WARN + "The game is already in " + controlType.name().toLowerCase() + " "));
                     return true;
                 }
 
-                Game.setControlType(controlType);
+                game.setControlType(controlType);
                 sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the game to " + MsgType.INFO.getVariableColor() + controlType.name().toLowerCase() + MsgType.INFO.getBaseColor() + " control."));
                 return true;
             }
@@ -429,8 +429,8 @@ public class SGCommand implements CommandExecutor {
                         }
 
                         String stat = args[3];
-                        Stat.Info info = StatHelper.getInfo(stat);
-                        if (info == null) {
+                        Field field = SGPlayerStats.getFields().get(stat);
+                        if (field == null) {
                             player.sendMessage(MCUtils.color(MsgType.WARN + "You provided an invalid stat name."));
                             return true;
                         }
