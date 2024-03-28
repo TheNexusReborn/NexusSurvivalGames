@@ -770,5 +770,7 @@ public class PlayerListener implements Listener {
             plugin.getLobby().removePlayer(nexusPlayer);
         }
         e.setQuitMessage(null);
+        SGPlayerStats stats = SurvivalGames.PLAYER_STATS.get(e.getPlayer().getUniqueId());
+        NexusAPI.getApi().getPrimaryDatabase().saveSilent(stats);
     }
 }
