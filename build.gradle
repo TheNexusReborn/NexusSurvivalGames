@@ -30,6 +30,12 @@ repositories {
     }
 }
 
+processResources {
+    filesMatching("*.yml") {
+        expand(project.properties)
+    }
+}
+
 dependencies {
     compileOnly 'com.github.StarDevelopmentLLC:StarCore:1.0.0-alpha.14'
     compileOnly 'com.github.StarDevelopmentLLC:StarChat:1.0.0-alpha.2'
@@ -60,3 +66,5 @@ publishing {
         }
     }
 }
+
+tasks.compileJava.dependsOn(clean)
