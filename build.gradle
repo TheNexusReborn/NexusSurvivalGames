@@ -45,6 +45,7 @@ dependencies {
     compileOnly 'com.thenexusreborn:NexusAPI:1.12-ALPHA'
     compileOnly 'org.spigotmc:spigot:1.8.8-R0.1-SNAPSHOT'
     compileOnly 'com.thenexusreborn:NexusMaps:1.0-ALPHA'
+    compileOnly 'com.thenexusreborn:NexusHub:1.6-ALPHA'
     compileOnly 'com.comphenix.protocol:ProtocolLib:4.8.0'
 }
 
