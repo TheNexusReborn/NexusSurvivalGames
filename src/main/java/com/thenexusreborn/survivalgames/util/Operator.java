@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.util;
 
 public enum Operator {
-    ADD('+') {
+    ADD("+") {
         public Number calculate(Number number1, Number number2) {
             if (number1 instanceof Integer && number2 instanceof Integer) {
                 return number1.intValue() + number2.intValue();
@@ -15,7 +15,7 @@ public enum Operator {
 
             return 0;
         }
-    }, SUBTRACT('-') {
+    }, SUBTRACT("-") {
         public Number calculate(Number number1, Number number2) {
             if (number1 instanceof Integer && number2 instanceof Integer) {
                 return number1.intValue() - number2.intValue();
@@ -29,7 +29,7 @@ public enum Operator {
 
             return 0;
         }
-    }, MULTIPLY('×') {
+    }, MULTIPLY("*") {
         public Number calculate(Number number1, Number number2) {
             if (number1 instanceof Integer && number2 instanceof Integer) {
                 return number1.intValue() * number2.intValue();
@@ -43,7 +43,7 @@ public enum Operator {
 
             return 0;
         }
-    }, DIVIDE('/') {
+    }, DIVIDE("/") {
         public Number calculate(Number number1, Number number2) {
             if (number1 instanceof Integer && number2 instanceof Integer) {
                 return number1.intValue() / number2.intValue();
@@ -58,13 +58,13 @@ public enum Operator {
         }
     };
 
-    private final char symbol;
+    private final String symbol;
 
-    Operator(char symbol) {
+    Operator(String symbol) {
         this.symbol = symbol;
     }
 
-    public char getSymbol() {
+    public String getSymbol() {
         return symbol;
     }
 
