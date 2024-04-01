@@ -20,6 +20,7 @@ import com.thenexusreborn.nexuscore.util.ServerProperties;
 import com.thenexusreborn.survivalgames.cmd.*;
 import com.thenexusreborn.survivalgames.disguises.NexusDisguises;
 import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.hooks.NexusHubHook;
 import com.thenexusreborn.survivalgames.hooks.SGPAPIExpansion;
 import com.thenexusreborn.survivalgames.listener.BlockListener;
 import com.thenexusreborn.survivalgames.listener.EntityListener;
@@ -63,6 +64,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
 
     private NexusCore nexusCore;
     private StarChat starChat;
+    private NexusHubHook nexusHubHook;
 
     private MapManager mapManager;
     private Lobby lobby;
@@ -133,6 +135,12 @@ public class SurvivalGames extends NexusSpigotPlugin {
 
         new SGPAPIExpansion(this).register();
         getLogger().info("Hooked into PlaceholderAPI");
+
+        Plugin nexusHubPlugin = getServer().getPluginManager().getPlugin("NexusHub");
+        if (nexusHubPlugin != null) {
+            this.nexusHubHook = new NexusHubHook(this, nexusHubPlugin);
+            getLogger().info("Applied Hooks and Usages for NexusHub.");
+        }
 
         deathMessagesFile = new File(getDataFolder(), "deathmessages.yml");
 
