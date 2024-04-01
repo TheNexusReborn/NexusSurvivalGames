@@ -3,6 +3,7 @@ package com.thenexusreborn.survivalgames;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starlib.Value;
 import com.stardevllc.starlib.Value.Type;
+import com.stardevllc.starlib.registry.UUIDRegistry;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.registry.ToggleRegistry;
@@ -57,9 +58,11 @@ import java.sql.Statement;
 import java.util.*;
 
 public class SurvivalGames extends NexusSpigotPlugin {
-
+    
+    public static SurvivalGames INSTANCE;
     public static final String MAP_URL = "https://starmediadev.com/files/nexusreborn/sgmaps/";
     public static final Queue<UUID> PLAYER_QUEUE = new LinkedList<>();
+    @Deprecated
     public static final Map<UUID, SGPlayerStats> PLAYER_STATS = new HashMap<>();
 
     private NexusCore nexusCore;
@@ -85,6 +88,12 @@ public class SurvivalGames extends NexusSpigotPlugin {
     private final SettingRegistry lobbySettingRegistry = new SettingRegistry();
     private final SettingRegistry gameSettingRegistry = new SettingRegistry();
     private int lastLocalLobbyId;
+    
+    private UUIDRegistry<SGPlayer> playerRegistry = new UUIDRegistry<>(SGPlayer::getUniqueId);
+
+    public static SurvivalGames getInstance() {
+        return INSTANCE;
+    }
 
     @Override
     public void onLoad() {
@@ -102,6 +111,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
 
     @Override
     public void onEnable() {
+        INSTANCE = this;
         getLogger().info("Loading NexusSurvivalGames v" + getDescription().getVersion());
         saveDefaultConfig();
 
@@ -558,5 +568,13 @@ public class SurvivalGames extends NexusSpigotPlugin {
 
     public void setLastLocalLobbyId(int lastLocalLobbyId) {
         this.lastLocalLobbyId = lastLocalLobbyId;
+    }
+
+    public NexusHubHook getNexusHubHook() {
+        return nexusHubHook;
+    }
+
+    public UUIDRegistry<SGPlayer> getPlayerRegistry() {
+        return playerRegistry;
     }
 }

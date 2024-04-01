@@ -11,6 +11,7 @@ import com.thenexusreborn.nexuscore.api.events.ToggleChangeEvent;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
+import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
@@ -717,12 +718,16 @@ public class PlayerListener implements Listener {
     public void onNexusPlayerLoad(NexusPlayerLoadEvent e) {
         NexusPlayer nexusPlayer = e.getNexusPlayer();
 
+        SGPlayer sgPlayer = new SGPlayer(nexusPlayer);
+
         SGPlayerStats stats;
         try {
             stats = NexusAPI.getApi().getPrimaryDatabase().get(SGPlayerStats.class, "uniqueid", e.getNexusPlayer().getUniqueId()).get(0);
         } catch (Throwable ex) {
             stats = new SGPlayerStats(e.getNexusPlayer().getUniqueId());
         }
+        
+        sgPlayer.setStats(stats);
         
         SurvivalGames.PLAYER_STATS.put(nexusPlayer.getUniqueId(), stats);
         
@@ -739,23 +744,28 @@ public class PlayerListener implements Listener {
         }
 
         SurvivalGames.PLAYER_QUEUE.offer(e.getNexusPlayer().getUniqueId());
-        if (plugin.getGame() != null) {
-            GameState state = plugin.getGame().getState();
-            if (state == GameState.ASSIGN_TEAMS) {
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        if (plugin.getGame().getState() != GameState.ASSIGN_TEAMS) {
-                            plugin.getGame().addPlayer(nexusPlayer, SurvivalGames.PLAYER_STATS.get(nexusPlayer.getUniqueId()));
-                            cancel();
+        
+        plugin.getPlayerRegistry().register(sgPlayer);
+        
+        if (plugin.getNexusHubHook() == null) {
+            if (plugin.getGame() != null) {
+                GameState state = plugin.getGame().getState();
+                if (state == GameState.ASSIGN_TEAMS) {
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            if (plugin.getGame().getState() != GameState.ASSIGN_TEAMS) {
+                                plugin.getGame().addPlayer(nexusPlayer, SurvivalGames.PLAYER_STATS.get(nexusPlayer.getUniqueId()));
+                                cancel();
+                            }
                         }
-                    }
-                }.runTaskTimer(plugin, 1L, 1L);
+                    }.runTaskTimer(plugin, 1L, 1L);
+                } else {
+                    plugin.getGame().addPlayer(nexusPlayer, stats);
+                }
             } else {
-                plugin.getGame().addPlayer(nexusPlayer, stats);
+                plugin.getLobby().addPlayer(nexusPlayer, stats);
             }
-        } else {
-            plugin.getLobby().addPlayer(nexusPlayer, stats);
         }
         e.setJoinMessage(null);
     }
