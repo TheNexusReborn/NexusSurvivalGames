@@ -25,6 +25,7 @@ import com.thenexusreborn.survivalgames.hooks.SGPAPIExpansion;
 import com.thenexusreborn.survivalgames.listener.BlockListener;
 import com.thenexusreborn.survivalgames.listener.EntityListener;
 import com.thenexusreborn.survivalgames.listener.PlayerListener;
+import com.thenexusreborn.survivalgames.listener.ServerListener;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyType;
 import com.thenexusreborn.survivalgames.loot.LootManager;
@@ -239,6 +240,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         getServer().getPluginManager().registerEvents(new EntityListener(this), this);
         getServer().getPluginManager().registerEvents(new BlockListener(this), this);
+        getServer().getPluginManager().registerEvents(new ServerListener(this), this);
 
         getLogger().info("Registered Listeners");
 
