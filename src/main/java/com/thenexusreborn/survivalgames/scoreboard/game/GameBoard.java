@@ -1,11 +1,15 @@
 package com.thenexusreborn.survivalgames.scoreboard.game;
 
-import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.api.scoreboard.*;
+import com.thenexusreborn.api.scoreboard.NexusScoreboard;
+import com.thenexusreborn.api.scoreboard.TeamBuilder;
+import com.thenexusreborn.api.scoreboard.ValueUpdater;
 import com.thenexusreborn.nexuscore.scoreboard.SpigotScoreboardView;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.*;
+import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.GamePlayer;
+import com.thenexusreborn.survivalgames.game.GameTeam;
+import com.thenexusreborn.survivalgames.game.Mode;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.ChatColor;
 
@@ -87,6 +91,6 @@ public class GameBoard extends SpigotScoreboardView {
             } 
         }));
         createTeam(new TeamBuilder("blank4").entry(ChatColor.DARK_PURPLE.toString()).score(2));
-        createTeam(new TeamBuilder("serverValue").prefix("&6&lSERVER: ").entry("&f" + NexusAPI.getApi().getServerManager().getCurrentServer().getName()).score(1));
+        createTeam(new TeamBuilder("serverValue").prefix("&6&lSERVER: ").entry("&fNexus")); //TODO
     }
 }

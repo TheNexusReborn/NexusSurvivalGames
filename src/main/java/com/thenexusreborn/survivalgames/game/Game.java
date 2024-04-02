@@ -109,7 +109,7 @@ public class Game {
         }
 
         gameInfo.setMapName(this.gameMap.getName().replace("'", "''"));
-        gameInfo.setServerName(NexusAPI.getApi().getServerManager().getCurrentServer().getName());
+        gameInfo.setServerName("Nexus"); //TODO
         for (MapSpawn spawn : this.gameMap.getSpawns()) {
             this.spawns.put(spawn.getIndex(), null);
         }

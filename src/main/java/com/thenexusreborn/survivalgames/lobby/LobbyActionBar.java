@@ -31,7 +31,7 @@ public class LobbyActionBar implements IActionBar {
 
         Timer timer = lobby.getTimer();
         if (lobby.getState() == LobbyState.WAITING || timer == null) {
-            return "&d&lNEXUS &7- &fPlaying on &f&l" + NexusAPI.getApi().getServerManager().getCurrentServer().getName();
+            return "&d&lNEXUS &7- &fPlaying on &f&lNexus"; //TODO
         }
         
         if (lobby.getState() == LobbyState.COUNTDOWN) {
