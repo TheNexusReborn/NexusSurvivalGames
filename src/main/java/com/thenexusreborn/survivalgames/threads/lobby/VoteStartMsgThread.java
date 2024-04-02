@@ -11,25 +11,18 @@ public class VoteStartMsgThread extends NexusThread<SurvivalGames> {
     }
     
     public void onRun() {
-        if (plugin.getGame() != null) {
-            return;
-        }
-    
-        Lobby lobby = plugin.getLobby();
-        if (lobby == null) {
-            return;
-        }
-    
-        if (lobby.getPlayers().isEmpty()) {
-            return;
-        }
-    
-        if (lobby.getState() != LobbyState.WAITING) {
-            return;
-        }
-    
-        if (lobby.getPlayers().size() < lobby.getLobbySettings().getMinPlayers()) {
-            lobby.sendMessage("&6&l>> &e&lDid you know that you can use &f&l/votestart &e&lto start a game early?");
+        for (Lobby lobby : plugin.getLobbies()) {
+            if (lobby.getPlayers().isEmpty()) {
+                continue;
+            }
+
+            if (lobby.getState() != LobbyState.WAITING) {
+                continue;
+            }
+
+            if (lobby.getPlayers().size() < lobby.getLobbySettings().getMinPlayers()) {
+                lobby.sendMessage("&6&l>> &e&lDid you know that you can use &f&l/votestart &e&lto start a game early?");
+            }
         }
     }
 }

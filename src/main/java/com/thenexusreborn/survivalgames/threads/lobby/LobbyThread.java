@@ -24,80 +24,77 @@ public class LobbyThread extends NexusThread<SurvivalGames> {
     
     @Override
     public void onRun() {
-        if (plugin.getGame() != null) {
-            return;
-        }
-        
-        World world = Bukkit.getWorld(ServerProperties.getLevelName());
-        for (Entity entity : world.getEntities()) {
-            if (!(entity instanceof Player)) {
-                entity.remove();
+        for (Lobby lobby : plugin.getLobbies()) {
+            World world = Bukkit.getWorld(ServerProperties.getLevelName());
+            for (Entity entity : world.getEntities()) {
+                if (!(entity instanceof Player)) {
+                    entity.remove();
+                }
             }
-        }
 
-        Lobby lobby = plugin.getLobby();
-        for (LobbyPlayer player : lobby.getPlayers()) {
-            SGUtils.updatePlayerHealthAndFood(Bukkit.getPlayer(player.getUniqueId()));
-        }
-        
-        world.setThundering(false);
-        world.setStorm(false);
-        
-        world.setGameRuleValue("doFireSpread", "false");
+            for (LobbyPlayer player : lobby.getPlayers()) {
+                SGUtils.updatePlayerHealthAndFood(Bukkit.getPlayer(player.getUniqueId()));
+            }
 
-        LobbyState state = lobby.getState();
-        if (state != LobbyState.MAP_EDITING) {
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                if (player.getLocation().getBlockY() < lobby.getSpawnpoint().getBlockY() - 20) {
-                    player.teleport(lobby.getSpawnpoint());
+            world.setThundering(false);
+            world.setStorm(false);
+
+            world.setGameRuleValue("doFireSpread", "false");
+
+            LobbyState state = lobby.getState();
+            if (state != LobbyState.MAP_EDITING) {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (player.getLocation().getBlockY() < lobby.getSpawnpoint().getBlockY() - 20) {
+                        player.teleport(lobby.getSpawnpoint());
+                    }
                 }
             }
-        }
-        
-        for (LobbyPlayer player : lobby.getPlayers()) {
-            Player bukkitPlayer = Bukkit.getPlayer(player.getUniqueId());
-            for (LobbyPlayer other : lobby.getPlayers()) {
-                Player otherBukkitPlayer = Bukkit.getPlayer(other.getUniqueId());
-                if (player.getToggleValue("vanish")) {
-                    if (other.getRank().ordinal() > Rank.HELPER.ordinal()) {
-                        otherBukkitPlayer.hidePlayer(bukkitPlayer);
+
+            for (LobbyPlayer player : lobby.getPlayers()) {
+                Player bukkitPlayer = Bukkit.getPlayer(player.getUniqueId());
+                for (LobbyPlayer other : lobby.getPlayers()) {
+                    Player otherBukkitPlayer = Bukkit.getPlayer(other.getUniqueId());
+                    if (player.getToggleValue("vanish")) {
+                        if (other.getRank().ordinal() > Rank.HELPER.ordinal()) {
+                            otherBukkitPlayer.hidePlayer(bukkitPlayer);
+                        }
+                    } else {
+                        otherBukkitPlayer.showPlayer(bukkitPlayer);
                     }
-                } else {
-                    otherBukkitPlayer.showPlayer(bukkitPlayer);
-                }
-                
-                if (other.getToggleValue("vanish")) {
-                    if (player.getRank().ordinal() > Rank.HELPER.ordinal()) {
-                        bukkitPlayer.hidePlayer(otherBukkitPlayer);
+
+                    if (other.getToggleValue("vanish")) {
+                        if (player.getRank().ordinal() > Rank.HELPER.ordinal()) {
+                            bukkitPlayer.hidePlayer(otherBukkitPlayer);
+                        }
+                    } else {
+                        bukkitPlayer.showPlayer(otherBukkitPlayer);
                     }
-                } else {
-                    bukkitPlayer.showPlayer(otherBukkitPlayer);
                 }
             }
-        }
-        
-        boolean resetLobby = false;
-        if (!(state == LobbyState.WAITING || state == LobbyState.MAP_EDITING)) {
-            if (lobby.getTimer() == null) {
-                resetLobby = true;
-            } else if (TimeUnit.SECONDS.fromMillis(lobby.getTimer().getTime()) <= 0) {
-                if (state == LobbyState.PREPARING_GAME || state == LobbyState.STARTING || state == LobbyState.GAME_PREPARED) {
-                    this.secondsInPrepareGame++;
-                    if (this.secondsInPrepareGame >= 10) {
+
+            boolean resetLobby = false;
+            if (!(state == LobbyState.WAITING || state == LobbyState.MAP_EDITING)) {
+                if (lobby.getTimer() == null) {
+                    resetLobby = true;
+                } else if (TimeUnit.SECONDS.fromMillis(lobby.getTimer().getTime()) <= 0) {
+                    if (state == LobbyState.PREPARING_GAME || state == LobbyState.STARTING || state == LobbyState.GAME_PREPARED) {
+                        this.secondsInPrepareGame++;
+                        if (this.secondsInPrepareGame >= 10) {
+                            resetLobby = true;
+                        }
+                    } else {
                         resetLobby = true;
                     }
-                } else {
+                }
+
+                if (Bukkit.getOnlinePlayers().size() <= 1) {
                     resetLobby = true;
                 }
             }
-            
-            if (Bukkit.getOnlinePlayers().size() <= 1) {
-                resetLobby = true;
+
+            if (resetLobby) {
+                //lobby.resetInvalidState();
             }
-        }
-        
-        if (resetLobby) {
-            //lobby.resetInvalidState();
         }
     }
 }

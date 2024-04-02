@@ -97,7 +97,7 @@ public class SetupPhase extends GamePhase {
                     gameMap.getWorld().setGameRuleValue("doFireTick", "false");
                     gameMap.getWorld().setGameRuleValue("keepInventory", "false");
                     gameMap.getWorld().setDifficulty(Difficulty.EASY);
-                    plugin.getLobby().resetLobby();
+//                    plugin.getLobby().resetLobby(); TODO Create new lobby
                     setStatus(PhaseStatus.COMPLETE);
                     checkPlayerCount();
                     game.setState(GameState.SETUP_COMPLETE); //TODO

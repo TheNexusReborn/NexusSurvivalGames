@@ -14,13 +14,14 @@ public class PlayerUpdateThread extends NexusThread<SurvivalGames> {
     }
     
     public void onRun() {
-        Game game = plugin.getGame();
-        if (game != null) {
-            for (GamePlayer player : game.getPlayers().values()) {
-                if (player.getTeam() == GameTeam.SPECTATORS) {
-                    SGUtils.updatePlayerHealthAndFood(Bukkit.getPlayer(player.getUniqueId()));
-                } else if (player.getTeam() == GameTeam.MUTATIONS) {
-                    player.setFood(20, 20F);
+        for (Game game : plugin.getGames()) {
+            if (game != null) {
+                for (GamePlayer player : game.getPlayers().values()) {
+                    if (player.getTeam() == GameTeam.SPECTATORS) {
+                        SGUtils.updatePlayerHealthAndFood(Bukkit.getPlayer(player.getUniqueId()));
+                    } else if (player.getTeam() == GameTeam.MUTATIONS) {
+                        player.setFood(20, 20F);
+                    }
                 }
             }
         }

@@ -1,6 +1,7 @@
 package com.thenexusreborn.survivalgames.game;
 
 import com.thenexusreborn.api.player.IActionBar;
+import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
 
@@ -8,15 +9,17 @@ public class GameActionBar implements IActionBar {
 
     private final GamePlayer player;
     private final SurvivalGames plugin;
+    private final SGPlayer sgPlayer;
 
     public GameActionBar(SurvivalGames plugin, GamePlayer player) {
         this.plugin = plugin;
         this.player = player;
+        this.sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
     }
 
     @Override
     public String getText() {
-        Game game = plugin.getGame();
+        Game game = sgPlayer.getGame();
         if (game == null || game.getState() == GameState.UNDEFINED || game.getState() == GameState.ERROR) {
             return "";
         }

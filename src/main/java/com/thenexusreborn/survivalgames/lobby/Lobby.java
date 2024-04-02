@@ -2,12 +2,13 @@ package com.thenexusreborn.survivalgames.lobby;
 
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
-import com.stardevllc.starlib.time.TimeUnit;
 import com.stardevllc.starclock.clocks.Timer;
+import com.stardevllc.starlib.time.TimeUnit;
 import com.stardevllc.starmclib.actor.Actor;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
+import com.thenexusreborn.gamemaps.FileHelper;
 import com.thenexusreborn.gamemaps.model.MapRating;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.scoreboard.impl.RankTablistHandler;
@@ -16,11 +17,10 @@ import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.ProgressBar;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.survivalgames.ControlType;
+import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.lobby.timer.LobbyTimerCallback;
-import com.thenexusreborn.survivalgames.loot.LootManager;
-import com.thenexusreborn.survivalgames.loot.LootTable;
 import com.thenexusreborn.survivalgames.scoreboard.lobby.DebugLobbyBoard;
 import com.thenexusreborn.survivalgames.scoreboard.lobby.LobbyBoard;
 import com.thenexusreborn.survivalgames.scoreboard.lobby.MapEditingBoard;
@@ -36,13 +36,21 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class Lobby {
     private final SurvivalGames plugin;
@@ -62,20 +70,87 @@ public class Lobby {
     private final List<StatSign> statSigns = new ArrayList<>();
     private final List<TributeSign> tributeSigns = new ArrayList<>();
     private boolean debugMode;
+    
+    private World world;
+    
+    private File file;
+    private FileConfiguration config;
 
-    public Lobby(SurvivalGames plugin) {
+    public Lobby(SurvivalGames plugin, LobbyType type) {
         this.plugin = plugin;
-        plugin.getLogger().info("Setting up the lobby.");
         
-        this.localId = plugin.getLastLocalLobbyId();
-        plugin.setLastLocalLobbyId(plugin.getLastLocalLobbyId() + 1);
+        this.file = new File(plugin.getDataFolder() + File.separator + "lobby" + File.separator + type.name().toLowerCase() + ".yml");
+        if (!file.exists()) {
+            file.mkdirs();
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
-        if (plugin.getConfig().contains("mapsigns")) {
-            plugin.getLogger().info("Loading Map Signs");
-            ConfigurationSection signsSection = plugin.getConfig().getConfigurationSection("mapsigns");
+        config = YamlConfiguration.loadConfiguration(file);
+    }
+    
+    public void setup() {
+        if (this.getConfig().contains("zipfile")) {
+            File zipFile = new File(this.getConfig().getString("zipfile"));
+            File destination = new File("./Lobby-" + getLocalId());
+            FileHelper.createDirectoryIfNotExists(destination.toPath());
+            byte[] buffer = new byte[1024];
+
+            try {
+                ZipInputStream zis = new ZipInputStream(Files.newInputStream(zipFile.toPath()));
+
+                for(ZipEntry zipEntry = zis.getNextEntry(); zipEntry != null; zipEntry = zis.getNextEntry()) {
+                    Path newFile = this.newFile(destination, zipEntry);
+                    if (zipEntry.isDirectory()) {
+                        FileHelper.createDirectoryIfNotExists(newFile);
+                    } else {
+                        Path parent = newFile.getParent();
+                        if (!Files.isDirectory(parent)) {
+                            FileHelper.createDirectoryIfNotExists(parent);
+                            if (Files.notExists(parent)) {
+                                throw new IOException("Failed to create directory " + parent);
+                            }
+                        }
+
+                        FileOutputStream fos = new FileOutputStream(newFile.toFile());
+
+                        int len;
+                        while((len = zis.read(buffer)) > 0) {
+                            fos.write(buffer, 0, len);
+                        }
+
+                        fos.close();
+                    }
+                }
+
+                zis.closeEntry();
+                zis.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
+            
+            this.world = Bukkit.createWorld(new WorldCreator("Lobby-" + getLocalId()).environment(World.Environment.NORMAL));
+        }
+        
+        if (this.getConfig().contains("spawnpoint")) {
+            int x = Integer.parseInt(this.getConfig().getString("spawnpoint.x"));
+            int y = Integer.parseInt(this.getConfig().getString("spawnpoint.y"));
+            int z = Integer.parseInt(this.getConfig().getString("spawnpoint.z"));
+            float yaw = Float.parseFloat(this.getConfig().getString("spawnpoint.yaw"));
+            float pitch = Float.parseFloat(this.getConfig().getString("spawnpoint.pitch"));
+
+            Location location = new Location(this.world, x, y, z, yaw, pitch);
+            setSpawnpoint(location);
+        }
+
+        if (this.getConfig().contains("mapsigns")) {
+            ConfigurationSection signsSection = this.getConfig().getConfigurationSection("mapsigns");
             for (String key : signsSection.getKeys(false)) {
                 int position = Integer.parseInt(key);
-                World world = Bukkit.getWorld(signsSection.getString(key + ".world"));
                 int x = signsSection.getInt(key + ".x");
                 int y = signsSection.getInt(key + ".y");
                 int z = signsSection.getInt(key + ".z");
@@ -85,11 +160,9 @@ public class Lobby {
             plugin.getLogger().info("Map Signs Loaded");
         }
 
-        if (plugin.getConfig().contains("statsigns")) {
-            plugin.getLogger().info("Loading Stat Signs");
-            ConfigurationSection signsSection = plugin.getConfig().getConfigurationSection("statsigns");
+        if (this.getConfig().contains("statsigns")) {
+            ConfigurationSection signsSection = this.getConfig().getConfigurationSection("statsigns");
             for (String key : signsSection.getKeys(false)) {
-                World world = Bukkit.getWorld(signsSection.getString(key + ".world"));
                 int x = signsSection.getInt(key + ".x");
                 int y = signsSection.getInt(key + ".y");
                 int z = signsSection.getInt(key + ".z");
@@ -99,12 +172,10 @@ public class Lobby {
             }
         }
 
-        if (plugin.getConfig().contains("tributesigns")) {
-            plugin.getLogger().info("Loading Tribute Signs");
-            ConfigurationSection signsSection = plugin.getConfig().getConfigurationSection("tributesigns");
+        if (this.getConfig().contains("tributesigns")) {
+            ConfigurationSection signsSection = this.getConfig().getConfigurationSection("tributesigns");
             for (String key : signsSection.getKeys(false)) {
                 int index = Integer.parseInt(key);
-                World world = Bukkit.getWorld(signsSection.getString(key + ".world"));
                 int signX = signsSection.getInt(key + ".sign.x");
                 int signY = signsSection.getInt(key + ".sign.y");
                 int signZ = signsSection.getInt(key + ".sign.z");
@@ -123,19 +194,30 @@ public class Lobby {
 
         this.lobbySettings = plugin.getLobbySettings("default");
         this.gameSettings = plugin.getGameSettings("default");
-        
+
         this.lobbyChatRoom = new ChatRoom(plugin, "room-lobby-" + getLocalId(), Actor.getServerActor(), "&8<&3%nexussg_score%&8> &8(&2&l%nexuscore_level%&8) &r%nexuscore_displayname%&8: %nexuscore_chatcolor%{message}", "{message}");
         plugin.getStarChat().getRoomRegistry().register(this.lobbyChatRoom.getSimplifiedName(), this.lobbyChatRoom);
 
         generateMapOptions();
+    }
 
-        for (LootTable lootTable : LootManager.getInstance().getLootTables()) {
-            lootTable.generateNewProbabilities(new Random());
+    private Path newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
+        Path path = FileHelper.subPath(destinationDir.toPath(), zipEntry.getName());
+        String destDirPath = destinationDir.getCanonicalPath();
+        String destFilePath = path.toFile().getCanonicalPath();
+        if (!destFilePath.startsWith(destDirPath + File.separator)) {
+            throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
+        } else {
+            return path;
         }
     }
 
     public int getLocalId() {
         return localId;
+    }
+
+    public FileConfiguration getConfig() {
+        return config;
     }
 
     public void resetInvalidState() {
@@ -403,7 +485,8 @@ public class Lobby {
 
         Game game = new Game(gameMap, this.gameSettings, getPlayers());
         this.players.clear();
-        plugin.setGame(game);
+        plugin.getGames().register(game);
+        plugin.getGames().deregister(getLocalId());
         if (game.getControlType() == ControlType.AUTOMATIC) {
             this.state = LobbyState.STARTING;
             game.setup();
@@ -443,7 +526,9 @@ public class Lobby {
         return gameMap;
     }
 
-    public void addPlayer(NexusPlayer nexusPlayer, SGPlayerStats stats) {
+    public void addPlayer(SGPlayer sgPlayer) {
+        NexusPlayer nexusPlayer = sgPlayer.getNexusPlayer();
+        SGPlayerStats stats = sgPlayer.getStats();
         if (nexusPlayer == null) {
             return;
         }
@@ -451,8 +536,10 @@ public class Lobby {
         if (nexusPlayer.getPlayer() == null) {
             return;
         }
-        
-        this.players.put(nexusPlayer.getUniqueId(), new LobbyPlayer(nexusPlayer, stats));
+
+        LobbyPlayer lobbyPlayer = new LobbyPlayer(nexusPlayer, stats);
+        this.players.put(nexusPlayer.getUniqueId(), lobbyPlayer);
+        sgPlayer.setLobby(this, lobbyPlayer);
         this.lobbyChatRoom.addMember(nexusPlayer.getUniqueId(), DefaultPermissions.VIEW_MESSAGES, DefaultPermissions.SEND_MESSAGES);
         this.plugin.getStarChat().setPlayerFocus(Bukkit.getPlayer(nexusPlayer.getUniqueId()), this.lobbyChatRoom);
 
@@ -540,7 +627,7 @@ public class Lobby {
             nexusPlayer.getScoreboard().setView(new LobbyBoard(nexusPlayer.getScoreboard(), this));
         }
         nexusPlayer.getScoreboard().setTablistHandler(new RankTablistHandler(nexusPlayer.getScoreboard()));
-        nexusPlayer.setActionBar(new LobbyActionBar(plugin));
+        nexusPlayer.setActionBar(new LobbyActionBar(plugin, plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId())));
         sendMapOptions(nexusPlayer);
     }
 
@@ -548,7 +635,11 @@ public class Lobby {
         if (!this.players.containsKey(nexusPlayer.getUniqueId())) {
             return;
         }
+        
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId());
+        
         this.lobbyChatRoom.removeMember(nexusPlayer.getUniqueId());
+        sgPlayer.setLobby(null, null);
         this.players.remove(nexusPlayer.getUniqueId());
         int totalPlayers = 0;
         for (LobbyPlayer player : getPlayers()) {
@@ -641,13 +732,12 @@ public class Lobby {
             this.gameSettings = plugin.getGameSettings("default");
         }
 
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(player.getUniqueId());
-            addPlayer(nexusPlayer, SurvivalGames.PLAYER_STATS.get(player.getUniqueId()));
+        for (UUID player : game.getPlayers().keySet()) {
+            addPlayer(plugin.getPlayerRegistry().get(player));
         }
 
-        plugin.getGame().getGameMap().removeFromServer(plugin);
-        plugin.setGame(null);
+        game.getGameMap().removeFromServer(plugin);
+        plugin.getGames().deregister(game.getLocalId());
     }
 
     public Location getSpawnpoint() {
@@ -735,10 +825,6 @@ public class Lobby {
     }
 
     public void addMapVote(NexusPlayer nexusPlayer, Location location) {
-        if (plugin.getGame() != null) {
-            return;
-        }
-
         LobbyPlayer player = this.players.get(nexusPlayer.getUniqueId());
 
         for (Entry<Integer, Location> entry : this.mapSigns.entrySet()) {
@@ -863,5 +949,13 @@ public class Lobby {
                 }
             }
         }
+    }
+
+    public void setLocalId(int localId) {
+        this.localId = localId;
+    }
+
+    public World getWorld() {
+        return this.world;
     }
 }

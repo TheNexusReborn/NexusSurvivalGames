@@ -5,20 +5,23 @@ import com.stardevllc.starlib.time.TimeUnit;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.IActionBar;
 import com.thenexusreborn.survivalgames.ControlType;
+import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 
 public class LobbyActionBar implements IActionBar {
     
     private final SurvivalGames plugin;
-    
-    public LobbyActionBar(SurvivalGames plugin) {
+    private final SGPlayer player;
+
+    public LobbyActionBar(SurvivalGames plugin, SGPlayer player) {
         this.plugin = plugin;
+        this.player = player;
     }
     
     @Override
     public String getText() {
-        Lobby lobby = plugin.getLobby();
-        if (plugin.getGame() != null) {
+        Lobby lobby = player.getLobby();
+        if (player.getGame() != null) {
             return "";
         }
         

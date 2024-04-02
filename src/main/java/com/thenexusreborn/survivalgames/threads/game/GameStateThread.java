@@ -10,37 +10,33 @@ public class GameStateThread extends NexusThread<SurvivalGames> {
     public GameStateThread(SurvivalGames plugin) {
         super(plugin, 1L, false);
     }
-    
+
     @Override
     public void onRun() {
-        if (plugin.getGame() == null) {
-            return;
-        }
+        for (Game game : plugin.getGames()) {
+            if (game.getControlType() == ControlType.MANUAL) {
+                continue;
+            }
 
-        Game game = plugin.getGame();
-        
-        if (game.getControlType() == ControlType.MANUAL) {
-            return;
-        }
-        
-        if (game.getState() == GameState.SETUP_COMPLETE) {
-            game.assignStartingTeams();
-        } else if (game.getState() == GameState.TEAMS_ASSIGNED) {
-            game.teleportStart();
-        } else if (game.getState() == GameState.TELEPORT_START_DONE) {
-            game.startWarmup();
-        } else if (game.getState() == GameState.WARMUP_DONE) {
-            game.startGame();
-        } else if (game.getState() == GameState.INGAME_DONE) {
-            game.teleportDeathmatch();
-        } else if (game.getState() == GameState.TELEPORT_DEATHMATCH_DONE) {
-            game.teleportDeathmatch();
-        } else if (game.getState() == GameState.DEATHMATCH_WARMUP_DONE) {
-            game.startDeathmatch();
-        } else if (game.getState() == GameState.GAME_COMPLETE) {
-            game.end();
-        } else if (game.getState() == GameState.NEXT_GAME_READY) {
-            game.nextGame();
+            if (game.getState() == GameState.SETUP_COMPLETE) {
+                game.assignStartingTeams();
+            } else if (game.getState() == GameState.TEAMS_ASSIGNED) {
+                game.teleportStart();
+            } else if (game.getState() == GameState.TELEPORT_START_DONE) {
+                game.startWarmup();
+            } else if (game.getState() == GameState.WARMUP_DONE) {
+                game.startGame();
+            } else if (game.getState() == GameState.INGAME_DONE) {
+                game.teleportDeathmatch();
+            } else if (game.getState() == GameState.TELEPORT_DEATHMATCH_DONE) {
+                game.teleportDeathmatch();
+            } else if (game.getState() == GameState.DEATHMATCH_WARMUP_DONE) {
+                game.startDeathmatch();
+            } else if (game.getState() == GameState.GAME_COMPLETE) {
+                game.end();
+            } else if (game.getState() == GameState.NEXT_GAME_READY) {
+                game.nextGame();
+            }
         }
     }
 }

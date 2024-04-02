@@ -11,22 +11,18 @@ public class MapChatOptionsMsgThread extends NexusThread<SurvivalGames> {
     }
     
     public void onRun() {
-        Lobby lobby = plugin.getLobby();
-        
-        if (plugin.getGame() != null) {
-            return;
-        }
-    
-        if (lobby.getPlayers().isEmpty()) {
-            return;
-        }
-    
-        if (!(lobby.getState() == LobbyState.WAITING || lobby.getState() == LobbyState.COUNTDOWN)) {
-            return;
-        }
-    
-        for (LobbyPlayer nexusPlayer : lobby.getPlayers()) {
-            lobby.sendMapOptions(nexusPlayer.getPlayer());
+        for (Lobby lobby : plugin.getLobbies()) {
+            if (lobby.getPlayers().isEmpty()) {
+                continue;
+            }
+
+            if (!(lobby.getState() == LobbyState.WAITING || lobby.getState() == LobbyState.COUNTDOWN)) {
+                continue;
+            }
+
+            for (LobbyPlayer nexusPlayer : lobby.getPlayers()) {
+                lobby.sendMapOptions(nexusPlayer.getPlayer());
+            }
         }
     }
 }

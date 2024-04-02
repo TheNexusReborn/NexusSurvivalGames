@@ -4,7 +4,10 @@ import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.util.*;
+import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
+import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.command.*;
@@ -27,17 +30,21 @@ public class MapVoteCommand implements CommandExecutor {
             return true;
         }
         
-        if (!(sender instanceof Player)) {
+        if (!(sender instanceof Player player)) {
             sender.sendMessage(MCUtils.color(MsgType.WARN + "Only players can use that command."));
             return true;
         }
+
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
+        Game game = sgPlayer.getGame();
+        Lobby lobby = sgPlayer.getLobby();
         
-        if (plugin.getGame() != null) {
+        if (game != null) {
             sender.sendMessage(MCUtils.color(MsgType.WARN + "You cannot vote for a map during a game."));
             return true;
         }
         
-        if (!(plugin.getLobby().getState() == LobbyState.WAITING || plugin.getLobby().getState() == LobbyState.COUNTDOWN)) {
+        if (!(lobby.getState() == LobbyState.WAITING || lobby.getState() == LobbyState.COUNTDOWN)) {
             sender.sendMessage(MCUtils.color(MsgType.WARN + "Invalid lobby state to vote."));
             return true;
         }
@@ -51,13 +58,13 @@ public class MapVoteCommand implements CommandExecutor {
         
         try {
             int position = Integer.parseInt(args[0]);
-            boolean contains = plugin.getLobby().getMapOptions().containsKey(position);
+            boolean contains = lobby.getMapOptions().containsKey(position);
             if (!contains) {
                 sender.sendMessage(MCUtils.color(MsgType.WARN + "The map options do not contain that position."));
                 return true;
             }
     
-            plugin.getLobby().addMapVote(nexusPlayer, plugin.getLobby().getMapSigns().get(position));
+            lobby.addMapVote(nexusPlayer, lobby.getMapSigns().get(position));
         } catch (NumberFormatException e) {
             StringBuilder sb = new StringBuilder();
             for (String arg : args) {
@@ -70,9 +77,9 @@ public class MapVoteCommand implements CommandExecutor {
                 return true;
             }
     
-            for (Entry<Integer, SGMap> entry : plugin.getLobby().getMapOptions().entrySet()) {
+            for (Entry<Integer, SGMap> entry : lobby.getMapOptions().entrySet()) {
                 if (gameMap.getName().equalsIgnoreCase(entry.getValue().getName())) {
-                    plugin.getLobby().addMapVote(nexusPlayer, plugin.getLobby().getMapSigns().get(entry.getKey()));
+                    lobby.addMapVote(nexusPlayer, lobby.getMapSigns().get(entry.getKey()));
                     return true;
                 }
             }

@@ -7,6 +7,7 @@ import com.stardevllc.starui.gui.InventoryGUI;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
+import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.game.GameTeam;
@@ -21,6 +22,8 @@ import java.util.stream.Collectors;
 public class PlayerMenu extends InventoryGUI {
     public PlayerMenu(SurvivalGames plugin, GamePlayer player) {
         super(1, "&lMenu " + player.getName());
+
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
 
         Button teleportButton = new Button().iconCreator(p -> ItemBuilder.start(Material.ENDER_PEARL).displayName("&e&lTeleport").build())
                 .consumer(e -> {
@@ -37,8 +40,8 @@ public class PlayerMenu extends InventoryGUI {
         Button sponsorButton = new Button().iconCreator(p -> ItemBuilder.start(Material.CHEST).displayName("&e&lSponsor").build())
                 .consumer(e -> {
                     GuiManager manager = plugin.getServer().getServicesManager().getRegistration(GuiManager.class).getProvider();
-                    GamePlayer gp = plugin.getGame().getPlayer(e.getWhoClicked().getUniqueId());
-                    if (!plugin.getGame().getSettings().isAllowSponsoring()) {
+                    GamePlayer gp = sgPlayer.getGamePlayer();
+                    if (!sgPlayer.getGame().getSettings().isAllowSponsoring()) {
                         gp.sendMessage(MsgType.WARN + "Sponsoring is disabled for this game.");
                         return;
                     }
@@ -58,7 +61,7 @@ public class PlayerMenu extends InventoryGUI {
         addElement(teleportButton);
         addElement(vitalsElement);
         addElement(viewInventoryButton);
-        if (plugin.getGame().getSettings().isAllowSponsoring() && player.getToggleValue("allowsponsors") && player.getTeam() == GameTeam.TRIBUTES) {
+        if (sgPlayer.getGame().getSettings().isAllowSponsoring() && player.getToggleValue("allowsponsors") && player.getTeam() == GameTeam.TRIBUTES) {
             addElement(sponsorButton);
         }
         addElement(statsElement);

@@ -53,7 +53,7 @@ public abstract class GamePhase {
     protected boolean checkPlayerCount() {
         if (game.getPlayers().size() <= 1) {
             game.setState(GameState.ENDING);
-            Game.getPlugin().getLobby().fromGame(game);
+//            Game.getPlugin().getLobby().fromGame(game); TODO Create new lobby
             for (Player player : Bukkit.getOnlinePlayers()) {
                 player.sendMessage(MsgType.WARN + "Detected only one player left in the game, resetting back to lobby.");
             }

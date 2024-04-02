@@ -1,6 +1,7 @@
 package com.thenexusreborn.survivalgames.mutations.impl;
 
 import com.thenexusreborn.nexuscore.util.timer.Timer;
+import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.mutations.*;
 import com.thenexusreborn.survivalgames.mutations.timer.*;
 import org.bukkit.*;
@@ -18,8 +19,8 @@ public class ChickenMutation extends Mutation {
     
     private List<Entity> chickens = new ArrayList<>();
     
-    protected ChickenMutation(UUID player, UUID target) {
-        super(MutationType.CHICKEN, player, target);
+    protected ChickenMutation(Game game, UUID player, UUID target) {
+        super(game, MutationType.CHICKEN, player, target);
     }
     
     public boolean isLaunchOnCooldown() {

@@ -20,6 +20,7 @@ import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.ControlType;
+import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.chat.GameTeamChatroom;
 import com.thenexusreborn.survivalgames.disguises.DisguiseAPI;
@@ -33,7 +34,9 @@ import com.thenexusreborn.survivalgames.game.state.phase.AssignTeamsPhase;
 import com.thenexusreborn.survivalgames.game.state.phase.SetupPhase;
 import com.thenexusreborn.survivalgames.game.state.phase.TeleportToMapPhase;
 import com.thenexusreborn.survivalgames.game.timer.old.*;
+import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
+import com.thenexusreborn.survivalgames.lobby.LobbyType;
 import com.thenexusreborn.survivalgames.loot.Items;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
 import com.thenexusreborn.survivalgames.mutations.MutationEffect;
@@ -69,7 +72,7 @@ public class Game {
     public static final TimeFormat TIME_FORMAT = new TimeFormat("%*00h%%#0m%%00s%");
     public static final TimeFormat LONG_TIME_FORMAT = new TimeFormat("%*00h%%00m%%00s%");
 
-    private final int localId;
+    private int localId = -1;
     private final SGMap gameMap;
     private ControlType controlType = ControlType.AUTOMATIC;
     private final GameSettings settings;
@@ -92,12 +95,10 @@ public class Game {
     private GamePhase setupPhase, assignTeamsPhase, teleportToMapPhase;
 
     public Game(SGMap gameMap, GameSettings settings, Collection<LobbyPlayer> players) {
-        this.localId = plugin.getLastLocalGameId();
-        plugin.setLastLocalGameId(plugin.getLastLocalGameId() + 1);
         this.gameMap = gameMap;
         this.settings = settings;
         this.gameInfo = new GameInfo();
-        
+
         this.gameChatroom = new ChatRoom(plugin, "room-game-" + this.localId + "-main", Actor.getServerActor(), "{message}", "{message}");
         plugin.getStarChat().getRoomRegistry().register(gameChatroom.getSimplifiedName(), gameChatroom);
 
@@ -106,7 +107,7 @@ public class Game {
             this.chatRooms.put(team, chatroom);
             plugin.getStarChat().getRoomRegistry().register(chatroom.getSimplifiedName(), chatroom);
         }
-        
+
         gameInfo.setMapName(this.gameMap.getName().replace("'", "''"));
         gameInfo.setServerName(NexusAPI.getApi().getServerManager().getCurrentServer().getName());
         for (MapSpawn spawn : this.gameMap.getSpawns()) {
@@ -115,7 +116,9 @@ public class Game {
         List<String> playerNames = new ArrayList<>();
         int tributeCount = 0;
         for (LobbyPlayer player : players) {
+            SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
             GamePlayer gamePlayer = new GamePlayer(player.getPlayer(), this, player.getStats());
+            sgPlayer.setGame(this, gamePlayer);
             if (player.isSpectating()) {
                 gamePlayer.setTeam(GameTeam.SPECTATORS);
             } else {
@@ -129,7 +132,7 @@ public class Game {
         }
         gameInfo.setPlayerCount(tributeCount);
         gameInfo.setPlayers(playerNames.toArray(new String[0]));
-
+        
         this.setupPhase = new SetupPhase(this);
         this.assignTeamsPhase = new AssignTeamsPhase(this);
         this.teleportToMapPhase = new TeleportToMapPhase(this);
@@ -137,6 +140,10 @@ public class Game {
 
     public int getLocalId() {
         return localId;
+    }
+
+    public void setLocalId(int localId) {
+        this.localId = localId;
     }
 
     public void setState(GameState state) {
@@ -187,15 +194,13 @@ public class Game {
     public void setControlType(ControlType controlType) {
         this.controlType = controlType;
         if (controlType == ControlType.MANUAL) {
-            if (plugin.getGame() != null) {
-                if (plugin.getGame().getTimer() != null) {
-                    plugin.getGame().getTimer().cancel();
-                    plugin.getGame().timer = null;
-                }
-                if (plugin.getGame().getGraceperiodTimer() != null) {
-                    plugin.getGame().getGraceperiodTimer().cancel();
-                    plugin.getGame().graceperiodTimer = null;
-                }
+            if (getTimer() != null) {
+                getTimer().cancel();
+                timer = null;
+            }
+            if (getGraceperiodTimer() != null) {
+                getGraceperiodTimer().cancel();
+                graceperiodTimer = null;
             }
         }
     }
@@ -223,6 +228,8 @@ public class Game {
 
     public void addPlayer(NexusPlayer nexusPlayer, SGPlayerStats stats) {
         GamePlayer gamePlayer = new GamePlayer(nexusPlayer, this, stats);
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId());
+        sgPlayer.setGame(this, gamePlayer);
         gamePlayer.setStatus(GamePlayer.Status.ADDING_TO_GAME);
         gamePlayer.setTeam(GameTeam.SPECTATORS);
         gamePlayer.sendMessage(GameTeam.SPECTATORS.getJoinMessage());
@@ -273,10 +280,12 @@ public class Game {
         EnumSet<GameState> ignoreStates = EnumSet.of(UNDEFINED, SETTING_UP, SETUP_COMPLETE, ASSIGN_TEAMS, TEAMS_ASSIGNED, TELEPORT_START, TELEPORT_START_DONE, ERROR, ENDING, ENDED);
         if (!ignoreStates.contains(this.state)) {
             if (gamePlayer.getTeam() == GameTeam.TRIBUTES || gamePlayer.getTeam() == GameTeam.MUTATIONS) {
-                killPlayer(gamePlayer, new DeathInfo(plugin.getGame(), System.currentTimeMillis(), gamePlayer, DeathType.SUICIDE));
+                killPlayer(gamePlayer, new DeathInfo(this, System.currentTimeMillis(), gamePlayer, DeathType.SUICIDE));
             }
         }
-
+        
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId());
+        sgPlayer.setGame(null, null);
         this.players.remove(nexusPlayer.getUniqueId());
 
         if (nexusPlayer.getToggleValue("vanish")) {
@@ -409,8 +418,10 @@ public class Game {
     public void handleError(String message) {
         setState(ERROR);
         sendMessage("&4&l>> &4" + message + " Resetting back to lobby.");
-        plugin.getLobby().resetLobby();
-        plugin.getLobby().fromGame(this);
+        Lobby lobby = new Lobby(plugin, LobbyType.CUSTOM);
+        plugin.getLobbies().register(lobby);
+        lobby.setup();
+        lobby.fromGame(this);
     }
 
     public void sendMessage(String message) {
@@ -784,8 +795,10 @@ public class Game {
         for (GameTeamChatroom chatroom : this.getChatRooms().values()) {
             roomRegistry.deregister(chatroom.getSimplifiedName());
         }
-
-        plugin.getLobby().fromGame(this);
+        
+        Lobby lobby = new Lobby(plugin, LobbyType.CUSTOM);
+        plugin.getLobbies().register(lobby);
+        lobby.fromGame(this);
     }
 
     public void killPlayer(GamePlayer gamePlayer, DeathInfo deathInfo) {

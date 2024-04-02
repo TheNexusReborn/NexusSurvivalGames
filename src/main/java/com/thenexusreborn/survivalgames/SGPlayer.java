@@ -80,22 +80,20 @@ public class SGPlayer {
         this.stats = stats;
     }
 
-    public void setLobby(Lobby lobby) {
+    public void setLobby(Lobby lobby, LobbyPlayer lobbyPlayer) {
         this.lobby = lobby;
-    }
-
-    public void setGame(Game game) {
-        this.game = game;
-    }
-
-    public void setLobbyPlayer(LobbyPlayer lobbyPlayer) {
         this.lobbyPlayer = lobbyPlayer;
+        this.game = null;
+        this.gamePlayer = null;
     }
 
-    public void setGamePlayer(GamePlayer gamePlayer) {
+    public void setGame(Game game, GamePlayer gamePlayer) {
+        this.game = game;
         this.gamePlayer = gamePlayer;
+        this.lobby = null;
+        this.lobbyPlayer = null;
     }
-    
+
     public long getJoinTime() {
         return this.joinTime;
     }

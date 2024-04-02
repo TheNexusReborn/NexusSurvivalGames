@@ -3,6 +3,7 @@ package com.thenexusreborn.survivalgames.cmd;
 import com.thenexusreborn.api.helper.NumberHelper;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
+import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Bounty;
 import com.thenexusreborn.survivalgames.game.Bounty.Type;
@@ -28,7 +29,9 @@ public class BountyCmd implements CommandExecutor {
             return true;
         }
 
-        Game game = plugin.getGame();
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
+
+        Game game = sgPlayer.getGame();
 
         if (game == null) {
             player.sendMessage(MCUtils.color(MsgType.WARN + "You can only bounty a player during a game."));

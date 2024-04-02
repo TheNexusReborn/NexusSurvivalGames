@@ -4,7 +4,9 @@ import com.stardevllc.starui.element.button.Button;
 import com.stardevllc.starui.gui.InventoryGUI;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
+import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
+import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.sponsoring.SponsorCategory;
 import com.thenexusreborn.survivalgames.sponsoring.SponsorManager;
@@ -18,11 +20,21 @@ import java.util.Random;
 public class SponsorMenu extends InventoryGUI {
     public SponsorMenu(SurvivalGames plugin, GamePlayer actor, GamePlayer target) {
         super(1, "&lSponsor " + target.getName());
+
+        SGPlayer actorPlayer = plugin.getPlayerRegistry().get(actor.getUniqueId());
+        SGPlayer targetPlayer = plugin.getPlayerRegistry().get(target.getUniqueId());
+
+        if (actorPlayer.getGame().getLocalId() != targetPlayer.getGame().getLocalId()) {
+            actor.sendMessage(MsgType.ERROR + "You and the target are not in the same game.");
+            return;
+        }
         
-        int creditCost = plugin.getGame().getSettings().getSponsorCreditCost();
-        int scoreCost = plugin.getGame().getSettings().getSponsorScoreCost();
+        Game game = actorPlayer.getGame();
+        
+        int creditCost = game.getSettings().getSponsorCreditCost();
+        int scoreCost = game.getSettings().getSponsorScoreCost();
     
-        SponsorManager sponsorManager = plugin.getGame().getSponsorManager();
+        SponsorManager sponsorManager = game.getSponsorManager();
         for (SponsorCategory<?> category : sponsorManager.getCategories()) {
             ItemBuilder iconBuilder = ItemBuilder.start(category.getIcon());
             iconBuilder.displayName("&a&l" + category.getName());
@@ -78,7 +90,7 @@ public class SponsorMenu extends InventoryGUI {
 
                 Object chosen = category.getEntries().get(new Random().nextInt(category.getEntries().size()));
                 category.apply(Bukkit.getPlayer(target.getUniqueId()), chosen);
-                plugin.getGame().sendMessage("&6&l>> " + target.getColoredName() + " &awas &lSPONSORED &aa(n) &l" + category.getName() + " item &aby " + actor.getColoredName() + "&a!");
+                game.sendMessage("&6&l>> " + target.getColoredName() + " &awas &lSPONSORED &aa(n) &l" + category.getName() + " item &aby " + actor.getColoredName() + "&a!");
                 
                 actor.getStats().addSponsoredOthers(1);
                 target.getStats().addSponsorsReceived(1);

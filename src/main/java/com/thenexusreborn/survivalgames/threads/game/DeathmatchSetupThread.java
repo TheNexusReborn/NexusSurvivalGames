@@ -13,18 +13,14 @@ public class DeathmatchSetupThread extends NexusThread<SurvivalGames> {
     
     @Override
     public void onRun() {
-        if (plugin.getGame() == null) {
-            return;
-        }
-        
-        Game game = plugin.getGame();
-        
-        if (game.getControlType() == ControlType.MANUAL) {
-            return;
-        }
-        
-        if (game.getState() == GameState.TELEPORT_DEATHMATCH_DONE) {
-            game.startDeathmatchWarmup();
+        for (Game game : plugin.getGames()) {
+            if (game.getControlType() == ControlType.MANUAL) {
+                continue;
+            }
+
+            if (game.getState() == GameState.TELEPORT_DEATHMATCH_DONE) {
+                game.startDeathmatchWarmup();
+            }
         }
     }
 }

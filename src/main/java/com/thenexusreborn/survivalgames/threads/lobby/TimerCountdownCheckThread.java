@@ -14,25 +14,25 @@ public class TimerCountdownCheckThread extends NexusThread<SurvivalGames> {
     
     @Override
     public void onRun() {
-        Lobby lobby = plugin.getLobby();
-        
-        if (lobby.getState() != LobbyState.WAITING) {
-            return;
-        }
-        
-        if (lobby.getControlType() == ControlType.MANUAL) {
-            return;
-        }
-        
-        if (lobby.getTimer() != null) {
-            return;
-        }
-        
-        int playerCount = lobby.getPlayingCount();
-        
-        if (playerCount >= lobby.getLobbySettings().getMinPlayers()) {
-            lobby.startTimer();
-            lobby.sendMessage("&eMinimum player count has been met, starting countdown to game start.");
+        for (Lobby lobby : plugin.getLobbies()) {
+            if (lobby.getState() != LobbyState.WAITING) {
+                continue;
+            }
+
+            if (lobby.getControlType() == ControlType.MANUAL) {
+                continue;
+            }
+
+            if (lobby.getTimer() != null) {
+                continue;
+            }
+
+            int playerCount = lobby.getPlayingCount();
+
+            if (playerCount >= lobby.getLobbySettings().getMinPlayers()) {
+                lobby.startTimer();
+                lobby.sendMessage("&eMinimum player count has been met, starting countdown to game start.");
+            }
         }
     }
 }

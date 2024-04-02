@@ -19,33 +19,30 @@ public class CombatTagThread extends NexusThread<SurvivalGames> {
     }
     
     public void onRun() {
-        Game game = plugin.getGame();
-        if (game == null) {
-            return;
-        }
-        
-        for (GamePlayer gamePlayer : new ArrayList<>(game.getPlayers().values())) {
-            if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
-                continue;
-            }
+        for (Game game : plugin.getGames()) {
+            for (GamePlayer gamePlayer : new ArrayList<>(game.getPlayers().values())) {
+                if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
+                    continue;
+                }
 
-            Player player = Bukkit.getPlayer(gamePlayer.getUniqueId());
-            if (player.getHealth() == player.getMaxHealth()) {
-                gamePlayer.getDamageInfo().clearDamagers();
+                Player player = Bukkit.getPlayer(gamePlayer.getUniqueId());
+                if (player.getHealth() == player.getMaxHealth()) {
+                    gamePlayer.getDamageInfo().clearDamagers();
+                }
+
+                CombatTag combatTag = gamePlayer.getCombatTag();
+
+                if (combatTag.getOther() == null) {
+                    continue;
+                }
+
+                if (combatTag.getTimestamp() + TimeUnit.SECONDS.toMillis(game.getSettings().getCombatTagLength()) > System.currentTimeMillis()) {
+                    continue;
+                }
+
+                combatTag.setOther(null);
+                gamePlayer.sendMessage("&6&l>> &eYou are no longer in combat.");
             }
-            
-            CombatTag combatTag = gamePlayer.getCombatTag();
-            
-            if (combatTag.getOther() == null) {
-                continue;
-            }
-            
-            if (combatTag.getTimestamp() + TimeUnit.SECONDS.toMillis(game.getSettings().getCombatTagLength()) > System.currentTimeMillis()) {
-                continue;
-            }
-            
-            combatTag.setOther(null);
-            gamePlayer.sendMessage("&6&l>> &eYou are no longer in combat.");
         }
     }
 }

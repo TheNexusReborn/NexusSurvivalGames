@@ -9,7 +9,6 @@ import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.tags.Tag;
 import com.thenexusreborn.nexuscore.util.ArmorType;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
-import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.chat.GameTeamChatroom;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
@@ -53,7 +52,7 @@ public class GamePlayer {
         this.nexusPlayer = nexusPlayer;
         this.game = game;
         this.bounty = new Bounty(nexusPlayer.getUniqueId());
-        this.combatTag = new CombatTag(nexusPlayer.getUniqueId());
+        this.combatTag = new CombatTag(game, nexusPlayer.getUniqueId());
         this.damageInfo = new DamageInfo(nexusPlayer.getUniqueId());
         this.stats = stats;
     }
@@ -223,7 +222,6 @@ public class GamePlayer {
     }
     
     public Pair<Boolean, String> canMutate() {
-        Game game = SurvivalGames.getPlugin(SurvivalGames.class).getGame();
         if (game == null) {
             return new Pair<>(false, "You cannot mutate because there is not game running.");
         }

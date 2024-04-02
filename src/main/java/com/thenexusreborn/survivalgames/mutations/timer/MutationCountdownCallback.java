@@ -41,7 +41,7 @@ public class MutationCountdownCallback implements ReturnableCallback<TimerSnapsh
             return false;
         }
 
-        Game game = plugin.getGame();
+        Game game = mutation.getGame();
         if (game == null) {
             return false;
         }
@@ -51,7 +51,7 @@ public class MutationCountdownCallback implements ReturnableCallback<TimerSnapsh
             return false;
         }
 
-        GamePlayer targetPlayer = plugin.getGame().getPlayer(mutation.getTarget());
+        GamePlayer targetPlayer = game.getPlayer(mutation.getTarget());
         if (targetPlayer.getTeam() != GameTeam.TRIBUTES) {
             p.sendMessage(MCUtils.color(MsgType.WARN + "Your target is no longer a tribute, mutation cancelled."));
             return false;

@@ -7,6 +7,7 @@ import com.stardevllc.starui.gui.InventoryGUI;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
+import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
@@ -24,6 +25,9 @@ public class MutateGui extends InventoryGUI {
     public MutateGui(SurvivalGames plugin, GamePlayer player) {
         super(3, "&lMutate as...");
 
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
+        Game game = sgPlayer.getGame();
+        
         PlayerMutations unlockedMutations = plugin.getUnlockedMutations(player.getUniqueId());
 
         if (!unlockedMutations.isUnlocked("pig_zombie")) {
@@ -34,7 +38,7 @@ public class MutateGui extends InventoryGUI {
     
         List<String> purchased = new ArrayList<>(), available = new ArrayList<>(), locked = new ArrayList<>();
         for (MutationType type : MutationType.TYPES) {
-            if (plugin.getGame() != null && plugin.getGame().getSettings().isUseAllMutations()) {
+            if (game != null && game.getSettings().isUseAllMutations()) {
                 purchased.add(type.getId());
             } else if (unlockedMutations.isUnlocked(type.getId().toLowerCase())) {
                 purchased.add(type.getId());
@@ -60,9 +64,8 @@ public class MutateGui extends InventoryGUI {
             MutationType type = MutationType.getType(m);
             Button button = new Button().iconCreator(p -> ItemBuilder.start(type.getIcon()).displayName("&a&l" + type.getDisplayName()).build())
                     .consumer(e -> {
-                        Game game = plugin.getGame();
                         if (game == null) {
-                            player.sendMessage(MsgType.WARN + "You cannot mutate, a game is not running.");
+                            player.sendMessage(MsgType.WARN + "You cannot mutate, You are not in a game.");
                             return;
                         }
 
@@ -84,7 +87,7 @@ public class MutateGui extends InventoryGUI {
 
                         player.getStats().addTimesMutated(1);
 
-                        Mutation mutation = Mutation.createInstance(type, player.getUniqueId(), gamePlayer.getKiller());
+                        Mutation mutation = Mutation.createInstance(game, type, player.getUniqueId(), gamePlayer.getKiller());
                         gamePlayer.setMutation(mutation);
                         mutation.startCountdown();
                         e.getWhoClicked().closeInventory();

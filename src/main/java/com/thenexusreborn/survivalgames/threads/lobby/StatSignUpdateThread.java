@@ -13,32 +13,25 @@ public class StatSignUpdateThread extends NexusThread<SurvivalGames> {
     }
     
     public void onRun() {
-        Lobby lobby = plugin.getLobby();
-        if (lobby == null) {
-            return;
-        }
-    
-        if (plugin.getGame() != null) {
-            return;
-        }
-    
-        if (lobby.getState() == LobbyState.MAP_EDITING) {
-            return;
-        }
-    
-        if (lobby.getStatSigns().isEmpty()) {
-            return;
-        }
-    
-        for (StatSign statSign : lobby.getStatSigns()) {
-            for (LobbyPlayer lobbyPlayer : lobby.getPlayers()) {
-                Player player = Bukkit.getPlayer(lobbyPlayer.getUniqueId());
-                if (player.getWorld() != statSign.getLocation().getWorld()) {
-                    continue;
+        for (Lobby lobby : plugin.getLobbies()) {
+            if (lobby.getState() == LobbyState.MAP_EDITING) {
+                continue;
+            }
+
+            if (lobby.getStatSigns().isEmpty()) {
+                continue;
+            }
+
+            for (StatSign statSign : lobby.getStatSigns()) {
+                for (LobbyPlayer lobbyPlayer : lobby.getPlayers()) {
+                    Player player = Bukkit.getPlayer(lobbyPlayer.getUniqueId());
+                    if (player.getWorld() != statSign.getLocation().getWorld()) {
+                        continue;
+                    }
+
+                    String[] lines = {MCUtils.color("&n" + statSign.getDisplayName()), "", lobbyPlayer.getStats().getValue(statSign.getStat()) + "", ""};
+                    player.sendSignChange(statSign.getLocation(), lines);
                 }
-                
-                String[] lines = {MCUtils.color("&n" + statSign.getDisplayName()), "", lobbyPlayer.getStats().getValue(statSign.getStat()) + "", ""};
-                player.sendSignChange(statSign.getLocation(), lines);
             }
         }
     }

@@ -3,6 +3,7 @@ package com.thenexusreborn.survivalgames.cmd;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
+import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
@@ -44,8 +45,10 @@ public class SpectateCommand implements CommandExecutor {
             sender.sendMessage(MCUtils.color(MsgType.WARN + "Only players can use that command."));
             return true;
         }
+
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
     
-        Game game = plugin.getGame();
+        Game game = sgPlayer.getGame();
         if (game != null) {
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
         
@@ -60,7 +63,7 @@ public class SpectateCommand implements CommandExecutor {
                 player.sendMessage(MsgType.WARN + "You are already spectating the game.");
             }
         } else {
-            Lobby lobby = plugin.getLobby();
+            Lobby lobby = sgPlayer.getLobby();
             if (lobby.getState() == LobbyState.WAITING || lobby.getState() == LobbyState.COUNTDOWN) {
                 boolean spectating = false;
                 for (UUID spectatingPlayer : lobby.getSpectatingPlayers()) {

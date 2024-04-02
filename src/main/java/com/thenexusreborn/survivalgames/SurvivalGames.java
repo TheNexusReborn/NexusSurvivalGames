@@ -17,7 +17,6 @@ import com.thenexusreborn.gamemaps.model.MapSpawn;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.NexusCore;
 import com.thenexusreborn.nexuscore.api.NexusSpigotPlugin;
-import com.thenexusreborn.nexuscore.util.ServerProperties;
 import com.thenexusreborn.survivalgames.cmd.*;
 import com.thenexusreborn.survivalgames.disguises.NexusDisguises;
 import com.thenexusreborn.survivalgames.game.Game;
@@ -27,11 +26,14 @@ import com.thenexusreborn.survivalgames.listener.BlockListener;
 import com.thenexusreborn.survivalgames.listener.EntityListener;
 import com.thenexusreborn.survivalgames.listener.PlayerListener;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
-import com.thenexusreborn.survivalgames.lobby.LobbyState;
-import com.thenexusreborn.survivalgames.lobby.StatSign;
+import com.thenexusreborn.survivalgames.lobby.LobbyType;
+import com.thenexusreborn.survivalgames.loot.LootManager;
+import com.thenexusreborn.survivalgames.loot.LootTable;
 import com.thenexusreborn.survivalgames.map.SQLMapManager;
 import com.thenexusreborn.survivalgames.mutations.PlayerMutations;
 import com.thenexusreborn.survivalgames.mutations.UnlockedMutation;
+import com.thenexusreborn.survivalgames.registry.GameRegistry;
+import com.thenexusreborn.survivalgames.registry.LobbyRegistry;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.settings.LobbySettings;
 import com.thenexusreborn.survivalgames.settings.SettingRegistry;
@@ -43,18 +45,13 @@ import com.thenexusreborn.survivalgames.threads.game.*;
 import com.thenexusreborn.survivalgames.threads.lobby.*;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 
 import java.io.File;
-import java.lang.reflect.Field;
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.*;
 
 public class SurvivalGames extends NexusSpigotPlugin {
@@ -62,34 +59,30 @@ public class SurvivalGames extends NexusSpigotPlugin {
     public static SurvivalGames INSTANCE;
     public static final String MAP_URL = "https://starmediadev.com/files/nexusreborn/sgmaps/";
     public static final Queue<UUID> PLAYER_QUEUE = new LinkedList<>();
-    @Deprecated
-    public static final Map<UUID, SGPlayerStats> PLAYER_STATS = new HashMap<>();
-
+    
     private NexusCore nexusCore;
     private StarChat starChat;
     private NexusHubHook nexusHubHook;
 
     private MapManager mapManager;
-    private Lobby lobby;
-
-    private Game game;
-
-    private int gamesPlayed;
-    private int lastLocalGameId;
 
     private final Map<String, LobbySettings> lobbySettings = new HashMap<>();
     private final Map<String, GameSettings> gameSettings = new HashMap<>();
 
     private final Map<UUID, PlayerMutations> playerUnlockedMutations = new HashMap<>();
 
-    private File deathMessagesFile;
-    private FileConfiguration deathMessagesConfig;
-
     private final SettingRegistry lobbySettingRegistry = new SettingRegistry();
     private final SettingRegistry gameSettingRegistry = new SettingRegistry();
-    private int lastLocalLobbyId;
-    
+
     private UUIDRegistry<SGPlayer> playerRegistry = new UUIDRegistry<>(SGPlayer::getUniqueId);
+
+    private File deathMessagesFile;
+    private FileConfiguration deathMessagesConfig;
+    
+    private LobbyRegistry lobbies;
+    private GameRegistry games;
+    
+    private int gamesPlayed;
 
     public static SurvivalGames getInstance() {
         return INSTANCE;
@@ -180,24 +173,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
         getCommand("sgmap").setExecutor(new SGMapCommand(this, mapManager));
 
         getLogger().info("Loaded " + mapManager.getMaps().size() + " Maps");
-        lobby = new Lobby(this);
-        getLogger().info("Loaded Lobby Settings");
-
-        lobby.setControlType(ControlType.AUTOMATIC);
-
-        if (this.getConfig().contains("spawnpoint")) {
-            String worldName = this.getConfig().getString("spawnpoint.world");
-            int x = Integer.parseInt(this.getConfig().getString("spawnpoint.x"));
-            int y = Integer.parseInt(this.getConfig().getString("spawnpoint.y"));
-            int z = Integer.parseInt(this.getConfig().getString("spawnpoint.z"));
-            float yaw = Float.parseFloat(this.getConfig().getString("spawnpoint.yaw"));
-            float pitch = Float.parseFloat(this.getConfig().getString("spawnpoint.pitch"));
-
-            Location location = new Location(Bukkit.getWorld(worldName), x, y, z, yaw, pitch);
-            lobby.setSpawnpoint(location);
-        } else {
-            lobby.setSpawnpoint(Bukkit.getWorld(ServerProperties.getLevelName()).getSpawnLocation());
-        }
 
         getLogger().info("Loading all unlocked mutations");
         SQLDatabase database = NexusAPI.getApi().getPrimaryDatabase();
@@ -217,6 +192,17 @@ public class SurvivalGames extends NexusSpigotPlugin {
         }
         getLogger().info("Unlocked mutations loaded.");
 
+        for (LootTable lootTable : LootManager.getInstance().getLootTables()) {
+            lootTable.generateNewProbabilities(new Random());
+        }
+
+        lobbies = new LobbyRegistry(this);
+        games = new GameRegistry(this);
+
+        Lobby lobby = new Lobby(this, LobbyType.CUSTOM);
+        lobbies.register(lobby); //First Lobby
+        lobby.setup();
+        
         getCommand("votestart").setExecutor(new VoteStartCommand(this));
         getCommand("stats").setExecutor(new StatsCommand(this));
         getCommand("survivalgames").setExecutor(new SGCommand(this));
@@ -256,83 +242,18 @@ public class SurvivalGames extends NexusSpigotPlugin {
 
         getLogger().info("Registered Listeners");
 
-        nexusCore.setMotdSupplier(() -> {
-            String line1 = "&5&lNEXUS REBORN &aSurvival Games", line2;
-            if (this.game == null) {
-                line1 += " &7- &bLobby";
-                line2 = "&3Status: &c" + this.lobby.getState() + "   " + (lobby.getState() == LobbyState.COUNTDOWN ? "&dTime Left: &e" + (int) Math.ceil(lobby.getTimer().getTime() / 1000.0) : "");
-            } else {
-                line1 += " &7- &bGame";
-                line2 = "&3Status: &c" + this.game.getState() + "   " + (game.getTimer() != null ? "&dTime Left: &e" + Game.LONG_TIME_FORMAT.format(game.getTimer().getTimeLeft()) : "");
-            }
-
-            return line1 + "\n" + line2;
-        });
-
-        boolean migrate = false;
-        if (!getConfig().contains("migration")) {
-            migrate = true;
-        } else {
-            if (!getConfig().getString("migration").equals("1.16-ALPHA")) {
-                migrate = true;
-            }
-        }
-
-        if (migrate) {
-            getLogger().info("Detected that data migration is needed...");
-            
-            getConfig().set("statsigns", null);
-            saveConfig();
-
-            for (StatSign statSign : this.getLobby().getStatSigns()) {
-                statSign.setStat(statSign.getStat().toLowerCase().replace("sg_", "").replace("_", ""));
-            }
-            getLogger().info("Migrated stat signs to use the new stat naming scheme.");
-            
-            try {
-                Map<UUID, SGPlayerStats> playerStats = new HashMap<>();
-                for (SGPlayerStats stats : database.get(SGPlayerStats.class)) {
-                    playerStats.put(stats.getUniqueId(), stats);
-                }
-                
-                Map<String, Field> fields = SGPlayerStats.getFields();
-                
-                List<Integer> deleteIds = new ArrayList<>();
-
-                try (Connection connection = database.getConnection(); Statement statement = connection.createStatement()) {
-                    ResultSet resultSet = statement.executeQuery("SELECT `id`, `uuid`, `name`, `value` FROM `stats` WHERE `name` LIKE 'sg_%'");
-                    while (resultSet.next()) {
-                        UUID uuid = UUID.fromString(resultSet.getString("uuid"));
-                        SGPlayerStats stats = playerStats.computeIfAbsent(uuid, SGPlayerStats::new);
-                        String statName = resultSet.getString("name").toLowerCase().replace("sg_", "").replace("_", "");
-                        int value = Integer.parseInt(resultSet.getString("value").split(":")[1]);
-                        try {
-                            fields.get(statName).set(stats, value);
-                            deleteIds.add(resultSet.getInt("id"));
-                        } catch (Exception e) {
-                            getLogger().severe("Could not set field for stat " + statName + " for player " + uuid);
-                            getLogger().severe(e.getClass().getSimpleName() + ": " + e.getMessage());
-                        }
-                    }
-
-                    for (Integer id : deleteIds) {
-                        statement.execute("DELETE FROM `stats` WHERE `id`='" + id + "';");
-                    }
-                    getLogger().info("Deleted " + deleteIds.size() + " stats from old stat system.");
-                }
-
-                for (SGPlayerStats stats : playerStats.values()) {
-                    database.save(stats);
-                }
-                getLogger().info("Migrated new stats from the old system.");
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            
-            getLogger().info("Migration complete.");
-            getConfig().set("migration", getDescription().getVersion());
-            saveConfig();
-        }
+//        nexusCore.setMotdSupplier(() -> {
+//            String line1 = "&5&lNEXUS REBORN &aSurvival Games", line2;
+//            if (this.game == null) {
+//                line1 += " &7- &bLobby";
+//                line2 = "&3Status: &c" + this.lobby.getState() + "   " + (lobby.getState() == LobbyState.COUNTDOWN ? "&dTime Left: &e" + (int) Math.ceil(lobby.getTimer().getTime() / 1000.0) : "");
+//            } else {
+//                line1 += " &7- &bGame";
+//                line2 = "&3Status: &c" + this.game.getState() + "   " + (game.getTimer() != null ? "&dTime Left: &e" + Game.LONG_TIME_FORMAT.format(game.getTimer().getTimeLeft()) : "");
+//            }
+//
+//            return line1 + "\n" + line2;
+//        });
         
         new NexusDisguises().init(this);
         getLogger().info("Loaded the disguises for mutations.");
@@ -449,21 +370,14 @@ public class SurvivalGames extends NexusSpigotPlugin {
 
     @Override
     public void onDisable() {
-        if (game != null) {
+        for (Game game : this.games.getObjects().values()) {
             game.handleShutdown();
         }
 
-        if (lobby != null) {
+        for (Lobby lobby : this.lobbies.getObjects().values()) {
             lobby.handleShutdown();
         }
-
-        getConfig().set("spawnpoint.world", lobby.getSpawnpoint().getWorld().getName());
-        getConfig().set("spawnpoint.x", lobby.getSpawnpoint().getBlockX() + "");
-        getConfig().set("spawnpoint.y", lobby.getSpawnpoint().getBlockY() + "");
-        getConfig().set("spawnpoint.z", lobby.getSpawnpoint().getBlockZ() + "");
-        getConfig().set("spawnpoint.yaw", lobby.getSpawnpoint().getYaw() + "");
-        getConfig().set("spawnpoint.pitch", lobby.getSpawnpoint().getPitch() + "");
-
+        
         if (mapManager instanceof SQLMapManager) {
             getConfig().set("map-source", "sql");
         } else if (mapManager instanceof YamlMapManager) {
@@ -477,20 +391,8 @@ public class SurvivalGames extends NexusSpigotPlugin {
         return mapManager;
     }
 
-    public Lobby getLobby() {
-        return lobby;
-    }
-
     public NexusCore getNexusCore() {
         return nexusCore;
-    }
-
-    public Game getGame() {
-        return game;
-    }
-
-    public void setGame(Game game) {
-        this.game = game;
     }
 
     public LobbySettings getLobbySettings(String type) {
@@ -548,26 +450,10 @@ public class SurvivalGames extends NexusSpigotPlugin {
         return starChat;
     }
 
-    public int getLastLocalGameId() {
-        return lastLocalGameId;
-    }
-
-    public void setLastLocalGameId(int lastLocalGameId) {
-        this.lastLocalGameId = lastLocalGameId;
-    }
-
     public void setMapManager(MapManager mapManager) {
         this.mapManager = mapManager;
         getCommand("sgmap").setExecutor(new SGMapCommand(this, mapManager));
         this.mapManager.loadMaps();
-    }
-
-    public int getLastLocalLobbyId() {
-        return lastLocalLobbyId;
-    }
-
-    public void setLastLocalLobbyId(int lastLocalLobbyId) {
-        this.lastLocalLobbyId = lastLocalLobbyId;
     }
 
     public NexusHubHook getNexusHubHook() {
@@ -576,5 +462,13 @@ public class SurvivalGames extends NexusSpigotPlugin {
 
     public UUIDRegistry<SGPlayer> getPlayerRegistry() {
         return playerRegistry;
+    }
+
+    public GameRegistry getGames() {
+        return games;
+    }
+
+    public LobbyRegistry getLobbies() {
+        return lobbies;
     }
 }

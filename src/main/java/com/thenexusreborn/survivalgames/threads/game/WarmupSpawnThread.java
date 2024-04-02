@@ -27,38 +27,36 @@ public class WarmupSpawnThread extends NexusThread<SurvivalGames> {
 
     @Override
     public void onRun() {
-        if (plugin.getGame() == null) {
-            return;
-        }
+        for (Game game : plugin.getGames()) {
+            SGMap gameMap = game.getGameMap();
 
-        Game game = plugin.getGame();
-        SGMap gameMap = game.getGameMap();
-
-        if (Stream.of(states).noneMatch(gameState -> game.getState() == gameState)) {
-            return;
-        }
-
-        try {
-            BiMap<UUID, Integer> spawns = HashBiMap.create(game.getSpawns()).inverse();
-            for (GamePlayer gamePlayer : game.getPlayers().values()) {
-                if (gamePlayer == null || gamePlayer.getTeam() != GameTeam.TRIBUTES) {
-                    continue;
-                }
-
-                Player player = Bukkit.getPlayer(gamePlayer.getUniqueId());
-                Location playerLocation = player.getLocation();
-                MapSpawn spawn = gameMap.getSpawns().get(spawns.get(player.getUniqueId()));
-                if (spawn == null) {
-                    continue;
-                }
-
-                Location spawnLocation = spawn.toGameLocation(gameMap.getWorld(), gameMap.getCenterLocation());
-                if (playerLocation.getBlockX() != spawnLocation.getBlockX() || playerLocation.getBlockZ() != spawnLocation.getBlockZ()) {
-                    spawnLocation.setYaw(playerLocation.getYaw());
-                    spawnLocation.setPitch(playerLocation.getPitch());
-                    player.teleport(spawnLocation);
-                }
+            if (Stream.of(states).noneMatch(gameState -> game.getState() == gameState)) {
+                continue;
             }
-        } catch (Exception e) {}
+
+            try {
+                BiMap<UUID, Integer> spawns = HashBiMap.create(game.getSpawns()).inverse();
+                for (GamePlayer gamePlayer : game.getPlayers().values()) {
+                    if (gamePlayer == null || gamePlayer.getTeam() != GameTeam.TRIBUTES) {
+                        continue;
+                    }
+
+                    Player player = Bukkit.getPlayer(gamePlayer.getUniqueId());
+                    Location playerLocation = player.getLocation();
+                    MapSpawn spawn = gameMap.getSpawns().get(spawns.get(player.getUniqueId()));
+                    if (spawn == null) {
+                        continue;
+                    }
+
+                    Location spawnLocation = spawn.toGameLocation(gameMap.getWorld(), gameMap.getCenterLocation());
+                    if (playerLocation.getBlockX() != spawnLocation.getBlockX() || playerLocation.getBlockZ() != spawnLocation.getBlockZ()) {
+                        spawnLocation.setYaw(playerLocation.getYaw());
+                        spawnLocation.setPitch(playerLocation.getPitch());
+                        player.teleport(spawnLocation);
+                    }
+                }
+            } catch (Exception e) {
+            }
+        }
     }
 }

@@ -23,12 +23,9 @@ public class ChickenMutationThread extends NexusThread<SurvivalGames> {
     
     @Override
     public void onRun() {
-        Game game = plugin.getGame();
-        if (game == null) {
-            return;
-        }
-        
         for (Player player : Bukkit.getOnlinePlayers()) {
+            Game game = plugin.getPlayerRegistry().get(player.getUniqueId()).getGame();
+            
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
             if (gamePlayer == null) {
                 continue;

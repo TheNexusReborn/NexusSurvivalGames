@@ -3,6 +3,7 @@ package com.thenexusreborn.survivalgames.cmd;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.nexuscore.util.*;
+import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import org.bukkit.command.*;
@@ -22,14 +23,16 @@ public class VoteStartCommand implements CommandExecutor {
             sender.sendMessage(MCUtils.color("&cOnly players can use that command."));
             return true;
         }
+
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(senderPlayer.getUniqueId());
     
-        if (plugin.getGame() != null) {
-            senderPlayer.sendMessage(MCUtils.color("&cThere is already a game running. You cannot use that command."));
+        if (sgPlayer.getGame() != null) {
+            senderPlayer.sendMessage(MCUtils.color("&cYou cannot use that command while in game."));
             return true;
         }
     
         NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(senderPlayer.getUniqueId());
-        Lobby lobby = plugin.getLobby();
+        Lobby lobby = sgPlayer.getLobby();
     
         if (!lobby.getLobbySettings().isAllowVoteStart()) {
             nexusPlayer.sendMessage(MsgType.WARN + "You cannot vote to start because it is disabled.");

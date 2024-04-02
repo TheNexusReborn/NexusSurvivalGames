@@ -3,6 +3,7 @@ package com.thenexusreborn.survivalgames.mutations;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
+import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.mutations.timer.MutationCountdownCallback;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -18,12 +19,13 @@ public abstract class Mutation {
     protected final UUID player;
     protected UUID target;
     protected Timer countdownTimer;
+    protected Game game;
     
-    public static Mutation createInstance(MutationType type, UUID player, UUID target) {
+    public static Mutation createInstance(Game game, MutationType type, UUID player, UUID target) {
         Class<? extends Mutation> clazz = type.getClazz();
         Constructor<? extends Mutation> constructor;
         try {
-            constructor = clazz.getDeclaredConstructor(UUID.class, UUID.class);
+            constructor = clazz.getDeclaredConstructor(Game.class, UUID.class, UUID.class);
         } catch (NoSuchMethodException e) {
             plugin.getLogger().severe("Mutation Class " + clazz.getName() + " does not have the constructor (UUID player, UUID target)");
             return null;
@@ -32,7 +34,7 @@ public abstract class Mutation {
         constructor.setAccessible(true);
     
         try {
-            return constructor.newInstance(player, target);
+            return constructor.newInstance(game, player, target);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             plugin.getLogger().severe("Could not create an instance of the Mutation Class: " + clazz.getName());
             plugin.getLogger().severe("Error Message: " + e.getClass().getName() + ": " + e.getMessage());
@@ -41,7 +43,8 @@ public abstract class Mutation {
         return null;
     }
     
-    protected Mutation(MutationType type, UUID player, UUID target) {
+    protected Mutation(Game game, MutationType type, UUID player, UUID target) {
+        this.game = game;
         this.type = type;
         this.player = player;
         this.target = target;
@@ -66,7 +69,7 @@ public abstract class Mutation {
         }
         
         this.countdownTimer = new Timer(new MutationCountdownCallback(this));
-        this.countdownTimer.setLength(plugin.getGame().getSettings().getMutationSpawnDelay() * 1000L + 50);
+        this.countdownTimer.setLength(game.getSettings().getMutationSpawnDelay() * 1000L + 50);
         p.sendMessage(MCUtils.color("&6&l>> &eYou will mutate as a(n) " + getType().getDisplayName() + "!"));
         p.sendMessage(MCUtils.color("&6&l>> &eYou will be mutated in &l" + this.countdownTimer.getSecondsLeft() + " Seconds&e."));
         Player t = Bukkit.getPlayer(this.target);
@@ -76,5 +79,9 @@ public abstract class Mutation {
     
     public void setTarget(UUID uniqueId) {
         this.target = uniqueId;
+    }
+
+    public Game getGame() {
+        return game;
     }
 }

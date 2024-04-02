@@ -36,7 +36,7 @@ public class GameTablistHandler extends TablistHandler {
             NexusPlayer otherNexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(other.getUniqueId());
             if (otherNexusPlayer != null) {
                 NexusPlayer player = scoreboard.getPlayer();
-                GamePlayer gamePlayer = plugin.getGame().getPlayer(player.getUniqueId());
+                GamePlayer gamePlayer = plugin.getPlayerRegistry().get(player.getUniqueId()).getGamePlayer();
                 ITeam otherTeam = getPlayerTeams().get(otherNexusPlayer.getUniqueId());
                 String correctChar = BEGIN_CHARS.get(gamePlayer.getTeam());
                 if (otherTeam == null) {
@@ -65,7 +65,7 @@ public class GameTablistHandler extends TablistHandler {
     
     @Override
     public String getPlayerTeamName(NexusPlayer player) {
-        Game game = plugin.getGame();
+        Game game = plugin.getPlayerRegistry().get(player.getUniqueId()).getGame();
         if (game != null) {
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
             GameTeam gameTeam = gamePlayer.getTeam();
@@ -85,8 +85,9 @@ public class GameTablistHandler extends TablistHandler {
     
     @Override
     public void setDisplayOptions(NexusPlayer nexusPlayer, ITeam team) {
-        if (plugin.getGame() != null) {
-            GamePlayer gamePlayer = plugin.getGame().getPlayer(nexusPlayer.getUniqueId());
+        Game game = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId()).getGame();
+        if (game != null) {
+            GamePlayer gamePlayer = game.getPlayer(nexusPlayer.getUniqueId());
             team.setPrefix(MCUtils.color(gamePlayer.getTeam().getColor()));
         }
     }

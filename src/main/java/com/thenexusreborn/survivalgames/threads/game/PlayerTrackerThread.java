@@ -18,109 +18,110 @@ public class PlayerTrackerThread extends NexusThread<SurvivalGames> {
     }
 
     public void onRun() {
-        Game game = plugin.getGame();
-        long start = System.currentTimeMillis();
-        if (game == null) {
-            return;
-        }
-
-        if (!(game.getState().ordinal() >= GameState.INGAME.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal())) {
-            return;
-        }
-
-        Set<UUID> players = new HashSet<>();
-        for (GamePlayer player : game.getPlayers().values()) {
-            players.add(player.getUniqueId());
-        }
-
-        for (UUID p : players) {
-            Player player = Bukkit.getPlayer(p);
-            if (player == null) {
+        for (Game game : plugin.getGames()) {
+            long start = System.currentTimeMillis();
+            if (game == null) {
                 continue;
             }
-            boolean trackerInHotbar = false;
-            boolean holdingTracker = false;
-            for (int i = 0; i < 9; i++) {
-                if (!trackerInHotbar) {
-                    ItemStack item = player.getInventory().getItem(i);
-                    if (item == null) {
-                        continue;
-                    }
-                    trackerInHotbar = item.getType() == Material.COMPASS;
-                }
+
+            if (!(game.getState().ordinal() >= GameState.INGAME.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal())) {
+                continue;
             }
 
-            if (trackerInHotbar) {
-                ItemStack hand = player.getInventory().getItemInHand();
-                if (hand != null) {
-                    holdingTracker = hand.getType() == Material.COMPASS;
-                }
+            Set<UUID> players = new HashSet<>();
+            for (GamePlayer player : game.getPlayers().values()) {
+                players.add(player.getUniqueId());
             }
 
-            Player target = null;
-            double distance = -1;
-            GamePlayer gamePlayer = game.getPlayer(p);
-            if (gamePlayer.getTeam() == GameTeam.MUTATIONS) {
-                target = Bukkit.getPlayer(gamePlayer.getMutation().getTarget());
-            } else {
-                for (UUID u : players) {
-                    Player t = Bukkit.getPlayer(u);
-                    if (u.equals(p)) {
-                        continue;
+            for (UUID p : players) {
+                Player player = Bukkit.getPlayer(p);
+                if (player == null) {
+                    continue;
+                }
+                boolean trackerInHotbar = false;
+                boolean holdingTracker = false;
+                for (int i = 0; i < 9; i++) {
+                    if (!trackerInHotbar) {
+                        ItemStack item = player.getInventory().getItem(i);
+                        if (item == null) {
+                            continue;
+                        }
+                        trackerInHotbar = item.getType() == Material.COMPASS;
                     }
+                }
 
-                    GamePlayer targetPlayer = game.getPlayer(u);
-                    if (targetPlayer.getTeam() != GameTeam.TRIBUTES) {
-                        continue;
+                if (trackerInHotbar) {
+                    ItemStack hand = player.getInventory().getItemInHand();
+                    if (hand != null) {
+                        holdingTracker = hand.getType() == Material.COMPASS;
                     }
+                }
 
-                    if (player.getLocation().getWorld().getName().equals(t.getLocation().getWorld().getName())) {
-                        double pd = player.getLocation().distance(t.getLocation());
-                        if (target == null) {
-                            target = t;
-                            distance = pd;
-                        } else if (distance == -1) {
-                            target = t;
-                            distance = pd;
-                        } else {
-                            if (pd < distance) {
+                Player target = null;
+                double distance = -1;
+                GamePlayer gamePlayer = game.getPlayer(p);
+                if (gamePlayer.getTeam() == GameTeam.MUTATIONS) {
+                    target = Bukkit.getPlayer(gamePlayer.getMutation().getTarget());
+                } else {
+                    for (UUID u : players) {
+                        Player t = Bukkit.getPlayer(u);
+                        if (u.equals(p)) {
+                            continue;
+                        }
+
+                        GamePlayer targetPlayer = game.getPlayer(u);
+                        if (targetPlayer.getTeam() != GameTeam.TRIBUTES) {
+                            continue;
+                        }
+
+                        if (player.getLocation().getWorld().getName().equals(t.getLocation().getWorld().getName())) {
+                            double pd = player.getLocation().distance(t.getLocation());
+                            if (target == null) {
                                 target = t;
                                 distance = pd;
+                            } else if (distance == -1) {
+                                target = t;
+                                distance = pd;
+                            } else {
+                                if (pd < distance) {
+                                    target = t;
+                                    distance = pd;
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            if (target == null) {
-                continue;
-            }
-
-            if (distance == -1) {
-                distance = player.getLocation().distance(target.getLocation());
-            }
-
-            Player finalClosest = target;
-            new BukkitRunnable() {
-                public void run() {
-                    player.setCompassTarget(finalClosest.getLocation());
+                if (target == null) {
+                    continue;
                 }
-            }.runTask(plugin);
 
-            String health = NumberHelper.formatNumber(target.getHealth());
-            String maxHealth = NumberHelper.formatNumber(target.getMaxHealth());
+                if (distance == -1) {
+                    distance = player.getLocation().distance(target.getLocation());
+                }
 
-            if (holdingTracker) {
-                gamePlayer.setTrackerInfo(new TrackerInfo(target.getName(), (int) distance, health, maxHealth));
-            } else {
-                gamePlayer.setTrackerInfo(null);
+                Player finalClosest = target;
+                new BukkitRunnable() {
+                    public void run() {
+                        player.setCompassTarget(finalClosest.getLocation());
+                    }
+                }.runTask(plugin);
+
+                String health = NumberHelper.formatNumber(target.getHealth());
+                String maxHealth = NumberHelper.formatNumber(target.getMaxHealth());
+
+                if (holdingTracker) {
+                    gamePlayer.setTrackerInfo(new TrackerInfo(target.getName(), (int) distance, health, maxHealth));
+                } else {
+                    gamePlayer.setTrackerInfo(null);
+                }
             }
-        }
 
-        long end = System.currentTimeMillis();
-        long totalTime = end - start;
-        if (totalTime > 20) {
-            plugin.getLogger().severe("Player Tracker task took " + totalTime);
+            long end = System.currentTimeMillis();
+            long totalTime = end - start;
+            if (totalTime > 20) {
+                plugin.getLogger().severe("Player Tracker task took " + totalTime);
+            }
         }
     }
 }

@@ -11,6 +11,7 @@ import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.ControlType;
+import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GameState;
@@ -70,9 +71,17 @@ public class SGCommand implements CommandExecutor {
             sender.sendMessage(MCUtils.color(MsgType.WARN + "You must provide a sub command."));
             return true;
         }
+        
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage(MCUtils.color(MsgType.WARN + "Only players can use this command. (Temporary)")); //TODO Fix this
+            return true;
+        }
 
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
+        Game game = sgPlayer.getGame();
+        Lobby lobby = sgPlayer.getLobby();
+        
         String subCommand = args[0].toLowerCase();
-        Game game = plugin.getGame();
         if (subCommand.equals("game") || subCommand.equals("g")) {
             if (!(args.length > 1)) {
                 sender.sendMessage(MCUtils.color(MsgType.WARN + "You must provide a sub command."));
@@ -272,11 +281,11 @@ public class SGCommand implements CommandExecutor {
                         sender.sendMessage(MCUtils.color(MsgType.WARN + "The server has a game in progress."));
                         return true;
                     }
-                    if (plugin.getLobby().getState() != LobbyState.WAITING) {
+                    if (lobby.getState() != LobbyState.WAITING) {
                         sender.sendMessage(MCUtils.color(MsgType.WARN + "Invalid state to start the lobby."));
                         return true;
                     }
-                    plugin.getLobby().forceStart();
+                    lobby.forceStart();
                     sender.sendMessage(MCUtils.color(MsgType.INFO + "You forcefully started the lobby."));
                 }
                 case "map", "m" -> {
@@ -297,23 +306,23 @@ public class SGCommand implements CommandExecutor {
                         sender.sendMessage(MCUtils.color(MsgType.WARN + "That map is not active."));
                         return true;
                     }
-                    plugin.getLobby().setGameMap(gameMap);
+                    lobby.setGameMap(gameMap);
                     sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the map to " + MsgType.INFO.getVariableColor() + gameMap.getName()));
                 }
                 case "automatic", "auto" -> {
-                    if (plugin.getLobby().getControlType() == ControlType.AUTOMATIC) {
+                    if (lobby.getControlType() == ControlType.AUTOMATIC) {
                         sender.sendMessage(MCUtils.color(MsgType.WARN + "The lobby is already in automatic control."));
                         return true;
                     }
-                    plugin.getLobby().automatic();
+                    lobby.automatic();
                     sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the lobby to automatic control."));
                 }
                 case "manual", "mnl" -> {
-                    if (plugin.getLobby().getControlType() == ControlType.MANUAL) {
+                    if (lobby.getControlType() == ControlType.MANUAL) {
                         sender.sendMessage(MCUtils.color(MsgType.WARN + "The lobby is already in manual control."));
                         return true;
                     }
-                    plugin.getLobby().manual();
+                    lobby.manual();
                     sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the lobby to manual control."));
                 }
                 case "editmaps", "em" -> {
@@ -321,11 +330,11 @@ public class SGCommand implements CommandExecutor {
                         sender.sendMessage(MCUtils.color(MsgType.WARN + "The server has a game in progress."));
                         return true;
                     }
-                    if (plugin.getLobby().getState() == LobbyState.MAP_EDITING) {
-                        plugin.getLobby().stopEditingMaps();
+                    if (lobby.getState() == LobbyState.MAP_EDITING) {
+                        lobby.stopEditingMaps();
                         sender.sendMessage(MCUtils.color(MsgType.INFO + "You stopped editing maps."));
                     } else {
-                        plugin.getLobby().editMaps();
+                        lobby.editMaps();
                         sender.sendMessage(MCUtils.color(MsgType.INFO + "You started editing maps."));
                     }
                 }
@@ -340,7 +349,7 @@ public class SGCommand implements CommandExecutor {
                         return true;
                     }
 
-                    if (!(sender instanceof Player player)) {
+                    if (!(sender instanceof Player)) {
                         sender.sendMessage(MCUtils.color(MsgType.WARN + "Only players can use that command."));
                         return true;
                     }
@@ -357,7 +366,7 @@ public class SGCommand implements CommandExecutor {
                     }
 
                     if (args[2].equalsIgnoreCase("remove")) {
-                        Iterator<Entry<Integer, Location>> iterator = plugin.getLobby().getMapSigns().entrySet().iterator();
+                        Iterator<Entry<Integer, Location>> iterator = lobby.getMapSigns().entrySet().iterator();
                         while (iterator.hasNext()) {
                             Entry<Integer, Location> entry = iterator.next();
                             if (entry.getValue().equals(targetBlock.getLocation())) {
@@ -380,9 +389,9 @@ public class SGCommand implements CommandExecutor {
                             return true;
                         }
 
-                        plugin.getLobby().getMapSigns().put(position, targetBlock.getLocation());
+                        lobby.getMapSigns().put(position, targetBlock.getLocation());
                         player.sendMessage(MCUtils.color(MsgType.INFO + "You set the sign you are looking at as a map sign in position &b" + position));
-                        plugin.getLobby().generateMapOptions();
+                        lobby.generateMapOptions();
                     }
                 }
                 case "statsigns", "sts" -> {
@@ -396,7 +405,7 @@ public class SGCommand implements CommandExecutor {
                         return true;
                     }
 
-                    if (!(sender instanceof Player player)) {
+                    if (!(sender instanceof Player)) {
                         sender.sendMessage(MCUtils.color(MsgType.WARN + "Only players can use that command."));
                         return true;
                     }
@@ -413,7 +422,7 @@ public class SGCommand implements CommandExecutor {
                     }
 
                     if (args[2].equalsIgnoreCase("remove")) {
-                        Iterator<StatSign> iterator = plugin.getLobby().getStatSigns().iterator();
+                        Iterator<StatSign> iterator = lobby.getStatSigns().iterator();
                         while (iterator.hasNext()) {
                             StatSign entry = iterator.next();
                             if (entry.getLocation().equals(targetBlock.getLocation())) {
@@ -435,7 +444,7 @@ public class SGCommand implements CommandExecutor {
                             return true;
                         }
 
-                        for (StatSign statSign : plugin.getLobby().getStatSigns()) {
+                        for (StatSign statSign : lobby.getStatSigns()) {
                             if (statSign.getStat().equalsIgnoreCase(stat)) {
                                 player.sendMessage(MCUtils.color(MsgType.WARN + "A stat sign with that stat already exists. You can only have one per stat."));
                                 return true;
@@ -454,7 +463,7 @@ public class SGCommand implements CommandExecutor {
                         }
 
                         StatSign statSign = new StatSign(targetBlock.getLocation(), stat, displayName);
-                        plugin.getLobby().getStatSigns().add(statSign);
+                        lobby.getStatSigns().add(statSign);
                         player.sendMessage(MCUtils.color(MsgType.INFO + "You added a stat sign for &b" + stat + " &ewith the display name &b" + displayName));
                     }
                 }
@@ -469,7 +478,7 @@ public class SGCommand implements CommandExecutor {
                         return true;
                     }
 
-                    if (!(sender instanceof Player player)) {
+                    if (!(sender instanceof Player)) {
                         sender.sendMessage(MCUtils.color(MsgType.WARN + "Only players can use that command."));
                         return true;
                     }
@@ -486,7 +495,7 @@ public class SGCommand implements CommandExecutor {
                     }
 
                     if (args[2].equalsIgnoreCase("remove")) {
-                        Iterator<TributeSign> iterator = plugin.getLobby().getTributeSigns().iterator();
+                        Iterator<TributeSign> iterator = lobby.getTributeSigns().iterator();
                         while (iterator.hasNext()) {
                             TributeSign sign = iterator.next();
                             if (sign.getSignLocation().equals(targetBlock.getLocation()) || sign.getHeadLocation().equals(targetBlock.getLocation())) {
@@ -516,7 +525,7 @@ public class SGCommand implements CommandExecutor {
                         }
 
                         TributeSign tributeSign = null;
-                        for (TributeSign sign : plugin.getLobby().getTributeSigns()) {
+                        for (TributeSign sign : lobby.getTributeSigns()) {
                             if (sign.getIndex() == index) {
                                 tributeSign = sign;
                                 break;
@@ -531,7 +540,7 @@ public class SGCommand implements CommandExecutor {
                             } else {
                                 msg += "&e, however you still need to add a head to it. Just use the same command while looking at a head.";
                             }
-                            plugin.getLobby().getTributeSigns().add(tributeSign);
+                            lobby.getTributeSigns().add(tributeSign);
                             player.sendMessage(MCUtils.color(MsgType.INFO + msg));
                             return true;
                         }
@@ -553,9 +562,9 @@ public class SGCommand implements CommandExecutor {
                         sender.sendMessage(MCUtils.color(MsgType.WARN + "The server has a game in progress."));
                         return true;
                     }
-                    LobbyState lobbyState = plugin.getLobby().getState();
+                    LobbyState lobbyState = lobby.getState();
                     if (lobbyState == LobbyState.WAITING || lobbyState == LobbyState.COUNTDOWN) {
-                        plugin.getLobby().prepareGame();
+                        lobby.prepareGame();
                         sender.sendMessage(MCUtils.color(MsgType.INFO + "You forcefully had the lobby prepare the game."));
                     } else {
                         sender.sendMessage(MCUtils.color(MsgType.WARN + "The lobby is in an invalid state to prepare a game."));
@@ -568,16 +577,15 @@ public class SGCommand implements CommandExecutor {
                         return true;
                     }
 
-                    if (!(sender instanceof Player player)) {
+                    if (!(sender instanceof Player)) {
                         sender.sendMessage(MCUtils.color(MsgType.WARN + "Only players can use that sub command."));
                         return true;
                     }
 
-                    plugin.getLobby().setSpawnpoint(player.getLocation());
+                    lobby.setSpawnpoint(player.getLocation());
                     sender.sendMessage(MCUtils.color(MsgType.INFO + "You set the lobby spawnpoint to your location."));
                 }
                 case "debug" -> {
-                    Lobby lobby = plugin.getLobby();
                     if (lobby.isDebugMode()) {
                         lobby.disableDebug();
                         sender.sendMessage(MCUtils.color(MsgType.INFO + "You &cdisabled &elobby debug mode."));
@@ -636,7 +644,7 @@ public class SGCommand implements CommandExecutor {
                         sb.append("\n").append("&dMax: &e").append(setting.getMaxValue().get());
                     }
                     component.setHoverEvent(new HoverEvent(Action.SHOW_TEXT, TextComponent.fromLegacyText(MCUtils.color(sb.toString()))));
-                    if (sender instanceof Player player) {
+                    if (sender instanceof Player) {
                         player.spigot().sendMessage(component);
                     } else if (sender instanceof ConsoleCommandSender console) {
                         console.sendMessage(MCUtils.color(component.getText()));
@@ -698,12 +706,12 @@ public class SGCommand implements CommandExecutor {
             SettingList<?> settingList;
             if (type.equalsIgnoreCase("game")) {
                 if (game == null) {
-                    settingList = plugin.getLobby().getGameSettings();
+                    settingList = lobby.getGameSettings();
                 } else {
-                    settingList = plugin.getGame().getSettings();
+                    settingList = game.getSettings();
                 }
             } else {
-                settingList = plugin.getLobby().getLobbySettings();
+                settingList = lobby.getLobbySettings();
             }
 
             settingList.setValue(settingName, value.get());
@@ -807,7 +815,7 @@ public class SGCommand implements CommandExecutor {
                 timer = game.getTimer();
                 timerType = "game";
             } else {
-                //TODO timer = plugin.getLobby().getTimer();
+                //TODO timer = lobby.getTimer();
                 timerType = "lobby";
             }
 
@@ -904,7 +912,6 @@ public class SGCommand implements CommandExecutor {
                 }
             }
         } else if (args[0].equalsIgnoreCase("skull")) {
-            Player player = (Player) sender;
             Block targetBlock = player.getTargetBlock((Set<Material>) null, 10);
             Skull skull = (Skull) targetBlock.getState();
             player.sendMessage(skull.getOwner());

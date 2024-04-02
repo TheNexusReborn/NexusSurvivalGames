@@ -6,7 +6,9 @@ import com.thenexusreborn.gamemaps.model.MapRating;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
+import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
+import com.thenexusreborn.survivalgames.game.Game;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -30,13 +32,16 @@ public class RateMapCmd implements CommandExecutor {
             player.sendMessage(MCUtils.color(MsgType.WARN + "Usage: /" + label + " <rating>"));
             return true;
         }
+
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
+        Game game = sgPlayer.getGame();
         
-        if (plugin.getGame() == null) {
+        if (game == null) {
             player.sendMessage(MCUtils.color(MsgType.WARN + "You can only rate a map during a game."));
             return true;
         }
     
-        SGMap gameMap = plugin.getGame().getGameMap();
+        SGMap gameMap = game.getGameMap();
         
         int rating;
         try {

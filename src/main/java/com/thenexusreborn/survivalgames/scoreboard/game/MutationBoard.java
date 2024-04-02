@@ -29,17 +29,15 @@ public class MutationBoard extends SpigotScoreboardView {
         
         createTeam(new TeamBuilder("blank1").entry(ChatColor.AQUA).score(14));
     
-        Game game = plugin.getGame();
-        
         createTeam(new TeamBuilder("targetLabel").entry("&6&lTARGET:").score(13));
         createTeam(new TeamBuilder("targetValue").entry(ChatColor.WHITE).score(12).valueUpdater((player, team) -> {
-            GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
+            GamePlayer gamePlayer = plugin.getPlayerRegistry().get(player.getUniqueId()).getGamePlayer();
             if (gamePlayer.getTeam() != GameTeam.MUTATIONS) {
                 team.setSuffix("None");
                 return;
             }
             Mutation mutation = gamePlayer.getMutation();
-            GamePlayer target = game.getPlayer(mutation.getTarget());
+            GamePlayer target = plugin.getPlayerRegistry().get(mutation.getTarget()).getGamePlayer();
             if (target == null) {
                 team.setSuffix("None");
                 return;
@@ -51,7 +49,7 @@ public class MutationBoard extends SpigotScoreboardView {
         
         createTeam(new TeamBuilder("typeLabel").entry("&6&lTYPE:").score(10));
         createTeam(new TeamBuilder("typeValue").entry(ChatColor.BLACK).score(9).valueUpdater((player, team) -> {
-            GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
+            GamePlayer gamePlayer = plugin.getPlayerRegistry().get(player.getUniqueId()).getGamePlayer();
             if (gamePlayer.getTeam() != GameTeam.MUTATIONS) {
                 team.setSuffix("None");
                 return;

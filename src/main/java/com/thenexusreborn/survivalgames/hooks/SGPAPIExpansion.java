@@ -6,6 +6,7 @@ import com.stardevllc.starmclib.Position;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.util.MCUtils;
+import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.CombatTag;
 import com.thenexusreborn.survivalgames.game.Game;
@@ -65,14 +66,17 @@ public class SGPAPIExpansion extends PlaceholderExpansion {
      */
     @Override
     public String onPlaceholderRequest(Player player, String params) {
-        SGPlayerStats stats = SurvivalGames.PLAYER_STATS.get(player.getUniqueId());
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
+        SGPlayerStats stats = sgPlayer.getStats();
 
+        Game game = sgPlayer.getGame();
+        Lobby lobby = sgPlayer.getLobby();
+        
         if (params.equalsIgnoreCase("score")) {
             return MCUtils.formatNumber(stats.getScore());
         }
 
         if (params.equalsIgnoreCase("displayname")) {
-            Game game = plugin.getGame();
             if (game == null) {
                 return "";
             }
@@ -101,7 +105,6 @@ public class SGPAPIExpansion extends PlaceholderExpansion {
 
             return prefix + nameColor + player.getName() + tag;
         } else if (params.equalsIgnoreCase("gameteam_color")) {
-            Game game = plugin.getGame();
             if (game == null) {
                 return "";
             }
@@ -117,8 +120,6 @@ public class SGPAPIExpansion extends PlaceholderExpansion {
             if (option == null || option.isEmpty()) {
                 return "";
             }
-
-            Lobby lobby = plugin.getLobby();
 
             if (option.equalsIgnoreCase("waiting")) {
                 int waiting = 0;
@@ -163,10 +164,10 @@ public class SGPAPIExpansion extends PlaceholderExpansion {
                         return "&7Voting";
                     }
                 } else if (mapOption.equalsIgnoreCase("center")) {
-                    if (plugin.getLobby().getGameMap() == null) {
+                    if (lobby.getGameMap() == null) {
                         return "&fNo Map Set";
                     } else {
-                        Position center = plugin.getLobby().getGameMap().getCenter();
+                        Position center = lobby.getGameMap().getCenter();
                         if (center != null) {
                             return center.getX() + "," + center.getY() + "," + center.getZ();
                         } else {
@@ -174,34 +175,34 @@ public class SGPAPIExpansion extends PlaceholderExpansion {
                         }
                     }
                 } else if (mapOption.equalsIgnoreCase("spawncount")) {
-                    if (plugin.getLobby().getGameMap() == null) {
+                    if (lobby.getGameMap() == null) {
                         return "0";
                     } else {
-                        return String.valueOf(plugin.getLobby().getGameMap().getSpawns().size());
+                        return String.valueOf(lobby.getGameMap().getSpawns().size());
                     }
                 } else if (mapOption.equalsIgnoreCase("borderradius")) {
-                    if (plugin.getLobby().getGameMap() == null) {
+                    if (lobby.getGameMap() == null) {
                         return "0";
                     } else {
-                        return String.valueOf(plugin.getLobby().getGameMap().getBorderDistance());
+                        return String.valueOf(lobby.getGameMap().getBorderDistance());
                     }
                 } else if (mapOption.equalsIgnoreCase("dmborderradius")) {
-                    if (plugin.getLobby().getGameMap() == null) {
+                    if (lobby.getGameMap() == null) {
                         return "0";
                     } else {
-                        return String.valueOf(plugin.getLobby().getGameMap().getDeathmatchBorderDistance());
+                        return String.valueOf(lobby.getGameMap().getDeathmatchBorderDistance());
                     }
                 } else if (mapOption.equalsIgnoreCase("creatorcount")) {
-                    if (plugin.getLobby().getGameMap() == null) {
+                    if (lobby.getGameMap() == null) {
                         return "0";
                     } else {
-                        return String.valueOf(plugin.getLobby().getGameMap().getCreators().size());
+                        return String.valueOf(lobby.getGameMap().getCreators().size());
                     }
                 } else if (mapOption.equalsIgnoreCase("swagshacklocation")) {
-                    if (plugin.getLobby().getGameMap() == null) {
+                    if (lobby.getGameMap() == null) {
                         return "&fNo Map Set";
                     } else {
-                        Position swagShack = plugin.getLobby().getGameMap().getSwagShack();
+                        Position swagShack = lobby.getGameMap().getSwagShack();
                         if (swagShack != null) {
                             return swagShack.getX() + "," + swagShack.getY() + "," + swagShack.getZ();
                         } else {
@@ -210,7 +211,6 @@ public class SGPAPIExpansion extends PlaceholderExpansion {
                     }
                 }
             } else if (option.equalsIgnoreCase("game")) {
-                Game game = plugin.getGame();
                 if (game == null) {
                     return "";
                 }
@@ -238,7 +238,7 @@ public class SGPAPIExpansion extends PlaceholderExpansion {
                     }
                     
                     if (playerOption.equalsIgnoreCase("score")) {
-                        return String.valueOf(SurvivalGames.PLAYER_STATS.get(player.getUniqueId()).getScore());
+                        return String.valueOf(stats.getScore());
                     } else if (playerOption.equalsIgnoreCase("kills")) {
                         int killStreak = gamePlayer.getKillStreak();
                         int hks = gamePlayer.getStats().getHighestKillstreak();
@@ -293,7 +293,7 @@ public class SGPAPIExpansion extends PlaceholderExpansion {
                         if (combatTag == null || combatTag.getOther() == null || !combatTag.isInCombat()) {
                             return "0s";
                         } else {
-                            long combatTagLength = plugin.getGame().getSettings().getCombatTagLength() * 1000L;
+                            long combatTagLength = game.getSettings().getCombatTagLength() * 1000L;
                             long timeRemaining = combatTag.getTimestamp() + combatTagLength - System.currentTimeMillis();
                             return TIME_FORMAT.format(timeRemaining);
                         }
