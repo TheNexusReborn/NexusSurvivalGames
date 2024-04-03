@@ -471,8 +471,9 @@ public class PlayerListener implements Listener {
             }
         } else {
             if (game == null) {
-                Bukkit.getScheduler().runTaskLater(plugin, lobby::recalculateVisibility, 1L);
-                lobby.sendMessage(message);
+                if (lobby != null) {
+                    lobby.sendMessage(message);
+                }
             } else {
                 if (e.newValue()) {
                     GamePlayer gamePlayer = game.getPlayer(nexusPlayer.getUniqueId());
