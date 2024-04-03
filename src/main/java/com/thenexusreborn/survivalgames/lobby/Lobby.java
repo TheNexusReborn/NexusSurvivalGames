@@ -463,6 +463,7 @@ public class Lobby {
         if (game.getControlType() == ControlType.AUTOMATIC) {
             this.state = LobbyState.STARTING;
             game.setup();
+            resetLobby();
         } else {
             sendMessage("&eThe game has been prepared and is now ready, however, it has not been started due to the game being in manual mode.");
             this.state = LobbyState.GAME_PREPARED;
