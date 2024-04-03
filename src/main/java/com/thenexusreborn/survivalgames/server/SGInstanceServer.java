@@ -12,8 +12,8 @@ public class SGInstanceServer extends InstanceServer {
         super(name, "survivalgames", 24);
         this.plugin = plugin;
         
-        this.primaryVirtualServer = new SGVirtualServer(plugin, this, name);
-        plugin.getServers().register(1, (SGVirtualServer) this.primaryVirtualServer);
+        this.primaryVirtualServer.set(new SGVirtualServer(plugin, this, name));
+        plugin.getServers().register(1, (SGVirtualServer) this.primaryVirtualServer.get());
     }
 
     @Override
