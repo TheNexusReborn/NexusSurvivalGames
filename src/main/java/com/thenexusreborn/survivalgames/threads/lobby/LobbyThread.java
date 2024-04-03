@@ -5,7 +5,6 @@ import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.nexuscore.util.ServerProperties;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
@@ -17,13 +16,13 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 public class LobbyThread extends NexusThread<SurvivalGames> {
-    
+
     private int secondsInPrepareGame;
-    
+
     public LobbyThread(SurvivalGames plugin) {
         super(plugin, 20L, false);
     }
-    
+
     @Override
     public void onRun() {
         for (SGVirtualServer server : plugin.getServers()) {
@@ -38,23 +37,22 @@ public class LobbyThread extends NexusThread<SurvivalGames> {
                 }
             }
 
-            for (LobbyPlayer player : lobby.getPlayers()) {
+            LobbyState state = lobby.getState();
+            for (LobbyPlayer lobbyPlayer : lobby.getPlayers()) {
+                Player player = Bukkit.getPlayer(lobbyPlayer.getUniqueId());
                 SGUtils.updatePlayerHealthAndFood(Bukkit.getPlayer(player.getUniqueId()));
+
+                if (state != LobbyState.MAP_EDITING) {
+                    if (player.getLocation().getBlockY() < lobby.getSpawnpoint().getBlockY() - 20) {
+                        player.teleport(lobby.getSpawnpoint());
+                    }
+                }
             }
 
             world.setThundering(false);
             world.setStorm(false);
 
             world.setGameRuleValue("doFireSpread", "false");
-
-            LobbyState state = lobby.getState();
-            if (state != LobbyState.MAP_EDITING) {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    if (player.getLocation().getBlockY() < lobby.getSpawnpoint().getBlockY() - 20) {
-                        player.teleport(lobby.getSpawnpoint());
-                    }
-                }
-            }
 
             for (LobbyPlayer player : lobby.getPlayers()) {
                 Player bukkitPlayer = Bukkit.getPlayer(player.getUniqueId());
@@ -93,9 +91,9 @@ public class LobbyThread extends NexusThread<SurvivalGames> {
                     }
                 }
 
-                if (Bukkit.getOnlinePlayers().size() <= 1) {
-                    resetLobby = true;
-                }
+//                if (Bukkit.getOnlinePlayers().size() <= 1) {
+//                    resetLobby = true;
+//                } //TODO
             }
 
             if (resetLobby) {

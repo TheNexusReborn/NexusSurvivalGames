@@ -286,35 +286,7 @@ public class Lobby {
             gameMap.removeFromServer(plugin);
         }
 
-        FileConfiguration config = plugin.getConfig();
-        this.mapSigns.forEach((position, location) -> {
-            config.set("mapsigns." + position + ".world", location.getWorld().getName());
-            config.set("mapsigns." + position + ".x", location.getBlockX());
-            config.set("mapsigns." + position + ".y", location.getBlockY());
-            config.set("mapsigns." + position + ".z", location.getBlockZ());
-        });
-
-        this.statSigns.forEach(statSign -> {
-            Location location = statSign.getLocation();
-            config.set("statsigns." + statSign.getStat() + ".world", location.getWorld().getName());
-            config.set("statsigns." + statSign.getStat() + ".x", location.getBlockX());
-            config.set("statsigns." + statSign.getStat() + ".y", location.getBlockY());
-            config.set("statsigns." + statSign.getStat() + ".z", location.getBlockZ());
-            config.set("statsigns." + statSign.getStat() + ".displayName", statSign.getDisplayName());
-        });
-
-        this.tributeSigns.forEach(tributeSign -> {
-            Location sl = tributeSign.getSignLocation();
-            Location hl = tributeSign.getHeadLocation();
-
-            config.set("tributesigns." + tributeSign.getIndex() + ".world", sl.getWorld().getName());
-            config.set("tributesigns." + tributeSign.getIndex() + ".sign.x", sl.getBlockX());
-            config.set("tributesigns." + tributeSign.getIndex() + ".sign.y", sl.getBlockY());
-            config.set("tributesigns." + tributeSign.getIndex() + ".sign.z", sl.getBlockZ());
-            config.set("tributesigns." + tributeSign.getIndex() + ".head.x", hl.getBlockX());
-            config.set("tributesigns." + tributeSign.getIndex() + ".head.y", hl.getBlockY());
-            config.set("tributesigns." + tributeSign.getIndex() + ".head.z", hl.getBlockZ());
-        });
+        //TODO Edit lobby settings and save them
     }
 
     public List<LobbyPlayer> getPlayers() {
