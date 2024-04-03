@@ -447,7 +447,9 @@ public class PlayerListener implements Listener {
         
         Collection<NexusPlayer> players = new ArrayList<>();
         if (game == null) {
-            lobby.getPlayers().forEach(p -> players.add(p.getPlayer()));
+            if (lobby != null) {
+                lobby.getPlayers().forEach(p -> players.add(p.getPlayer()));
+            }
         } else {
             for (GamePlayer value : game.getPlayers().values()) {
                 players.add(value.getNexusPlayer());
