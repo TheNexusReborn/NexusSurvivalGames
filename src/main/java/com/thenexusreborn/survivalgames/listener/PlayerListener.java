@@ -122,6 +122,10 @@ public class PlayerListener implements Listener {
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
         Lobby lobby = sgPlayer.getLobby();
         Game game = sgPlayer.getGame();
+        
+        if (lobby == null && game == null) {
+            return;
+        }
 
         if (lobby != null && lobby.checkMapEditing(e.getPlayer())) {
             return;
