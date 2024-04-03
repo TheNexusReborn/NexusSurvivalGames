@@ -31,6 +31,10 @@ public class ChickenMutationThread extends NexusThread<SurvivalGames> {
             }
             Game game = sgPlayer.getGame();
             
+            if (game == null) {
+                continue;
+            }
+            
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
             if (gamePlayer == null) {
                 continue;
