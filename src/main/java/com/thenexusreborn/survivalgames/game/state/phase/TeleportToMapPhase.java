@@ -54,7 +54,6 @@ public class TeleportToMapPhase extends GamePhase {
             }
 
             setStatus(Status.RECALCULATING_VISIBILITY);
-            game.recalculateVisibility();
             setStatus(PhaseStatus.COMPLETE);
             game.setState(TELEPORT_START_DONE);
         } catch (Exception e) {

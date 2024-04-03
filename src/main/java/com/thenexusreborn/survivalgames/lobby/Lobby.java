@@ -911,23 +911,6 @@ public class Lobby {
                 '}';
     }
 
-    public void recalculateVisibility() {
-        for (LobbyPlayer player : this.getPlayers()) {
-            Player bukkitPlayer = Bukkit.getPlayer(player.getUniqueId());
-            boolean vanish = player.getToggleValue("vanish");
-            for (LobbyPlayer other : this.getPlayers()) {
-                Player otherBukkit = Bukkit.getPlayer(other.getUniqueId());
-                if (!vanish) {
-                    otherBukkit.showPlayer(bukkitPlayer);
-                } else {
-                    if (other.getRank().ordinal() > Rank.HELPER.ordinal()) {
-                        otherBukkit.hidePlayer(bukkitPlayer);
-                    }
-                }
-            }
-        }
-    }
-
     public World getWorld() {
         return this.world;
     }

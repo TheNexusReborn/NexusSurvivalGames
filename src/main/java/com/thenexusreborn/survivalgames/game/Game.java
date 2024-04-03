@@ -265,7 +265,6 @@ public class Game {
         gamePlayer.setStatus(GamePlayer.Status.SETTING_UP_ACTIONBAR);
         gamePlayer.applyActionBar();
         gamePlayer.setStatus(GamePlayer.Status.READY);
-        recalculateVisibility();
     }
 
     public void removePlayer(NexusPlayer nexusPlayer) {
@@ -356,37 +355,6 @@ public class Game {
         } catch (NullPointerException e) {
             if (spectator != null) {
                 throw e;
-            }
-        }
-    }
-
-    public void recalculateVisibility() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            GamePlayer gamePlayer = getPlayer(player.getUniqueId());
-            if (gamePlayer == null) {
-                continue;
-            }
-            for (Player other : Bukkit.getOnlinePlayers()) {
-                GamePlayer otherGamePlayer = getPlayer(other.getUniqueId());
-
-                if (otherGamePlayer == null) {
-                    continue;
-                }
-
-                if (gamePlayer.getToggleValue("vanish")) {
-                    player.showPlayer(other);
-                    if (otherGamePlayer.getRank().ordinal() > Rank.HELPER.ordinal()) {
-                        other.hidePlayer(player);
-                    }
-                } else if (gamePlayer.getTeam() != GameTeam.SPECTATORS && otherGamePlayer.getTeam() != GameTeam.SPECTATORS) {
-                    player.showPlayer(other);
-                    other.showPlayer(player);
-                } else if (gamePlayer.getTeam() == GameTeam.SPECTATORS && otherGamePlayer.getTeam() != GameTeam.SPECTATORS) {
-                    player.showPlayer(other);
-                    other.hidePlayer(player);
-                } else {
-                    player.hidePlayer(other);
-                }
             }
         }
     }
@@ -510,7 +478,6 @@ public class Game {
                     gp.setTeam(GameTeam.SPECTATORS);
                     gp.sendMessage(gp.getTeam().getJoinMessage());
                     giveSpectatorItems(Bukkit.getPlayer(gp.getUniqueId()));
-                    recalculateVisibility();
                     gp.sendMessage("&6&l>> &cYou were made a spectator because deathmatch started.");
                 }
             }
@@ -530,7 +497,6 @@ public class Game {
             teleportTributes(tributes, mapSpawn);
             teleportSpectators(spectators, mapSpawn);
 
-            recalculateVisibility();
             setState(TELEPORT_DEATHMATCH_DONE);
         } catch (Exception e) {
             e.printStackTrace();
@@ -807,7 +773,6 @@ public class Game {
         GameTeam oldTeam = gamePlayer.getTeam();
         gamePlayer.addDeathInfo(deathInfo);
         gamePlayer.setTeam(GameTeam.SPECTATORS);
-        recalculateVisibility();
         Player player = Bukkit.getPlayer(gamePlayer.getUniqueId());
         String strippedDeathMessage = ChatColor.stripColor(deathInfo.getDeathMessage());
         strippedDeathMessage = strippedDeathMessage.substring(3, strippedDeathMessage.length() - 1);
@@ -1204,7 +1169,6 @@ public class Game {
 
         gamePlayer.setMutated(true);
         teleportMutation(player, location);
-        recalculateVisibility();
         gamePlayer.clearInventory();
         gamePlayer.setFlight(false, false);
         gamePlayer.setCollisions(true);

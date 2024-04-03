@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames.server;
 
+import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.server.InstanceServer;
@@ -7,11 +8,17 @@ import com.thenexusreborn.api.server.VirtualServer;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.game.GameState;
+import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyType;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.UUID;
 
 public class SGVirtualServer extends VirtualServer {
 
@@ -28,6 +35,58 @@ public class SGVirtualServer extends VirtualServer {
     public SGVirtualServer(SurvivalGames plugin, String name) {
         super(name, "survivalgames", 24);
         this.plugin = plugin;
+    }
+
+    @Override
+    public boolean recalculateVisibility(UUID playerUUID, UUID otherPlayerUUID) {
+        Player player = Bukkit.getPlayer(playerUUID);
+        Player otherPlayer = Bukkit.getPlayer(otherPlayerUUID);
+        
+        NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(playerUUID);
+        NexusPlayer otherNexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(otherPlayerUUID);
+        
+        Rank playerRank = nexusPlayer.getRank();
+        Rank otherPlayerRank = otherNexusPlayer.getRank();
+        
+        boolean playerIsVanished = playerRank.ordinal() <= Rank.HELPER.ordinal() && nexusPlayer.getToggleValue("vanish");
+        boolean otherPlayerIsVanished = otherPlayerRank.ordinal() <= Rank.HELPER.ordinal() && otherNexusPlayer.getToggleValue("vanish");
+        
+        if (game == null) {
+            if (playerIsVanished && otherPlayerIsVanished) {
+                if (playerRank.ordinal() >= otherPlayerRank.ordinal()) {
+                    player.showPlayer(otherPlayer);
+                    otherPlayer.showPlayer(player);
+                } else {
+                    otherPlayer.hidePlayer(player);
+                    player.showPlayer(otherPlayer);
+                }
+            } else if (playerIsVanished && !otherPlayerIsVanished) {
+                otherPlayer.hidePlayer(player);
+                player.showPlayer(otherPlayer);
+            } else if (otherPlayerIsVanished && !playerIsVanished) {
+                player.hidePlayer(otherPlayer);
+                otherPlayer.showPlayer(player);
+            }
+        } else {
+            GamePlayer gamePlayer = game.getPlayer(playerUUID);
+            GamePlayer otherGamePlayer = game.getPlayer(otherPlayerUUID);
+            
+            boolean playerIsSpectator = gamePlayer.getTeam() == GameTeam.SPECTATORS;
+            boolean otherPlayerIsSpectator = otherGamePlayer.getTeam() == GameTeam.SPECTATORS;
+            
+            if (playerIsSpectator && otherPlayerIsSpectator) {
+                player.hidePlayer(otherPlayer);
+                otherPlayer.hidePlayer(player);
+            } else if (playerIsSpectator && !otherPlayerIsSpectator) {
+                player.showPlayer(otherPlayer);
+                otherPlayer.hidePlayer(player);
+            } else {
+                player.showPlayer(otherPlayer);
+                otherPlayer.showPlayer(player);
+            }
+        }
+        
+        return true;
     }
 
     @Override

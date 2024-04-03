@@ -481,7 +481,6 @@ public class PlayerListener implements Listener {
                         game.killPlayer(gamePlayer, new DeathInfo(game, System.currentTimeMillis(), gamePlayer, DeathType.VANISH));
                     }
                 }
-                Bukkit.getScheduler().runTaskLater(plugin, game::recalculateVisibility, 1L);
                 game.sendMessage(message);
             }
         }
