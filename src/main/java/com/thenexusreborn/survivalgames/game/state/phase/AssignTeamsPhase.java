@@ -28,6 +28,9 @@ public class AssignTeamsPhase extends GamePhase {
             Queue<UUID> tributes = new LinkedList<>(), spectators = new LinkedList<>();
             while ((uuid = SurvivalGames.PLAYER_QUEUE.poll()) != null) {
                 GamePlayer player = game.getPlayers().get(uuid);
+                if (player == null) {
+                    continue;
+                }
                 if (player.getTeam() != null) {
                     if (player.getTeam() == GameTeam.SPECTATORS) {
                         spectators.offer(player.getUniqueId());
