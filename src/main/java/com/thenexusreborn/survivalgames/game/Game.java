@@ -605,10 +605,16 @@ public class Game {
             this.ratingPromptTimer.cancel();
             this.ratingPromptTimer = null;
         }
-
+        
         for (Player player : Bukkit.getOnlinePlayers()) {
+            if (!this.players.containsKey(player.getUniqueId())) {
+                continue;
+            }
             player.setAllowFlight(true);
             for (Player p : Bukkit.getOnlinePlayers()) {
+                if (!this.players.containsKey(player.getUniqueId())) {
+                    continue;
+                }
                 player.showPlayer(p);
                 p.showPlayer(player);
             }
