@@ -5,6 +5,7 @@ import com.thenexusreborn.survivalgames.ControlType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
+import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 
 public class TimerCountdownCheckThread extends NexusThread<SurvivalGames> {
     
@@ -14,7 +15,11 @@ public class TimerCountdownCheckThread extends NexusThread<SurvivalGames> {
     
     @Override
     public void onRun() {
-        for (Lobby lobby : plugin.getLobbies()) {
+        for (SGVirtualServer server : plugin.getServers()) {
+            Lobby lobby = server.getLobby();
+            if (lobby == null) {
+                continue;
+            }
             if (lobby.getState() != LobbyState.WAITING) {
                 continue;
             }

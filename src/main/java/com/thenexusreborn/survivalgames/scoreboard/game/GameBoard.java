@@ -91,6 +91,6 @@ public class GameBoard extends SpigotScoreboardView {
             } 
         }));
         createTeam(new TeamBuilder("blank4").entry(ChatColor.DARK_PURPLE.toString()).score(2));
-        createTeam(new TeamBuilder("serverValue").prefix("&6&lSERVER: ").entry("&fNexus")); //TODO
+        createTeam(new TeamBuilder("serverValue").prefix("&6&lSERVER: ").entry("&f" + plugin.getPlayerRegistry().get(scoreboard.getPlayer().getUniqueId()).getGame().getServer().getName()));
     }
 }

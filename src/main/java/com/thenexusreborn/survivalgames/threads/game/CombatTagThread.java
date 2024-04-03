@@ -7,6 +7,7 @@ import com.thenexusreborn.survivalgames.game.CombatTag;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.game.GameTeam;
+import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -17,9 +18,14 @@ public class CombatTagThread extends NexusThread<SurvivalGames> {
     public CombatTagThread(SurvivalGames plugin) {
         super(plugin, 5L, 0L, false);
     }
-    
+
     public void onRun() {
-        for (Game game : plugin.getGames()) {
+        for (SGVirtualServer server : plugin.getServers()) {
+            Game game = server.getGame();
+            if (game == null) {
+                continue;
+            }
+            
             for (GamePlayer gamePlayer : new ArrayList<>(game.getPlayers().values())) {
                 if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
                     continue;

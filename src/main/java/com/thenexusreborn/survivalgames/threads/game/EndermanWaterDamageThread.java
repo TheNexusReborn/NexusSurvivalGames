@@ -6,6 +6,7 @@ import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.game.GameState;
 import com.thenexusreborn.survivalgames.game.GameTeam;
+import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -15,13 +16,18 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 
 public class EndermanWaterDamageThread extends NexusThread<SurvivalGames> {
-    
+
     public EndermanWaterDamageThread(SurvivalGames plugin) {
         super(plugin, 20L, 0L, false);
     }
-    
+
     public void onRun() {
-        for (Game game : plugin.getGames()) {
+        for (SGVirtualServer server : plugin.getServers()) {
+            Game game = server.getGame();
+            if (game == null) {
+                continue;
+            }
+            
             if (!(game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_DEATHMATCH)) {
                 continue;
             }

@@ -5,6 +5,7 @@ import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.*;
+import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Skull;
 import org.bukkit.entity.Player;
@@ -21,7 +22,11 @@ public class TributeSignUpdateThread extends NexusThread<SurvivalGames> {
     }
     
     public void onRun() {
-        for (Lobby lobby : plugin.getLobbies()) {
+        for (SGVirtualServer server : plugin.getServers()) {
+            Lobby lobby = server.getLobby();
+            if (lobby == null) {
+                continue;
+            }
             if (lobby.getState() == LobbyState.MAP_EDITING) {
                 continue;
             }

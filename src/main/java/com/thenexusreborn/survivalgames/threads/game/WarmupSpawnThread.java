@@ -10,6 +10,7 @@ import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.game.GameState;
 import com.thenexusreborn.survivalgames.game.GameTeam;
+import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -27,7 +28,12 @@ public class WarmupSpawnThread extends NexusThread<SurvivalGames> {
 
     @Override
     public void onRun() {
-        for (Game game : plugin.getGames()) {
+        for (SGVirtualServer server : plugin.getServers()) {
+            Game game = server.getGame();
+            if (game == null) {
+                continue;
+            }
+            
             SGMap gameMap = game.getGameMap();
 
             if (Stream.of(states).noneMatch(gameState -> game.getState() == gameState)) {

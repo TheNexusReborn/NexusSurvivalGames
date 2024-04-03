@@ -2,7 +2,6 @@ package com.thenexusreborn.survivalgames.lobby;
 
 import com.stardevllc.starclock.clocks.Timer;
 import com.stardevllc.starlib.time.TimeUnit;
-import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.IActionBar;
 import com.thenexusreborn.survivalgames.ControlType;
 import com.thenexusreborn.survivalgames.SGPlayer;
@@ -31,7 +30,7 @@ public class LobbyActionBar implements IActionBar {
 
         Timer timer = lobby.getTimer();
         if (lobby.getState() == LobbyState.WAITING || timer == null) {
-            return "&d&lNEXUS &7- &fPlaying on &f&lNexus"; //TODO
+            return "&d&lNEXUS &7- &fPlaying on &f&l" + lobby.getServer().getName();
         }
         
         if (lobby.getState() == LobbyState.COUNTDOWN) {

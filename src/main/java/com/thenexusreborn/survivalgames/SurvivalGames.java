@@ -3,6 +3,7 @@ package com.thenexusreborn.survivalgames;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starlib.Value;
 import com.stardevllc.starlib.Value.Type;
+import com.stardevllc.starlib.registry.IntegerRegistry;
 import com.stardevllc.starlib.registry.UUIDRegistry;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.Rank;
@@ -19,22 +20,18 @@ import com.thenexusreborn.nexuscore.NexusCore;
 import com.thenexusreborn.nexuscore.api.NexusSpigotPlugin;
 import com.thenexusreborn.survivalgames.cmd.*;
 import com.thenexusreborn.survivalgames.disguises.NexusDisguises;
-import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.hooks.NexusHubHook;
 import com.thenexusreborn.survivalgames.hooks.SGPAPIExpansion;
 import com.thenexusreborn.survivalgames.listener.BlockListener;
 import com.thenexusreborn.survivalgames.listener.EntityListener;
 import com.thenexusreborn.survivalgames.listener.PlayerListener;
 import com.thenexusreborn.survivalgames.listener.ServerListener;
-import com.thenexusreborn.survivalgames.lobby.Lobby;
-import com.thenexusreborn.survivalgames.lobby.LobbyType;
 import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.loot.LootTable;
 import com.thenexusreborn.survivalgames.map.SQLMapManager;
 import com.thenexusreborn.survivalgames.mutations.PlayerMutations;
 import com.thenexusreborn.survivalgames.mutations.UnlockedMutation;
-import com.thenexusreborn.survivalgames.registry.GameRegistry;
-import com.thenexusreborn.survivalgames.registry.LobbyRegistry;
+import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.settings.LobbySettings;
 import com.thenexusreborn.survivalgames.settings.SettingRegistry;
@@ -80,8 +77,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
     private File deathMessagesFile;
     private FileConfiguration deathMessagesConfig;
     
-    private LobbyRegistry lobbies;
-    private GameRegistry games;
+    private IntegerRegistry<SGVirtualServer> servers = new IntegerRegistry<>();
     
     private int gamesPlayed;
 
@@ -143,6 +139,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         Plugin nexusHubPlugin = getServer().getPluginManager().getPlugin("NexusHub");
         if (nexusHubPlugin != null) {
             this.nexusHubHook = new NexusHubHook(this, nexusHubPlugin);
+            getServer().getPluginManager().registerEvents(this.nexusHubHook, this);
             getLogger().info("Applied Hooks and Usages for NexusHub.");
         }
 
@@ -197,13 +194,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
             lootTable.generateNewProbabilities(new Random());
         }
 
-        lobbies = new LobbyRegistry(this);
-        games = new GameRegistry(this);
-
-        Lobby lobby = new Lobby(this, LobbyType.CUSTOM);
-        lobbies.register(lobby); //First Lobby
-        lobby.setup();
-        
         getCommand("votestart").setExecutor(new VoteStartCommand(this));
         getCommand("stats").setExecutor(new StatsCommand(this));
         getCommand("survivalgames").setExecutor(new SGCommand(this));
@@ -372,12 +362,8 @@ public class SurvivalGames extends NexusSpigotPlugin {
 
     @Override
     public void onDisable() {
-        for (Game game : this.games.getObjects().values()) {
-            game.handleShutdown();
-        }
-
-        for (Lobby lobby : this.lobbies.getObjects().values()) {
-            lobby.handleShutdown();
+        for (SGVirtualServer server : this.servers) {
+            server.onStop();
         }
         
         if (mapManager instanceof SQLMapManager) {
@@ -466,11 +452,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         return playerRegistry;
     }
 
-    public GameRegistry getGames() {
-        return games;
-    }
-
-    public LobbyRegistry getLobbies() {
-        return lobbies;
+    public IntegerRegistry<SGVirtualServer> getServers() {
+        return servers;
     }
 }

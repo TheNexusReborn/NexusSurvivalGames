@@ -15,7 +15,7 @@ public class GameTeamChatroom extends ChatRoom {
     private Game game;
     
     public GameTeamChatroom(SurvivalGames plugin, Game game, GameTeam team) {
-        super(plugin, "room-game-" + game.getLocalId() + "-" + team.name().toLowerCase(), Actor.getServerActor(), team.getChatFormat(), "{message}");
+        super(plugin, "room-game-" + game.getServer().getName().toLowerCase().replace(" ", "_") + "-" + team.name().toLowerCase(), Actor.getServerActor(), team.getChatFormat(), "{message}");
         this.game = game;
     }
 

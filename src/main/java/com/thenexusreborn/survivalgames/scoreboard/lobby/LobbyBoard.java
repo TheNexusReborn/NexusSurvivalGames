@@ -42,6 +42,6 @@ public class LobbyBoard extends SpigotScoreboardView {
         }));
         createTeam(new TeamBuilder("neededValue").entry("&fNeeded: &e").score(10).valueUpdater((player, team) -> team.setSuffix(lobby.getLobbySettings().getMinPlayers() + "")));
         createTeam(new TeamBuilder("blank2").entry(ChatColor.DARK_PURPLE).score(9));
-        createTeam(new TeamBuilder("serverValue").entry("Nexus")); //TODO
+        createTeam(new TeamBuilder("serverValue").entry("&f" + lobby.getServer().getName()));
     }
 }

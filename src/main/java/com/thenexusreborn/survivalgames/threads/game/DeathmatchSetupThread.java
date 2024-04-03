@@ -5,15 +5,21 @@ import com.thenexusreborn.survivalgames.ControlType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GameState;
+import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 
 public class DeathmatchSetupThread extends NexusThread<SurvivalGames> {
     public DeathmatchSetupThread(SurvivalGames plugin) {
         super(plugin, 1L, 0L, false);
     }
-    
+
     @Override
     public void onRun() {
-        for (Game game : plugin.getGames()) {
+        for (SGVirtualServer server : plugin.getServers()) {
+            Game game = server.getGame();
+            if (game == null) {
+                continue;
+            }
+
             if (game.getControlType() == ControlType.MANUAL) {
                 continue;
             }

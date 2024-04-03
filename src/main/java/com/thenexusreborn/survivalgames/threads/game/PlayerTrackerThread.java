@@ -4,6 +4,7 @@ import com.thenexusreborn.api.helper.NumberHelper;
 import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
+import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -18,7 +19,12 @@ public class PlayerTrackerThread extends NexusThread<SurvivalGames> {
     }
 
     public void onRun() {
-        for (Game game : plugin.getGames()) {
+        for (SGVirtualServer server : plugin.getServers()) {
+            Game game = server.getGame();
+            if (game == null) {
+                continue;
+            }
+            
             long start = System.currentTimeMillis();
             if (game == null) {
                 continue;

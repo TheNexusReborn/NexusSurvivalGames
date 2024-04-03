@@ -4,6 +4,7 @@ import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
+import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 
 public class VoteStartMsgThread extends NexusThread<SurvivalGames> {
     public VoteStartMsgThread(SurvivalGames plugin) {
@@ -11,7 +12,11 @@ public class VoteStartMsgThread extends NexusThread<SurvivalGames> {
     }
     
     public void onRun() {
-        for (Lobby lobby : plugin.getLobbies()) {
+        for (SGVirtualServer server : plugin.getServers()) {
+            Lobby lobby = server.getLobby();
+            if (lobby == null) {
+                continue;
+            }
             if (lobby.getPlayers().isEmpty()) {
                 continue;
             }

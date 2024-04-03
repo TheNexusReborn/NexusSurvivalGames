@@ -734,44 +734,10 @@ public class PlayerListener implements Listener {
         }
         
         sgPlayer.setStats(stats);
-        
-        //TODO Requires an event in NexusHub
-//        if (plugin.getGame() == null) {
-//            if (plugin.getLobby().getPlayingCount() >= plugin.getLobby().getLobbySettings().getMaxPlayers()) {
-//                boolean isStaff = nexusPlayer.getRank().ordinal() <= Rank.HELPER.ordinal();
-//                boolean isInVanish = nexusPlayer.getToggleValue("vanish");
-//                if (!(isStaff && isInVanish)) {
-//                    nexusPlayer.sendMessage("&cThe lobby is full.");
-//                    return;
-//                }
-//            }
-//        }
 
         SurvivalGames.PLAYER_QUEUE.offer(e.getNexusPlayer().getUniqueId());
         
         plugin.getPlayerRegistry().register(sgPlayer);
-        
-        //TODO Will need to add a check for this
-//        if (plugin.getNexusHubHook() == null) {
-//            if (plugin.getGame() != null) {
-//                GameState state = plugin.getGame().getState();
-//                if (state == GameState.ASSIGN_TEAMS) {
-//                    new BukkitRunnable() {
-//                        @Override
-//                        public void run() {
-//                            if (plugin.getGame().getState() != GameState.ASSIGN_TEAMS) {
-//                                plugin.getGame().addPlayer(nexusPlayer, SurvivalGames.PLAYER_STATS.get(nexusPlayer.getUniqueId()));
-//                                cancel();
-//                            }
-//                        }
-//                    }.runTaskTimer(plugin, 1L, 1L);
-//                } else {
-//                    plugin.getGame().addPlayer(nexusPlayer, stats);
-//                }
-//            } else {
-//                plugin.getLobby().addPlayer(nexusPlayer, stats);
-//            }
-//        }
         e.setJoinMessage(null);
     }
     

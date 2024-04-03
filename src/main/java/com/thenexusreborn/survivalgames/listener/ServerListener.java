@@ -24,15 +24,21 @@ public class ServerListener implements Listener {
     @EventHandler
     public void onServerSetup(NexusServerSetupEvent e) {
         if (e.getNetworkType() == NetworkType.MULTI) {
-            e.setServer(new SGInstanceServer("SG")); //TODO Name from somewhere
+            e.setServer(new SGInstanceServer(plugin, "SG")); //TODO Name from somewhere
             return;
         }
         
         if (plugin.getNexusHubHook() == null) {
-            e.setServer(new SGInstanceServer("SG"));
+            e.setServer(new SGInstanceServer(plugin, "SG"));
         } else {
-            for (int i = 0; i < numberOfServers; i++) {
-                e.addVirtualServer(new SGVirtualServer("SG" + (i+1)));
+            SGVirtualServer sg1 = new SGVirtualServer(plugin, "SG1");
+            e.setPrimaryVirtualServer(sg1);
+            e.addVirtualServer(sg1);
+            plugin.getServers().register(1, sg1);
+            for (int i = 1; i < numberOfServers; i++) {
+                SGVirtualServer server = new SGVirtualServer(plugin, "SG" + (i + 1));
+                e.addVirtualServer(server);
+                plugin.getServers().register(i + 1, server);
             }
         }
     }

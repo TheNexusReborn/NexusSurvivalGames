@@ -5,6 +5,7 @@ import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.scoreboard.game.*;
+import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 
 import java.util.ArrayList;
 
@@ -15,7 +16,12 @@ public class PlayerScoreboardThread extends NexusThread<SurvivalGames> {
     
     @Override
     public void onRun() {
-        for (Game game : plugin.getGames()) {
+        for (SGVirtualServer server : plugin.getServers()) {
+            Game game = server.getGame();
+            if (game == null) {
+                continue;
+            }
+            
             for (GamePlayer gamePlayer : new ArrayList<>(game.getPlayers().values())) {
                 NexusScoreboard scoreboard = gamePlayer.getScoreboard();
                 ScoreboardView view = scoreboard.getView();

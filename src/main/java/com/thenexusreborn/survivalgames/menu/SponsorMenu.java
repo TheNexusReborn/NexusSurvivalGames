@@ -24,7 +24,7 @@ public class SponsorMenu extends InventoryGUI {
         SGPlayer actorPlayer = plugin.getPlayerRegistry().get(actor.getUniqueId());
         SGPlayer targetPlayer = plugin.getPlayerRegistry().get(target.getUniqueId());
 
-        if (actorPlayer.getGame().getLocalId() != targetPlayer.getGame().getLocalId()) {
+        if (actorPlayer.getGame() != targetPlayer.getGame()) {
             actor.sendMessage(MsgType.ERROR + "You and the target are not in the same game.");
             return;
         }

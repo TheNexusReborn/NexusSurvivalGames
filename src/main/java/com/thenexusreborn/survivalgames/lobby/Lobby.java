@@ -24,6 +24,7 @@ import com.thenexusreborn.survivalgames.lobby.timer.LobbyTimerCallback;
 import com.thenexusreborn.survivalgames.scoreboard.lobby.DebugLobbyBoard;
 import com.thenexusreborn.survivalgames.scoreboard.lobby.LobbyBoard;
 import com.thenexusreborn.survivalgames.scoreboard.lobby.MapEditingBoard;
+import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.settings.LobbySettings;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
@@ -54,7 +55,7 @@ import java.util.zip.ZipInputStream;
 
 public class Lobby {
     private final SurvivalGames plugin;
-    private int localId;
+    private final SGVirtualServer server;
     private ControlType controlType = ControlType.MANUAL;
     private LobbyState state = LobbyState.WAITING;
     private ChatRoom lobbyChatRoom;
@@ -76,8 +77,9 @@ public class Lobby {
     private File file;
     private FileConfiguration config;
 
-    public Lobby(SurvivalGames plugin, LobbyType type) {
+    public Lobby(SurvivalGames plugin, SGVirtualServer server, LobbyType type) {
         this.plugin = plugin;
+        this.server = server;
         
         this.file = new File(plugin.getDataFolder() + File.separator + "lobby" + File.separator + type.name().toLowerCase() + ".yml");
         if (!file.exists()) {
@@ -95,7 +97,7 @@ public class Lobby {
     public void setup() {
         if (this.getConfig().contains("zipfile")) {
             File zipFile = new File(this.getConfig().getString("zipfile"));
-            File destination = new File("./Lobby-" + getLocalId());
+            File destination = new File("." + File.separator + getServer().getName() + "-Lobby");
             FileHelper.createDirectoryIfNotExists(destination.toPath());
             byte[] buffer = new byte[1024];
 
@@ -133,7 +135,7 @@ public class Lobby {
                 return;
             }
             
-            this.world = Bukkit.createWorld(new WorldCreator("Lobby-" + getLocalId()).environment(World.Environment.NORMAL));
+            this.world = Bukkit.createWorld(new WorldCreator(getServer().getName() + "-Lobby").environment(World.Environment.NORMAL));
         }
         
         if (this.getConfig().contains("spawnpoint")) {
@@ -195,10 +197,14 @@ public class Lobby {
         this.lobbySettings = plugin.getLobbySettings("default");
         this.gameSettings = plugin.getGameSettings("default");
 
-        this.lobbyChatRoom = new ChatRoom(plugin, "room-lobby-" + getLocalId(), Actor.getServerActor(), "&8<&3%nexussg_score%&8> &8(&2&l%nexuscore_level%&8) &r%nexuscore_displayname%&8: %nexuscore_chatcolor%{message}", "{message}");
+        this.lobbyChatRoom = new ChatRoom(plugin, "room-lobby-" + getServer().getName().toLowerCase().replace(" ", "_"), Actor.getServerActor(), "&8<&3%nexussg_score%&8> &8(&2&l%nexuscore_level%&8) &r%nexuscore_displayname%&8: %nexuscore_chatcolor%{message}", "{message}");
         plugin.getStarChat().getRoomRegistry().register(this.lobbyChatRoom.getSimplifiedName(), this.lobbyChatRoom);
 
         generateMapOptions();
+    }
+
+    public SGVirtualServer getServer() {
+        return server;
     }
 
     private Path newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
@@ -210,10 +216,6 @@ public class Lobby {
         } else {
             return path;
         }
-    }
-
-    public int getLocalId() {
-        return localId;
     }
 
     public FileConfiguration getConfig() {
@@ -483,10 +485,9 @@ public class Lobby {
         sendMessage("&6&l> &7Votes: &e" + gameMap.getVotes());
         sendMessage("");
 
-        Game game = new Game(gameMap, this.gameSettings, getPlayers());
+        Game game = new Game(server, gameMap, this.gameSettings, getPlayers());
         this.players.clear();
-        plugin.getGames().register(game);
-        plugin.getGames().deregister(getLocalId());
+        server.setGame(game);
         if (game.getControlType() == ControlType.AUTOMATIC) {
             this.state = LobbyState.STARTING;
             game.setup();
@@ -737,7 +738,7 @@ public class Lobby {
         }
 
         game.getGameMap().removeFromServer(plugin);
-        plugin.getGames().deregister(game.getLocalId());
+        server.setGame(null);
     }
 
     public Location getSpawnpoint() {
@@ -949,10 +950,6 @@ public class Lobby {
                 }
             }
         }
-    }
-
-    public void setLocalId(int localId) {
-        this.localId = localId;
     }
 
     public World getWorld() {

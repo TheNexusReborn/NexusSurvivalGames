@@ -4,6 +4,7 @@ import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GameState;
+import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import com.thenexusreborn.survivalgames.settings.object.enums.Weather;
 import org.bukkit.World;
 
@@ -15,7 +16,12 @@ public class GameWorldThread extends NexusThread<SurvivalGames> {
     
     @Override
     public void onRun() {
-        for (Game game : plugin.getGames()) {
+        for (SGVirtualServer server : plugin.getServers()) {
+            Game game = server.getGame();
+            if (game == null) {
+                continue;
+            }
+            
             if (game.getState().ordinal() < GameState.SETUP_COMPLETE.ordinal()) {
                 continue;
             }

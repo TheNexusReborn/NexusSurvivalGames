@@ -5,6 +5,7 @@ import com.thenexusreborn.survivalgames.ControlType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GameState;
+import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 
 public class GameStateThread extends NexusThread<SurvivalGames> {
     public GameStateThread(SurvivalGames plugin) {
@@ -13,7 +14,12 @@ public class GameStateThread extends NexusThread<SurvivalGames> {
 
     @Override
     public void onRun() {
-        for (Game game : plugin.getGames()) {
+        for (SGVirtualServer server : plugin.getServers()) {
+            Game game = server.getGame();
+            if (game == null) {
+                continue;
+            }
+            
             if (game.getControlType() == ControlType.MANUAL) {
                 continue;
             }

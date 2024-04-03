@@ -5,9 +5,11 @@ import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.nexuscore.util.ServerProperties;
 import com.thenexusreborn.survivalgames.SurvivalGames;
+import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
+import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -24,7 +26,11 @@ public class LobbyThread extends NexusThread<SurvivalGames> {
     
     @Override
     public void onRun() {
-        for (Lobby lobby : plugin.getLobbies()) {
+        for (SGVirtualServer server : plugin.getServers()) {
+            Lobby lobby = server.getLobby();
+            if (lobby == null) {
+                continue;
+            }
             World world = Bukkit.getWorld(ServerProperties.getLevelName());
             for (Entity entity : world.getEntities()) {
                 if (!(entity instanceof Player)) {

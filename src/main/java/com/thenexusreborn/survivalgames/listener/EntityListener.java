@@ -12,6 +12,7 @@ import com.thenexusreborn.survivalgames.mutations.Mutation;
 import com.thenexusreborn.survivalgames.mutations.MutationType;
 import com.thenexusreborn.survivalgames.mutations.impl.ChickenMutation;
 import com.thenexusreborn.survivalgames.mutations.impl.SkeletonMutation;
+import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import org.bukkit.World;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -96,18 +97,24 @@ public class EntityListener implements Listener {
     public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
         Game game = null;
         World eventWorld = e.getEntity().getWorld();
-        for (Game g : plugin.getGames().getObjects().values()) {
-            if (g.getGameMap().getWorld().equals(eventWorld)) {
-                game = g;
+        for (SGVirtualServer server : plugin.getServers().getObjects().values()) {
+            if (server.getGame() == null) {
+                continue;
+            }
+            if (server.getGame().getGameMap().getWorld().equals(eventWorld)) {
+                game = server.getGame();
                 break;
             }
         }
 
         if (game == null) {
             Lobby lobby = null;
-            for (Lobby l : plugin.getLobbies().getObjects().values()) {
-                if (l.getWorld().equals(eventWorld)) {
-                    lobby = l;
+            for (SGVirtualServer server : plugin.getServers().getObjects().values()) {
+                if (server.getLobby() == null) {
+                    continue;
+                }
+                if (server.getLobby().getWorld().equals(eventWorld)) {
+                    lobby = server.getLobby();
                 }
             }
 

@@ -1,6 +1,10 @@
 package com.thenexusreborn.survivalgames.util;
 
+import com.stardevllc.starmclib.color.ColorUtils;
+import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.scoreboard.wrapper.ITeam;
+import com.thenexusreborn.api.server.NexusServer;
+import com.thenexusreborn.api.util.NetworkType;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.util.*;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -62,7 +66,20 @@ public final class SGUtils {
     }
     
     public static void sendToHub(Player player) {
-        //TODO Handle this
+        for (NexusServer nexusServer : NexusAPI.getApi().getServerRegistry()) {
+            if (nexusServer.getMode().equalsIgnoreCase("hub")) {
+                if (nexusServer.getPlayers().size() < nexusServer.getMaxPlayers()) {
+                    if (NexusAPI.NETWORK_TYPE == NetworkType.SINGLE && plugin.getNexusHubHook() != null) {
+                        nexusServer.join(NexusAPI.getApi().getPlayerManager().getNexusPlayer(player.getUniqueId()));
+                        break;
+                    } else {
+                        //TODO Implement this later.
+                    }
+                }
+            }
+        }
+        
+        player.sendMessage(ColorUtils.color(MsgType.WARN + "Server is not set up to send to a hub."));
     }
     
     public static String getMapNameFromCommand(String[] args, int startIndex) {

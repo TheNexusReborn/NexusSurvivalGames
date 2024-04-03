@@ -42,6 +42,7 @@ import com.thenexusreborn.survivalgames.mutations.Mutation;
 import com.thenexusreborn.survivalgames.mutations.MutationEffect;
 import com.thenexusreborn.survivalgames.mutations.MutationItem;
 import com.thenexusreborn.survivalgames.mutations.MutationType;
+import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.sponsoring.SponsorManager;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
@@ -72,8 +73,8 @@ public class Game {
     public static final TimeFormat TIME_FORMAT = new TimeFormat("%*00h%%#0m%%00s%");
     public static final TimeFormat LONG_TIME_FORMAT = new TimeFormat("%*00h%%00m%%00s%");
 
-    private int localId = -1;
     private final SGMap gameMap;
+    private final SGVirtualServer server;
     private ControlType controlType = ControlType.AUTOMATIC;
     private final GameSettings settings;
     private final Map<UUID, GamePlayer> players = new HashMap<>();
@@ -94,12 +95,13 @@ public class Game {
 
     private GamePhase setupPhase, assignTeamsPhase, teleportToMapPhase;
 
-    public Game(SGMap gameMap, GameSettings settings, Collection<LobbyPlayer> players) {
+    public Game(SGVirtualServer server, SGMap gameMap, GameSettings settings, Collection<LobbyPlayer> players) {
         this.gameMap = gameMap;
+        this.server = server;
         this.settings = settings;
         this.gameInfo = new GameInfo();
 
-        this.gameChatroom = new ChatRoom(plugin, "room-game-" + this.localId + "-main", Actor.getServerActor(), "{message}", "{message}");
+        this.gameChatroom = new ChatRoom(plugin, "room-game-" + getServer().getName().toLowerCase().replace(" ", "_")+ "-main", Actor.getServerActor(), "{message}", "{message}");
         plugin.getStarChat().getRoomRegistry().register(gameChatroom.getSimplifiedName(), gameChatroom);
 
         for (GameTeam team : GameTeam.values()) {
@@ -109,7 +111,7 @@ public class Game {
         }
 
         gameInfo.setMapName(this.gameMap.getName().replace("'", "''"));
-        gameInfo.setServerName("Nexus"); //TODO
+        gameInfo.setServerName(server.getName());
         for (MapSpawn spawn : this.gameMap.getSpawns()) {
             this.spawns.put(spawn.getIndex(), null);
         }
@@ -138,12 +140,8 @@ public class Game {
         this.teleportToMapPhase = new TeleportToMapPhase(this);
     }
 
-    public int getLocalId() {
-        return localId;
-    }
-
-    public void setLocalId(int localId) {
-        this.localId = localId;
+    public SGVirtualServer getServer() {
+        return server;
     }
 
     public void setState(GameState state) {
@@ -418,9 +416,7 @@ public class Game {
     public void handleError(String message) {
         setState(ERROR);
         sendMessage("&4&l>> &4" + message + " Resetting back to lobby.");
-        Lobby lobby = new Lobby(plugin, LobbyType.CUSTOM);
-        plugin.getLobbies().register(lobby);
-        lobby.setup();
+        Lobby lobby = new Lobby(plugin, server, LobbyType.CUSTOM);
         lobby.fromGame(this);
     }
 
@@ -796,9 +792,7 @@ public class Game {
             roomRegistry.deregister(chatroom.getSimplifiedName());
         }
         
-        Lobby lobby = new Lobby(plugin, LobbyType.CUSTOM);
-        plugin.getLobbies().register(lobby);
-        lobby.fromGame(this);
+        server.getLobby().fromGame(this);
     }
 
     public void killPlayer(GamePlayer gamePlayer, DeathInfo deathInfo) {
