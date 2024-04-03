@@ -18,21 +18,21 @@ public class SGInstanceServer extends InstanceServer {
 
     @Override
     public void join(NexusPlayer nexusPlayer) {
-        this.primaryVirtualServer.join(nexusPlayer);
+        this.primaryVirtualServer.get().join(nexusPlayer);
     }
 
     @Override
     public void quit(NexusPlayer nexusPlayer) {
-        this.primaryVirtualServer.quit(nexusPlayer);
+        this.primaryVirtualServer.get().quit(nexusPlayer);
     }
 
     @Override
     public void onStart() {
-
+        this.primaryVirtualServer.get().onStart();
     }
 
     @Override
     public void onStop() {
-
+        this.primaryVirtualServer.get().onStart();
     }
 }

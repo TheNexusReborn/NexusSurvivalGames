@@ -63,11 +63,23 @@ public class SGVirtualServer extends VirtualServer {
         } else {
             lobby.addPlayer(sgPlayer);
         }
+        
+        this.players.add(nexusPlayer.getUniqueId());
     }
 
     @Override
     public void quit(NexusPlayer nexusPlayer) {
-
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId());
+        
+        if (sgPlayer.getGame() != null) {
+            sgPlayer.getGame().removePlayer(nexusPlayer);
+        }
+        
+        if (sgPlayer.getLobby() != null) {
+            sgPlayer.getLobby().removePlayer(nexusPlayer);
+        }
+        
+        this.players.remove(nexusPlayer.getUniqueId());
     }
 
     @Override
