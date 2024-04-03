@@ -21,7 +21,7 @@ public class GameActionBar implements IActionBar {
     public String getText() {
         Game game = sgPlayer.getGame();
         if (game == null || game.getState() == GameState.UNDEFINED || game.getState() == GameState.ERROR) {
-            return "";
+            return null;
         }
 
         if (game.getState() == GameState.SETTING_UP) {

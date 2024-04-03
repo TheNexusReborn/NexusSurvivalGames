@@ -20,8 +20,8 @@ public class LobbyActionBar implements IActionBar {
     @Override
     public String getText() {
         Lobby lobby = player.getLobby();
-        if (player.getGame() != null) {
-            return "";
+        if (player.getLobby() == null) {
+            return null;
         }
         
         if (lobby.getControlType() == ControlType.MANUAL) {
