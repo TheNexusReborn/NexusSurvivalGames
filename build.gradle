@@ -42,7 +42,7 @@ dependencies {
     compileOnly 'com.thenexusreborn:NexusMaps:1.0-ALPHA'
     compileOnly 'com.thenexusreborn:NexusHub:1.6-ALPHA'
     compileOnly 'com.github.StarDevelopmentLLC:StarCore:1.0.0-alpha.16'
-    compileOnly 'com.github.StarDevelopmentLLC:StarChat:1.0.0-alpha.3'
+    compileOnly 'com.github.StarDevelopmentLLC:StarChat:1.0.0-alpha.4'
     compileOnly 'com.github.StarDevelopmentLLC:StarUI:1.0.0-alpha.1'
     compileOnly 'com.github.StarDevelopmentLLC:StarLib:1.0.0-alpha.4'
     compileOnly 'com.github.StarDevelopmentLLC:StarBeans:1.0.0-alpha.2'
