@@ -789,7 +789,9 @@ public class Game {
     public void nextGame() {
         setState(ENDED);
         for (Player player : Bukkit.getOnlinePlayers()) {
-            resetPlayer(player);
+            if (this.players.containsKey(player.getUniqueId())) {
+                resetPlayer(player);
+            }
         }
 
         StringRegistry<ChatRoom> roomRegistry = plugin.getStarChat().getRoomRegistry();
