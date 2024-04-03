@@ -539,6 +539,9 @@ public class Lobby {
         player.setLevel(0);
 
         for (Player online : Bukkit.getOnlinePlayers()) {
+            if (!this.players.containsKey(online.getUniqueId())) {
+                continue;
+            }
             online.showPlayer(player);
             player.showPlayer(online);
         }
