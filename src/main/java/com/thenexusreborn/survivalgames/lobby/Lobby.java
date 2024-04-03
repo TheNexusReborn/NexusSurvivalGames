@@ -56,7 +56,7 @@ import java.util.zip.ZipInputStream;
 public class Lobby {
     private final SurvivalGames plugin;
     private final SGVirtualServer server;
-    private ControlType controlType = ControlType.MANUAL;
+    private ControlType controlType = ControlType.AUTOMATIC;
     private LobbyState state = LobbyState.WAITING;
     private ChatRoom lobbyChatRoom;
     private Timer timer;
