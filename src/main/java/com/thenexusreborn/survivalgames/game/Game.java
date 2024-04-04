@@ -13,6 +13,7 @@ import com.thenexusreborn.api.helper.NumberHelper;
 import com.thenexusreborn.api.helper.StringHelper;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
+import com.thenexusreborn.api.sql.objects.SQLDatabase;
 import com.thenexusreborn.api.tags.Tag;
 import com.thenexusreborn.gamemaps.model.MapSpawn;
 import com.thenexusreborn.gamemaps.model.SGMap;
@@ -283,6 +284,14 @@ public class Game {
         
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId());
         sgPlayer.setGame(null, null);
+        
+        NexusAPI.getApi().getScheduler().runTaskAsynchronously(() -> {
+            SQLDatabase database = NexusAPI.getApi().getPrimaryDatabase();
+            database.saveSilent(sgPlayer.getStats());
+            database.saveSilent(sgPlayer.getNexusPlayer().getBalance());
+            database.saveSilent(sgPlayer.getNexusPlayer().getExperience());
+        });
+        
         this.players.remove(nexusPlayer.getUniqueId());
 
         if (nexusPlayer.getToggleValue("vanish")) {
@@ -662,6 +671,7 @@ public class Game {
                     nexites *= multiplier;
                 }
 
+                winner.getBalance().addNexites(nexites);
                 String baseMessage = "&2&l>> &a&l" + nexites + " &9&lNEXITES&a&l!";
                 if (multiplier > 1 && winner.getRank().isNexiteBoost()) {
                     winner.sendMessage(baseMessage + multiplierMessage);
@@ -730,6 +740,14 @@ public class Game {
                         });
                     }
                 }
+
+                for (GamePlayer gamePlayer : players.values()) {
+                    NexusAPI.getApi().getPrimaryDatabase().queue(gamePlayer.getStats());
+                    NexusAPI.getApi().getPrimaryDatabase().queue(gamePlayer.getBalance());
+                    NexusAPI.getApi().getPrimaryDatabase().queue(gamePlayer.getNexusPlayer().getExperience());
+                }
+                
+                NexusAPI.getApi().getPrimaryDatabase().flush();
             }
         });
 
@@ -753,7 +771,6 @@ public class Game {
     }
 
     public void nextGame() {
-        setState(ENDED);
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (this.players.containsKey(player.getUniqueId())) {
                 resetPlayer(player);
@@ -765,7 +782,8 @@ public class Game {
         for (GameTeamChatroom chatroom : this.getChatRooms().values()) {
             roomRegistry.deregister(chatroom.getSimplifiedName());
         }
-        
+
+        setState(ENDED);
         server.getLobby().fromGame(this);
     }
 
