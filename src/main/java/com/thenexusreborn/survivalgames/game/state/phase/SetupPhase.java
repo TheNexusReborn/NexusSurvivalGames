@@ -51,7 +51,7 @@ public class SetupPhase extends GamePhase {
             }
 
             setStatus(Status.COPYING_MAP);
-            if (!gameMap.copyFolder(plugin, false)) {
+            if (!gameMap.copyFolder(plugin, game.getServer().getName() + "-", false)) {
                 game.handleError("There was an error copying the map files.");
                 return;
             }
