@@ -1,7 +1,5 @@
 package com.thenexusreborn.survivalgames.threads.game;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.thenexusreborn.gamemaps.model.MapSpawn;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.api.NexusThread;
@@ -15,6 +13,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -41,7 +41,13 @@ public class WarmupSpawnThread extends NexusThread<SurvivalGames> {
             }
 
             try {
-                BiMap<UUID, Integer> spawns = HashBiMap.create(game.getSpawns()).inverse();
+                Map<UUID, Integer> spawns = new HashMap<>();
+                for (Map.Entry<Integer, UUID> entry : game.getSpawns().entrySet()) {
+                    if (entry.getValue() != null) {
+                        spawns.put(entry.getValue(), entry.getKey());
+                    }
+                }
+                
                 for (GamePlayer gamePlayer : game.getPlayers().values()) {
                     if (gamePlayer == null || gamePlayer.getTeam() != GameTeam.TRIBUTES) {
                         continue;
@@ -56,12 +62,14 @@ public class WarmupSpawnThread extends NexusThread<SurvivalGames> {
 
                     Location spawnLocation = spawn.toGameLocation(gameMap.getWorld(), gameMap.getCenterLocation());
                     if (playerLocation.getBlockX() != spawnLocation.getBlockX() || playerLocation.getBlockZ() != spawnLocation.getBlockZ()) {
+                        spawnLocation.setY(playerLocation.getY() + 1);
                         spawnLocation.setYaw(playerLocation.getYaw());
                         spawnLocation.setPitch(playerLocation.getPitch());
                         player.teleport(spawnLocation);
                     }
                 }
             } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
