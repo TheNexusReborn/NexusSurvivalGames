@@ -399,7 +399,6 @@ public class Game {
 
     public void sendMessage(String message) {
         this.gameChatroom.sendMessage(message);
-        Bukkit.getConsoleSender().sendMessage(MCUtils.color(message));
     }
 
     public GameState getState() {

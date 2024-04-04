@@ -12,7 +12,6 @@ import com.thenexusreborn.gamemaps.FileHelper;
 import com.thenexusreborn.gamemaps.model.MapRating;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.scoreboard.impl.RankTablistHandler;
-import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.ProgressBar;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
@@ -330,7 +329,6 @@ public class Lobby {
 
     public void sendMessage(String message) {
         this.lobbyChatRoom.sendMessage(message);
-        Bukkit.getConsoleSender().sendMessage(MCUtils.color(message));
     }
 
     public void editMaps() {
