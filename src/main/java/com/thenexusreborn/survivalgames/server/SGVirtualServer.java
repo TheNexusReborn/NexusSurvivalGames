@@ -128,6 +128,10 @@ public class SGVirtualServer extends VirtualServer {
         } else {
             lobby.addPlayer(sgPlayer);
         }
+
+        if (nexusPlayer.getRank().ordinal() <= Rank.MEDIA.ordinal()) {
+            plugin.getNexusCore().getStaffChannel().sendMessage(nexusPlayer.getDisplayName() + " &7&l-> &6" + name);
+        }
         
         this.players.add(nexusPlayer.getUniqueId());
     }
