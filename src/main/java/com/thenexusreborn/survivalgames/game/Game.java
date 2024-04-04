@@ -2,10 +2,10 @@ package com.thenexusreborn.survivalgames.game;
 
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
+import com.stardevllc.starcore.utils.actor.Actor;
 import com.stardevllc.starlib.registry.StringRegistry;
 import com.stardevllc.starlib.time.TimeFormat;
 import com.stardevllc.starlib.time.TimeUnit;
-import com.stardevllc.starmclib.actor.Actor;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.gamearchive.GameAction;
 import com.thenexusreborn.api.gamearchive.GameInfo;
@@ -101,7 +101,7 @@ public class Game {
         this.settings = settings;
         this.gameInfo = new GameInfo();
 
-        this.gameChatroom = new ChatRoom(plugin, "room-game-" + getServer().getName().toLowerCase().replace(" ", "_")+ "-main", Actor.getServerActor(), "{message}", "{message}");
+        this.gameChatroom = new ChatRoom(plugin, "room-game-" + getServer().getName().toLowerCase().replace(" ", "_")+ "-main", Actor.of(plugin), "{message}", "{message}");
         plugin.getStarChat().getRoomRegistry().register(gameChatroom.getSimplifiedName(), gameChatroom);
 
         for (GameTeam team : GameTeam.values()) {

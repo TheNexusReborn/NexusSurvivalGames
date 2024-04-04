@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.game.state.phase;
 
-import com.stardevllc.starmclib.Cuboid;
+import com.stardevllc.starcore.utils.Cuboid;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.survivalgames.SurvivalGames;

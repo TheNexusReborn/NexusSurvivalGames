@@ -3,8 +3,8 @@ package com.thenexusreborn.survivalgames.lobby;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.starclock.clocks.Timer;
+import com.stardevllc.starcore.utils.actor.Actor;
 import com.stardevllc.starlib.time.TimeUnit;
-import com.stardevllc.starmclib.actor.Actor;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
@@ -197,7 +197,7 @@ public class Lobby {
         this.lobbySettings = plugin.getLobbySettings("default");
         this.gameSettings = plugin.getGameSettings("default");
 
-        this.lobbyChatRoom = new ChatRoom(plugin, "room-lobby-" + getServer().getName().toLowerCase().replace(" ", "_"), Actor.getServerActor(), "&8<&3%nexussg_score%&8> &8(&2&l%nexuscore_level%&8) &r%nexuscore_displayname%&8: %nexuscore_chatcolor%{message}", "{message}");
+        this.lobbyChatRoom = new ChatRoom(plugin, "room-lobby-" + getServer().getName().toLowerCase().replace(" ", "_"), Actor.of(plugin), "&8<&3%nexussg_score%&8> &8(&2&l%nexuscore_level%&8) &r%nexuscore_displayname%&8: %nexuscore_chatcolor%{message}", "{message}");
         plugin.getStarChat().getRoomRegistry().register(this.lobbyChatRoom.getSimplifiedName(), this.lobbyChatRoom);
 
         generateMapOptions();

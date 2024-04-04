@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.listener;
 
+import com.stardevllc.starcore.gui.GuiManager;
 import com.stardevllc.starlib.Pair;
-import com.stardevllc.starui.GuiManager;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;

@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.cmd;
 
+import com.stardevllc.starcore.utils.color.ColorUtils;
 import com.stardevllc.starlib.Value;
-import com.stardevllc.starmclib.color.ColorUtils;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.sql.objects.typehandlers.ValueHandler;
 import com.thenexusreborn.gamemaps.MapManager;

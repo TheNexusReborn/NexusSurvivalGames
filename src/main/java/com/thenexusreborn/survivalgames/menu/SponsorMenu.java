@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.menu;
 
-import com.stardevllc.starui.element.button.Button;
-import com.stardevllc.starui.gui.InventoryGUI;
+import com.stardevllc.starcore.gui.element.button.Button;
+import com.stardevllc.starcore.gui.gui.InventoryGUI;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.survivalgames.SGPlayer;
