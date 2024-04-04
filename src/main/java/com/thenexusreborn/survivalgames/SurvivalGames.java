@@ -124,12 +124,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
             return;
         }
 
-        if (pluginManager.getPlugin("StarUI") == null) {
-            getLogger().severe("StarUI not found, disabling SurvivalGames.");
-            pluginManager.disablePlugin(this);
-            return;
-        }
-
         this.starChat = (StarChat) getServer().getPluginManager().getPlugin("StarChat");
         getLogger().info("Hooked into StarChat");
 
