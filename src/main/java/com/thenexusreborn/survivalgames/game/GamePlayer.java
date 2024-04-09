@@ -410,8 +410,8 @@ public class GamePlayer {
             mutateName = "&cCan't mutate again.";
         } else {
             Pair<Boolean, String> mutateAllowedStatus = canMutate();
-            if (!mutateAllowedStatus.firstValue()) {
-                mutateName = "&c" + mutateAllowedStatus.secondValue();
+            if (!mutateAllowedStatus.key()) {
+                mutateName = "&c" + mutateAllowedStatus.value();
             } else {
                 GamePlayer killer = game.getPlayer(getKiller());
                 String passes;

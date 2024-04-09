@@ -71,8 +71,8 @@ public class MutateGui extends InventoryGUI {
 
                         GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
                         Pair<Boolean, String> canMutateResult = gamePlayer.canMutate();
-                        if (!canMutateResult.firstValue()) {
-                            player.sendMessage(MsgType.WARN + canMutateResult.secondValue());
+                        if (!canMutateResult.key()) {
+                            player.sendMessage(MsgType.WARN + canMutateResult.value());
                             return;
                         }
 

@@ -1,9 +1,9 @@
 package com.thenexusreborn.survivalgames.lobby;
 
+import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.starclock.clocks.Timer;
-import com.stardevllc.starcore.utils.actor.Actor;
 import com.stardevllc.starlib.time.TimeUnit;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
@@ -18,6 +18,7 @@ import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.survivalgames.ControlType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
+import com.thenexusreborn.survivalgames.chat.LobbyChatRoom;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.lobby.timer.LobbyTimerCallback;
 import com.thenexusreborn.survivalgames.scoreboard.lobby.DebugLobbyBoard;
@@ -195,9 +196,9 @@ public class Lobby {
 
         this.lobbySettings = plugin.getLobbySettings("default");
         this.gameSettings = plugin.getGameSettings("default");
-
-        this.lobbyChatRoom = new ChatRoom(plugin, "room-lobby-" + getServer().getName().toLowerCase().replace(" ", "_"), Actor.of(plugin), "&8<&3%nexussg_score%&8> &8(&2&l%nexuscore_level%&8) &r%nexuscore_displayname%&8: %nexuscore_chatcolor%{message}", "{message}");
-        plugin.getStarChat().getRoomRegistry().register(this.lobbyChatRoom.getSimplifiedName(), this.lobbyChatRoom);
+    
+        this.lobbyChatRoom = new LobbyChatRoom(this);
+        plugin.getStarChat().getRoomRegistry().register(this.lobbyChatRoom.getName(), this.lobbyChatRoom);
 
         generateMapOptions();
     }
@@ -328,7 +329,7 @@ public class Lobby {
     }
 
     public void sendMessage(String message) {
-        this.lobbyChatRoom.sendMessage(message);
+        this.lobbyChatRoom.sendMessage(new ChatContext(message));
     }
 
     public void editMaps() {

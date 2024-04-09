@@ -1,8 +1,8 @@
 package com.thenexusreborn.survivalgames.game;
 
+import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
-import com.stardevllc.starcore.utils.actor.Actor;
 import com.stardevllc.starlib.registry.StringRegistry;
 import com.stardevllc.starlib.time.TimeFormat;
 import com.stardevllc.starlib.time.TimeUnit;
@@ -23,6 +23,7 @@ import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.ControlType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
+import com.thenexusreborn.survivalgames.chat.GameChatRoom;
 import com.thenexusreborn.survivalgames.chat.GameTeamChatroom;
 import com.thenexusreborn.survivalgames.disguises.DisguiseAPI;
 import com.thenexusreborn.survivalgames.disguises.disguisetypes.MobDisguise;
@@ -67,7 +68,7 @@ import java.util.stream.Stream;
 
 import static com.thenexusreborn.survivalgames.game.GameState.*;
 
-@SuppressWarnings({"unused", "ExtractMethodRecommender"})
+@SuppressWarnings({"unused"})
 public class Game {
     private static final SurvivalGames plugin = SurvivalGames.getPlugin(SurvivalGames.class);
     public static final TimeFormat SHORT_TIME_FORMAT = new TimeFormat("%*00h%%*#0m%%*#0s%");
@@ -102,13 +103,13 @@ public class Game {
         this.settings = settings;
         this.gameInfo = new GameInfo();
 
-        this.gameChatroom = new ChatRoom(plugin, "room-game-" + getServer().getName().toLowerCase().replace(" ", "_")+ "-main", Actor.of(plugin), "{message}", "{message}");
-        plugin.getStarChat().getRoomRegistry().register(gameChatroom.getSimplifiedName(), gameChatroom);
+        this.gameChatroom = new GameChatRoom(this);
+        plugin.getStarChat().getRoomRegistry().register(gameChatroom.getName(), gameChatroom);
 
         for (GameTeam team : GameTeam.values()) {
             GameTeamChatroom chatroom = new GameTeamChatroom(plugin, this, team);
             this.chatRooms.put(team, chatroom);
-            plugin.getStarChat().getRoomRegistry().register(chatroom.getSimplifiedName(), chatroom);
+            plugin.getStarChat().getRoomRegistry().register(chatroom.getName(), chatroom);
         }
 
         gameInfo.setMapName(this.gameMap.getName().replace("'", "''"));
@@ -398,7 +399,7 @@ public class Game {
     }
 
     public void sendMessage(String message) {
-        this.gameChatroom.sendMessage(message);
+        this.gameChatroom.sendMessage(new ChatContext(message));
     }
 
     public GameState getState() {
@@ -777,9 +778,9 @@ public class Game {
         }
 
         StringRegistry<ChatRoom> roomRegistry = plugin.getStarChat().getRoomRegistry();
-        roomRegistry.deregister(this.gameChatroom.getSimplifiedName());
+        roomRegistry.deregister(this.gameChatroom.getName());
         for (GameTeamChatroom chatroom : this.getChatRooms().values()) {
-            roomRegistry.deregister(chatroom.getSimplifiedName());
+            roomRegistry.deregister(chatroom.getName());
         }
 
         setState(ENDED);

@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames.server;
 
+import com.stardevllc.starchat.context.ChatContext;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
@@ -130,7 +131,7 @@ public class SGVirtualServer extends VirtualServer {
         }
 
         if (nexusPlayer.getRank().ordinal() <= Rank.MEDIA.ordinal()) {
-            plugin.getNexusCore().getStaffChannel().sendMessage(nexusPlayer.getDisplayName() + " &7&l-> &6" + name);
+            plugin.getNexusCore().getStaffChannel().sendMessage(new ChatContext(nexusPlayer.getDisplayName() + " &7&l-> &6" + name));
         }
         
         this.players.add(nexusPlayer.getUniqueId());

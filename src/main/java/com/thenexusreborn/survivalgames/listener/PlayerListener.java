@@ -156,10 +156,10 @@ public class PlayerListener implements Listener {
                             }
                         } else if (item.getType() == Material.ROTTEN_FLESH) {
                             Pair<Boolean, String> canMutateResult = gamePlayer.canMutate();
-                            if (canMutateResult.firstValue()) {
+                            if (canMutateResult.key()) {
                                 manager.openGUI(new MutateGui(plugin, gamePlayer), player);
                             } else {
-                                gamePlayer.sendMessage(MsgType.WARN + canMutateResult.secondValue());
+                                gamePlayer.sendMessage(MsgType.WARN + canMutateResult.value());
                             }
                         } else if (item.getType() == Material.WATCH) {
                             player.teleport(game.getGameMap().getCenter().toLocation(game.getGameMap().getWorld()));

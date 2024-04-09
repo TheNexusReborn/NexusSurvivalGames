@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames.chat;
 
+import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starcore.utils.actor.Actor;
 import com.thenexusreborn.api.gamearchive.GameAction;
@@ -7,7 +8,6 @@ import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GameState;
 import com.thenexusreborn.survivalgames.game.GameTeam;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class GameTeamChatroom extends ChatRoom {
@@ -15,16 +15,20 @@ public class GameTeamChatroom extends ChatRoom {
     private Game game;
     
     public GameTeamChatroom(SurvivalGames plugin, Game game, GameTeam team) {
-        super(plugin, "room-game-" + game.getServer().getName().toLowerCase().replace(" ", "_") + "-" + team.name().toLowerCase(), Actor.getServerActor(), team.getChatFormat(), "{message}");
+        super(plugin, Actor.of(plugin), "room-game-" + game.getServer().getName().toLowerCase().replace(" ", "_") + "-" + team.name().toLowerCase());
         this.game = game;
+        senderFormat.set(team.getChatFormat());
+        systemFormat.set("{message}");
     }
 
     @Override
-    public void sendMessage(CommandSender sender, String message) {
-        if (!(sender instanceof Player player)) {
-            super.sendMessage(sender, message);
+    public void sendMessage(ChatContext chatContext) {
+        if (!(chatContext.getSender() instanceof Player player)) {
+            super.sendMessage(chatContext);
             return;
         }
+        
+        String message = chatContext.getMessage();
         
         if (game != null) {
             if (game.getState().ordinal() >= GameState.INGAME.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal()) {
@@ -36,6 +40,6 @@ public class GameTeamChatroom extends ChatRoom {
             }
         }
         
-        super.sendMessage(sender, message);
+        super.sendMessage(chatContext);
     }
 }
