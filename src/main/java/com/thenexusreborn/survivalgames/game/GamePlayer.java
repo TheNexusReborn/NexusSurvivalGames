@@ -1,6 +1,8 @@
 package com.thenexusreborn.survivalgames.game;
 
+import com.cryptomorin.xseries.XMaterial;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
+import com.stardevllc.starcore.utils.item.ItemBuilder;
 import com.stardevllc.starlib.Pair;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.PlayerBalance;
@@ -8,7 +10,6 @@ import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.tags.Tag;
 import com.thenexusreborn.nexuscore.util.ArmorType;
-import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.survivalgames.chat.GameTeamChatroom;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
@@ -16,7 +17,6 @@ import com.thenexusreborn.survivalgames.scoreboard.GameTablistHandler;
 import com.thenexusreborn.survivalgames.scoreboard.game.GameBoard;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -398,9 +398,9 @@ public class GamePlayer {
     }
     
     public void giveSpectatorItems(Game game) {
-        ItemStack tributesBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&a&lTributes &7&o(Right Click)").build();
-        ItemStack mutationsBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&d&lMutations &7&o(Right Click)").build();
-        ItemStack spectatorsBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&c&lSpectators &7&o(Right Click)").build();
+        ItemStack tributesBook = ItemBuilder.of(XMaterial.ENCHANTED_BOOK).displayName("&a&lTributes &7&o(Right Click)").build();
+        ItemStack mutationsBook = ItemBuilder.of(XMaterial.ENCHANTED_BOOK).displayName("&d&lMutations &7&o(Right Click)").build();
+        ItemStack spectatorsBook = ItemBuilder.of(XMaterial.ENCHANTED_BOOK).displayName("&c&lSpectators &7&o(Right Click)").build();
         String mutateName;
         if (!game.getSettings().isAllowMutations()) {
             mutateName = "&cMutations Disabled";
@@ -423,10 +423,10 @@ public class GamePlayer {
                 mutateName = "&c&lTAKE REVENGE   &eTarget: " + killer.getColoredName() + "   &ePasses: &b" + passes;
             }
         }
-        ItemStack mutateItem = ItemBuilder.start(Material.ROTTEN_FLESH).displayName(mutateName).build();
-        ItemStack compass = ItemBuilder.start(Material.COMPASS).displayName("&fPlayer Tracker").build();
-        ItemStack tpCenter = ItemBuilder.start(Material.WATCH).displayName("&e&lTeleport to Map Center &7&o(Right Click)").build();
-        ItemStack hubItem = ItemBuilder.start(Material.WOOD_DOOR).displayName("&e&lReturn to Hub &7(Right Click)").build();
+        ItemStack mutateItem = ItemBuilder.of(XMaterial.ROTTEN_FLESH).displayName(mutateName).build();
+        ItemStack compass = ItemBuilder.of(XMaterial.COMPASS).displayName("&fPlayer Tracker").build();
+        ItemStack tpCenter = ItemBuilder.of(XMaterial.COMPASS).displayName("&e&lTeleport to Map Center &7&o(Right Click)").build();
+        ItemStack hubItem = ItemBuilder.of(XMaterial.OAK_DOOR).displayName("&e&lReturn to Hub &7(Right Click)").build();
         Player p = Bukkit.getPlayer(getUniqueId());
         PlayerInventory inv = p.getInventory();
         inv.setItem(0, tributesBook);

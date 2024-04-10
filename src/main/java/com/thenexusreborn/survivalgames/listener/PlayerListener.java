@@ -1,6 +1,8 @@
 package com.thenexusreborn.survivalgames.listener;
 
+import com.cryptomorin.xseries.XMaterial;
 import com.stardevllc.starcore.gui.GuiManager;
+import com.stardevllc.starcore.utils.item.ItemBuilder;
 import com.stardevllc.starlib.Pair;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
@@ -10,7 +12,6 @@ import com.thenexusreborn.nexuscore.api.events.NexusPlayerLoadEvent;
 import com.thenexusreborn.nexuscore.api.events.ToggleChangeEvent;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
-import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
@@ -245,8 +246,8 @@ public class PlayerListener implements Listener {
                     boolean sponsorsValue = lobbyPlayer.getToggleValue("allowsponsors");
                     lobbyPlayer.getPlayer().setToggleValue("allowsponsors", !sponsorsValue);
                     sponsorsValue = lobbyPlayer.getToggleValue("allowsponsors");
-                    Material sponsorsItemMaterial = sponsorsValue ? Material.GLOWSTONE_DUST : Material.SULPHUR;
-                    player.getInventory().setItem(0, ItemBuilder.start(sponsorsItemMaterial).displayName("&e&lSponsors &7&o(Right click to toggle)").build());
+                    XMaterial sponsorsItemMaterial = sponsorsValue ? XMaterial.GLOWSTONE_DUST : XMaterial.GUNPOWDER;
+                    player.getInventory().setItem(0, ItemBuilder.of(sponsorsItemMaterial).displayName("&e&lSponsors &7&o(Right click to toggle)").build());
                 } else if (e.getItem().getItemMeta().getDisplayName().contains("Return to Hub")) {
                     SGUtils.sendToHub(player);
                 }

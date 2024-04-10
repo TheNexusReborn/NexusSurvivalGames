@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames.sponsoring;
 
+import com.cryptomorin.xseries.XMaterial;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.loot.LootItem;
 import org.bukkit.*;
@@ -8,7 +9,7 @@ import org.bukkit.entity.Player;
 import java.util.*;
 
 public class ItemSponsorCategory extends SponsorCategory<LootItem> {
-    public ItemSponsorCategory(String name, Material icon) {
+    public ItemSponsorCategory(String name, XMaterial icon) {
         super(name, icon);
     }
     

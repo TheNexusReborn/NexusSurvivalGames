@@ -2,8 +2,8 @@ package com.thenexusreborn.survivalgames.menu;
 
 import com.stardevllc.starcore.gui.element.button.Button;
 import com.stardevllc.starcore.gui.gui.InventoryGUI;
+import com.stardevllc.starcore.utils.item.ItemBuilder;
 import com.thenexusreborn.nexuscore.util.MsgType;
-import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
@@ -36,7 +36,7 @@ public class SponsorMenu extends InventoryGUI {
     
         SponsorManager sponsorManager = game.getSponsorManager();
         for (SponsorCategory<?> category : sponsorManager.getCategories()) {
-            ItemBuilder iconBuilder = ItemBuilder.start(category.getIcon());
+            ItemBuilder iconBuilder = ItemBuilder.of(category.getIcon());
             iconBuilder.displayName("&a&l" + category.getName());
             List<String> lore = new LinkedList<>();
             lore.add("&ePossible Items");
@@ -44,7 +44,7 @@ public class SponsorMenu extends InventoryGUI {
             lore.add("");
             lore.add("&6&lLeft Click &fto use " + creditCost + " &3Credits");
             lore.add("&6&lRight Click &fto use " + scoreCost + " &dScore");
-            iconBuilder.lore(lore);
+            iconBuilder.setLore(lore);
             
             Button button = new Button().iconCreator(p -> iconBuilder.build()).consumer(e -> {
                 String currency;

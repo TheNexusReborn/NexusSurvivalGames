@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames.sponsoring;
 
+import com.cryptomorin.xseries.XMaterial;
 import com.thenexusreborn.nexuscore.util.PotionNames;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -8,7 +9,7 @@ import org.bukkit.potion.*;
 import java.util.*;
 
 public class PotionSponsorCategory extends SponsorCategory<PotionEffectType> {
-    public PotionSponsorCategory(String name, Material icon) {
+    public PotionSponsorCategory(String name, XMaterial icon) {
         super(name, icon);
     }
     
