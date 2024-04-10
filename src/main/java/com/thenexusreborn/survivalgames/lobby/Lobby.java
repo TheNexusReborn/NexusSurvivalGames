@@ -285,8 +285,6 @@ public class Lobby {
         if (gameMap != null) {
             gameMap.removeFromServer(plugin);
         }
-
-        //TODO Edit lobby settings and save them
     }
 
     public List<LobbyPlayer> getPlayers() {
