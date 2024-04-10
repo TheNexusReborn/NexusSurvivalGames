@@ -293,8 +293,7 @@ public class SGPAPIExpansion extends PlaceholderExpansion {
                         if (combatTag == null || combatTag.getOther() == null || !combatTag.isInCombat()) {
                             return "0s";
                         } else {
-                            long combatTagLength = game.getSettings().getCombatTagLength() * 1000L;
-                            long timeRemaining = combatTag.getTimestamp() + combatTagLength - System.currentTimeMillis();
+                            long timeRemaining = combatTag.getTimer().getTime();
                             return TIME_FORMAT.format(timeRemaining);
                         }
                     }

@@ -1,27 +1,31 @@
 package com.thenexusreborn.survivalgames.game;
 
+import com.stardevllc.starclock.clocks.Timer;
 import com.stardevllc.starlib.time.TimeUnit;
 
 import java.util.UUID;
 
 public final class CombatTag {
     private UUID player, other;
-    private long timestamp;
     private Game game;
-    
-    public CombatTag(Game game, UUID player, UUID other, long timestamp) {
-        this.game = game;
-        this.player = player;
-        this.other = other;
-        this.timestamp = timestamp;
-    }
-    
-    public CombatTag(Game game, UUID player, UUID other) {
-        this(game, player, other, System.currentTimeMillis());
-    }
+    private Timer timer;
     
     public CombatTag(Game game, UUID player) {
-        this(game, player, null);
+        this.game = game;
+        this.player = player;
+        this.timer = Game.getPlugin().getClockManager().createTimer(TimeUnit.SECONDS.toMillis(game.getSettings().getCombatTagLength()));
+        this.timer.addCallback(timerSnapshot -> {
+            if (other != null) {
+                setOther(null);
+                GamePlayer gamePlayer = this.game.getPlayer(player);
+                if (gamePlayer != null) {
+                    gamePlayer.sendMessage("&6&l>> &eYou are no longer in combat.");
+                }
+            }
+        }, 0L);
+        
+        this.timer.setEndCondition(timerSnapshot -> game.getPlayer(player) == null);
+        timer.start();
     }
     
     public UUID getPlayer() {
@@ -34,17 +38,15 @@ public final class CombatTag {
     
     public void setOther(UUID other) {
         this.other = other;
-        this.timestamp = System.currentTimeMillis();
+        if (other != null) {
+            this.timer.reset();
+        }
     }
-    
-    public long getTimestamp() {
-        return timestamp;
+
+    public Timer getTimer() {
+        return timer;
     }
-    
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
-    }
-    
+
     public boolean isInCombatWith(UUID uuid) {
         if (!isInCombat()) {
             return false;
@@ -54,7 +56,7 @@ public final class CombatTag {
     }
     
     public boolean isInCombat() {
-        return this.other != null && System.currentTimeMillis() < this.timestamp + TimeUnit.SECONDS.toMillis(game.getSettings().getCombatTagLength());
+        return this.other != null && this.timer.getTime() > 0;
     }
 
     @Override
@@ -62,7 +64,8 @@ public final class CombatTag {
         return "CombatTag{" +
                 "player=" + player +
                 ", other=" + other +
-                ", timestamp=" + timestamp +
+                ", game=" + game +
+                ", timer=" + timer +
                 '}';
     }
 }

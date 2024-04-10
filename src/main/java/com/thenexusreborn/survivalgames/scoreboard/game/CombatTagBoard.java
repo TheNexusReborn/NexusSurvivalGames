@@ -67,9 +67,7 @@ public class CombatTagBoard extends SpigotScoreboardView {
             if (combatTag == null || combatTag.getOther() == null || !combatTag.isInCombat()) {
                 team.setSuffix("0s");
             } else {
-                long combatTagLength = game.getSettings().getCombatTagLength() * 1000L;
-                long timeRemaining = combatTag.getTimestamp() + combatTagLength - System.currentTimeMillis();
-                team.setSuffix("&f" + TIME_FORMAT.format(timeRemaining));
+                team.setSuffix("&f" + TIME_FORMAT.format(combatTag.getTimer().getTime()));
             }
         }));
     }

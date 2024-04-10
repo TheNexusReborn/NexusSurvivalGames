@@ -220,7 +220,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
         new ChickenMutationThread(this).start();
         new PlayerUpdateThread(this).start();
         new ServerStatusThread(this).start();
-        new CombatTagThread(this).start();
         new PlayerScoreboardThread(this).start();
         new WarmupSpawnThread(this).start();
 
