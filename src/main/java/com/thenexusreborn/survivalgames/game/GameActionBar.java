@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames.game;
 
+import com.stardevllc.starlib.time.TimeUnit;
 import com.thenexusreborn.api.player.IActionBar;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -49,7 +50,7 @@ public class GameActionBar implements IActionBar {
         }
 
         if (game.getState() == GameState.WARMUP) {
-            return "&fGAME BEGINS IN &c&l" + game.getTimer().getSecondsLeft() + " SECONDS&f...";
+            return "&fGAME BEGINS IN &c&l" + TimeUnit.SECONDS.fromMillis(game.getTimer().getTime()) + " SECONDS&f...";
         }
 
         if (game.getState() == GameState.WARMUP_DONE) {
@@ -74,19 +75,19 @@ public class GameActionBar implements IActionBar {
         }
 
         if (game.isGraceperiod()) {
-            return "&f&lGrace Period ends in &e" + Game.LONG_TIME_FORMAT.format(game.getGraceperiodTimer().getTimeLeft());
+            return "&f&lGrace Period ends in &e" + Game.LONG_TIME_FORMAT.format(game.getGraceperiodTimer().getTime());
         }
 
         if (game.getState() == GameState.INGAME) {
-            if (game.getRestockTimer() != null && game.getRestockTimer().getSecondsLeft() > 0) {
-                return "&f&lChests restock in &e" + Game.LONG_TIME_FORMAT.format(game.getRestockTimer().getTimeLeft());
+            if (game.willRestockChests()) {
+                return "&f&lChests restock in &e" + Game.LONG_TIME_FORMAT.format(game.getNextRestock());
             } else {
-                return "&f&lDeathmatch in &e" + Game.LONG_TIME_FORMAT.format(game.getTimer().getTimeLeft());
+                return "&f&lDeathmatch in &e" + Game.LONG_TIME_FORMAT.format(game.getTimer().getTime());
             }
         }
 
         if (game.getState() == GameState.INGAME_DEATHMATCH) {
-            return "&f&lDeathmatch in &e" + Game.LONG_TIME_FORMAT.format(game.getTimer().getTimeLeft());
+            return "&f&lDeathmatch in &e" + Game.LONG_TIME_FORMAT.format(game.getTimer().getTime());
         }
 
         if (game.getState() == GameState.TELEPORT_DEATHMATCH) {
@@ -98,7 +99,7 @@ public class GameActionBar implements IActionBar {
         }
 
         if (game.getState() == GameState.DEATHMATCH_WARMUP) {
-            return "&f&lYou have &e" + Game.LONG_TIME_FORMAT.format(game.getTimer().getTimeLeft());
+            return "&f&lYou have &e" + Game.LONG_TIME_FORMAT.format(game.getTimer().getTime());
         }
 
         if (game.getState() == GameState.DEATHMATCH_WARMUP_DONE) {
@@ -106,14 +107,14 @@ public class GameActionBar implements IActionBar {
         }
 
         if (game.getState() == GameState.DEATHMATCH) {
-            return "&f&lYou have &e" + Game.LONG_TIME_FORMAT.format(game.getTimer().getTimeLeft());
+            return "&f&lYou have &e" + Game.LONG_TIME_FORMAT.format(game.getTimer().getTime());
         }
 
         if (game.getState() == GameState.ENDING) {
             if (game.getTimer() == null) {
                 return "&aArchiving game...";
             }
-            return "&d&lNEXUS&7 - &eNext game starting... &7(" + game.getTimer().getSecondsLeft() + "s)";
+            return "&d&lNEXUS&7 - &eNext game starting... &7(" + game.getTimer().getTime() + "s)";
         }
 
         return "";

@@ -1,6 +1,7 @@
 package com.thenexusreborn.survivalgames;
 
 import com.stardevllc.starchat.StarChat;
+import com.stardevllc.starclock.ClockManager;
 import com.stardevllc.starlib.Value;
 import com.stardevllc.starlib.Value.Type;
 import com.stardevllc.starlib.registry.IntegerRegistry;
@@ -80,6 +81,8 @@ public class SurvivalGames extends NexusSpigotPlugin {
     private IntegerRegistry<SGVirtualServer> servers = new IntegerRegistry<>();
     
     private int gamesPlayed;
+    
+    private ClockManager clockManager;
 
     public static SurvivalGames getInstance() {
         return INSTANCE;
@@ -123,6 +126,8 @@ public class SurvivalGames extends NexusSpigotPlugin {
             pluginManager.disablePlugin(this);
             return;
         }
+        
+        this.clockManager = getServer().getServicesManager().getRegistration(ClockManager.class).getProvider();
 
         this.starChat = (StarChat) getServer().getPluginManager().getPlugin("StarChat");
         getLogger().info("Hooked into StarChat");
@@ -448,5 +453,9 @@ public class SurvivalGames extends NexusSpigotPlugin {
 
     public IntegerRegistry<SGVirtualServer> getServers() {
         return servers;
+    }
+
+    public ClockManager getClockManager() {
+        return clockManager;
     }
 }

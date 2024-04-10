@@ -5,6 +5,7 @@ import com.stardevllc.starcore.gui.GuiManager;
 import com.stardevllc.starcore.utils.color.ColorUtils;
 import com.stardevllc.starcore.utils.item.ItemBuilder;
 import com.stardevllc.starlib.Pair;
+import com.stardevllc.starlib.time.TimeUnit;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
@@ -196,7 +197,7 @@ public class PlayerListener implements Listener {
                             player.setVelocity(new Vector(0, 2, 0));
                             chickenMutation.startLaunchCooldown();
                         } else {
-                            player.sendMessage(ColorUtils.color(MsgType.WARN + "Chicken Launch is still on cooldown: &e" + chickenMutation.getLaunchCooldownTimer().getSecondsLeft() + "s&c!"));
+                            player.sendMessage(ColorUtils.color(MsgType.WARN + "Chicken Launch is still on cooldown: &e" + TimeUnit.MILLISECONDS.toSeconds(chickenMutation.getLaunchCooldownTimer().getTime()) + "s&c!"));
                         }
                     } else if (item.getType() == Material.FEATHER) {
                         if (!chickenMutation.isParachuteOnCooldown()) {
@@ -206,7 +207,7 @@ public class PlayerListener implements Listener {
                                 chickenMutation.activateChute();
                             }
                         } else {
-                            player.sendMessage(ColorUtils.color(MsgType.WARN + "Chicken Chute is still on cooldown: &e" + chickenMutation.getParachuteCooldownTimer().getSecondsLeft() + "s&c!"));
+                            player.sendMessage(ColorUtils.color(MsgType.WARN + "Chicken Chute is still on cooldown: &e" + TimeUnit.MILLISECONDS.toSeconds(chickenMutation.getParachuteCooldownTimer().getTime()) + "s&c!"));
                         }
                     }
                 }
@@ -331,7 +332,7 @@ public class PlayerListener implements Listener {
                             } else {
                                 boolean withinCenter = game.getGameMap().getDeathmatchArea().contains(player);
                                 if (game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_DEATHMATCH) {
-                                    boolean afterRestock = game.getRestockTimer() == null;
+                                    boolean afterRestock = game.getTimedRestockCount() > 0;
                                     if (withinCenter) {
                                         if (afterRestock) {
                                             lootTable = lootManager.getLootTable("tierThree");

@@ -37,9 +37,8 @@ public class ServerStatusThread extends NexusThread<SurvivalGames> {
                 stateObject.addProperty("mode", game.getMode().name());
                 stateObject.addProperty("state", game.getState().name()); //Replace with a JsonObject when new state system is fully implemented
                 JsonObject timeObject = new JsonObject();
-                timeObject.addProperty("main", game.getTimer() != null ? game.getTimer().getTimeLeft() : 0L);
-                timeObject.addProperty("grace", game.getGraceperiodTimer() != null ? game.getGraceperiodTimer().getSecondsLeft() : 0);
-                timeObject.addProperty("restock", game.getRestockTimer() != null ? game.getRestockTimer().getSecondsLeft() : 0);
+                timeObject.addProperty("main", game.getTimer() != null ? game.getTimer().getTime() : 0L);
+                timeObject.addProperty("grace", game.getGraceperiodTimer() != null ? game.getGraceperiodTimer().getTime() : 0);
                 stateObject.add("time", timeObject);
             } else if (lobby != null) {
                 stateObject.addProperty("type", "lobby");

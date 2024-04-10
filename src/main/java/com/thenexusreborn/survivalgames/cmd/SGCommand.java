@@ -2,6 +2,7 @@ package com.thenexusreborn.survivalgames.cmd;
 
 import com.stardevllc.starcore.utils.color.ColorUtils;
 import com.stardevllc.starlib.Value;
+import com.stardevllc.starclock.clocks.Timer;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.sql.objects.typehandlers.ValueHandler;
 import com.thenexusreborn.gamemaps.MapManager;
@@ -9,7 +10,6 @@ import com.thenexusreborn.gamemaps.YamlMapManager;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
-import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.ControlType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -786,13 +786,13 @@ public class SGCommand implements CommandExecutor {
                 return true;
             }
 
-            Timer timer = null;
+            Timer timer;
             String timerType;
             if (game != null) {
                 timer = game.getTimer();
                 timerType = "game";
             } else {
-                //TODO timer = lobby.getTimer();
+                timer = lobby.getTimer();
                 timerType = "lobby";
             }
 
@@ -808,7 +808,7 @@ public class SGCommand implements CommandExecutor {
                         sender.sendMessage(ColorUtils.color(MsgType.WARN + "The timer is already paused."));
                         return true;
                     }
-                    timer.setPaused(true);
+                    timer.pause();
                     sender.sendMessage(ColorUtils.color(MsgType.INFO + "You paused the timer."));
                 }
                 case "resume" -> {
@@ -816,7 +816,7 @@ public class SGCommand implements CommandExecutor {
                         sender.sendMessage(ColorUtils.color(MsgType.WARN + "The timer is not paused."));
                         return true;
                     }
-                    timer.setPaused(false);
+                    timer.unpause();
                     sender.sendMessage(ColorUtils.color(MsgType.INFO + "You resumed the timer."));
                 }
                 case "reset" -> {
@@ -846,42 +846,42 @@ public class SGCommand implements CommandExecutor {
                     } else {
                         switch (operator) {
                             case ADD -> {
-                                long newTime = timer.getTimeLeft() + milliseconds;
+                                long newTime = timer.getTime() + milliseconds;
                                 if (newTime > timer.getLength()) {
                                     newTime = timer.getLength();
                                     sender.sendMessage(ColorUtils.color(MsgType.WARN + "The new timer length exceeds the specified length of the timer. Using the max length. Please use this command without an operator to change the specified length"));
                                 }
-                                timer.setRawTime(newTime);
+                                timer.setLength(newTime);
                             }
                             case SUBTRACT -> {
-                                long newTime = timer.getTimeLeft() - milliseconds;
+                                long newTime = timer.getTime() - milliseconds;
                                 if (newTime <= 0) {
                                     sender.sendMessage(ColorUtils.color(MsgType.WARN + "The new timer length is less than or equal to 0. Please use the timer cancel command instead."));
                                     return true;
                                 }
 
-                                timer.setRawTime(newTime);
+                                timer.setLength(newTime);
                             }
                             case MULTIPLY -> {
-                                long newTime = timer.getTimeLeft() * milliseconds;
+                                long newTime = timer.getTime() * milliseconds;
                                 if (newTime > timer.getLength()) {
                                     newTime = timer.getLength();
                                     sender.sendMessage(ColorUtils.color(MsgType.VERBOSE + "The new timer length exceeds the specified length of the timer. Using the max length. Please use this command without an operator to change the specified length"));
                                 }
-                                timer.setRawTime(newTime);
+                                timer.setLength(newTime);
                             }
                             case DIVIDE -> {
                                 if (milliseconds == 0) {
                                     sender.sendMessage(ColorUtils.color(MsgType.WARN + "Cannot divide by zero"));
                                     return true;
                                 }
-                                long newTime = timer.getTimeLeft() / milliseconds;
+                                long newTime = timer.getTime() / milliseconds;
                                 if (newTime <= 0) {
                                     sender.sendMessage(ColorUtils.color(MsgType.WARN + "The new timer length is less than or equal to 0. Please use the timer cancel command instead."));
                                     return true;
                                 }
 
-                                timer.setRawTime(newTime);
+                                timer.setTime(newTime);
                             }
                         }
                         sender.sendMessage(ColorUtils.color(MsgType.INFO + "You modified the " + timerType + " timer."));

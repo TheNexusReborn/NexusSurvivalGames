@@ -88,7 +88,7 @@ public final class SGUtils {
                         nexusServer.join(nexusPlayer);
                         break;
                     } else {
-                        //TODO Implement this later.
+                        //TODO Implement sending to bungee server later
                     }
                 }
             }

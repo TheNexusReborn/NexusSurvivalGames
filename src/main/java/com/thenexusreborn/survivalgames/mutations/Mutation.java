@@ -1,15 +1,17 @@
 package com.thenexusreborn.survivalgames.mutations;
 
+import com.stardevllc.starclock.clocks.Timer;
 import com.stardevllc.starcore.utils.color.ColorUtils;
-import com.thenexusreborn.nexuscore.util.MCUtils;
-import com.thenexusreborn.nexuscore.util.timer.Timer;
+import com.stardevllc.starlib.time.TimeUnit;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.mutations.timer.MutationCountdownCallback;
+import com.thenexusreborn.survivalgames.mutations.timer.MutationEndCondition;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 
 public abstract class Mutation {
@@ -69,13 +71,16 @@ public abstract class Mutation {
             return;
         }
         
-        this.countdownTimer = new Timer(new MutationCountdownCallback(this));
+        this.countdownTimer = plugin.getClockManager().createTimer(TimeUnit.SECONDS.toMillis(game.getSettings().getMutationSpawnDelay()) + 50L);
+        this.countdownTimer.addRepeatingCallback(new MutationCountdownCallback(game, this), TimeUnit.SECONDS, 1);
+        this.countdownTimer.setEndCondition(new MutationEndCondition(this, game));
         this.countdownTimer.setLength(game.getSettings().getMutationSpawnDelay() * 1000L + 50);
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(this.countdownTimer.getTime());
         p.sendMessage(ColorUtils.color("&6&l>> &eYou will mutate as a(n) " + getType().getDisplayName() + "!"));
-        p.sendMessage(ColorUtils.color("&6&l>> &eYou will be mutated in &l" + this.countdownTimer.getSecondsLeft() + " Seconds&e."));
+        p.sendMessage(ColorUtils.color("&6&l>> &eYou will be mutated in &l" + seconds + " Seconds&e."));
         Player t = Bukkit.getPlayer(this.target);
-        t.sendMessage(ColorUtils.color("&4&l>> &c" + p.getName() + " is &lMUTATING! &cThey spawn in &c&l" + this.countdownTimer.getSecondsLeft() + "s..."));
-        this.countdownTimer.run();
+        t.sendMessage(ColorUtils.color("&4&l>> &c" + p.getName() + " is &lMUTATING! &cThey spawn in &c&l" + seconds + "s..."));
+        this.countdownTimer.start();
     }
     
     public void setTarget(UUID uniqueId) {

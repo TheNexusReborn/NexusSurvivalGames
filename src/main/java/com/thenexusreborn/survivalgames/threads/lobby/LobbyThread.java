@@ -93,7 +93,7 @@ public class LobbyThread extends NexusThread<SurvivalGames> {
 
 //                if (Bukkit.getOnlinePlayers().size() <= 1) {
 //                    resetLobby = true;
-//                } //TODO
+//                } //TODO Reimplement the bad lobby state detection
             }
 
             if (resetLobby) {
