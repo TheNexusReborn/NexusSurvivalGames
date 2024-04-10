@@ -1,13 +1,18 @@
 package com.thenexusreborn.survivalgames.threads.lobby;
 
+import com.stardevllc.starcore.utils.color.ColorUtils;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.api.NexusThread;
-import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.lobby.*;
+import com.thenexusreborn.survivalgames.lobby.Lobby;
+import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
+import com.thenexusreborn.survivalgames.lobby.LobbyState;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
-import org.bukkit.*;
-import org.bukkit.block.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 
 import java.util.Map.Entry;
@@ -50,7 +55,7 @@ public class MapSignUpdateThread extends NexusThread<SurvivalGames> {
                 sign.setLine(1, mapName);
                 int votes = lobby.getTotalMapVotes(entry.getKey());
 
-                sign.setLine(3, MCUtils.color("&n" + votes + " Vote(s)"));
+                sign.setLine(3, ColorUtils.color("&n" + votes + " Vote(s)"));
 
                 for (LobbyPlayer player : lobby.getPlayers()) {
                     Player bukkitPlayer = Bukkit.getPlayer(player.getUniqueId());
@@ -61,10 +66,10 @@ public class MapSignUpdateThread extends NexusThread<SurvivalGames> {
                                 continue;
                             }
                             if (player.getMapVote() == entry.getKey()) {
-                                sign.setLine(0, MCUtils.color("&n#" + entry.getKey()));
-                                sign.setLine(2, MCUtils.color("&2&lVOTED!"));
+                                sign.setLine(0, ColorUtils.color("&n#" + entry.getKey()));
+                                sign.setLine(2, ColorUtils.color("&2&lVOTED!"));
                             } else {
-                                sign.setLine(0, MCUtils.color("&nClick to Vote"));
+                                sign.setLine(0, ColorUtils.color("&nClick to Vote"));
                                 sign.setLine(2, "");
                             }
                             bukkitPlayer.sendSignChange(sign.getLocation(), sign.getLines());

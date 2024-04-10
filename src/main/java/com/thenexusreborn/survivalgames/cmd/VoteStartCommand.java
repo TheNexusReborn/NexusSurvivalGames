@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames.cmd;
 
+import com.stardevllc.starcore.utils.color.ColorUtils;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.nexuscore.util.*;
@@ -20,14 +21,14 @@ public class VoteStartCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (!(sender instanceof Player senderPlayer)) {
-            sender.sendMessage(MCUtils.color("&cOnly players can use that command."));
+            sender.sendMessage(ColorUtils.color("&cOnly players can use that command."));
             return true;
         }
 
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(senderPlayer.getUniqueId());
     
         if (sgPlayer.getGame() != null) {
-            senderPlayer.sendMessage(MCUtils.color("&cYou cannot use that command while in game."));
+            senderPlayer.sendMessage(ColorUtils.color("&cYou cannot use that command while in game."));
             return true;
         }
     

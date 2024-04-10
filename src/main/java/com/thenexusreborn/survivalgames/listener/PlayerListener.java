@@ -2,6 +2,7 @@ package com.thenexusreborn.survivalgames.listener;
 
 import com.cryptomorin.xseries.XMaterial;
 import com.stardevllc.starcore.gui.GuiManager;
+import com.stardevllc.starcore.utils.color.ColorUtils;
 import com.stardevllc.starcore.utils.item.ItemBuilder;
 import com.stardevllc.starlib.Pair;
 import com.thenexusreborn.api.NexusAPI;
@@ -10,7 +11,6 @@ import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.player.Toggle;
 import com.thenexusreborn.nexuscore.api.events.NexusPlayerLoadEvent;
 import com.thenexusreborn.nexuscore.api.events.ToggleChangeEvent;
-import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -196,7 +196,7 @@ public class PlayerListener implements Listener {
                             player.setVelocity(new Vector(0, 2, 0));
                             chickenMutation.startLaunchCooldown();
                         } else {
-                            player.sendMessage(MCUtils.color(MsgType.WARN + "Chicken Launch is still on cooldown: &e" + chickenMutation.getLaunchCooldownTimer().getSecondsLeft() + "s&c!"));
+                            player.sendMessage(ColorUtils.color(MsgType.WARN + "Chicken Launch is still on cooldown: &e" + chickenMutation.getLaunchCooldownTimer().getSecondsLeft() + "s&c!"));
                         }
                     } else if (item.getType() == Material.FEATHER) {
                         if (!chickenMutation.isParachuteOnCooldown()) {
@@ -206,7 +206,7 @@ public class PlayerListener implements Listener {
                                 chickenMutation.activateChute();
                             }
                         } else {
-                            player.sendMessage(MCUtils.color(MsgType.WARN + "Chicken Chute is still on cooldown: &e" + chickenMutation.getParachuteCooldownTimer().getSecondsLeft() + "s&c!"));
+                            player.sendMessage(ColorUtils.color(MsgType.WARN + "Chicken Chute is still on cooldown: &e" + chickenMutation.getParachuteCooldownTimer().getSecondsLeft() + "s&c!"));
                         }
                     }
                 }
@@ -350,7 +350,7 @@ public class PlayerListener implements Listener {
                         }
                         
                         if (lootTable == null) {
-                            player.sendMessage(MCUtils.color(MsgType.ERROR + "Error while determining the loot table."));
+                            player.sendMessage(ColorUtils.color(MsgType.ERROR + "Error while determining the loot table."));
                             return;
                         }
                         
@@ -506,12 +506,12 @@ public class PlayerListener implements Listener {
             e.setCancelled(true);
             if (villager.getCustomName().contains("Swag Shack")) {
                 if (game == null) {
-                    e.getPlayer().sendMessage(MCUtils.color(MsgType.WARN + "You cannot open the Swag Shack when not in a game."));
+                    e.getPlayer().sendMessage(ColorUtils.color(MsgType.WARN + "You cannot open the Swag Shack when not in a game."));
                     return;
                 }
                 
                 if (!game.getSettings().isAllowSwagShack()) {
-                    e.getPlayer().sendMessage(MCUtils.color(MsgType.WARN + "The Swag Shack is disabled for this game."));
+                    e.getPlayer().sendMessage(ColorUtils.color(MsgType.WARN + "The Swag Shack is disabled for this game."));
                     return;
                 }
                 
@@ -539,13 +539,13 @@ public class PlayerListener implements Listener {
         } else if (inv.getRecipe().getResult().getType() == Material.DIAMOND_AXE) {
             ItemStack itemStack = new ItemStack(Material.DIAMOND_AXE);
             ItemMeta itemMeta = itemStack.getItemMeta();
-            itemMeta.setDisplayName(MCUtils.color("&fBetty"));
+            itemMeta.setDisplayName(ColorUtils.color("&fBetty"));
             itemStack.setItemMeta(itemMeta);
             inv.setResult(itemStack);
         } else if (inv.getRecipe().getResult().getType() == Material.IRON_AXE) {
             ItemStack itemStack = new ItemStack(Material.IRON_AXE);
             ItemMeta itemMeta = itemStack.getItemMeta();
-            itemMeta.setDisplayName(MCUtils.color("&fFrederick"));
+            itemMeta.setDisplayName(ColorUtils.color("&fFrederick"));
             itemStack.setItemMeta(itemMeta);
             inv.setResult(itemStack);
         }

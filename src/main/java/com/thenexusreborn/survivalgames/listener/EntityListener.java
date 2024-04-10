@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.listener;
 
-import com.thenexusreborn.nexuscore.util.MCUtils;
+import com.stardevllc.starcore.utils.color.ColorUtils;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
@@ -166,7 +166,7 @@ public class EntityListener implements Listener {
             }
 
             if (game.isGraceperiod()) {
-                shooter.sendMessage(MCUtils.color("&6&l>> &cYou cannot harm others during grace period!"));
+                shooter.sendMessage(ColorUtils.color("&6&l>> &cYou cannot harm others during grace period!"));
                 e.setCancelled(true);
                 return;
             }

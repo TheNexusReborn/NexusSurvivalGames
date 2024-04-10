@@ -1,16 +1,20 @@
 package com.thenexusreborn.survivalgames.scoreboard;
 
+import com.stardevllc.starcore.utils.color.ColorUtils;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
-import com.thenexusreborn.api.scoreboard.*;
+import com.thenexusreborn.api.scoreboard.NexusScoreboard;
+import com.thenexusreborn.api.scoreboard.TablistHandler;
 import com.thenexusreborn.api.scoreboard.wrapper.ITeam;
-import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.*;
+import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.GamePlayer;
+import com.thenexusreborn.survivalgames.game.GameTeam;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.EnumMap;
+import java.util.Map;
 
 public class GameTablistHandler extends TablistHandler {
     
@@ -88,7 +92,7 @@ public class GameTablistHandler extends TablistHandler {
         Game game = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId()).getGame();
         if (game != null) {
             GamePlayer gamePlayer = game.getPlayer(nexusPlayer.getUniqueId());
-            team.setPrefix(MCUtils.color(gamePlayer.getTeam().getColor()));
+            team.setPrefix(ColorUtils.color(gamePlayer.getTeam().getColor()));
         }
     }
 }

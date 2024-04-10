@@ -5,8 +5,8 @@ import com.stardevllc.starcore.gui.GuiManager;
 import com.stardevllc.starcore.gui.element.Element;
 import com.stardevllc.starcore.gui.element.button.Button;
 import com.stardevllc.starcore.gui.gui.InventoryGUI;
+import com.stardevllc.starcore.utils.color.ColorUtils;
 import com.stardevllc.starcore.utils.item.ItemBuilder;
-import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -28,14 +28,14 @@ public class PlayerMenu extends InventoryGUI {
         Button teleportButton = new Button().iconCreator(p -> ItemBuilder.of(XMaterial.ENDER_PEARL).displayName("&e&lTeleport").build())
                 .consumer(e -> {
                     e.getWhoClicked().teleport(Bukkit.getPlayer(player.getUniqueId()).getLocation());
-                    e.getWhoClicked().sendMessage(MCUtils.color(MsgType.INFO + "Teleported to " + player.getColoredName() + "&e."));
+                    e.getWhoClicked().sendMessage(ColorUtils.color(MsgType.INFO + "Teleported to " + player.getColoredName() + "&e."));
                 });
 
         List<String> vitalsLore = player.getMenuVitals().stream().map(line -> "  " + line).collect(Collectors.toCollection(LinkedList::new));
         Element vitalsElement = new Element().iconCreator(p -> ItemBuilder.of(XMaterial.GLASS_BOTTLE).displayName("&e&lVitals").setLore(vitalsLore).build());
 
         Button viewInventoryButton = new Button().iconCreator(p -> ItemBuilder.of(XMaterial.ENDER_CHEST).displayName("Inventory").addLoreLine("&c&lNOT YET IMPLEMENTED").build())
-                .consumer(e -> e.getWhoClicked().sendMessage(MCUtils.color(MsgType.WARN + "This feature is not yet implemented.")));
+                .consumer(e -> e.getWhoClicked().sendMessage(ColorUtils.color(MsgType.WARN + "This feature is not yet implemented.")));
 
         Button sponsorButton = new Button().iconCreator(p -> ItemBuilder.of(XMaterial.CHEST).displayName("&e&lSponsor").build())
                 .consumer(e -> {

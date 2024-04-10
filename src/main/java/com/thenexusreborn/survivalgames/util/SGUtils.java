@@ -7,14 +7,18 @@ import com.thenexusreborn.api.scoreboard.wrapper.ITeam;
 import com.thenexusreborn.api.server.NexusServer;
 import com.thenexusreborn.api.util.NetworkType;
 import com.thenexusreborn.gamemaps.model.SGMap;
-import com.thenexusreborn.nexuscore.util.*;
+import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import net.minecraft.server.v1_8_R3.EntityTNTPrimed;
-import org.bukkit.*;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_8_R3.entity.*;
-import org.bukkit.entity.*;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftTNTPrimed;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Field;
@@ -108,7 +112,7 @@ public final class SGUtils {
         }
         
         if (gameMap.getWorld() == null) {
-            actor.sendMessage(MCUtils.color(MsgType.WARN + "That map is not loaded, please load before teleporting."));
+            actor.sendMessage(ColorUtils.color(MsgType.WARN + "That map is not loaded, please load before teleporting."));
             return null;
         }
         return gameMap;
@@ -123,7 +127,7 @@ public final class SGUtils {
         }
         
         if (gameMap == null) {
-            actor.sendMessage(MCUtils.color(MsgType.WARN + "Could not find a map with that name or file name."));
+            actor.sendMessage(ColorUtils.color(MsgType.WARN + "Could not find a map with that name or file name."));
         }
         
         return gameMap;

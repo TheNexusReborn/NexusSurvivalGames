@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames.scoreboard.game;
 
+import com.stardevllc.starcore.utils.color.ColorUtils;
 import com.thenexusreborn.api.scoreboard.*;
 import com.thenexusreborn.nexuscore.scoreboard.SpigotScoreboardView;
 import com.thenexusreborn.nexuscore.util.MCUtils;
@@ -15,7 +16,7 @@ public class MutationBoard extends SpigotScoreboardView {
     private SurvivalGames plugin;
     
     public MutationBoard(NexusScoreboard scoreboard, SurvivalGames plugin) {
-        super(scoreboard, "combattag", MCUtils.color("&d&lMutation"));
+        super(scoreboard, "combattag", ColorUtils.color("&d&lMutation"));
         this.plugin = plugin;
     }
     

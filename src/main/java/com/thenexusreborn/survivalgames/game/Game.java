@@ -3,6 +3,7 @@ package com.thenexusreborn.survivalgames.game;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
+import com.stardevllc.starcore.utils.color.ColorUtils;
 import com.stardevllc.starlib.registry.StringRegistry;
 import com.stardevllc.starlib.time.TimeFormat;
 import com.stardevllc.starlib.time.TimeUnit;
@@ -446,7 +447,7 @@ public class Game {
         if (gameMap.getSwagShack() != null) {
             Villager entity = (Villager) gameMap.getWorld().spawnEntity(gameMap.getSwagShack().toLocation(gameMap.getWorld()), EntityType.VILLAGER);
             entity.setCustomNameVisible(true);
-            entity.setCustomName(MCUtils.color("&e&lSwag Shack"));
+            entity.setCustomName(ColorUtils.color("&e&lSwag Shack"));
             entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 255, false, false));
         }
     }

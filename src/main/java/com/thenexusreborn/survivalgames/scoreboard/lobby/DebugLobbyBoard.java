@@ -1,6 +1,7 @@
 package com.thenexusreborn.survivalgames.scoreboard.lobby;
 
 import com.stardevllc.starclock.clocks.Timer;
+import com.stardevllc.starcore.utils.color.ColorUtils;
 import com.stardevllc.starlib.time.TimeFormat;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
@@ -17,7 +18,7 @@ public class DebugLobbyBoard extends SpigotScoreboardView {
     private final Lobby lobby;
     
     public DebugLobbyBoard(NexusScoreboard scoreboard, Lobby lobby) {
-        super(scoreboard, "debuglobbyboard", MCUtils.color("&e&lDEBUG LOBBY"));
+        super(scoreboard, "debuglobbyboard", ColorUtils.color("&e&lDEBUG LOBBY"));
         this.lobby = lobby;
     }
     
@@ -55,7 +56,7 @@ public class DebugLobbyBoard extends SpigotScoreboardView {
             if (lobby.getGameMap() != null) {
                 SGUtils.setMapNameForScoreboard(lobby.getGameMap(), team);
             } else {
-                team.setPrefix(MCUtils.color("&7None"));
+                team.setPrefix(ColorUtils.color("&7None"));
                 team.setSuffix("");
             }
         }));

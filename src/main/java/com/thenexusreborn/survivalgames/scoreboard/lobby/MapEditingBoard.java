@@ -1,10 +1,10 @@
 package com.thenexusreborn.survivalgames.scoreboard.lobby;
 
 import com.stardevllc.starcore.utils.Position;
+import com.stardevllc.starcore.utils.color.ColorUtils;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.scoreboard.TeamBuilder;
 import com.thenexusreborn.nexuscore.scoreboard.SpigotScoreboardView;
-import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.ChatColor;
@@ -14,7 +14,7 @@ public class MapEditingBoard extends SpigotScoreboardView {
     private SurvivalGames plugin;
     
     public MapEditingBoard(NexusScoreboard scoreboard, SurvivalGames plugin) {
-        super(scoreboard, "mapeditingboard", MCUtils.color("&a&lMap Editing"));
+        super(scoreboard, "mapeditingboard", ColorUtils.color("&a&lMap Editing"));
         this.plugin = plugin;
     }
     

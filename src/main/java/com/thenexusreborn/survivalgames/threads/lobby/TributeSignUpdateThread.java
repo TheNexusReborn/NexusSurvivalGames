@@ -1,17 +1,23 @@
 package com.thenexusreborn.survivalgames.threads.lobby;
 
 import com.mojang.authlib.GameProfile;
+import com.stardevllc.starcore.utils.color.ColorUtils;
 import com.thenexusreborn.nexuscore.api.NexusThread;
-import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.lobby.*;
+import com.thenexusreborn.survivalgames.lobby.Lobby;
+import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
+import com.thenexusreborn.survivalgames.lobby.LobbyState;
+import com.thenexusreborn.survivalgames.lobby.TributeSign;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Skull;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.UUID;
 
 public class TributeSignUpdateThread extends NexusThread<SurvivalGames> {
     
@@ -68,7 +74,7 @@ public class TributeSignUpdateThread extends NexusThread<SurvivalGames> {
                 Player player = Bukkit.getPlayer(lobbyPlayer.getUniqueId());
                 String name;
                 if (lobbyPlayer.getName().length() <= 14) {
-                    name = MCUtils.color(lobbyPlayer.getRank().getColor() + lobbyPlayer.getName());
+                    name = ColorUtils.color(lobbyPlayer.getRank().getColor() + lobbyPlayer.getName());
                 } else {
                     name = lobbyPlayer.getName();
                 }

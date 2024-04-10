@@ -1,10 +1,10 @@
 package com.thenexusreborn.survivalgames.scoreboard.game;
 
+import com.stardevllc.starcore.utils.color.ColorUtils;
 import com.stardevllc.starlib.time.TimeFormat;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.scoreboard.TeamBuilder;
 import com.thenexusreborn.nexuscore.scoreboard.SpigotScoreboardView;
-import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.CombatTag;
@@ -21,7 +21,7 @@ public class CombatTagBoard extends SpigotScoreboardView {
     private SurvivalGames plugin;
     
     public CombatTagBoard(NexusScoreboard scoreboard, SurvivalGames plugin) {
-        super(scoreboard, "combattag", MCUtils.color("&9&lCombat Tag"));
+        super(scoreboard, "combattag", ColorUtils.color("&9&lCombat Tag"));
         this.plugin = plugin;
     }
     
