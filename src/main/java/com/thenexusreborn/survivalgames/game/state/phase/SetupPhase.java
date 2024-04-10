@@ -97,10 +97,10 @@ public class SetupPhase extends GamePhase {
                     gameMap.getWorld().setGameRuleValue("doFireTick", "false");
                     gameMap.getWorld().setGameRuleValue("keepInventory", "false");
                     gameMap.getWorld().setDifficulty(Difficulty.EASY);
-//                    plugin.getLobby().resetLobby(); TODO Create new lobby
+                    game.getServer().getLobby().resetLobby();
                     setStatus(PhaseStatus.COMPLETE);
                     checkPlayerCount();
-                    game.setState(OldGameState.SETUP_COMPLETE); //TODO
+                    game.setState(OldGameState.SETUP_COMPLETE);
                 } catch (Exception e) {
                     e.printStackTrace();
                     game.handleError("There was an error setting up the world.");
