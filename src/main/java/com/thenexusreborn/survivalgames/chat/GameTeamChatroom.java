@@ -6,7 +6,7 @@ import com.stardevllc.starcore.utils.actor.Actor;
 import com.thenexusreborn.api.gamearchive.GameAction;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
-import com.thenexusreborn.survivalgames.game.GameState;
+import com.thenexusreborn.survivalgames.game.OldGameState;
 import com.thenexusreborn.survivalgames.game.GameTeam;
 import org.bukkit.entity.Player;
 
@@ -31,7 +31,7 @@ public class GameTeamChatroom extends ChatRoom {
         String message = chatContext.getMessage();
         
         if (game != null) {
-            if (game.getState().ordinal() >= GameState.INGAME.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal()) {
+            if (game.getState().ordinal() >= OldGameState.INGAME.ordinal() && game.getState().ordinal() <= OldGameState.DEATHMATCH.ordinal()) {
                 if (game.getPlayer(player.getUniqueId()).getTeam() == GameTeam.SPECTATORS) {
                     game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "deadchat", player.getName() + ":" + message.replace("'", "''")));
                 } else {

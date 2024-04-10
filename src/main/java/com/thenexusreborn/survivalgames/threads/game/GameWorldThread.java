@@ -3,7 +3,7 @@ package com.thenexusreborn.survivalgames.threads.game;
 import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
-import com.thenexusreborn.survivalgames.game.GameState;
+import com.thenexusreborn.survivalgames.game.OldGameState;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import com.thenexusreborn.survivalgames.settings.object.enums.Weather;
 import org.bukkit.World;
@@ -22,7 +22,7 @@ public class GameWorldThread extends NexusThread<SurvivalGames> {
                 continue;
             }
             
-            if (game.getState().ordinal() < GameState.SETUP_COMPLETE.ordinal()) {
+            if (game.getState().ordinal() < OldGameState.SETUP_COMPLETE.ordinal()) {
                 continue;
             }
 

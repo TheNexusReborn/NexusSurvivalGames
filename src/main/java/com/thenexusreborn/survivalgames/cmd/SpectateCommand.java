@@ -8,7 +8,7 @@ import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
-import com.thenexusreborn.survivalgames.game.GameState;
+import com.thenexusreborn.survivalgames.game.OldGameState;
 import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.game.death.DeathType;
@@ -28,8 +28,8 @@ public class SpectateCommand implements CommandExecutor {
     
     private final SurvivalGames plugin;
     
-    private static final Set<GameState> INVALID_GAME_STATES = new HashSet<>(Arrays.asList(GameState.ASSIGN_TEAMS, GameState.ENDED, GameState.ENDING, 
-            GameState.ERROR, GameState.TELEPORT_START, GameState.SETTING_UP, GameState.SETUP_COMPLETE, GameState.UNDEFINED));
+    private static final Set<OldGameState> INVALID_GAME_STATES = new HashSet<>(Arrays.asList(OldGameState.ASSIGN_TEAMS, OldGameState.ENDED, OldGameState.ENDING, 
+            OldGameState.ERROR, OldGameState.TELEPORT_START, OldGameState.SETTING_UP, OldGameState.SETUP_COMPLETE, OldGameState.UNDEFINED));
     
     public SpectateCommand(SurvivalGames plugin) {
         this.plugin = plugin;

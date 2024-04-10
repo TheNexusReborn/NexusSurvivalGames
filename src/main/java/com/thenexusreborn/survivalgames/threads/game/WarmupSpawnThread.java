@@ -6,7 +6,7 @@ import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
-import com.thenexusreborn.survivalgames.game.GameState;
+import com.thenexusreborn.survivalgames.game.OldGameState;
 import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import org.bukkit.Bukkit;
@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 
 public class WarmupSpawnThread extends NexusThread<SurvivalGames> {
     
-    public static final GameState[] states = new GameState[] {GameState.WARMUP, GameState.WARMUP_DONE, GameState.DEATHMATCH_WARMUP, GameState.DEATHMATCH_WARMUP_DONE, GameState.TELEPORT_START, GameState.TELEPORT_DEATHMATCH, GameState.TELEPORT_START_DONE, GameState.TELEPORT_DEATHMATCH_DONE};
+    public static final OldGameState[] states = new OldGameState[] {OldGameState.WARMUP, OldGameState.WARMUP_DONE, OldGameState.DEATHMATCH_WARMUP, OldGameState.DEATHMATCH_WARMUP_DONE, OldGameState.TELEPORT_START, OldGameState.TELEPORT_DEATHMATCH, OldGameState.TELEPORT_START_DONE, OldGameState.TELEPORT_DEATHMATCH_DONE};
     
     public WarmupSpawnThread(SurvivalGames plugin) {
         super(plugin, 1L, 1L, false);

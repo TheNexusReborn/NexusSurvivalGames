@@ -6,7 +6,7 @@ import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
-import com.thenexusreborn.survivalgames.game.GameState;
+import com.thenexusreborn.survivalgames.game.OldGameState;
 import com.thenexusreborn.survivalgames.game.state.GamePhase;
 import com.thenexusreborn.survivalgames.game.state.PhaseStatus;
 import com.thenexusreborn.survivalgames.scoreboard.GameTablistHandler;
@@ -18,7 +18,7 @@ import org.bukkit.Location;
 
 public class SetupPhase extends GamePhase {
     public SetupPhase(Game game) {
-        super(game, "Setup");
+        super(game, "setup");
     }
 
     @Override
@@ -100,7 +100,7 @@ public class SetupPhase extends GamePhase {
 //                    plugin.getLobby().resetLobby(); TODO Create new lobby
                     setStatus(PhaseStatus.COMPLETE);
                     checkPlayerCount();
-                    game.setState(GameState.SETUP_COMPLETE); //TODO
+                    game.setState(OldGameState.SETUP_COMPLETE); //TODO
                 } catch (Exception e) {
                     e.printStackTrace();
                     game.handleError("There was an error setting up the world.");

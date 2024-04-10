@@ -4,7 +4,7 @@ import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
-import com.thenexusreborn.survivalgames.game.GameState;
+import com.thenexusreborn.survivalgames.game.OldGameState;
 import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import org.bukkit.Bukkit;
@@ -28,7 +28,7 @@ public class EndermanWaterDamageThread extends NexusThread<SurvivalGames> {
                 continue;
             }
             
-            if (!(game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_DEATHMATCH)) {
+            if (!(game.getState() == OldGameState.INGAME || game.getState() == OldGameState.INGAME_DEATHMATCH)) {
                 continue;
             }
 

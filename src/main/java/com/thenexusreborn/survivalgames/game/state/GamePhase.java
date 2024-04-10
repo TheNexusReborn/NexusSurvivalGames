@@ -3,7 +3,7 @@ package com.thenexusreborn.survivalgames.game.state;
 import com.stardevllc.starclock.clocks.Timer;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.game.Game;
-import com.thenexusreborn.survivalgames.game.GameState;
+import com.thenexusreborn.survivalgames.game.OldGameState;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -53,7 +53,7 @@ public abstract class GamePhase {
     
     protected boolean checkPlayerCount() {
         if (game.getPlayers().size() <= 1) {
-            game.setState(GameState.ENDING);
+            game.setState(OldGameState.ENDING);
 //            Game.getPlugin().getLobby().fromGame(game); TODO Create new lobby
             for (Player player : Bukkit.getOnlinePlayers()) {
                 player.sendMessage(MsgType.WARN + "Detected only one player left in the game, resetting back to lobby.");
@@ -62,6 +62,11 @@ public abstract class GamePhase {
         }
         
         return false;
+    }
+    
+    //Can be overridden to have custom logic if needed.
+    public boolean isComplete() {
+        return this.status == PhaseStatus.COMPLETE;
     }
 
     public Game getGame() {

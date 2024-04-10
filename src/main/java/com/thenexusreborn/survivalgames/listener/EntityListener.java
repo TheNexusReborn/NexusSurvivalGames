@@ -5,7 +5,7 @@ import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
-import com.thenexusreborn.survivalgames.game.GameState;
+import com.thenexusreborn.survivalgames.game.OldGameState;
 import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
@@ -82,9 +82,9 @@ public class EntityListener implements Listener {
                 }
             }
 
-            if (game.getState().ordinal() >= GameState.SETTING_UP.ordinal() && game.getState().ordinal() <= GameState.WARMUP_DONE.ordinal() ||
-                    game.getState().ordinal() >= GameState.DEATHMATCH_WARMUP.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH_WARMUP_DONE.ordinal() ||
-                    game.getState().ordinal() >= GameState.ENDING.ordinal() && game.getState().ordinal() <= GameState.ENDED.ordinal()) {
+            if (game.getState().ordinal() >= OldGameState.SETTING_UP.ordinal() && game.getState().ordinal() <= OldGameState.WARMUP_DONE.ordinal() ||
+                    game.getState().ordinal() >= OldGameState.DEATHMATCH_WARMUP.ordinal() && game.getState().ordinal() <= OldGameState.DEATHMATCH_WARMUP_DONE.ordinal() ||
+                    game.getState().ordinal() >= OldGameState.ENDING.ordinal() && game.getState().ordinal() <= OldGameState.ENDED.ordinal()) {
                 e.setCancelled(true);
             }
         } else {

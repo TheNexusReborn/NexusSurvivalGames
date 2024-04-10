@@ -4,7 +4,7 @@ import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.ControlType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
-import com.thenexusreborn.survivalgames.game.GameState;
+import com.thenexusreborn.survivalgames.game.OldGameState;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 
 public class GameStateThread extends NexusThread<SurvivalGames> {
@@ -24,23 +24,21 @@ public class GameStateThread extends NexusThread<SurvivalGames> {
                 continue;
             }
 
-            if (game.getState() == GameState.SETUP_COMPLETE) {
-                game.assignStartingTeams();
-            } else if (game.getState() == GameState.TEAMS_ASSIGNED) {
-                game.teleportStart();
-            } else if (game.getState() == GameState.TELEPORT_START_DONE) {
-                game.startWarmup();
-            } else if (game.getState() == GameState.WARMUP_DONE) {
+            if (game.getGameState().progress()) {
+                continue; //Progresses the game based on currently implemented states. Otherwise, default to the old state system.
+            }
+
+            if (game.getState() == OldGameState.WARMUP_DONE) {
                 game.startGame();
-            } else if (game.getState() == GameState.INGAME_DONE) {
+            } else if (game.getState() == OldGameState.INGAME_DONE) {
                 game.teleportDeathmatch();
-            } else if (game.getState() == GameState.TELEPORT_DEATHMATCH_DONE) {
+            } else if (game.getState() == OldGameState.TELEPORT_DEATHMATCH_DONE) {
                 game.teleportDeathmatch();
-            } else if (game.getState() == GameState.DEATHMATCH_WARMUP_DONE) {
+            } else if (game.getState() == OldGameState.DEATHMATCH_WARMUP_DONE) {
                 game.startDeathmatch();
-            } else if (game.getState() == GameState.GAME_COMPLETE) {
+            } else if (game.getState() == OldGameState.GAME_COMPLETE) {
                 game.end();
-            } else if (game.getState() == GameState.NEXT_GAME_READY) {
+            } else if (game.getState() == OldGameState.NEXT_GAME_READY) {
                 game.nextGame();
             }
         }

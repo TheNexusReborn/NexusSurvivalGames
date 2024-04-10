@@ -33,6 +33,7 @@ import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.game.death.DeathType;
 import com.thenexusreborn.survivalgames.game.death.KillerInfo;
 import com.thenexusreborn.survivalgames.game.state.GamePhase;
+import com.thenexusreborn.survivalgames.game.state.GameState;
 import com.thenexusreborn.survivalgames.game.state.phase.AssignTeamsPhase;
 import com.thenexusreborn.survivalgames.game.state.phase.SetupPhase;
 import com.thenexusreborn.survivalgames.game.state.phase.TeleportToMapPhase;
@@ -70,7 +71,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
 
-import static com.thenexusreborn.survivalgames.game.GameState.*;
+import static com.thenexusreborn.survivalgames.game.OldGameState.*;
 
 @SuppressWarnings({"unused"})
 public class Game {
@@ -87,7 +88,8 @@ public class Game {
     private final Map<Integer, UUID> spawns = new HashMap<>();
     private final ChatRoom gameChatroom;
     private final Map<GameTeam, GameTeamChatroom> chatRooms = new HashMap<>();
-    private GameState state = UNDEFINED;
+    private OldGameState state = UNDEFINED;
+    private final GameState gameState;
     private Timer timer, graceperiodTimer;
     private final List<Location> lootedChests = new ArrayList<>();
     private final GameInfo gameInfo;
@@ -109,6 +111,7 @@ public class Game {
         this.server = server;
         this.settings = settings;
         this.gameInfo = new GameInfo();
+        this.gameState = new GameState(this);
 
         this.gameChatroom = new GameChatRoom(this);
         plugin.getStarChat().getRoomRegistry().register(gameChatroom.getName(), gameChatroom);
@@ -149,12 +152,26 @@ public class Game {
         this.teleportToMapPhase = new TeleportToMapPhase(this);
         this.warmupPhase = new WarmupPhase(this);
     }
+    
+    public GamePhase determineNextPhase(GamePhase currentPhase) {
+        return switch (currentPhase.getName()) {
+            case "setup" -> assignTeamsPhase;
+            case "assign_starting_teams" -> teleportToMapPhase;
+            case "teleport_to_map" -> warmupPhase;
+            //TODO Add more phases here as they are implemented
+            default -> null;
+        };
+    }
+
+    public GameState getGameState() {
+        return gameState;
+    }
 
     public SGVirtualServer getServer() {
         return server;
     }
 
-    public void setState(GameState state) {
+    public void setState(OldGameState state) {
         this.state = state;
         this.gameInfo.getActions().add(new GameAction(System.currentTimeMillis(), "statechange", state.name()));
     }
@@ -267,7 +284,7 @@ public class Game {
         GamePlayer gamePlayer = this.players.get(nexusPlayer.getUniqueId());
         this.chatRooms.get(gamePlayer.getTeam()).removeMember(gamePlayer.getUniqueId());
         this.gameChatroom.removeMember(gamePlayer.getUniqueId());
-        EnumSet<GameState> ignoreStates = EnumSet.of(UNDEFINED, SETTING_UP, SETUP_COMPLETE, ASSIGN_TEAMS, TEAMS_ASSIGNED, TELEPORT_START, TELEPORT_START_DONE, ERROR, ENDING, ENDED);
+        EnumSet<OldGameState> ignoreStates = EnumSet.of(UNDEFINED, SETTING_UP, SETUP_COMPLETE, ASSIGN_TEAMS, TEAMS_ASSIGNED, TELEPORT_START, TELEPORT_START_DONE, ERROR, ENDING, ENDED);
         if (!ignoreStates.contains(this.state)) {
             if (gamePlayer.getTeam() == GameTeam.TRIBUTES || gamePlayer.getTeam() == GameTeam.MUTATIONS) {
                 killPlayer(gamePlayer, new DeathInfo(this, System.currentTimeMillis(), gamePlayer, DeathType.SUICIDE));
@@ -329,7 +346,7 @@ public class Game {
     }
 
     public void ingameComplete() {
-        setState(GameState.INGAME_DONE);
+        setState(OldGameState.INGAME_DONE);
     }
 
     private void teleportToGameSpawn(Player player, Location spawn, GameTeam gameTeam) {
@@ -393,7 +410,7 @@ public class Game {
         this.gameChatroom.sendMessage(new ChatContext(message));
     }
 
-    public GameState getState() {
+    public OldGameState getState() {
         return state;
     }
 
@@ -1147,6 +1164,10 @@ public class Game {
         return null;
     }
 
+    public void cleanup() {
+        //TODO Implement this method, this will just cleanup things that it did. Just moving some of the logic around.
+    }
+
     public void startDeathmatchTimer() {
         setState(INGAME_DEATHMATCH);
         if (this.timer != null) {
@@ -1283,11 +1304,11 @@ public class Game {
     }
 
     public void gameComplete() {
-        setState(GameState.GAME_COMPLETE);
+        setState(OldGameState.GAME_COMPLETE);
     }
 
     public void nextGameReady() {
-        setState(GameState.NEXT_GAME_READY);
+        setState(OldGameState.NEXT_GAME_READY);
     }
 
     public static SurvivalGames getPlugin() {

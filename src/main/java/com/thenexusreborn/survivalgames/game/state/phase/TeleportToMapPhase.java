@@ -13,11 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static com.thenexusreborn.survivalgames.game.GameState.TELEPORT_START_DONE;
+import static com.thenexusreborn.survivalgames.game.OldGameState.TELEPORT_START_DONE;
 
 public class TeleportToMapPhase extends GamePhase {
     public TeleportToMapPhase(Game game) {
-        super(game, "Teleport to Map");
+        super(game, "teleport_to_map");
     }
 
     @Override

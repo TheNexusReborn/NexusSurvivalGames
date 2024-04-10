@@ -1,10 +1,10 @@
 package com.thenexusreborn.survivalgames.game.timer.endconditions;
 
 import com.thenexusreborn.survivalgames.game.Game;
-import com.thenexusreborn.survivalgames.game.GameState;
+import com.thenexusreborn.survivalgames.game.OldGameState;
 
 public class RestockEndCondition extends SGCallbackEndCondition {
     public RestockEndCondition(Game game) {
-        super(game, Game::restockChests, null, "restock", "restock chests", GameState.INGAME, GameState.INGAME_DEATHMATCH, GameState.DEATHMATCH);
+        super(game, Game::restockChests, null, "restock", "restock chests", OldGameState.INGAME, OldGameState.INGAME_DEATHMATCH, OldGameState.DEATHMATCH);
     }
 }

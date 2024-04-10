@@ -27,8 +27,8 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.function.Consumer;
 
-import static com.thenexusreborn.survivalgames.game.GameState.INGAME;
-import static com.thenexusreborn.survivalgames.game.GameState.INGAME_DEATHMATCH;
+import static com.thenexusreborn.survivalgames.game.OldGameState.INGAME;
+import static com.thenexusreborn.survivalgames.game.OldGameState.INGAME_DEATHMATCH;
 
 public class GamePlayer {
     private final NexusPlayer nexusPlayer;
@@ -226,7 +226,7 @@ public class GamePlayer {
             return new Pair<>(false, "You cannot mutate because there is not game running.");
         }
 
-        if (!(game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_DEATHMATCH)) {
+        if (!(game.getState() == OldGameState.INGAME || game.getState() == OldGameState.INGAME_DEATHMATCH)) {
             return new Pair<>(false, "You cannot mutate in the current game phase.");
         }
 

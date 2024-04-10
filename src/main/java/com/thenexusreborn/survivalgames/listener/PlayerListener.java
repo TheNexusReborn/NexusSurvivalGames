@@ -327,11 +327,11 @@ public class PlayerListener implements Listener {
                         if (!useTieredLoot) {
                             lootTable = lootManager.getLootTable("tierOne");
                         } else {
-                            if (game.getState() == GameState.DEATHMATCH) {
+                            if (game.getState() == OldGameState.DEATHMATCH) {
                                 lootTable = lootManager.getLootTable("tierFour");
                             } else {
                                 boolean withinCenter = game.getGameMap().getDeathmatchArea().contains(player);
-                                if (game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_DEATHMATCH) {
+                                if (game.getState() == OldGameState.INGAME || game.getState() == OldGameState.INGAME_DEATHMATCH) {
                                     boolean afterRestock = game.getTimedRestockCount() > 0;
                                     if (withinCenter) {
                                         if (afterRestock) {

@@ -4,7 +4,7 @@ import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.ControlType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
-import com.thenexusreborn.survivalgames.game.GameState;
+import com.thenexusreborn.survivalgames.game.OldGameState;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 
 public class DeathmatchSetupThread extends NexusThread<SurvivalGames> {
@@ -24,7 +24,7 @@ public class DeathmatchSetupThread extends NexusThread<SurvivalGames> {
                 continue;
             }
 
-            if (game.getState() == GameState.TELEPORT_DEATHMATCH_DONE) {
+            if (game.getState() == OldGameState.TELEPORT_DEATHMATCH_DONE) {
                 game.startDeathmatchWarmup();
             }
         }
