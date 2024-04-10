@@ -36,6 +36,7 @@ import com.thenexusreborn.survivalgames.game.state.GamePhase;
 import com.thenexusreborn.survivalgames.game.state.phase.AssignTeamsPhase;
 import com.thenexusreborn.survivalgames.game.state.phase.SetupPhase;
 import com.thenexusreborn.survivalgames.game.state.phase.TeleportToMapPhase;
+import com.thenexusreborn.survivalgames.game.state.phase.WarmupPhase;
 import com.thenexusreborn.survivalgames.game.timer.callbacks.GameMinutesCallback;
 import com.thenexusreborn.survivalgames.game.timer.callbacks.GameSecondsCallback;
 import com.thenexusreborn.survivalgames.game.timer.endconditions.*;
@@ -98,8 +99,8 @@ public class Game {
     private boolean debugMode; //Debug Mode. This may be replaced with a class with other settings
     private Graceperiod graceperiod = Graceperiod.INACTIVE;
 
-    private GamePhase setupPhase, assignTeamsPhase, teleportToMapPhase;
-    
+    private GamePhase setupPhase, assignTeamsPhase, teleportToMapPhase, warmupPhase;
+
     private UUID restockCallbackId;
     private int timedRestockCount;
 
@@ -142,10 +143,11 @@ public class Game {
         }
         gameInfo.setPlayerCount(tributeCount);
         gameInfo.setPlayers(playerNames.toArray(new String[0]));
-        
+
         this.setupPhase = new SetupPhase(this);
         this.assignTeamsPhase = new AssignTeamsPhase(this);
         this.teleportToMapPhase = new TeleportToMapPhase(this);
+        this.warmupPhase = new WarmupPhase(this);
     }
 
     public SGVirtualServer getServer() {
@@ -271,17 +273,17 @@ public class Game {
                 killPlayer(gamePlayer, new DeathInfo(this, System.currentTimeMillis(), gamePlayer, DeathType.SUICIDE));
             }
         }
-        
+
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId());
         sgPlayer.setGame(null, null);
-        
+
         NexusAPI.getApi().getScheduler().runTaskAsynchronously(() -> {
             SQLDatabase database = NexusAPI.getApi().getPrimaryDatabase();
             database.saveSilent(sgPlayer.getStats());
             database.saveSilent(sgPlayer.getNexusPlayer().getBalance());
             database.saveSilent(sgPlayer.getNexusPlayer().getExperience());
         });
-        
+
         this.players.remove(nexusPlayer.getUniqueId());
 
         if (nexusPlayer.getToggleValue("vanish")) {
@@ -367,17 +369,17 @@ public class Game {
 
     public void teleportStart() {
         setState(TELEPORT_START);
-        this.teleportToMapPhase.beginphase(); //TODO Temporary until it can be fully implemented
+        this.teleportToMapPhase.beginphase();
     }
 
     public void assignStartingTeams() {
         setState(ASSIGN_TEAMS);
-        this.assignTeamsPhase.beginphase(); //TODO Temporary until it can be fully implemented
+        this.assignTeamsPhase.beginphase();
     }
 
     public void setup() {
         setState(SETTING_UP);
-        this.setupPhase.beginphase(); //TODO Temporary until it can be fully fully implemented
+        this.setupPhase.beginphase();
     }
 
     public void handleError(String message) {
@@ -397,34 +399,9 @@ public class Game {
 
     public void startWarmup() {
         setState(WARMUP);
-        this.timer = plugin.getClockManager().createTimer(TimeUnit.SECONDS.toMillis(settings.getWarmupLength()) + 50L);
-        this.timer.setEndCondition(new WarmupEndCondition(this));
-        this.timer.addRepeatingCallback(new GameSecondsCallback(this, "&6&l>> &eThe game begins in &b{time}&e."), TimeUnit.SECONDS, 1);
-        this.timer.addCallback(timerSnapshot -> {
-            if (getSettings().isSounds()) {
-                playSound(Sound.WOLF_HOWL);
-            }
-            sendMessage("&5&l/ / / / / / &d&lTHE NEXUS REBORN &5&l/ / / / / /");
-            sendMessage("&6&lSurvival Games &7&oFree-for-all Deathmatch &8- &3Classic Mode");
-            sendMessage("&8- &7Loot chests scattered around the map for gear.");
-            sendMessage("&8- &7Outlast the other tributes and be the last one standing!");
-            sendMessage("&8- &7Arena deathmatch begins after &e" + getSettings().getGameLength() + " minutes&7.");
-            sendMessage("");
-            StringBuilder creatorBuilder = new StringBuilder();
-            for (String creator : getGameMap().getCreators()) {
-                creatorBuilder.append("&e").append(creator).append("&7, ");
-            }
-
-            if (creatorBuilder.length() < 2) {
-                creatorBuilder.append("&eNot Configured, ");
-            }
-
-            sendMessage("&d&l>> &7Playing on &a" + getGameMap().getName() + " &7created by " + creatorBuilder.substring(0, creatorBuilder.length() - 2));
-            if (getSettings().isGracePeriod()) {
-                sendMessage("&d&l>> &7There is a &e" + getSettings().getGracePeriodLength() + " second &7grace period.");
-            }
-        }, TimeUnit.SECONDS.toMillis(settings.getWarmupLength()) / 2);
-        this.timer.start();
+        this.warmupPhase.prephase();
+        this.warmupPhase.beginphase();
+        this.timer = this.warmupPhase.getTimer();
     }
 
     public void startGame() {
@@ -449,10 +426,10 @@ public class Game {
             restockChests();
             sendMessage("&6&l>> &a&lALL CHESTS HAVE BEEN RESTOCKED");
         }, TimeUnit.MINUTES, restockLength);
-        
+
         this.timer.setEndCondition(new InGameEndCondition(this));
         this.timer.start();
-        
+
         this.start = System.currentTimeMillis();
         if (this.settings.isGracePeriod()) {
             this.graceperiodTimer = plugin.getClockManager().createTimer(TimeUnit.SECONDS.toMillis(settings.getGracePeriodLength()) + 50L);
@@ -552,7 +529,7 @@ public class Game {
                 Bukkit.getPlayer(player.getUniqueId()).addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 0));
             }
         }
-        
+
         this.timer = plugin.getClockManager().createTimer(TimeUnit.SECONDS.toMillis(settings.getDeathmatchWarmupLength()) + 50L);
         this.timer.addRepeatingCallback(new GameSecondsCallback(this, "&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b{time}&e."), TimeUnit.SECONDS, 1);
         this.timer.setEndCondition(new DMWarmupEndCondition(this));
@@ -578,7 +555,7 @@ public class Game {
         restockChests();
 
         this.gameMap.applyWorldBoarder("deathmatch", settings.getDeathmatchLength() * 60);
-        
+
         this.timer = plugin.getClockManager().createTimer(TimeUnit.MINUTES.toMillis(settings.getDeathmatchLength()) + 50L);
         this.timer.addRepeatingCallback(new GameMinutesCallback(this, "&6&l>> &c&lGAME &eends &ein &b{time}&e."), TimeUnit.MINUTES, 1);
         this.timer.addRepeatingCallback(new GameSecondsCallback(this, "&6&l>> &c&lGAME &eends &ein &b{time}&e."), TimeUnit.SECONDS, 1);
@@ -603,7 +580,7 @@ public class Game {
             graceperiodTimer.cancel();
             this.graceperiodTimer = null;
         }
-        
+
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (!this.players.containsKey(player.getUniqueId())) {
                 continue;
@@ -769,7 +746,7 @@ public class Game {
                     NexusAPI.getApi().getPrimaryDatabase().queue(gamePlayer.getBalance());
                     NexusAPI.getApi().getPrimaryDatabase().queue(gamePlayer.getNexusPlayer().getExperience());
                 }
-                
+
                 NexusAPI.getApi().getPrimaryDatabase().flush();
             }
         });
@@ -1324,12 +1301,12 @@ public class Game {
     public Map<GameTeam, GameTeamChatroom> getChatRooms() {
         return chatRooms;
     }
-    
+
     public boolean willRestockChests() {
         if (this.getState() != INGAME) {
             return false;
         }
-        
+
         if (this.restockCallbackId == null) {
             return false;
         }
@@ -1341,17 +1318,17 @@ public class Game {
         if (this.getState() != INGAME) {
             return 0;
         }
-        
+
         if (this.restockCallbackId == null) {
             return 0;
         }
-        
+
         long nextRun = this.timer.getNextRun(this.restockCallbackId);
-        
+
         if (nextRun < 0) {
             return 0;
         }
-        
+
         return timer.getTime() - nextRun;
     }
 

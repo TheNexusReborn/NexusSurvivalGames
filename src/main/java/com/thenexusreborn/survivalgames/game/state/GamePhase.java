@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames.game.state;
 
+import com.stardevllc.starclock.clocks.Timer;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GameState;
@@ -45,7 +46,7 @@ public abstract class GamePhase {
         return status;
     }
 
-    protected void setStatus(PhaseStatus status) {
+    public void setStatus(PhaseStatus status) {
         this.completedStatuses.put(this.status, System.currentTimeMillis());
         this.status = status;
     }
@@ -61,6 +62,18 @@ public abstract class GamePhase {
         }
         
         return false;
+    }
+
+    public Game getGame() {
+        return game;
+    }
+
+    public String getName() {
+        return name;
+    }
+    
+    public Timer getTimer() {
+        return null;
     }
 
     @Override
