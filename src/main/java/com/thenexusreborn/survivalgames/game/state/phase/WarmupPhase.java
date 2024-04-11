@@ -58,6 +58,7 @@ public class WarmupPhase extends GamePhase {
 
     @Override
     public boolean run() {
+        setStatus(PhaseStatus.STARTING);
         this.timer.start();
         return true;
     }
