@@ -18,7 +18,7 @@ public class WarmupPhase extends GamePhase {
     }
 
     @Override
-    public void prephase() {
+    public boolean setup() {
         this.timer = Game.getPlugin().getClockManager().createTimer(TimeUnit.SECONDS.toMillis(game.getSettings().getWarmupLength()) + 50L);
         this.timer.setEndCondition(new WarmupEndCondition(this));
         this.timer.addRepeatingCallback(new GameSecondsCallback(game, "&6&l>> &eThe game begins in &b{time}&e."), TimeUnit.SECONDS, 1);
@@ -53,11 +53,13 @@ public class WarmupPhase extends GamePhase {
             }
             setStatus(Status.SENT_GAME_INFO);
         }, TimeUnit.SECONDS.toMillis(game.getSettings().getWarmupLength()) / 2);
+        return true;
     }
 
     @Override
-    public void beginphase() {
+    public boolean run() {
         this.timer.start();
+        return true;
     }
 
     @Override

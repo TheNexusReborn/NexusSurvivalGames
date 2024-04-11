@@ -95,7 +95,7 @@ public class SGCommand implements CommandExecutor {
                     controlType = ControlType.valueOf(gameSubCommand.toUpperCase());
                 } catch (Exception e) {
                     if (gameSubCommand.equals("auto")) {
-                        controlType = ControlType.AUTOMATIC;
+                        controlType = ControlType.AUTO;
                     } else if (gameSubCommand.equals("man")) {
                         controlType = ControlType.MANUAL;
                     }
@@ -309,7 +309,7 @@ public class SGCommand implements CommandExecutor {
                     sender.sendMessage(ColorUtils.color(MsgType.INFO + "You set the map to " + MsgType.INFO.getVariableColor() + gameMap.getName()));
                 }
                 case "automatic", "auto" -> {
-                    if (lobby.getControlType() == ControlType.AUTOMATIC) {
+                    if (lobby.getControlType() == ControlType.AUTO) {
                         sender.sendMessage(ColorUtils.color(MsgType.WARN + "The lobby is already in automatic control."));
                         return true;
                     }

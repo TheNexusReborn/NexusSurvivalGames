@@ -57,7 +57,7 @@ import java.util.zip.ZipInputStream;
 public class Lobby {
     private final SurvivalGames plugin;
     private final SGVirtualServer server;
-    private ControlType controlType = ControlType.AUTOMATIC;
+    private ControlType controlType = ControlType.AUTO;
     private LobbyState state = LobbyState.WAITING;
     private ChatRoom lobbyChatRoom;
     private Timer timer;
@@ -356,7 +356,7 @@ public class Lobby {
     }
 
     public void automatic() {
-        this.controlType = ControlType.AUTOMATIC;
+        this.controlType = ControlType.AUTO;
     }
 
     public void manual() {
@@ -458,7 +458,7 @@ public class Lobby {
         Game game = new Game(server, gameMap, this.gameSettings, getPlayers());
         this.players.clear();
         server.setGame(game);
-        if (game.getControlType() == ControlType.AUTOMATIC) {
+        if (game.getControlType() == ControlType.AUTO) {
             this.state = LobbyState.STARTING;
             game.setup();
             resetLobby();

@@ -36,7 +36,7 @@ public class SGCallbackEndCondition implements ClockEndCondition<TimerSnapshot> 
             if (!validStates.contains(game.getState())) {
                 return true;
             }
-            if (game.getControlType() == ControlType.AUTOMATIC) {
+            if (game.getControlType() == ControlType.AUTO) {
                 autoMethod.accept(game);
                 return true;
             } else {

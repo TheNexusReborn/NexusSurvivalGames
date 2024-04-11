@@ -1,10 +1,10 @@
-package com.thenexusreborn.survivalgames.game.state.phase;
+package com.thenexusreborn.survivalgames.game.state.phase.setupplayers;
 
-import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.game.state.GamePhase;
-import com.thenexusreborn.survivalgames.game.state.PhaseStatus;
+import com.thenexusreborn.survivalgames.game.state.GamePhaseStep;
+import com.thenexusreborn.survivalgames.game.state.StepStatus;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Monster;
@@ -13,19 +13,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static com.thenexusreborn.survivalgames.game.OldGameState.TELEPORT_START_DONE;
-
-public class TeleportToMapPhase extends GamePhase {
-    public TeleportToMapPhase(Game game) {
-        super(game, "teleport_to_map");
+public class TeleportToMapStep extends GamePhaseStep {
+    public TeleportToMapStep(GamePhase gamePhase, GamePhaseStep... prerequisiteSteps) {
+        super(gamePhase, "teleport_to_map", prerequisiteSteps);
     }
 
     @Override
-    public void beginphase() {
+    public boolean run() {
         try {
-            setStatus(Status.RESETTING_SPAWNS);
+            setStatus(StepStatus.STARTING);
             game.resetSpawns();
-            setStatus(Status.RESETTING_PLAYERS);
             List<UUID> tributes = new ArrayList<>(), spectators = new ArrayList<>();
             for (GamePlayer player : game.getPlayers().values()) {
                 player.clearInventory();
@@ -40,30 +37,22 @@ public class TeleportToMapPhase extends GamePhase {
                     player.giveSpectatorItems(game);
                 }
             }
-            
+
             Location mapSpawn = game.getGameMap().getCenter().toLocation(game.getGameMap().getWorld());
-            setStatus(Status.TELEPORTING_TRIBUTES);
             game.teleportTributes(tributes, mapSpawn);
-            setStatus(Status.TELEPORTING_SPECTATORS);
             game.teleportSpectators(spectators, mapSpawn);
-            setStatus(Status.REMOVING_MONSTERS);
             for (Entity entity : game.getGameMap().getWorld().getEntities()) {
                 if (entity instanceof Monster) {
                     entity.remove();
                 }
             }
-
-            setStatus(Status.RECALCULATING_VISIBILITY);
-            setStatus(PhaseStatus.COMPLETE);
-            game.setState(TELEPORT_START_DONE);
+            setStatus(StepStatus.COMPLETE);
         } catch (Exception e) {
+            setStatus(StepStatus.ERROR);
             e.printStackTrace();
-            game.handleError("There was an error teleporting players to their starting positions.");
         }
-    }
-    
-    public enum Status implements PhaseStatus {
-        RESETTING_SPAWNS, TELEPORTING_TRIBUTES, TELEPORTING_SPECTATORS, REMOVING_MONSTERS, RECALCULATING_VISIBILITY, RESETTING_PLAYERS
-
+        
+        setStatus(StepStatus.COMPLETE);
+        return true;
     }
 }

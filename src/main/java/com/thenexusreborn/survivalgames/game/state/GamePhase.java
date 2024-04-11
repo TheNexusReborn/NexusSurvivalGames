@@ -8,12 +8,16 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 public abstract class GamePhase {
     protected Game game;
     protected String name;
     protected PhaseStatus status = PhaseStatus.STARTING;
+    protected int currentStepIndex = 0;
+    protected List<GamePhaseStep> steps = new LinkedList<>();
     
     //A status is only considered completed when it is replaced by a new status. The setStatus method handles this automatically.
     protected Map<PhaseStatus, Long> completedStatuses = new HashMap<>();
@@ -22,24 +26,57 @@ public abstract class GamePhase {
         this.game = game;
         this.name = name;
     }
-
-    /**
-     * Called before the phase begins to check and/or setup the necessary things needed for the phase
-     */
-    public void prephase() {
+    
+    public boolean step() {
+        if (currentStepIndex >= steps.size()) {
+            setStatus(PhaseStatus.COMPLETE); //At the end of the steps, phase complete
+            return false;
+        }
         
+        GamePhaseStep step = steps.get(currentStepIndex); //This should never be null due to the check above.
+        if (!step.requirementsMet()) { //Requirements not met for the step
+            if (!step.tryMeetRequirements()) { //tells the step to try to make it so that requirements are met
+                return false; //Could not make requirements meet, step failed to start.
+            }
+        }
+
+        if (!step.setup()) {
+            return false; //Step failed to setup
+        }
+
+        if (!step.run()) {
+            return false; //Step failed to run
+        }
+
+        if (!step.cleanup()) {
+            return false; //Step failed to cleanup
+        }
+        
+        currentStepIndex++; //Success
+        return true;
     }
-
-    /**
-     * The main function of phase, this is where the the processing of the phase is started and the status is updated here.
-     */
-    public abstract void beginphase();
-
-    /**
-     * 
-     */
-    public void postphase() {
+    
+    public boolean requirementsMet() {
+        return true;
+    }
+    
+    public boolean setup() {
+        return true;
+    }
+    
+    public boolean run() {
+        for (int i = 0; i < steps.size(); i++) {
+            boolean stepSuccess = step();
+            if (!stepSuccess) {
+                return false;
+            }
+        }
         
+        return true;
+    }
+    
+    public boolean cleanup() {
+        return true;
     }
 
     public PhaseStatus getStatus() {
@@ -51,7 +88,7 @@ public abstract class GamePhase {
         this.status = status;
     }
     
-    protected boolean checkPlayerCount() {
+    public boolean checkPlayerCount() {
         if (game.getPlayers().size() <= 1) {
             game.setState(OldGameState.ENDING);
             game.getServer().getLobby().fromGame(game);
@@ -66,7 +103,21 @@ public abstract class GamePhase {
     
     //Can be overridden to have custom logic if needed.
     public boolean isComplete() {
-        return this.status == PhaseStatus.COMPLETE;
+        for (GamePhaseStep step : this.steps) {
+            if (!step.isCompleted()) {
+                return false;
+            }
+        }
+        
+        if (this.status == null) {
+            return false;
+        }
+        
+        return this.status.equals(PhaseStatus.COMPLETE);
+    }
+
+    public boolean tryMeetRequirements() {
+        return true;
     }
 
     public Game getGame() {
@@ -80,12 +131,18 @@ public abstract class GamePhase {
     public Timer getTimer() {
         return null;
     }
+    
+    public <T extends GamePhaseStep> T addStep(T step) {
+        this.steps.add(step);
+        return step;
+    }
 
     @Override
     public String toString() {
         return "GamePhase{" +
-                "name='" + name + '\'' +
-                ", status=" + status.toString() +
+                ", name='" + name + '\'' +
+                ", status=" + status +
+                ", completedStatuses=" + completedStatuses +
                 '}';
     }
 }

@@ -24,7 +24,7 @@ public class GameStateThread extends NexusThread<SurvivalGames> {
                 continue;
             }
 
-            if (game.getGameState().progress()) {
+            if (game.getGameState().step()) {
                 continue; //Progresses the game based on currently implemented states. Otherwise, default to the old state system.
             }
 

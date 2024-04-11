@@ -34,9 +34,8 @@ import com.thenexusreborn.survivalgames.game.death.DeathType;
 import com.thenexusreborn.survivalgames.game.death.KillerInfo;
 import com.thenexusreborn.survivalgames.game.state.GamePhase;
 import com.thenexusreborn.survivalgames.game.state.GameState;
-import com.thenexusreborn.survivalgames.game.state.phase.AssignTeamsPhase;
-import com.thenexusreborn.survivalgames.game.state.phase.SetupPhase;
-import com.thenexusreborn.survivalgames.game.state.phase.TeleportToMapPhase;
+import com.thenexusreborn.survivalgames.game.state.phase.GameSetupPhase;
+import com.thenexusreborn.survivalgames.game.state.phase.SetupPlayersPhase;
 import com.thenexusreborn.survivalgames.game.state.phase.WarmupPhase;
 import com.thenexusreborn.survivalgames.game.timer.callbacks.GameMinutesCallback;
 import com.thenexusreborn.survivalgames.game.timer.callbacks.GameSecondsCallback;
@@ -82,7 +81,7 @@ public class Game {
 
     private final SGMap gameMap;
     private final SGVirtualServer server;
-    private ControlType controlType = ControlType.AUTOMATIC;
+    private ControlType controlType = ControlType.AUTO;
     private final GameSettings settings;
     private final Map<UUID, GamePlayer> players = new HashMap<>();
     private final Map<Integer, UUID> spawns = new HashMap<>();
@@ -147,9 +146,8 @@ public class Game {
         gameInfo.setPlayerCount(tributeCount);
         gameInfo.setPlayers(playerNames.toArray(new String[0]));
 
-        this.setupPhase = new SetupPhase(this);
-        this.assignTeamsPhase = new AssignTeamsPhase(this);
-        this.teleportToMapPhase = new TeleportToMapPhase(this);
+        this.setupPhase = new GameSetupPhase(this);
+        this.assignTeamsPhase = new SetupPlayersPhase(this);
         this.warmupPhase = new WarmupPhase(this);
     }
     
@@ -386,17 +384,17 @@ public class Game {
 
     public void teleportStart() {
         setState(TELEPORT_START);
-        this.teleportToMapPhase.beginphase();
+        this.teleportToMapPhase.run();
     }
 
     public void assignStartingTeams() {
         setState(ASSIGN_TEAMS);
-        this.assignTeamsPhase.beginphase();
+        this.assignTeamsPhase.run();
     }
 
     public void setup() {
         setState(SETTING_UP);
-        this.setupPhase.beginphase();
+        this.setupPhase.run();
     }
 
     public void handleError(String message) {
@@ -416,8 +414,8 @@ public class Game {
 
     public void startWarmup() {
         setState(WARMUP);
-        this.warmupPhase.prephase();
-        this.warmupPhase.beginphase();
+        this.warmupPhase.setup();
+        this.warmupPhase.run();
         this.timer = this.warmupPhase.getTimer();
     }
 
@@ -776,7 +774,7 @@ public class Game {
                     if (getState() != ENDING) {
                         return true;
                     }
-                    if (getControlType() == ControlType.AUTOMATIC) {
+                    if (getControlType() == ControlType.AUTO) {
                         nextGame();
                     } else {
                         sendMessage("&eThe next game timer has concluded, but the mode is not automatic. Skipped automatically performing next game tasks.");
@@ -1011,7 +1009,7 @@ public class Game {
         if (totalTributes <= settings.getDeathmatchThreshold()) {
             if (state == INGAME) {
                 if (totalTributes > 1) {
-                    if (controlType == ControlType.AUTOMATIC) {
+                    if (controlType == ControlType.AUTO) {
                         this.startDeathmatchTimer();
                     } else {
                         sendMessage("&eTribute count reached or went below the deathmatch threashold, but was not automatically started due to being in manual mode.");
