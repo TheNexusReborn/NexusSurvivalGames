@@ -5,7 +5,6 @@ import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.starclock.clocks.Timer;
-import com.stardevllc.starcore.utils.item.ItemBuilder;
 import com.stardevllc.starlib.time.TimeUnit;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
@@ -16,6 +15,7 @@ import com.thenexusreborn.gamemaps.model.MapRating;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.scoreboard.impl.RankTablistHandler;
 import com.thenexusreborn.nexuscore.util.MsgType;
+import com.thenexusreborn.nexuscore.util.item.ItemBuilder;
 import com.thenexusreborn.survivalgames.ControlType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -72,16 +72,16 @@ public class Lobby {
     private final List<StatSign> statSigns = new ArrayList<>();
     private final List<TributeSign> tributeSigns = new ArrayList<>();
     private boolean debugMode;
-    
+
     private World world;
-    
+
     private File file;
     private FileConfiguration config;
 
     public Lobby(SurvivalGames plugin, SGVirtualServer server, LobbyType type) {
         this.plugin = plugin;
         this.server = server;
-        
+
         this.file = new File(plugin.getDataFolder() + File.separator + "lobby" + File.separator + type.name().toLowerCase() + ".yml");
         if (!file.exists()) {
             file.mkdirs();
@@ -94,7 +94,7 @@ public class Lobby {
 
         config = YamlConfiguration.loadConfiguration(file);
     }
-    
+
     public void setup() {
         if (this.getConfig().contains("zipfile")) {
             File zipFile = new File(this.getConfig().getString("zipfile"));
@@ -105,7 +105,7 @@ public class Lobby {
             try {
                 ZipInputStream zis = new ZipInputStream(Files.newInputStream(zipFile.toPath()));
 
-                for(ZipEntry zipEntry = zis.getNextEntry(); zipEntry != null; zipEntry = zis.getNextEntry()) {
+                for (ZipEntry zipEntry = zis.getNextEntry(); zipEntry != null; zipEntry = zis.getNextEntry()) {
                     Path newFile = this.newFile(destination, zipEntry);
                     if (zipEntry.isDirectory()) {
                         FileHelper.createDirectoryIfNotExists(newFile);
@@ -121,7 +121,7 @@ public class Lobby {
                         FileOutputStream fos = new FileOutputStream(newFile.toFile());
 
                         int len;
-                        while((len = zis.read(buffer)) > 0) {
+                        while ((len = zis.read(buffer)) > 0) {
                             fos.write(buffer, 0, len);
                         }
 
@@ -135,10 +135,10 @@ public class Lobby {
                 e.printStackTrace();
                 return;
             }
-            
+
             this.world = Bukkit.createWorld(new WorldCreator(getServer().getName() + "-Lobby").environment(World.Environment.NORMAL));
         }
-        
+
         if (this.getConfig().contains("spawnpoint")) {
             int x = Integer.parseInt(this.getConfig().getString("spawnpoint.x"));
             int y = Integer.parseInt(this.getConfig().getString("spawnpoint.y"));
@@ -197,7 +197,7 @@ public class Lobby {
 
         this.lobbySettings = plugin.getLobbySettings("default");
         this.gameSettings = plugin.getGameSettings("default");
-    
+
         this.lobbyChatRoom = new LobbyChatRoom(this);
         plugin.getStarChat().getRoomRegistry().register(this.lobbyChatRoom.getName(), this.lobbyChatRoom);
 
@@ -444,7 +444,7 @@ public class Lobby {
             for (MapRating playerRating : gameMap.getRatings().values()) {
                 rating += playerRating.getRating();
             }
-            
+
             double ratingRatio = rating * 1.0 / totalRatings;
             int ratingPercent = (int) (ratingRatio * 100);
 
@@ -460,10 +460,9 @@ public class Lobby {
         server.setGame(game);
         if (game.getControlType() == ControlType.AUTO) {
             this.state = LobbyState.STARTING;
-            game.setup();
             resetLobby();
         } else {
-            sendMessage("&eThe game has been prepared and is now ready, however, it has not been started due to the game being in manual mode.");
+            sendMessage("&eThe game has been prepared and is now ready, however, it has not been started due to not being in auto mode.");
             this.state = LobbyState.GAME_PREPARED;
         }
     }
@@ -610,9 +609,9 @@ public class Lobby {
         if (!this.players.containsKey(nexusPlayer.getUniqueId())) {
             return;
         }
-        
+
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId());
-        
+
         this.lobbyChatRoom.removeMember(nexusPlayer.getUniqueId());
         sgPlayer.setLobby(null, null);
         this.players.remove(nexusPlayer.getUniqueId());
@@ -838,7 +837,7 @@ public class Lobby {
                     playerCount++;
                 }
             }
-            
+
             this.timer.setLengthAndReset(TimeUnit.SECONDS.toMillis(settings.getTimerLength()));
 
             if (playerCount < this.lobbySettings.getMinPlayers()) {
