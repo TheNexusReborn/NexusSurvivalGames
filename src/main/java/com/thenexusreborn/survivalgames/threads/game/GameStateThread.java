@@ -4,7 +4,6 @@ import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.ControlType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
-import com.thenexusreborn.survivalgames.game.OldGameState;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 
 public class GameStateThread extends NexusThread<SurvivalGames> {
@@ -20,26 +19,20 @@ public class GameStateThread extends NexusThread<SurvivalGames> {
                 continue;
             }
             
-            if (game.getControlType() == ControlType.MANUAL) {
+            if (game.getControlType() != ControlType.AUTO) {
                 continue;
             }
-
-            if (game.getGameState().step()) {
-                continue; //Progresses the game based on currently implemented states. Otherwise, default to the old state system.
-            }
-
-            if (game.getState() == OldGameState.WARMUP_DONE) {
-                game.startGame();
-            } else if (game.getState() == OldGameState.INGAME_DONE) {
-                game.teleportDeathmatch();
-            } else if (game.getState() == OldGameState.TELEPORT_DEATHMATCH_DONE) {
-                game.teleportDeathmatch();
-            } else if (game.getState() == OldGameState.DEATHMATCH_WARMUP_DONE) {
-                game.startDeathmatch();
-            } else if (game.getState() == OldGameState.GAME_COMPLETE) {
-                game.end();
-            } else if (game.getState() == OldGameState.NEXT_GAME_READY) {
-                game.nextGame();
+            
+            switch (game.getState()) {
+                case SETUP_COMPLETE -> game.assignStartingTeams();
+                case TEAMS_ASSIGNED -> game.teleportStart();
+                case TELEPORT_START_DONE -> game.startWarmup();
+                case WARMUP_DONE -> game.startGame();
+                case TELEPORT_DEATHMATCH_DONE -> game.startDeathmatchWarmup();
+                case DEATHMATCH_WARMUP_DONE -> game.startDeathmatch();
+                case GAME_COMPLETE -> game.end();
+                case NEXT_GAME_READY -> game.nextGame();
+                default -> {}
             }
         }
     }

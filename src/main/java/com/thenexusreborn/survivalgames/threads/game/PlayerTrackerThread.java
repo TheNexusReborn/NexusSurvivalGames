@@ -30,7 +30,7 @@ public class PlayerTrackerThread extends NexusThread<SurvivalGames> {
                 continue;
             }
 
-            if (!(game.getState().ordinal() >= OldGameState.INGAME.ordinal() && game.getState().ordinal() <= OldGameState.DEATHMATCH.ordinal())) {
+            if (!(game.getState().ordinal() >= GameState.INGAME.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal())) {
                 continue;
             }
 

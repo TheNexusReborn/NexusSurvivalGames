@@ -4,7 +4,7 @@ import com.stardevllc.starclock.condition.ClockEndCondition;
 import com.stardevllc.starclock.snapshot.TimerSnapshot;
 import com.thenexusreborn.survivalgames.ControlType;
 import com.thenexusreborn.survivalgames.game.Game;
-import com.thenexusreborn.survivalgames.game.OldGameState;
+import com.thenexusreborn.survivalgames.game.GameState;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -14,11 +14,11 @@ import java.util.function.Consumer;
 public class SGCallbackEndCondition implements ClockEndCondition<TimerSnapshot> {
 
     private Game game;
-    private Set<OldGameState> validStates = new HashSet<>();
+    private Set<GameState> validStates = new HashSet<>();
     private Consumer<Game> autoMethod, manualMethod;
     private String timerType, action;
 
-    public SGCallbackEndCondition(Game game, Consumer<Game> autoMethod, Consumer<Game> manualMethod, String timerType, String action, OldGameState state, OldGameState... states) {
+    public SGCallbackEndCondition(Game game, Consumer<Game> autoMethod, Consumer<Game> manualMethod, String timerType, String action, GameState state, GameState... states) {
         this.game = game;
         this.autoMethod = autoMethod;
         this.manualMethod = manualMethod;

@@ -4,6 +4,7 @@ import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.starclock.clocks.Timer;
+import com.stardevllc.starcore.utils.Cuboid;
 import com.stardevllc.starcore.utils.color.ColorUtils;
 import com.stardevllc.starlib.registry.StringRegistry;
 import com.stardevllc.starlib.time.TimeFormat;
@@ -32,11 +33,6 @@ import com.thenexusreborn.survivalgames.game.Bounty.Type;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.game.death.DeathType;
 import com.thenexusreborn.survivalgames.game.death.KillerInfo;
-import com.thenexusreborn.survivalgames.game.state.GamePhase;
-import com.thenexusreborn.survivalgames.game.state.GameState;
-import com.thenexusreborn.survivalgames.game.state.phase.GameSetupPhase;
-import com.thenexusreborn.survivalgames.game.state.phase.SetupPlayersPhase;
-import com.thenexusreborn.survivalgames.game.state.phase.WarmupPhase;
 import com.thenexusreborn.survivalgames.game.timer.callbacks.GameMinutesCallback;
 import com.thenexusreborn.survivalgames.game.timer.callbacks.GameSecondsCallback;
 import com.thenexusreborn.survivalgames.game.timer.endconditions.*;
@@ -52,14 +48,9 @@ import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.sponsoring.SponsorManager;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
@@ -70,7 +61,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
 
-import static com.thenexusreborn.survivalgames.game.OldGameState.*;
+import static com.thenexusreborn.survivalgames.game.GameState.*;
 
 @SuppressWarnings({"unused"})
 public class Game {
@@ -87,8 +78,7 @@ public class Game {
     private final Map<Integer, UUID> spawns = new HashMap<>();
     private final ChatRoom gameChatroom;
     private final Map<GameTeam, GameTeamChatroom> chatRooms = new HashMap<>();
-    private OldGameState state = UNDEFINED;
-    private final GameState gameState;
+    private GameState state = UNDEFINED;
     private Timer timer, graceperiodTimer;
     private final List<Location> lootedChests = new ArrayList<>();
     private final GameInfo gameInfo;
@@ -100,8 +90,6 @@ public class Game {
     private boolean debugMode; //Debug Mode. This may be replaced with a class with other settings
     private Graceperiod graceperiod = Graceperiod.INACTIVE;
 
-    private GamePhase setupPhase, assignTeamsPhase, teleportToMapPhase, warmupPhase;
-
     private UUID restockCallbackId;
     private int timedRestockCount;
 
@@ -110,7 +98,6 @@ public class Game {
         this.server = server;
         this.settings = settings;
         this.gameInfo = new GameInfo();
-        this.gameState = new GameState(this);
 
         this.gameChatroom = new GameChatRoom(this);
         plugin.getStarChat().getRoomRegistry().register(gameChatroom.getName(), gameChatroom);
@@ -145,45 +132,15 @@ public class Game {
         }
         gameInfo.setPlayerCount(tributeCount);
         gameInfo.setPlayers(playerNames.toArray(new String[0]));
-
-        this.setupPhase = new GameSetupPhase(this);
-        this.assignTeamsPhase = new SetupPlayersPhase(this);
-        this.warmupPhase = new WarmupPhase(this);
     }
     
-    public GamePhase determineNextPhase(GamePhase currentPhase) {
-        return switch (currentPhase.getName()) {
-            case "setup" -> assignTeamsPhase;
-            case "assign_starting_teams" -> teleportToMapPhase;
-            case "teleport_to_map" -> warmupPhase;
-            //TODO Add more phases here as they are implemented
-            default -> null;
-        };
-    }
-
-    public GameState getGameState() {
-        return gameState;
-    }
-
     public SGVirtualServer getServer() {
         return server;
     }
 
-    public void setState(OldGameState state) {
+    public void setState(GameState state) {
         this.state = state;
         this.gameInfo.getActions().add(new GameAction(System.currentTimeMillis(), "statechange", state.name()));
-    }
-
-    public GamePhase getSetupPhase() {
-        return setupPhase;
-    }
-
-    public GamePhase getAssignTeamsPhase() {
-        return assignTeamsPhase;
-    }
-
-    public GamePhase getTeleportToMapPhase() {
-        return teleportToMapPhase;
     }
 
     public void handleShutdown() {
@@ -282,7 +239,7 @@ public class Game {
         GamePlayer gamePlayer = this.players.get(nexusPlayer.getUniqueId());
         this.chatRooms.get(gamePlayer.getTeam()).removeMember(gamePlayer.getUniqueId());
         this.gameChatroom.removeMember(gamePlayer.getUniqueId());
-        EnumSet<OldGameState> ignoreStates = EnumSet.of(UNDEFINED, SETTING_UP, SETUP_COMPLETE, ASSIGN_TEAMS, TEAMS_ASSIGNED, TELEPORT_START, TELEPORT_START_DONE, ERROR, ENDING, ENDED);
+        EnumSet<GameState> ignoreStates = EnumSet.of(UNDEFINED, SETTING_UP, SETUP_COMPLETE, ASSIGN_TEAMS, TEAMS_ASSIGNED, TELEPORT_START, TELEPORT_START_DONE, ERROR, ENDING, ENDED);
         if (!ignoreStates.contains(this.state)) {
             if (gamePlayer.getTeam() == GameTeam.TRIBUTES || gamePlayer.getTeam() == GameTeam.MUTATIONS) {
                 killPlayer(gamePlayer, new DeathInfo(this, System.currentTimeMillis(), gamePlayer, DeathType.SUICIDE));
@@ -343,10 +300,6 @@ public class Game {
         }
     }
 
-    public void ingameComplete() {
-        setState(OldGameState.INGAME_DONE);
-    }
-
     private void teleportToGameSpawn(Player player, Location spawn, GameTeam gameTeam) {
         player.teleport(spawn);
         Bukkit.getScheduler().runTaskLater(plugin, () -> player.setGameMode(gameTeam.getGameMode()), 1L);
@@ -384,17 +337,109 @@ public class Game {
 
     public void teleportStart() {
         setState(TELEPORT_START);
-        this.teleportToMapPhase.run();
+        resetSpawns();
+        List<UUID> tributes = new ArrayList<>(), spectators = new ArrayList<>();
+        for (GamePlayer player : getPlayers().values()) {
+            player.clearInventory();
+            player.clearPotionEffects();
+            player.setFood(20, getSettings().getStartingSaturation());
+            if (player.getTeam() == GameTeam.TRIBUTES) {
+                tributes.add(player.getUniqueId());
+                player.setFlight(false, false);
+            } else if (player.getTeam() == GameTeam.SPECTATORS) {
+                spectators.add(player.getUniqueId());
+                player.setFlight(true, true);
+                player.giveSpectatorItems(this);
+            }
+        }
+
+        Location mapSpawn = getGameMap().getCenter().toLocation(getGameMap().getWorld());
+        teleportTributes(tributes, mapSpawn);
+        teleportSpectators(spectators, mapSpawn);
+        for (Entity entity : getGameMap().getWorld().getEntities()) {
+            if (entity instanceof Monster) {
+                entity.remove();
+            }
+        }
     }
 
     public void assignStartingTeams() {
         setState(ASSIGN_TEAMS);
-        this.assignTeamsPhase.run();
+        //TODO Add a secondary check for total games played as well
+        SortedSet<GamePlayer> players = new TreeSet<>((player, other) -> {
+            SGPlayer sgPlayer = SurvivalGames.getInstance().getPlayerRegistry().get(player.getUniqueId());
+            SGPlayer otherPlayer = SurvivalGames.getInstance().getPlayerRegistry().get(other.getUniqueId());
+            return Long.compare(otherPlayer.getJoinTime(), sgPlayer.getJoinTime());
+        });
+
+        players.addAll(getPlayers().values());
+
+        List<UUID> tributes = new LinkedList<>();
+        for (GamePlayer player : players) {
+            if (player.getTeam() == null) {
+                if (tributes.size() >= getGameMap().getSpawns().size()) {
+                    player.setTeam(GameTeam.SPECTATORS);
+                } else {
+                    player.setTeam(GameTeam.TRIBUTES);
+                    tributes.add(player.getUniqueId());
+                }
+            }
+        }
     }
 
     public void setup() {
         setState(SETTING_UP);
-        this.setupPhase.run();
+        if (!getGameMap().download(Game.getPlugin())) {
+            handleError("Could not download map");
+            return;
+        }
+
+        if (!getGameMap().unzip(Game.getPlugin())) {
+            handleError("Could not unzip map");
+            return;
+        }
+
+        if (!getGameMap().copyFolder(Game.getPlugin(), getServer().getName() + "-", false)) {
+            handleError("Could not copy map folder");
+            return;
+        }
+
+        if (!getGameMap().load(Game.getPlugin())) {
+            handleError("Could not load map");
+            return;
+        }
+
+        int radius = gameMap.getDeathmatchBorderDistance();
+        Location center = gameMap.getCenter().toLocation(gameMap.getWorld());
+        Location corner1 = center.clone();
+        corner1.add(radius, radius, radius);
+        Location corner2 = center.clone();
+        corner2.subtract(radius, radius, radius);
+        gameMap.setDeathmatchArea(new Cuboid(corner1, corner2));
+
+        try {
+            for (int i = 0; i < getGameMap().getSpawns().size(); i++) {
+                setSpawn(i, null);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            handleError("Could not setup the spawns.");
+            return;
+        }
+
+        try {
+            gameMap.getWorld().setGameRuleValue("naturalRegeneration", "" + settings.isRegeneration());
+            gameMap.getWorld().setGameRuleValue("doDaylightCycle", "" + settings.isTimeProgression());
+            gameMap.getWorld().setGameRuleValue("doWeatherCycle", "" + settings.isWeatherProgression());
+            gameMap.getWorld().setGameRuleValue("doMobSpawning", "false");
+            gameMap.getWorld().setGameRuleValue("announceAdvancements", "false");
+            gameMap.getWorld().setGameRuleValue("doFireTick", "false");
+            gameMap.getWorld().setGameRuleValue("keepInventory", "false");
+            gameMap.getWorld().setDifficulty(Difficulty.EASY);
+        } catch (Exception e) {
+            e.printStackTrace();
+            handleError("Could not setup the world settings..");
+        }
     }
 
     public void handleError(String message) {
@@ -408,15 +453,40 @@ public class Game {
         this.gameChatroom.sendMessage(new ChatContext(message));
     }
 
-    public OldGameState getState() {
+    public GameState getState() {
         return state;
     }
 
     public void startWarmup() {
         setState(WARMUP);
-        this.warmupPhase.setup();
-        this.warmupPhase.run();
-        this.timer = this.warmupPhase.getTimer();
+        this.timer = Game.getPlugin().getClockManager().createTimer(TimeUnit.SECONDS.toMillis(getSettings().getWarmupLength()) + 50L);
+        this.timer.setEndCondition(new WarmupEndCondition(this));
+        this.timer.addRepeatingCallback(new GameSecondsCallback(this, "&6&l>> &eThe game begins in &b{time}&e."), TimeUnit.SECONDS, 1);
+        this.timer.addCallback(timerSnapshot -> {
+            if (getSettings().isSounds()) {
+                playSound(Sound.WOLF_HOWL);
+            }
+            sendMessage("&5&l/ / / / / / &d&lTHE NEXUS REBORN &5&l/ / / / / /");
+            sendMessage("&6&lSurvival Games &7&oFree-for-all Deathmatch &8- &3Classic Mode");
+            sendMessage("&8- &7Loot chests scattered around the map for gear.");
+            sendMessage("&8- &7Outlast the other tributes and be the last one standing!");
+            sendMessage("&8- &7Arena deathmatch begins after &e" + getSettings().getGameLength() + " minutes&7.");
+            sendMessage("");
+            StringBuilder creatorBuilder = new StringBuilder();
+            for (String creator : getGameMap().getCreators()) {
+                creatorBuilder.append("&e").append(creator).append("&7, ");
+            }
+
+            if (creatorBuilder.length() < 2) {
+                creatorBuilder.append("&eNot Configured, ");
+            }
+
+            sendMessage("&d&l>> &7Playing on &a" + getGameMap().getName() + " &7created by " + creatorBuilder.substring(0, creatorBuilder.length() - 2));
+            if (getSettings().isGracePeriod()) {
+                sendMessage("&d&l>> &7There is a &e" + getSettings().getGracePeriodLength() + " second &7grace period.");
+            }
+        }, TimeUnit.SECONDS.toMillis(getSettings().getWarmupLength()) / 2);
+        this.timer.start();
     }
 
     public void startGame() {
@@ -1302,11 +1372,11 @@ public class Game {
     }
 
     public void gameComplete() {
-        setState(OldGameState.GAME_COMPLETE);
+        setState(GameState.GAME_COMPLETE);
     }
 
     public void nextGameReady() {
-        setState(OldGameState.NEXT_GAME_READY);
+        setState(GameState.NEXT_GAME_READY);
     }
 
     public static SurvivalGames getPlugin() {
@@ -1375,8 +1445,6 @@ public class Game {
                 ", mode=" + mode +
                 ", debugMode=" + debugMode +
                 ", graceperiod=" + graceperiod +
-                ", setupPhase=" + setupPhase +
-                ", assignTeamsPhase=" + assignTeamsPhase +
                 '}';
     }
 }

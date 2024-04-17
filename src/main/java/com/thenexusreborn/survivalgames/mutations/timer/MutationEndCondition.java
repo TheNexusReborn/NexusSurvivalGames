@@ -6,7 +6,7 @@ import com.stardevllc.starcore.utils.color.ColorUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
-import com.thenexusreborn.survivalgames.game.OldGameState;
+import com.thenexusreborn.survivalgames.game.GameState;
 import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
 import org.bukkit.Bukkit;
@@ -41,7 +41,7 @@ public class MutationEndCondition implements ClockEndCondition<TimerSnapshot> {
             return true;
         }
 
-        if (!(game.getState() == OldGameState.INGAME || game.getState() == OldGameState.INGAME_DEATHMATCH)) {
+        if (!(game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_DEATHMATCH)) {
             p.sendMessage(ColorUtils.color(MsgType.WARN + "You are no longer allowed to mutate due to the game's current progress."));
             return true;
         }
