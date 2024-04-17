@@ -99,6 +99,7 @@ public class Lobby {
         if (this.getConfig().contains("zipfile")) {
             File zipFile = new File(this.getConfig().getString("zipfile"));
             File destination = new File("." + File.separator + getServer().getName() + "-Lobby");
+            FileHelper.deleteDirectory(destination.toPath());
             FileHelper.createDirectoryIfNotExists(destination.toPath());
             byte[] buffer = new byte[1024];
 
@@ -459,6 +460,7 @@ public class Lobby {
         this.players.clear();
         server.setGame(game);
         if (game.getControlType() == ControlType.AUTO) {
+            game.setup();
             this.state = LobbyState.STARTING;
             resetLobby();
         } else {

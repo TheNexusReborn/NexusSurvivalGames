@@ -8,7 +8,7 @@ public class GameChatRoom extends ChatRoom {
     private Game game;
     
     public GameChatRoom(Game game) {
-        super(Game.getPlugin(), Actor.of(Game.getPlugin()), "room-game-" + Game.getPlugin().getServer().getName().toLowerCase().replace(" ", "_")+ "-main");
+        super(Game.getPlugin(), Actor.of(Game.getPlugin()), "room-game-" + game.getServer().getName().toLowerCase().replace(" ", "_") + "-main");
         this.game = game;
         
         senderFormat.set("{message}");

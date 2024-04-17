@@ -361,6 +361,7 @@ public class Game {
                 entity.remove();
             }
         }
+        setState(TELEPORT_START_DONE);
     }
 
     public void assignStartingTeams() {
@@ -385,6 +386,7 @@ public class Game {
                 }
             }
         }
+        setState(TEAMS_ASSIGNED);
     }
 
     public void setup() {
@@ -440,6 +442,8 @@ public class Game {
             e.printStackTrace();
             handleError("Could not setup the world settings..");
         }
+        
+        setState(SETUP_COMPLETE);
     }
 
     public void handleError(String message) {

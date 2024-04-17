@@ -2,7 +2,6 @@ package com.thenexusreborn.survivalgames.game;
 
 import com.cryptomorin.xseries.XMaterial;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
-import com.stardevllc.starcore.utils.item.ItemBuilder;
 import com.stardevllc.starlib.Pair;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.PlayerBalance;
@@ -10,6 +9,7 @@ import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.tags.Tag;
 import com.thenexusreborn.nexuscore.util.ArmorType;
+import com.thenexusreborn.nexuscore.util.item.ItemBuilder;
 import com.thenexusreborn.survivalgames.chat.GameTeamChatroom;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
@@ -118,20 +118,25 @@ public class GamePlayer {
         GameTeamChatroom chatroom = game.getChatRooms().get(this.team);
         chatroom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES, DefaultPermissions.SEND_MESSAGES);
         Game.getPlugin().getStarChat().setPlayerFocus(Bukkit.getPlayer(getUniqueId()), chatroom);
-        
+
+        GameTeamChatroom mutationsRoom = game.getChatRooms().get(GameTeam.MUTATIONS);
+        GameTeamChatroom zombiesRoom = game.getChatRooms().get(GameTeam.ZOMBIES);
         if (this.team == GameTeam.TRIBUTES) {
-            game.getChatRooms().get(GameTeam.MUTATIONS).addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
-            game.getChatRooms().get(GameTeam.ZOMBIES).addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
-        } else if (this.team == GameTeam.MUTATIONS) {
-            game.getChatRooms().get(GameTeam.TRIBUTES).addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
-            game.getChatRooms().get(GameTeam.ZOMBIES).addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
-        } else if (this.team == GameTeam.ZOMBIES) {
-            game.getChatRooms().get(GameTeam.TRIBUTES).addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
-            game.getChatRooms().get(GameTeam.MUTATIONS).addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
-        } else if (this.team == GameTeam.SPECTATORS) {
-            game.getChatRooms().get(GameTeam.TRIBUTES).addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
-            game.getChatRooms().get(GameTeam.MUTATIONS).addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
-            game.getChatRooms().get(GameTeam.ZOMBIES).addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+            mutationsRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+            zombiesRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+        } else {
+            GameTeamChatroom tributesRoom = game.getChatRooms().get(GameTeam.TRIBUTES);
+            if (this.team == GameTeam.MUTATIONS) {
+                tributesRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+                zombiesRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+            } else if (this.team == GameTeam.ZOMBIES) {
+                tributesRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+                mutationsRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+            } else if (this.team == GameTeam.SPECTATORS) {
+                tributesRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+                mutationsRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+                zombiesRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+            }
         }
     }
     
