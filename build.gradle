@@ -54,6 +54,10 @@ version = '1.17-ALPHA'
 description = 'NexusSurvivalGames'
 java.sourceCompatibility = JavaVersion.VERSION_17
 
+jar {
+    destinationDirectory = file(System.getProperty("user.home") + File.separator + "Documents" + File.separator + "JarOutput" + File.separator + "NexusReborn")
+}
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
