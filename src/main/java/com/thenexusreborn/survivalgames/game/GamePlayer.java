@@ -2,6 +2,7 @@ package com.thenexusreborn.survivalgames.game;
 
 import com.cryptomorin.xseries.XMaterial;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
+import com.stardevllc.starcore.item.ItemBuilder;
 import com.stardevllc.starlib.Pair;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.PlayerBalance;
@@ -9,7 +10,6 @@ import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.tags.Tag;
 import com.thenexusreborn.nexuscore.util.ArmorType;
-import com.thenexusreborn.nexuscore.util.item.ItemBuilder;
 import com.thenexusreborn.survivalgames.chat.GameTeamChatroom;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.mutations.Mutation;

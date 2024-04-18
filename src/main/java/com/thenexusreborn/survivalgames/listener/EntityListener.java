@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.listener;
 
-import com.stardevllc.starcore.utils.color.ColorUtils;
+import com.stardevllc.starcore.color.ColorUtils;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;

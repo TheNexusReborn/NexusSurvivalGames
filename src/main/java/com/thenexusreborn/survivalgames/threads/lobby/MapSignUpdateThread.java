@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.threads.lobby;
 
-import com.stardevllc.starcore.utils.color.ColorUtils;
+import com.stardevllc.starcore.color.ColorUtils;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;

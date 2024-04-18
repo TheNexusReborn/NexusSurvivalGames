@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.cmd;
 
-import com.stardevllc.starcore.utils.color.ColorUtils;
+import com.stardevllc.starcore.color.ColorUtils;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;

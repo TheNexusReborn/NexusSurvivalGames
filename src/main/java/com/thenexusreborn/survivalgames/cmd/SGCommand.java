@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.cmd;
 
-import com.stardevllc.starcore.utils.color.ColorUtils;
+import com.stardevllc.starcore.color.ColorUtils;
 import com.stardevllc.starlib.Value;
 import com.stardevllc.starclock.clocks.Timer;
 import com.thenexusreborn.api.player.Rank;

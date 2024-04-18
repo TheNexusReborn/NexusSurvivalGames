@@ -1,9 +1,8 @@
 package com.thenexusreborn.survivalgames.scoreboard.game;
 
-import com.stardevllc.starcore.utils.color.ColorUtils;
+import com.stardevllc.starcore.color.ColorUtils;
 import com.thenexusreborn.api.scoreboard.*;
 import com.thenexusreborn.nexuscore.scoreboard.SpigotScoreboardView;
-import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.mutations.Mutation;

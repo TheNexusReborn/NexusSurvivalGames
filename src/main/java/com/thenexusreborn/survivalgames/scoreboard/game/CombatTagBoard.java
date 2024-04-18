@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.scoreboard.game;
 
-import com.stardevllc.starcore.utils.color.ColorUtils;
+import com.stardevllc.starcore.color.ColorUtils;
 import com.stardevllc.starlib.time.TimeFormat;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.scoreboard.TeamBuilder;

@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.mutations;
 
 import com.stardevllc.starclock.clocks.Timer;
-import com.stardevllc.starcore.utils.color.ColorUtils;
+import com.stardevllc.starcore.color.ColorUtils;
 import com.stardevllc.starlib.time.TimeUnit;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;

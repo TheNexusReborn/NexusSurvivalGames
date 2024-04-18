@@ -1,13 +1,12 @@
 package com.thenexusreborn.survivalgames.scoreboard.lobby;
 
 import com.stardevllc.starclock.clocks.Timer;
-import com.stardevllc.starcore.utils.color.ColorUtils;
+import com.stardevllc.starcore.color.ColorUtils;
 import com.stardevllc.starlib.time.TimeFormat;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.scoreboard.TeamBuilder;
 import com.thenexusreborn.nexuscore.scoreboard.SpigotScoreboardView;
-import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
 import com.thenexusreborn.survivalgames.util.SGUtils;

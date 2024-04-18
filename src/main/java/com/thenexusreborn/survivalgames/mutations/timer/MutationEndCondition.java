@@ -2,7 +2,7 @@ package com.thenexusreborn.survivalgames.mutations.timer;
 
 import com.stardevllc.starclock.condition.ClockEndCondition;
 import com.stardevllc.starclock.snapshot.TimerSnapshot;
-import com.stardevllc.starcore.utils.color.ColorUtils;
+import com.stardevllc.starcore.color.ColorUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;

@@ -1,9 +1,9 @@
 package com.thenexusreborn.survivalgames.listener;
 
 import com.cryptomorin.xseries.XMaterial;
+import com.stardevllc.starcore.color.ColorUtils;
 import com.stardevllc.starcore.gui.GuiManager;
-import com.stardevllc.starcore.utils.color.ColorUtils;
-import com.stardevllc.starcore.utils.item.ItemBuilder;
+import com.stardevllc.starcore.item.ItemBuilder;
 import com.stardevllc.starlib.Pair;
 import com.stardevllc.starlib.time.TimeUnit;
 import com.thenexusreborn.api.NexusAPI;
