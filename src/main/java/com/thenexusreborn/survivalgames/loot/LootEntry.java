@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.loot;
 
-import com.thenexusreborn.nexuscore.util.MaterialNames;
+import com.stardevllc.starcore.utils.MaterialNames;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 

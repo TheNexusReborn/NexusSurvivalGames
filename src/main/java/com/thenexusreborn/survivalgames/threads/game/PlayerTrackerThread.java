@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.threads.game;
 
-import com.thenexusreborn.api.helper.NumberHelper;
 import com.thenexusreborn.nexuscore.api.NexusThread;
+import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
@@ -113,8 +113,8 @@ public class PlayerTrackerThread extends NexusThread<SurvivalGames> {
                     }
                 }.runTask(plugin);
 
-                String health = NumberHelper.formatNumber(target.getHealth());
-                String maxHealth = NumberHelper.formatNumber(target.getMaxHealth());
+                String health = MCUtils.formatNumber(target.getHealth());
+                String maxHealth = MCUtils.formatNumber(target.getMaxHealth());
 
                 if (holdingTracker) {
                     gamePlayer.setTrackerInfo(new TrackerInfo(target.getName(), (int) distance, health, maxHealth));

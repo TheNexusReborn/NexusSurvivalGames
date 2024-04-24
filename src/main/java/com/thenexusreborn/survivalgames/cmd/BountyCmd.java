@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.cmd;
 
 import com.stardevllc.starcore.color.ColorUtils;
-import com.thenexusreborn.api.helper.NumberHelper;
+import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -102,8 +102,8 @@ public class BountyCmd implements CommandExecutor {
 
         bounty.add(type, amount);
         String coloredName = senderPlayer.getColoredName();
-        String formattedAmount = NumberHelper.formatNumber(amount);
-        String totalFormattedAmount = NumberHelper.formatNumber(bounty.getAmount(type));
+        String formattedAmount = MCUtils.formatNumber(amount);
+        String totalFormattedAmount = MCUtils.formatNumber(bounty.getAmount(type));
         game.sendMessage("&6&l>> &dThe bounty on " + coloredName + " &dwas increased by &b" + formattedAmount + " " + type.name().toLowerCase() + "&d!");
         game.sendMessage("&6&l>> &dThe current value is &b" + totalFormattedAmount + " " + type.name().toLowerCase() + "&d.");
         return true;

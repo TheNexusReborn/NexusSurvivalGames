@@ -1,12 +1,14 @@
 package com.thenexusreborn.survivalgames.loot;
 
 import com.stardevllc.starcore.color.ColorUtils;
-import com.thenexusreborn.nexuscore.util.*;
+import com.stardevllc.starcore.utils.MaterialNames;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public class LootItem {
     protected final Material material;

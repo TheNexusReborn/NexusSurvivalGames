@@ -2,8 +2,8 @@ package com.thenexusreborn.survivalgames.mutations;
 
 import com.cryptomorin.xseries.XMaterial;
 import com.stardevllc.starcore.item.ItemBuilder;
-import com.thenexusreborn.api.helper.StringHelper;
-import com.thenexusreborn.nexuscore.util.ArmorType;
+import com.stardevllc.starcore.utils.ArmorSet;
+import com.stardevllc.starlib.helper.StringHelper;
 import com.thenexusreborn.survivalgames.disguises.disguisetypes.DisguiseType;
 import com.thenexusreborn.survivalgames.mutations.impl.*;
 import org.bukkit.Material;
@@ -14,7 +14,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 
-import static com.thenexusreborn.nexuscore.util.ArmorType.*;
+import static com.stardevllc.starcore.utils.ArmorSet.*;
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.*;
 import static org.bukkit.potion.PotionEffectType.*;
 
@@ -36,7 +36,7 @@ public class MutationType {
     protected String displayName;
     protected Class<? extends Mutation> clazz;
     protected XMaterial icon;
-    protected ArmorType armorType;
+    protected ArmorSet armorType;
     protected ItemStack weapon;
     protected DisguiseType disguiseType;
     protected int unlockCost;
@@ -46,7 +46,7 @@ public class MutationType {
     protected List<MutationEffect> effects;
     protected List<MutationItem> items;
     
-    MutationType(String id, String displayName, Class<? extends Mutation> clazz, XMaterial icon, ArmorType armorType, ItemStack weapon, DisguiseType disguiseType, int unlockCost, int health, boolean healthRegen, List<DamageCause> damageImmunities, List<MutationEffect> effects, List<MutationItem> items) {
+    MutationType(String id, String displayName, Class<? extends Mutation> clazz, XMaterial icon, ArmorSet armorType, ItemStack weapon, DisguiseType disguiseType, int unlockCost, int health, boolean healthRegen, List<DamageCause> damageImmunities, List<MutationEffect> effects, List<MutationItem> items) {
         this.id = id;
         this.displayName = displayName;
         this.clazz = clazz;
@@ -80,7 +80,7 @@ public class MutationType {
         return displayName;
     }
     
-    public ArmorType getArmorType() {
+    public ArmorSet getArmorType() {
         return armorType;
     }
     
@@ -142,7 +142,7 @@ public class MutationType {
         private String displayName;
         private Class<? extends Mutation> clazz;
         private XMaterial icon;
-        private ArmorType armorType;
+        private ArmorSet armorType;
         private ItemStack weapon;
         private DisguiseType disguiseType;
         private int unlockCost;
@@ -198,7 +198,7 @@ public class MutationType {
             return this;
         }
         
-        public Builder armor(ArmorType armorType) {
+        public Builder armor(ArmorSet armorType) {
             this.armorType = armorType;
             return this;
         }
@@ -210,11 +210,11 @@ public class MutationType {
         
         public MutationType create() {
             if (this.displayName == null || this.displayName.isEmpty()) {
-                this.displayName = StringHelper.capitalizeEveryWord(this.id);
+                this.displayName = StringHelper.titlize(this.id);
             }
             
             if (armorType == null) {
-                armorType = ArmorType.NONE;
+                armorType = ArmorSet.NONE;
             }
             
             if (health == 0) {

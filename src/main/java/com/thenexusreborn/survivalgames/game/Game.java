@@ -6,14 +6,13 @@ import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.starclock.clocks.Timer;
 import com.stardevllc.starcore.color.ColorUtils;
 import com.stardevllc.starcore.utils.Cuboid;
+import com.stardevllc.starlib.helper.StringHelper;
 import com.stardevllc.starlib.registry.StringRegistry;
 import com.stardevllc.starlib.time.TimeFormat;
 import com.stardevllc.starlib.time.TimeUnit;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.gamearchive.GameAction;
 import com.thenexusreborn.api.gamearchive.GameInfo;
-import com.thenexusreborn.api.helper.NumberHelper;
-import com.thenexusreborn.api.helper.StringHelper;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.sql.objects.SQLDatabase;
@@ -781,7 +780,7 @@ public class Game {
             for (Type type : Type.values()) {
                 double amount = bounty.getAmount(type);
                 if (amount > 0) {
-                    sendMessage("&6&l>> For winning the game, " + winner.getColoredName() + " &6&l has kept their &b&l" + NumberHelper.formatNumber(amount) + " " + StringHelper.capitalizeEveryWord(type.name()) + " &6&lbounty!");
+                    sendMessage("&6&l>> For winning the game, " + winner.getColoredName() + " &6&l has kept their &b&l" + MCUtils.formatNumber(amount) + " " + StringHelper.titlize(type.name()) + " &6&lbounty!");
                     if (type == Type.CREDIT) {
                         winner.getBalance().addCredits(amount);
                     } else if (type == Type.SCORE) {
@@ -1176,7 +1175,7 @@ public class Game {
 
         if (killerPlayer != null) {
             String killerName = killerPlayer.getColoredName();
-            String killerHealth = NumberHelper.formatNumber(killer.getHealth());
+            String killerHealth = MCUtils.formatNumber(killer.getHealth());
             gamePlayer.sendMessage("&4&l>> &cYour killer &8(" + killerName + "&8) &chad &4" + killerHealth + " HP &cremaining!");
         }
 
