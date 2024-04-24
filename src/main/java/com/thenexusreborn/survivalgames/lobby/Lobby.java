@@ -6,11 +6,11 @@ import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.starclock.clocks.Timer;
 import com.stardevllc.starcore.item.ItemBuilder;
+import com.stardevllc.starcore.utils.ProgressBar;
 import com.stardevllc.starlib.time.TimeUnit;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
-import com.thenexusreborn.api.util.ProgressBar;
 import com.thenexusreborn.gamemaps.FileHelper;
 import com.thenexusreborn.gamemaps.model.MapRating;
 import com.thenexusreborn.gamemaps.model.SGMap;
@@ -449,7 +449,7 @@ public class Lobby {
             double ratingRatio = rating * 1.0 / totalRatings;
             int ratingPercent = (int) (ratingRatio * 100);
 
-            ratingMsg = "&7Rating: " + new ProgressBar(ratingPercent, 100, 5, "* ", "&a", "&7").display() + " &7&o(rating: " + rating / totalRatings + " star(s), based on: " + totalRatings + " vote(s))";
+            ratingMsg = "&7Rating: " + ProgressBar.of(ratingPercent, 100, 5, "* ", "&a", "&7") + " &7&o(rating: " + rating / totalRatings + " star(s), based on: " + totalRatings + " vote(s))";
         }
 
         sendMessage("&6&l> " + ratingMsg);
