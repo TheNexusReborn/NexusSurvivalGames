@@ -77,6 +77,8 @@ public class Lobby {
 
     private File file;
     private FileConfiguration config;
+    
+    private File worldFolder;
 
     public Lobby(SurvivalGames plugin, SGVirtualServer server, LobbyType type) {
         this.plugin = plugin;
@@ -98,16 +100,16 @@ public class Lobby {
     public void setup() {
         if (this.getConfig().contains("zipfile")) {
             File zipFile = new File(this.getConfig().getString("zipfile"));
-            File destination = new File("." + File.separator + getServer().getName() + "-Lobby");
-            FileHelper.deleteDirectory(destination.toPath());
-            FileHelper.createDirectoryIfNotExists(destination.toPath());
+            worldFolder = new File("." + File.separator + getServer().getName() + "-Lobby");
+            FileHelper.deleteDirectory(worldFolder.toPath());
+            FileHelper.createDirectoryIfNotExists(worldFolder.toPath());
             byte[] buffer = new byte[1024];
 
             try {
                 ZipInputStream zis = new ZipInputStream(Files.newInputStream(zipFile.toPath()));
 
                 for (ZipEntry zipEntry = zis.getNextEntry(); zipEntry != null; zipEntry = zis.getNextEntry()) {
-                    Path newFile = this.newFile(destination, zipEntry);
+                    Path newFile = this.newFile(worldFolder, zipEntry);
                     if (zipEntry.isDirectory()) {
                         FileHelper.createDirectoryIfNotExists(newFile);
                     } else {
@@ -286,6 +288,11 @@ public class Lobby {
 
         if (gameMap != null) {
             gameMap.removeFromServer(plugin);
+        }
+        
+        if (this.world != null) {
+            Bukkit.unloadWorld(world, false);
+            FileHelper.deleteDirectory(this.worldFolder.toPath());
         }
     }
 
