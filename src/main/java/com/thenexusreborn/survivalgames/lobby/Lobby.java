@@ -7,11 +7,11 @@ import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.starclock.clocks.Timer;
 import com.stardevllc.starcore.item.ItemBuilder;
 import com.stardevllc.starcore.utils.ProgressBar;
+import com.stardevllc.starlib.helper.FileHelper;
 import com.stardevllc.starlib.time.TimeUnit;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
-import com.thenexusreborn.gamemaps.FileHelper;
 import com.thenexusreborn.gamemaps.model.MapRating;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.scoreboard.impl.RankTablistHandler;
@@ -83,7 +83,7 @@ public class Lobby {
     public Lobby(SurvivalGames plugin, SGVirtualServer server, LobbyType type) {
         this.plugin = plugin;
         this.server = server;
-
+        
         this.file = new File(plugin.getDataFolder() + File.separator + "lobby" + File.separator + type.name().toLowerCase() + ".yml");
         if (!file.exists()) {
             file.mkdirs();
