@@ -15,11 +15,15 @@ import com.thenexusreborn.survivalgames.ControlType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.game.GameState;
+import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
 import com.thenexusreborn.survivalgames.lobby.StatSign;
 import com.thenexusreborn.survivalgames.lobby.TributeSign;
+import com.thenexusreborn.survivalgames.loot.Items;
+import com.thenexusreborn.survivalgames.loot.LootItem;
 import com.thenexusreborn.survivalgames.map.SQLMapManager;
 import com.thenexusreborn.survivalgames.settings.SettingRegistry;
 import com.thenexusreborn.survivalgames.settings.collection.SettingList;
@@ -30,6 +34,7 @@ import com.thenexusreborn.survivalgames.util.SGUtils;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.HoverEvent.Action;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -265,6 +270,57 @@ public class SGCommand implements CommandExecutor {
                     } else {
                         sender.sendMessage(ColorUtils.color(MsgType.WARN + "You must end the game first before going to the next one."));
                     }
+                } case "give" -> {
+                    if (!(args.length > 2)) {
+                        sender.sendMessage(ColorUtils.color(MsgType.WARN + "Usage: /" + label + " " + args[0] + " " + args[1] + " <item> [player]"));
+                        return true;
+                    }
+
+                    LootItem lootItem = Items.REGISTRY.get(args[2]);
+                    
+                    if (lootItem == null) {
+                        sender.sendMessage(MsgType.WARN.format("Unknown item %v", args[2]));
+                        return true;
+                    }
+                    
+                    if (args.length == 3) {
+                        player.getInventory().addItem(lootItem.getItemStack());
+                        player.sendMessage(MsgType.WARN.format("You gave yourself %v", lootItem.getName()));
+                    } else {
+                        Player target = Bukkit.getPlayer(args[3]);
+                        if (target == null) {
+                            sender.sendMessage(MsgType.WARN.format("Unknown player %v", args[3]));
+                            return true;
+                        }
+
+                        if (!game.getPlayers().containsKey(target.getUniqueId())) {
+                            sender.sendMessage(MsgType.WARN.format("Unknown player %v", args[3]));
+                            return true;
+                        }
+                    }
+                    
+                } case "giveall" -> {
+                    if (!(args.length > 2)) {
+                        sender.sendMessage(ColorUtils.color(MsgType.WARN + "Usage: /" + label + " " + args[0] + " " + args[1] + " <item> [player]"));
+                        return true;
+                    }
+
+                    LootItem lootItem = Items.REGISTRY.get(args[2]);
+
+                    if (lootItem == null) {
+                        sender.sendMessage(MsgType.WARN.format("Unknown item %v", args[2]));
+                        return true;
+                    }
+
+                    for (GamePlayer gamePlayer : game.getPlayers().values()) {
+                        if (gamePlayer.getTeam() != GameTeam.TRIBUTES) {
+                            continue;
+                        }
+                        
+                        Bukkit.getPlayer(gamePlayer.getUniqueId()).getInventory().addItem(lootItem.getItemStack());
+                    }
+                    
+                    game.sendMessage(MsgType.INFO.format("All players were given %v by %v", lootItem.getName(), player.getName()));
                 }
             }
         } else if (subCommand.equals("lobby") || subCommand.equals("l")) {
