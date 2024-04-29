@@ -50,7 +50,7 @@ public class GameActionBar implements IActionBar {
         }
 
         if (game.getState() == GameState.WARMUP) {
-            return "&fGAME BEGINS IN &c&l" + TimeUnit.SECONDS.fromMillis(game.getTimer().getTime()) + " SECONDS&f...";
+            return "&fGAME BEGINS IN &c&l" + (TimeUnit.MILLISECONDS.toSeconds(game.getTimer().getTime()) + 1) + " SECONDS&f...";
         }
 
         if (game.getState() == GameState.WARMUP_DONE) {
@@ -114,7 +114,7 @@ public class GameActionBar implements IActionBar {
             if (game.getTimer() == null) {
                 return "&aArchiving game...";
             }
-            return "&d&lNEXUS&7 - &eNext game starting... &7(" + game.getTimer().getTime() + "s)";
+            return "&d&lNEXUS&7 - &eNext game starting... &7(" + Game.SHORT_TIME_FORMAT.format(game.getTimer().getTime()) + ")";
         }
 
         return "";
