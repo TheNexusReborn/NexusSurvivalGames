@@ -20,7 +20,7 @@ public class LootItem {
         this.name = name;
         this.lore.addAll(lore);
         
-        Items.REGISTRY.add(this);
+        Items.REGISTRY.register(this);
     }
     
     public LootItem(Material material, String name) {
