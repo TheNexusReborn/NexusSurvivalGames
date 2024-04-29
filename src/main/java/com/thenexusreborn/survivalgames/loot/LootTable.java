@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.loot;
 
-import com.thenexusreborn.survivalgames.util.Range;
+import com.stardevllc.starlib.Range;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
