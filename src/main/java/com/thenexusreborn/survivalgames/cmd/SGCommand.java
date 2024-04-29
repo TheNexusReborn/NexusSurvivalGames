@@ -1,6 +1,7 @@
 package com.thenexusreborn.survivalgames.cmd;
 
 import com.stardevllc.starcore.color.ColorUtils;
+import com.stardevllc.starlib.Operator;
 import com.stardevllc.starlib.Value;
 import com.stardevllc.starclock.clocks.Timer;
 import com.thenexusreborn.api.player.Rank;
@@ -24,7 +25,6 @@ import com.thenexusreborn.survivalgames.settings.SettingRegistry;
 import com.thenexusreborn.survivalgames.settings.collection.SettingList;
 import com.thenexusreborn.survivalgames.settings.object.Setting;
 import com.thenexusreborn.survivalgames.settings.object.Setting.Info;
-import com.thenexusreborn.survivalgames.util.Operator;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import net.md_5.bungee.api.chat.HoverEvent;
