@@ -40,7 +40,7 @@ public class SGPlayerStats {
     }
 
     public void setTimesMutated(int timesMutated) {
-        this.timesMutated = timesMutated;
+        this.timesMutated = Math.max(0, timesMutated);
     }
 
     public int getDeathmatchesReached() {
@@ -48,63 +48,63 @@ public class SGPlayerStats {
     }
 
     public void setDeathmatchesReached(int deathmatchesReached) {
-        this.deathmatchesReached = deathmatchesReached;
+        this.deathmatchesReached = Math.max(0, deathmatchesReached);
     }
 
     public void setScore(int score) {
-        this.score = score;
+        this.score = Math.max(10, score);
     }
 
     public void setKills(int kills) {
-        this.kills = kills;
+        this.kills = Math.max(0, kills);
     }
 
     public void setHighestKillstreak(int highestKillstreak) {
-        this.highestKillstreak = highestKillstreak;
+        this.highestKillstreak = Math.max(0, highestKillstreak);
     }
 
     public void setGames(int games) {
-        this.games = games;
+        this.games = Math.max(0, games);
     }
 
     public void setWins(int wins) {
-        this.wins = wins;
+        this.wins = Math.max(0, wins);
     }
 
     public void setWinStreak(int winStreak) {
-        this.winStreak = winStreak;
+        this.winStreak = Math.max(0, winStreak);
     }
 
     public void setDeaths(int deaths) {
-        this.deaths = deaths;
+        this.deaths = Math.max(0, deaths);
     }
 
     public void setChestsLooted(int chestsLooted) {
-        this.chestsLooted = chestsLooted;
+        this.chestsLooted = Math.max(0, chestsLooted);
     }
 
     public void setAssists(int assists) {
-        this.assists = assists;
+        this.assists = Math.max(0, assists);
     }
 
     public void setMutationKills(int mutationKills) {
-        this.mutationKills = mutationKills;
+        this.mutationKills = Math.max(0, mutationKills);
     }
 
     public void setMutationDeaths(int mutationDeaths) {
-        this.mutationDeaths = mutationDeaths;
+        this.mutationDeaths = Math.max(0, mutationDeaths);
     }
 
     public void setMutationPasses(int mutationPasses) {
-        this.mutationPasses = mutationPasses;
+        this.mutationPasses = Math.max(0, mutationPasses);
     }
 
     public void setSponsoredOthers(int sponsoredOthers) {
-        this.sponsoredOthers = sponsoredOthers;
+        this.sponsoredOthers = Math.max(0, sponsoredOthers);
     }
 
     public void setSponsorsReceived(int sponsorsReceived) {
-        this.sponsorsReceived = sponsorsReceived;
+        this.sponsorsReceived = Math.max(0, sponsorsReceived);
     }
 
     public UUID getUniqueId() {
@@ -168,63 +168,63 @@ public class SGPlayerStats {
     }
 
     public void addScore(int i) {
-        this.score += i;
+        setScore(score + i);
     }
 
     public void addDeathmatchesReached(int i) {
-        this.deathmatchesReached += i;
+        setDeathmatchesReached(this.deathmatchesReached + i);
     }
 
     public void addGames(int i) {
-        this.games += i;
+        setGames(this.games + i);
     }
 
     public void addWins(int i) {
-        this.wins += i;
+        setWins(wins + i);
     }
 
     public void addWinStreak(int i) {
-        this.winStreak += i;
+        setWinStreak(winStreak + 1);
     }
 
     public void addMutationPasses(int i) {
-        this.mutationPasses += i;
+        setMutationPasses(mutationPasses + 1);
     }
 
     public void addDeaths(int i) {
-        this.deaths += i;
+        setDeaths(deaths + 1);
     }
 
     public void addMutationDeaths(int i) {
-        this.mutationDeaths += i;
+        setMutationDeaths(mutationDeaths + 1);
     }
 
     public void addKills(int i) {
-        this.kills += i;
+        setKills(kills + 1);
     }
 
     public void addMutationKills(int i) {
-        this.mutationKills += i;
+        setMutationKills(mutationKills + i);
     }
 
     public void addAssists(int i) {
-        this.assists += i;
+        setAssists(assists + i);
     }
 
     public void addChestsLooted(int i) {
-        this.chestsLooted += i;
+        setChestsLooted(chestsLooted + i);
     }
 
     public void addTimesMutated(int i) {
-        this.timesMutated += i;
+        setTimesMutated(timesMutated + i);
     }
 
     public void addSponsoredOthers(int i) {
-        this.sponsoredOthers += i;
+        setSponsoredOthers(sponsoredOthers + i);
     }
 
     public void addSponsorsReceived(int i) {
-        this.sponsorsReceived += i;
+        setSponsorsReceived(sponsorsReceived + i);
     }
     
     public static Map<String, Field> getFields() {
