@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.cmd;
 
 import com.stardevllc.starcore.color.ColorUtils;
-import com.stardevllc.starlib.Operator;
+import com.stardevllc.starlib.MathOperator;
 import com.stardevllc.starlib.Value;
 import com.stardevllc.starclock.clocks.Timer;
 import com.thenexusreborn.api.player.Rank;
@@ -885,7 +885,7 @@ public class SGCommand implements CommandExecutor {
                         return true;
                     }
                     String input = args[2];
-                    Operator operator = Operator.getOperator(input);
+                    MathOperator operator = MathOperator.getOperator(input);
                     if (operator != null) {
                         input = input.substring(1);
                     }

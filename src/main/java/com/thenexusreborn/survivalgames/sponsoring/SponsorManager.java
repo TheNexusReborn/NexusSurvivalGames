@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.sponsoring;
 
-import com.cryptomorin.xseries.XMaterial;
+import com.stardevllc.starcore.xseries.XMaterial;
 import com.thenexusreborn.survivalgames.loot.Items;
 import com.thenexusreborn.survivalgames.loot.LootItem;
 import org.bukkit.potion.PotionEffectType;

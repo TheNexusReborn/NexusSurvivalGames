@@ -1,12 +1,12 @@
 package com.thenexusreborn.survivalgames.lobby;
 
-import com.cryptomorin.xseries.XMaterial;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.starclock.clocks.Timer;
 import com.stardevllc.starcore.item.ItemBuilder;
 import com.stardevllc.starcore.utils.ProgressBar;
+import com.stardevllc.starcore.xseries.XMaterial;
 import com.stardevllc.starlib.helper.FileHelper;
 import com.stardevllc.starlib.time.TimeUnit;
 import com.thenexusreborn.api.NexusAPI;

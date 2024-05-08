@@ -882,9 +882,9 @@ public class Game {
         }
 
         StringRegistry<ChatRoom> roomRegistry = plugin.getStarChat().getRoomRegistry();
-        roomRegistry.deregister(this.gameChatroom.getName());
+        roomRegistry.unregister(this.gameChatroom.getName());
         for (GameTeamChatroom chatroom : this.getChatRooms().values()) {
-            roomRegistry.deregister(chatroom.getName());
+            roomRegistry.unregister(chatroom.getName());
         }
 
         setState(ENDED);

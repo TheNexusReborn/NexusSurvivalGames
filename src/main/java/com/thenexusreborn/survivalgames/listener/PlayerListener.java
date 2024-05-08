@@ -1,9 +1,9 @@
 package com.thenexusreborn.survivalgames.listener;
 
-import com.cryptomorin.xseries.XMaterial;
 import com.stardevllc.starcore.color.ColorUtils;
 import com.stardevllc.starcore.gui.GuiManager;
 import com.stardevllc.starcore.item.ItemBuilder;
+import com.stardevllc.starcore.xseries.XMaterial;
 import com.stardevllc.starlib.Pair;
 import com.stardevllc.starlib.time.TimeUnit;
 import com.thenexusreborn.api.NexusAPI;
@@ -764,6 +764,6 @@ public class PlayerListener implements Listener {
         
         e.setQuitMessage(null);
         NexusAPI.getApi().getPrimaryDatabase().saveSilent(sgPlayer.getStats());
-        plugin.getPlayerRegistry().deregister(e.getPlayer().getUniqueId());
+        plugin.getPlayerRegistry().unregister(e.getPlayer().getUniqueId());
     }
 }

@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.sponsoring;
 
-import com.cryptomorin.xseries.XMaterial;
+import com.stardevllc.starcore.xseries.XMaterial;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;

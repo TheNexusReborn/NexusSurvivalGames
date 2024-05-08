@@ -1,10 +1,10 @@
 package com.thenexusreborn.survivalgames.menu;
 
-import com.cryptomorin.xseries.XMaterial;
 import com.stardevllc.starcore.gui.element.Element;
 import com.stardevllc.starcore.gui.element.button.Button;
 import com.stardevllc.starcore.gui.gui.InventoryGUI;
 import com.stardevllc.starcore.item.ItemBuilder;
+import com.stardevllc.starcore.xseries.XMaterial;
 import com.stardevllc.starlib.Pair;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.nexuscore.util.MsgType;
