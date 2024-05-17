@@ -1,8 +1,8 @@
 package com.thenexusreborn.survivalgames.mutations.timer;
 
-import com.stardevllc.starclock.condition.ClockEndCondition;
-import com.stardevllc.starclock.snapshot.TimerSnapshot;
-import com.stardevllc.starcore.color.ColorUtils;
+import com.stardevllc.starcore.color.ColorHandler;
+import com.stardevllc.starlib.clock.condition.ClockEndCondition;
+import com.stardevllc.starlib.clock.snapshot.TimerSnapshot;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
@@ -32,7 +32,7 @@ public class MutationEndCondition implements ClockEndCondition<TimerSnapshot> {
 
         Player t = Bukkit.getPlayer(mutation.getTarget());
         if (t == null) {
-            p.sendMessage(ColorUtils.color(MsgType.WARN + "Your target is no longer online, mutation cancelled."));
+            p.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "Your target is no longer online, mutation cancelled."));
             return true;
         }
 
@@ -42,13 +42,13 @@ public class MutationEndCondition implements ClockEndCondition<TimerSnapshot> {
         }
 
         if (!(game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_DEATHMATCH)) {
-            p.sendMessage(ColorUtils.color(MsgType.WARN + "You are no longer allowed to mutate due to the game's current progress."));
+            p.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "You are no longer allowed to mutate due to the game's current progress."));
             return true;
         }
 
         GamePlayer targetPlayer = game.getPlayer(mutation.getTarget());
         if (targetPlayer.getTeam() != GameTeam.TRIBUTES) {
-            p.sendMessage(ColorUtils.color(MsgType.WARN + "Your target is no longer a tribute, mutation cancelled."));
+            p.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "Your target is no longer a tribute, mutation cancelled."));
             return true;
         }
         

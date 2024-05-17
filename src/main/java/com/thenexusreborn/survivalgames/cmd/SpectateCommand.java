@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.cmd;
 
-import com.stardevllc.starcore.color.ColorUtils;
+import com.stardevllc.starcore.color.ColorHandler;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
@@ -38,12 +38,12 @@ public class SpectateCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         Rank senderRank = MCUtils.getSenderRank(plugin.getNexusCore(), sender);
         if (senderRank.ordinal() > Rank.MEDIA.ordinal()) {
-            sender.sendMessage(ColorUtils.color(MsgType.WARN + "You do not have permission to use that command."));
+            sender.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "You do not have permission to use that command."));
             return true;
         }
         
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(ColorUtils.color(MsgType.WARN + "Only players can use that command."));
+            sender.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "Only players can use that command."));
             return true;
         }
 
@@ -75,10 +75,10 @@ public class SpectateCommand implements CommandExecutor {
             
                 if (spectating) {
                     lobby.removeSpectatingPlayer(player.getUniqueId());
-                    sender.sendMessage(ColorUtils.color(MsgType.INFO + "You will no longer be spectating the game"));
+                    sender.sendMessage(ColorHandler.getInstance().color(MsgType.INFO + "You will no longer be spectating the game"));
                 } else {
                     lobby.addSpectatingPlayer(player.getUniqueId());
-                    sender.sendMessage(ColorUtils.color(MsgType.INFO + "You will be spectating the game."));
+                    sender.sendMessage(ColorHandler.getInstance().color(MsgType.INFO + "You will be spectating the game."));
                 }
             } else {
                 sender.sendMessage(MsgType.WARN + "Invalid lobby state. Can only be done before or during the game start countdown");

@@ -1,9 +1,9 @@
 package com.thenexusreborn.survivalgames;
 
 import com.stardevllc.starchat.StarChat;
-import com.stardevllc.starclock.ClockManager;
-import com.stardevllc.starlib.Value;
-import com.stardevllc.starlib.Value.Type;
+import com.stardevllc.starlib.clock.ClockManager;
+import com.stardevllc.starlib.misc.Value;
+import com.stardevllc.starlib.misc.Value.Type;
 import com.stardevllc.starlib.registry.IntegerRegistry;
 import com.stardevllc.starlib.registry.UUIDRegistry;
 import com.thenexusreborn.api.NexusAPI;
@@ -73,7 +73,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
     private final SettingRegistry lobbySettingRegistry = new SettingRegistry();
     private final SettingRegistry gameSettingRegistry = new SettingRegistry();
 
-    private UUIDRegistry<SGPlayer> playerRegistry = new UUIDRegistry<>(SGPlayer::getUniqueId);
+    private UUIDRegistry<SGPlayer> playerRegistry = new UUIDRegistry<>(null, null, SGPlayer::getUniqueId, null, null);
 
     private File deathMessagesFile;
     private FileConfiguration deathMessagesConfig;

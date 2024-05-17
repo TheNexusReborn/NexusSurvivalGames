@@ -1,8 +1,8 @@
 package com.thenexusreborn.survivalgames.mutations.timer;
 
-import com.stardevllc.starclock.callback.ClockCallback;
-import com.stardevllc.starclock.snapshot.TimerSnapshot;
-import com.stardevllc.starcore.color.ColorUtils;
+import com.stardevllc.starcore.color.ColorHandler;
+import com.stardevllc.starlib.clock.callback.ClockCallback;
+import com.stardevllc.starlib.clock.snapshot.TimerSnapshot;
 import com.stardevllc.starlib.time.TimeUnit;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.gamearchive.GameAction;
@@ -37,15 +37,15 @@ public class MutationCountdownCallback implements ClockCallback<TimerSnapshot> {
 
         long secondsLeft = TimeUnit.MILLISECONDS.toSeconds(timerSnapshot.getTime());
 
-        p.sendMessage(ColorUtils.color(MsgType.INFO + "&lMUTATING: " + secondsLeft) + "s...");
+        p.sendMessage(ColorHandler.getInstance().color(MsgType.INFO + "&lMUTATING: " + secondsLeft) + "s...");
 
         if (secondsLeft == 15 || secondsLeft == 10 || secondsLeft <= 5 && secondsLeft > 0) {
-            t.sendMessage(ColorUtils.color("&4&l>> &c" + p.getName() + " is &lMUTATING! &cThey spawn in &c&l" + secondsLeft + "s..."));
+            t.sendMessage(ColorHandler.getInstance().color("&4&l>> &c" + p.getName() + " is &lMUTATING! &cThey spawn in &c&l" + secondsLeft + "s..."));
         }
 
         if (secondsLeft <= 0) {
             NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(p.getUniqueId());
-            t.sendMessage(ColorUtils.color("&6&l>> " + nexusPlayer.getColoredName().toUpperCase() + " &c&lIS AFTER YOU! RUN!"));
+            t.sendMessage(ColorHandler.getInstance().color("&6&l>> " + nexusPlayer.getColoredName().toUpperCase() + " &c&lIS AFTER YOU! RUN!"));
 
             game.addMutation(mutation);
             game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "mutation", nexusPlayer.getName() + " mutated agaisnt " + t.getName()));

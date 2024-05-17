@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.scoreboard;
 
-import com.stardevllc.starcore.color.ColorUtils;
+import com.stardevllc.starcore.color.ColorHandler;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
@@ -92,7 +92,7 @@ public class GameTablistHandler extends TablistHandler {
         Game game = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId()).getGame();
         if (game != null) {
             GamePlayer gamePlayer = game.getPlayer(nexusPlayer.getUniqueId());
-            team.setPrefix(ColorUtils.color(gamePlayer.getTeam().getColor()));
+            team.setPrefix(ColorHandler.getInstance().color(gamePlayer.getTeam().getColor()));
         }
     }
 }

@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.cmd;
 
-import com.stardevllc.starcore.color.ColorUtils;
+import com.stardevllc.starcore.color.ColorHandler;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.gamemaps.model.SGMap;
@@ -27,12 +27,12 @@ public class MapVoteCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (!(args.length > 0)) {
-            sender.sendMessage(ColorUtils.color(MsgType.WARN + "You must provide a map name or position."));
+            sender.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "You must provide a map name or position."));
             return true;
         }
         
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(ColorUtils.color(MsgType.WARN + "Only players can use that command."));
+            sender.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "Only players can use that command."));
             return true;
         }
 
@@ -41,12 +41,12 @@ public class MapVoteCommand implements CommandExecutor {
         Lobby lobby = sgPlayer.getLobby();
         
         if (game != null) {
-            sender.sendMessage(ColorUtils.color(MsgType.WARN + "You cannot vote for a map during a game."));
+            sender.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "You cannot vote for a map during a game."));
             return true;
         }
         
         if (!(lobby.getState() == LobbyState.WAITING || lobby.getState() == LobbyState.COUNTDOWN)) {
-            sender.sendMessage(ColorUtils.color(MsgType.WARN + "Invalid lobby state to vote."));
+            sender.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "Invalid lobby state to vote."));
             return true;
         }
     
@@ -61,7 +61,7 @@ public class MapVoteCommand implements CommandExecutor {
             int position = Integer.parseInt(args[0]);
             boolean contains = lobby.getMapOptions().containsKey(position);
             if (!contains) {
-                sender.sendMessage(ColorUtils.color(MsgType.WARN + "The map options do not contain that position."));
+                sender.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "The map options do not contain that position."));
                 return true;
             }
     
@@ -74,7 +74,7 @@ public class MapVoteCommand implements CommandExecutor {
     
             SGMap gameMap = SGUtils.getGameMapFromInput(sb.toString().trim(), sender);
             if (gameMap == null) {
-                sender.sendMessage(ColorUtils.color(MsgType.WARN + "Could not find a game map."));
+                sender.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "Could not find a game map."));
                 return true;
             }
     

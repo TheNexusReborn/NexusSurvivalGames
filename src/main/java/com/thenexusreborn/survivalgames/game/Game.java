@@ -3,13 +3,13 @@ package com.thenexusreborn.survivalgames.game;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
-import com.stardevllc.starclock.clocks.Timer;
-import com.stardevllc.starcore.color.ColorUtils;
+import com.stardevllc.starcore.color.ColorHandler;
 import com.stardevllc.starcore.utils.Cuboid;
 import com.stardevllc.starlib.helper.StringHelper;
 import com.stardevllc.starlib.registry.StringRegistry;
 import com.stardevllc.starlib.time.TimeFormat;
 import com.stardevllc.starlib.time.TimeUnit;
+import com.stardevllc.starlib.clock.clocks.Timer;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.gamearchive.GameAction;
 import com.thenexusreborn.api.gamearchive.GameInfo;
@@ -537,7 +537,7 @@ public class Game {
         if (gameMap.getSwagShack() != null) {
             Villager entity = (Villager) gameMap.getWorld().spawnEntity(gameMap.getSwagShack().toLocation(gameMap.getWorld()), EntityType.VILLAGER);
             entity.setCustomNameVisible(true);
-            entity.setCustomName(ColorUtils.color("&e&lSwag Shack"));
+            entity.setCustomName(ColorHandler.getInstance().color("&e&lSwag Shack"));
             entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 255, false, false));
         }
     }

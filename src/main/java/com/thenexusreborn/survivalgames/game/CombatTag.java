@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.game;
 
-import com.stardevllc.starclock.clocks.Timer;
+import com.stardevllc.starlib.clock.clocks.Timer;
 import com.stardevllc.starlib.time.TimeUnit;
 
 import java.util.UUID;

@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.settings.collection;
 
-import com.stardevllc.starlib.Value;
+import com.stardevllc.starlib.misc.Value;
 import com.thenexusreborn.survivalgames.settings.object.Setting;
 
 import java.util.*;

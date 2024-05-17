@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.threads.lobby;
 
 import com.mojang.authlib.GameProfile;
-import com.stardevllc.starcore.color.ColorUtils;
+import com.stardevllc.starcore.color.ColorHandler;
 import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
@@ -74,7 +74,7 @@ public class TributeSignUpdateThread extends NexusThread<SurvivalGames> {
                 Player player = Bukkit.getPlayer(lobbyPlayer.getUniqueId());
                 String name;
                 if (lobbyPlayer.getName().length() <= 14) {
-                    name = ColorUtils.color(lobbyPlayer.getRank().getColor() + lobbyPlayer.getName());
+                    name = ColorHandler.getInstance().color(lobbyPlayer.getRank().getColor() + lobbyPlayer.getName());
                 } else {
                     name = lobbyPlayer.getName();
                 }

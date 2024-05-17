@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.mutations;
 
-import com.stardevllc.starclock.clocks.Timer;
-import com.stardevllc.starcore.color.ColorUtils;
+import com.stardevllc.starcore.color.ColorHandler;
+import com.stardevllc.starlib.clock.clocks.Timer;
 import com.stardevllc.starlib.time.TimeUnit;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
@@ -76,10 +76,10 @@ public abstract class Mutation {
         this.countdownTimer.setEndCondition(new MutationEndCondition(this, game));
         this.countdownTimer.setLength(game.getSettings().getMutationSpawnDelay() * 1000L + 50);
         long seconds = TimeUnit.MILLISECONDS.toSeconds(this.countdownTimer.getTime());
-        p.sendMessage(ColorUtils.color("&6&l>> &eYou will mutate as a(n) " + getType().getDisplayName() + "!"));
-        p.sendMessage(ColorUtils.color("&6&l>> &eYou will be mutated in &l" + seconds + " Seconds&e."));
+        p.sendMessage(ColorHandler.getInstance().color("&6&l>> &eYou will mutate as a(n) " + getType().getDisplayName() + "!"));
+        p.sendMessage(ColorHandler.getInstance().color("&6&l>> &eYou will be mutated in &l" + seconds + " Seconds&e."));
         Player t = Bukkit.getPlayer(this.target);
-        t.sendMessage(ColorUtils.color("&4&l>> &c" + p.getName() + " is &lMUTATING! &cThey spawn in &c&l" + seconds + "s..."));
+        t.sendMessage(ColorHandler.getInstance().color("&4&l>> &c" + p.getName() + " is &lMUTATING! &cThey spawn in &c&l" + seconds + "s..."));
         this.countdownTimer.start();
     }
     

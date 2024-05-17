@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.lobby;
 
-import com.stardevllc.starclock.clocks.Timer;
+import com.stardevllc.starlib.clock.clocks.Timer;
 import com.stardevllc.starlib.time.TimeUnit;
 import com.thenexusreborn.api.player.IActionBar;
 import com.thenexusreborn.survivalgames.ControlType;

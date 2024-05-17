@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.threads.lobby;
 
-import com.stardevllc.starcore.color.ColorUtils;
+import com.stardevllc.starcore.color.ColorHandler;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -55,7 +55,7 @@ public class MapSignUpdateThread extends NexusThread<SurvivalGames> {
                 sign.setLine(1, mapName);
                 int votes = lobby.getTotalMapVotes(entry.getKey());
 
-                sign.setLine(3, ColorUtils.color("&n" + votes + " Vote(s)"));
+                sign.setLine(3, ColorHandler.getInstance().color("&n" + votes + " Vote(s)"));
 
                 for (LobbyPlayer player : lobby.getPlayers()) {
                     Player bukkitPlayer = Bukkit.getPlayer(player.getUniqueId());
@@ -66,10 +66,10 @@ public class MapSignUpdateThread extends NexusThread<SurvivalGames> {
                                 continue;
                             }
                             if (player.getMapVote() == entry.getKey()) {
-                                sign.setLine(0, ColorUtils.color("&n#" + entry.getKey()));
-                                sign.setLine(2, ColorUtils.color("&2&lVOTED!"));
+                                sign.setLine(0, ColorHandler.getInstance().color("&n#" + entry.getKey()));
+                                sign.setLine(2, ColorHandler.getInstance().color("&2&lVOTED!"));
                             } else {
-                                sign.setLine(0, ColorUtils.color("&nClick to Vote"));
+                                sign.setLine(0, ColorHandler.getInstance().color("&nClick to Vote"));
                                 sign.setLine(2, "");
                             }
                             bukkitPlayer.sendSignChange(sign.getLocation(), sign.getLines());

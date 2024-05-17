@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.threads.lobby;
 
-import com.stardevllc.starcore.color.ColorUtils;
+import com.stardevllc.starcore.color.ColorHandler;
 import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.*;
@@ -34,7 +34,7 @@ public class StatSignUpdateThread extends NexusThread<SurvivalGames> {
                         continue;
                     }
 
-                    String[] lines = {ColorUtils.color("&n" + statSign.getDisplayName()), "", lobbyPlayer.getStats().getValue(statSign.getStat()) + "", ""};
+                    String[] lines = {ColorHandler.getInstance().color("&n" + statSign.getDisplayName()), "", lobbyPlayer.getStats().getValue(statSign.getStat()) + "", ""};
                     player.sendSignChange(statSign.getLocation(), lines);
                 }
             }

@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.scoreboard.lobby;
 
-import com.stardevllc.starcore.color.ColorUtils;
+import com.stardevllc.starcore.color.ColorHandler;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.scoreboard.TeamBuilder;
 import com.thenexusreborn.nexuscore.scoreboard.SpigotScoreboardView;
@@ -14,7 +14,7 @@ public class LobbyBoard extends SpigotScoreboardView {
     private final Lobby lobby;
     
     public LobbyBoard(NexusScoreboard scoreboard, Lobby lobby) {
-        super(scoreboard, "lobby", ColorUtils.color("&a&lLobby"));
+        super(scoreboard, "lobby", ColorHandler.getInstance().color("&a&lLobby"));
         this.lobby = lobby;
     }
     
@@ -25,7 +25,7 @@ public class LobbyBoard extends SpigotScoreboardView {
             if (lobby.getGameMap() != null) {
                 SGUtils.setMapNameForScoreboard(lobby.getGameMap(), team);
             } else {
-                team.setPrefix(ColorUtils.color("&7Voting"));
+                team.setPrefix(ColorHandler.getInstance().color("&7Voting"));
                 team.setSuffix("");
             }
         }));

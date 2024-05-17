@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.settings.object;
 
-import com.stardevllc.starlib.Value;
+import com.stardevllc.starlib.misc.Value;
 
 @FunctionalInterface
 public interface ChangeListener {

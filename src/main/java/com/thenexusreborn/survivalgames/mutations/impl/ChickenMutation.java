@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.mutations.impl;
 
-import com.stardevllc.starclock.clocks.Timer;
-import com.stardevllc.starcore.color.ColorUtils;
+import com.stardevllc.starcore.color.ColorHandler;
+import com.stardevllc.starlib.clock.clocks.Timer;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
@@ -56,7 +56,7 @@ public class ChickenMutation extends Mutation {
     public void startLaunchCooldown() {
         if (launchCooldownTimer == null) {
             launchCooldownTimer = Game.getPlugin().getClockManager().createTimer(5000L);
-            launchCooldownTimer.addCallback(timerSnapshot -> Bukkit.getPlayer(getPlayer()).sendMessage(ColorUtils.color(MsgType.INFO + "Chicken Launch is ready!")), 0L);
+            launchCooldownTimer.addCallback(timerSnapshot -> Bukkit.getPlayer(getPlayer()).sendMessage(ColorHandler.getInstance().color(MsgType.INFO + "Chicken Launch is ready!")), 0L);
             launchCooldownTimer.start();
         } else {
             launchCooldownTimer.reset();
@@ -70,7 +70,7 @@ public class ChickenMutation extends Mutation {
     public void startParachuteCooldown() {
         if (parachuteCooldownTimer == null) {
             parachuteCooldownTimer = Game.getPlugin().getClockManager().createTimer(5000L);
-            parachuteCooldownTimer.addCallback(timerSnapshot -> Bukkit.getPlayer(getPlayer()).sendMessage(ColorUtils.color(MsgType.INFO + "Chicken Chute is ready!")), 0L);
+            parachuteCooldownTimer.addCallback(timerSnapshot -> Bukkit.getPlayer(getPlayer()).sendMessage(ColorHandler.getInstance().color(MsgType.INFO + "Chicken Chute is ready!")), 0L);
             parachuteCooldownTimer.start();
         } else {
             parachuteCooldownTimer.reset();

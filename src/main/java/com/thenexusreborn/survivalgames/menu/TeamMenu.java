@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.menu;
 
-import com.stardevllc.starcore.color.ColorUtils;
+import com.stardevllc.starcore.color.ColorHandler;
 import com.stardevllc.starcore.gui.GuiManager;
 import com.stardevllc.starcore.gui.element.button.Button;
 import com.stardevllc.starcore.gui.gui.InventoryGUI;
@@ -16,7 +16,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class TeamMenu extends InventoryGUI {
     public TeamMenu(SurvivalGames plugin, GameTeam team, Game game) {
-        super(3, ColorUtils.color(team.getColor() + team.getName()));
+        super(3, ColorHandler.getInstance().color(team.getColor() + team.getName()));
         GuiManager manager = plugin.getServer().getServicesManager().getRegistration(GuiManager.class).getProvider();
         
         if (game != null) {
@@ -28,7 +28,7 @@ public class TeamMenu extends InventoryGUI {
                         Button button = new Button().iconCreator(p -> {
                             ItemStack skull = SpigotUtils.getPlayerSkull(Bukkit.getPlayer(player.getUniqueId()));
                             ItemMeta meta = skull.getItemMeta();
-                            meta.setDisplayName(ColorUtils.color(player.getDisplayName()));
+                            meta.setDisplayName(ColorHandler.getInstance().color(player.getDisplayName()));
                             skull.setItemMeta(meta);
                             return skull;
                         }).consumer(e -> manager.openGUI(new PlayerMenu(plugin, player), (Player) e.getWhoClicked()));

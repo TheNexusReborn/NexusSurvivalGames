@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.cmd;
 
-import com.stardevllc.starcore.color.ColorUtils;
+import com.stardevllc.starcore.color.ColorHandler;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
@@ -25,7 +25,7 @@ public class BountyCmd implements CommandExecutor {
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(ColorUtils.color(MsgType.WARN + "Only players can use that command."));
+            sender.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "Only players can use that command."));
             return true;
         }
 
@@ -34,24 +34,24 @@ public class BountyCmd implements CommandExecutor {
         Game game = sgPlayer.getGame();
 
         if (game == null) {
-            player.sendMessage(ColorUtils.color(MsgType.WARN + "You can only bounty a player during a game."));
+            player.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "You can only bounty a player during a game."));
             return true;
         }
 
         if (!(args.length > 1)) {
-            player.sendMessage(ColorUtils.color(MsgType.WARN + "Usage: /" + label + " <player> <amount> [type: default score]"));
+            player.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "Usage: /" + label + " <player> <amount> [type: default score]"));
             return true;
         }
 
         GamePlayer senderPlayer = game.getPlayer(player.getUniqueId());
         GamePlayer gamePlayer = game.getPlayer(args[0]);
         if (gamePlayer == null) {
-            player.sendMessage(ColorUtils.color(MsgType.WARN + "The name you provided is not a player in the game."));
+            player.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "The name you provided is not a player in the game."));
             return true;
         }
 
         if (gamePlayer.getTeam() != GameTeam.TRIBUTES) {
-            player.sendMessage(ColorUtils.color(MsgType.WARN + "You can only set a bounty on a Tribute."));
+            player.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "You can only set a bounty on a Tribute."));
             return true;
         }
 
@@ -59,7 +59,7 @@ public class BountyCmd implements CommandExecutor {
         try {
             amount = Integer.parseInt(args[1]);
         } catch (NumberFormatException e) {
-            player.sendMessage(ColorUtils.color(MsgType.WARN + "You provided an invalid number value."));
+            player.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "You provided an invalid number value."));
             return true;
         }
 
@@ -68,7 +68,7 @@ public class BountyCmd implements CommandExecutor {
             try {
                 type = Bounty.Type.valueOf(args[2].toUpperCase());
             } catch (Exception e) {
-                player.sendMessage(ColorUtils.color(MsgType.WARN + "Invalid Bounty Type. Valid Options: CREDIT, SCORE"));
+                player.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "Invalid Bounty Type. Valid Options: CREDIT, SCORE"));
                 return true;
             }
         }
