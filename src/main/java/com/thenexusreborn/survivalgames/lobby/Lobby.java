@@ -1,29 +1,31 @@
 package com.thenexusreborn.survivalgames.lobby;
 
+import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
+import com.stardevllc.starcore.item.ItemBuilder;
+import com.stardevllc.starcore.utils.ProgressBar;
+import com.stardevllc.starcore.xseries.XMaterial;
+import com.stardevllc.starlib.helper.FileHelper;
 import com.stardevllc.starlib.time.TimeUnit;
-import com.stardevllc.starclock.clocks.Timer;
-import com.stardevllc.starmclib.actor.Actor;
+import com.stardevllc.starlib.clock.clocks.Timer;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.gamemaps.model.MapRating;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.scoreboard.impl.RankTablistHandler;
-import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
-import com.thenexusreborn.nexuscore.util.ProgressBar;
-import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
 import com.thenexusreborn.survivalgames.ControlType;
+import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
+import com.thenexusreborn.survivalgames.chat.LobbyChatRoom;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.lobby.timer.LobbyTimerCallback;
-import com.thenexusreborn.survivalgames.loot.LootManager;
-import com.thenexusreborn.survivalgames.loot.LootTable;
 import com.thenexusreborn.survivalgames.scoreboard.lobby.DebugLobbyBoard;
 import com.thenexusreborn.survivalgames.scoreboard.lobby.LobbyBoard;
 import com.thenexusreborn.survivalgames.scoreboard.lobby.MapEditingBoard;
+import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.settings.LobbySettings;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
@@ -36,18 +38,26 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class Lobby {
     private final SurvivalGames plugin;
-    private int localId;
-    private ControlType controlType = ControlType.MANUAL;
+    private final SGVirtualServer server;
+    private ControlType controlType = ControlType.AUTO;
     private LobbyState state = LobbyState.WAITING;
     private ChatRoom lobbyChatRoom;
     private Timer timer;
@@ -63,19 +73,90 @@ public class Lobby {
     private final List<TributeSign> tributeSigns = new ArrayList<>();
     private boolean debugMode;
 
-    public Lobby(SurvivalGames plugin) {
-        this.plugin = plugin;
-        plugin.getLogger().info("Setting up the lobby.");
-        
-        this.localId = plugin.getLastLocalLobbyId();
-        plugin.setLastLocalLobbyId(plugin.getLastLocalLobbyId() + 1);
+    private World world;
 
-        if (plugin.getConfig().contains("mapsigns")) {
-            plugin.getLogger().info("Loading Map Signs");
-            ConfigurationSection signsSection = plugin.getConfig().getConfigurationSection("mapsigns");
+    private File file;
+    private FileConfiguration config;
+    
+    private File worldFolder;
+
+    public Lobby(SurvivalGames plugin, SGVirtualServer server, LobbyType type) {
+        this.plugin = plugin;
+        this.server = server;
+        
+        this.file = new File(plugin.getDataFolder() + File.separator + "lobby" + File.separator + type.name().toLowerCase() + ".yml");
+        if (!file.exists()) {
+            file.mkdirs();
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        config = YamlConfiguration.loadConfiguration(file);
+    }
+
+    public void setup() {
+        if (this.getConfig().contains("zipfile")) {
+            File zipFile = new File(this.getConfig().getString("zipfile"));
+            worldFolder = new File("." + File.separator + getServer().getName() + "-Lobby");
+            FileHelper.deleteDirectory(worldFolder.toPath());
+            FileHelper.createDirectoryIfNotExists(worldFolder.toPath());
+            byte[] buffer = new byte[1024];
+
+            try {
+                ZipInputStream zis = new ZipInputStream(Files.newInputStream(zipFile.toPath()));
+
+                for (ZipEntry zipEntry = zis.getNextEntry(); zipEntry != null; zipEntry = zis.getNextEntry()) {
+                    Path newFile = this.newFile(worldFolder, zipEntry);
+                    if (zipEntry.isDirectory()) {
+                        FileHelper.createDirectoryIfNotExists(newFile);
+                    } else {
+                        Path parent = newFile.getParent();
+                        if (!Files.isDirectory(parent)) {
+                            FileHelper.createDirectoryIfNotExists(parent);
+                            if (Files.notExists(parent)) {
+                                throw new IOException("Failed to create directory " + parent);
+                            }
+                        }
+
+                        FileOutputStream fos = new FileOutputStream(newFile.toFile());
+
+                        int len;
+                        while ((len = zis.read(buffer)) > 0) {
+                            fos.write(buffer, 0, len);
+                        }
+
+                        fos.close();
+                    }
+                }
+
+                zis.closeEntry();
+                zis.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
+
+            this.world = Bukkit.createWorld(new WorldCreator(getServer().getName() + "-Lobby").environment(World.Environment.NORMAL));
+        }
+
+        if (this.getConfig().contains("spawnpoint")) {
+            int x = Integer.parseInt(this.getConfig().getString("spawnpoint.x"));
+            int y = Integer.parseInt(this.getConfig().getString("spawnpoint.y"));
+            int z = Integer.parseInt(this.getConfig().getString("spawnpoint.z"));
+            float yaw = Float.parseFloat(this.getConfig().getString("spawnpoint.yaw"));
+            float pitch = Float.parseFloat(this.getConfig().getString("spawnpoint.pitch"));
+
+            Location location = new Location(this.world, x, y, z, yaw, pitch);
+            setSpawnpoint(location);
+        }
+
+        if (this.getConfig().contains("mapsigns")) {
+            ConfigurationSection signsSection = this.getConfig().getConfigurationSection("mapsigns");
             for (String key : signsSection.getKeys(false)) {
                 int position = Integer.parseInt(key);
-                World world = Bukkit.getWorld(signsSection.getString(key + ".world"));
                 int x = signsSection.getInt(key + ".x");
                 int y = signsSection.getInt(key + ".y");
                 int z = signsSection.getInt(key + ".z");
@@ -85,11 +166,9 @@ public class Lobby {
             plugin.getLogger().info("Map Signs Loaded");
         }
 
-        if (plugin.getConfig().contains("statsigns")) {
-            plugin.getLogger().info("Loading Stat Signs");
-            ConfigurationSection signsSection = plugin.getConfig().getConfigurationSection("statsigns");
+        if (this.getConfig().contains("statsigns")) {
+            ConfigurationSection signsSection = this.getConfig().getConfigurationSection("statsigns");
             for (String key : signsSection.getKeys(false)) {
-                World world = Bukkit.getWorld(signsSection.getString(key + ".world"));
                 int x = signsSection.getInt(key + ".x");
                 int y = signsSection.getInt(key + ".y");
                 int z = signsSection.getInt(key + ".z");
@@ -99,12 +178,10 @@ public class Lobby {
             }
         }
 
-        if (plugin.getConfig().contains("tributesigns")) {
-            plugin.getLogger().info("Loading Tribute Signs");
-            ConfigurationSection signsSection = plugin.getConfig().getConfigurationSection("tributesigns");
+        if (this.getConfig().contains("tributesigns")) {
+            ConfigurationSection signsSection = this.getConfig().getConfigurationSection("tributesigns");
             for (String key : signsSection.getKeys(false)) {
                 int index = Integer.parseInt(key);
-                World world = Bukkit.getWorld(signsSection.getString(key + ".world"));
                 int signX = signsSection.getInt(key + ".sign.x");
                 int signY = signsSection.getInt(key + ".sign.y");
                 int signZ = signsSection.getInt(key + ".sign.z");
@@ -123,19 +200,30 @@ public class Lobby {
 
         this.lobbySettings = plugin.getLobbySettings("default");
         this.gameSettings = plugin.getGameSettings("default");
-        
-        this.lobbyChatRoom = new ChatRoom(plugin, "room-lobby-" + getLocalId(), Actor.getServerActor(), "&8<&3%nexussg_score%&8> &8(&2&l%nexuscore_level%&8) &r%nexuscore_displayname%&8: %nexuscore_chatcolor%{message}", "{message}");
-        plugin.getStarChat().getRoomRegistry().register(this.lobbyChatRoom.getSimplifiedName(), this.lobbyChatRoom);
+
+        this.lobbyChatRoom = new LobbyChatRoom(this);
+        plugin.getStarChat().getRoomRegistry().register(this.lobbyChatRoom.getName(), this.lobbyChatRoom);
 
         generateMapOptions();
+    }
 
-        for (LootTable lootTable : LootManager.getInstance().getLootTables()) {
-            lootTable.generateNewProbabilities(new Random());
+    public SGVirtualServer getServer() {
+        return server;
+    }
+
+    private Path newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
+        Path path = FileHelper.subPath(destinationDir.toPath(), zipEntry.getName());
+        String destDirPath = destinationDir.getCanonicalPath();
+        String destFilePath = path.toFile().getCanonicalPath();
+        if (!destFilePath.startsWith(destDirPath + File.separator)) {
+            throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
+        } else {
+            return path;
         }
     }
 
-    public int getLocalId() {
-        return localId;
+    public FileConfiguration getConfig() {
+        return config;
     }
 
     public void resetInvalidState() {
@@ -201,36 +289,11 @@ public class Lobby {
         if (gameMap != null) {
             gameMap.removeFromServer(plugin);
         }
-
-        FileConfiguration config = plugin.getConfig();
-        this.mapSigns.forEach((position, location) -> {
-            config.set("mapsigns." + position + ".world", location.getWorld().getName());
-            config.set("mapsigns." + position + ".x", location.getBlockX());
-            config.set("mapsigns." + position + ".y", location.getBlockY());
-            config.set("mapsigns." + position + ".z", location.getBlockZ());
-        });
-
-        this.statSigns.forEach(statSign -> {
-            Location location = statSign.getLocation();
-            config.set("statsigns." + statSign.getStat() + ".world", location.getWorld().getName());
-            config.set("statsigns." + statSign.getStat() + ".x", location.getBlockX());
-            config.set("statsigns." + statSign.getStat() + ".y", location.getBlockY());
-            config.set("statsigns." + statSign.getStat() + ".z", location.getBlockZ());
-            config.set("statsigns." + statSign.getStat() + ".displayName", statSign.getDisplayName());
-        });
-
-        this.tributeSigns.forEach(tributeSign -> {
-            Location sl = tributeSign.getSignLocation();
-            Location hl = tributeSign.getHeadLocation();
-
-            config.set("tributesigns." + tributeSign.getIndex() + ".world", sl.getWorld().getName());
-            config.set("tributesigns." + tributeSign.getIndex() + ".sign.x", sl.getBlockX());
-            config.set("tributesigns." + tributeSign.getIndex() + ".sign.y", sl.getBlockY());
-            config.set("tributesigns." + tributeSign.getIndex() + ".sign.z", sl.getBlockZ());
-            config.set("tributesigns." + tributeSign.getIndex() + ".head.x", hl.getBlockX());
-            config.set("tributesigns." + tributeSign.getIndex() + ".head.y", hl.getBlockY());
-            config.set("tributesigns." + tributeSign.getIndex() + ".head.z", hl.getBlockZ());
-        });
+        
+        if (this.world != null) {
+            Bukkit.unloadWorld(world, false);
+            FileHelper.deleteDirectory(this.worldFolder.toPath());
+        }
     }
 
     public List<LobbyPlayer> getPlayers() {
@@ -273,8 +336,7 @@ public class Lobby {
     }
 
     public void sendMessage(String message) {
-        this.lobbyChatRoom.sendMessage(message);
-        Bukkit.getConsoleSender().sendMessage(MCUtils.color(message));
+        this.lobbyChatRoom.sendMessage(new ChatContext(message));
     }
 
     public void editMaps() {
@@ -302,7 +364,7 @@ public class Lobby {
     }
 
     public void automatic() {
-        this.controlType = ControlType.AUTOMATIC;
+        this.controlType = ControlType.AUTO;
     }
 
     public void manual() {
@@ -390,25 +452,26 @@ public class Lobby {
             for (MapRating playerRating : gameMap.getRatings().values()) {
                 rating += playerRating.getRating();
             }
-            
+
             double ratingRatio = rating * 1.0 / totalRatings;
             int ratingPercent = (int) (ratingRatio * 100);
 
-            ratingMsg = "&7Rating: " + new ProgressBar(ratingPercent, 100, 5, "✦ ", "&a", "&7").display() + " &7&o(rating: " + rating / totalRatings + " star(s), based on: " + totalRatings + " vote(s))";
+            ratingMsg = "&7Rating: " + ProgressBar.of(ratingPercent, 100, 5, "* ", "&a", "&7") + " &7&o(rating: " + rating / totalRatings + " star(s), based on: " + totalRatings + " vote(s))";
         }
 
         sendMessage("&6&l> " + ratingMsg);
         sendMessage("&6&l> &7Votes: &e" + gameMap.getVotes());
         sendMessage("");
 
-        Game game = new Game(gameMap, this.gameSettings, getPlayers());
+        Game game = new Game(server, gameMap, this.gameSettings, getPlayers());
         this.players.clear();
-        plugin.setGame(game);
-        if (game.getControlType() == ControlType.AUTOMATIC) {
-            this.state = LobbyState.STARTING;
+        server.setGame(game);
+        if (game.getControlType() == ControlType.AUTO) {
             game.setup();
+            this.state = LobbyState.STARTING;
+            resetLobby();
         } else {
-            sendMessage("&eThe game has been prepared and is now ready, however, it has not been started due to the game being in manual mode.");
+            sendMessage("&eThe game has been prepared and is now ready, however, it has not been started due to not being in auto mode.");
             this.state = LobbyState.GAME_PREPARED;
         }
     }
@@ -443,7 +506,9 @@ public class Lobby {
         return gameMap;
     }
 
-    public void addPlayer(NexusPlayer nexusPlayer, SGPlayerStats stats) {
+    public void addPlayer(SGPlayer sgPlayer) {
+        NexusPlayer nexusPlayer = sgPlayer.getNexusPlayer();
+        SGPlayerStats stats = sgPlayer.getStats();
         if (nexusPlayer == null) {
             return;
         }
@@ -451,8 +516,10 @@ public class Lobby {
         if (nexusPlayer.getPlayer() == null) {
             return;
         }
-        
-        this.players.put(nexusPlayer.getUniqueId(), new LobbyPlayer(nexusPlayer, stats));
+
+        LobbyPlayer lobbyPlayer = new LobbyPlayer(nexusPlayer, stats);
+        this.players.put(nexusPlayer.getUniqueId(), lobbyPlayer);
+        sgPlayer.setLobby(this, lobbyPlayer);
         this.lobbyChatRoom.addMember(nexusPlayer.getUniqueId(), DefaultPermissions.VIEW_MESSAGES, DefaultPermissions.SEND_MESSAGES);
         this.plugin.getStarChat().setPlayerFocus(Bukkit.getPlayer(nexusPlayer.getUniqueId()), this.lobbyChatRoom);
 
@@ -478,6 +545,9 @@ public class Lobby {
         player.setLevel(0);
 
         for (Player online : Bukkit.getOnlinePlayers()) {
+            if (!this.players.containsKey(online.getUniqueId())) {
+                continue;
+            }
             online.showPlayer(player);
             player.showPlayer(online);
         }
@@ -525,9 +595,9 @@ public class Lobby {
             }
 
             boolean sponsors = nexusPlayer.getToggleValue("allowsponsors");
-            Material sponsorsItemMaterial = sponsors ? Material.GLOWSTONE_DUST : Material.SULPHUR;
-            player.getInventory().setItem(0, ItemBuilder.start(sponsorsItemMaterial).displayName("&e&lSponsors &7&o(Right click to toggle)").build());
-            player.getInventory().setItem(8, ItemBuilder.start(Material.WOOD_DOOR).displayName("&e&lReturn to Hub &7(Right Click)").build());
+            XMaterial sponsorsItemMaterial = sponsors ? XMaterial.GLOWSTONE_DUST : XMaterial.GUNPOWDER;
+            player.getInventory().setItem(0, ItemBuilder.of(sponsorsItemMaterial).displayName("&e&lSponsors &7&o(Right click to toggle)").build());
+            player.getInventory().setItem(8, ItemBuilder.of(XMaterial.OAK_DOOR).displayName("&e&lReturn to Hub &7(Right Click)").build());
         }
 
         if (nexusPlayer.getRank().ordinal() <= Rank.DIAMOND.ordinal()) {
@@ -540,7 +610,7 @@ public class Lobby {
             nexusPlayer.getScoreboard().setView(new LobbyBoard(nexusPlayer.getScoreboard(), this));
         }
         nexusPlayer.getScoreboard().setTablistHandler(new RankTablistHandler(nexusPlayer.getScoreboard()));
-        nexusPlayer.setActionBar(new LobbyActionBar(plugin));
+        nexusPlayer.setActionBar(new LobbyActionBar(plugin, plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId())));
         sendMapOptions(nexusPlayer);
     }
 
@@ -548,7 +618,11 @@ public class Lobby {
         if (!this.players.containsKey(nexusPlayer.getUniqueId())) {
             return;
         }
+
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId());
+
         this.lobbyChatRoom.removeMember(nexusPlayer.getUniqueId());
+        sgPlayer.setLobby(null, null);
         this.players.remove(nexusPlayer.getUniqueId());
         int totalPlayers = 0;
         for (LobbyPlayer player : getPlayers()) {
@@ -641,13 +715,12 @@ public class Lobby {
             this.gameSettings = plugin.getGameSettings("default");
         }
 
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(player.getUniqueId());
-            addPlayer(nexusPlayer, SurvivalGames.PLAYER_STATS.get(player.getUniqueId()));
+        for (UUID player : game.getPlayers().keySet()) {
+            addPlayer(plugin.getPlayerRegistry().get(player));
         }
 
-        plugin.getGame().getGameMap().removeFromServer(plugin);
-        plugin.setGame(null);
+        game.getGameMap().removeFromServer(plugin);
+        server.setGame(null);
     }
 
     public Location getSpawnpoint() {
@@ -735,10 +808,6 @@ public class Lobby {
     }
 
     public void addMapVote(NexusPlayer nexusPlayer, Location location) {
-        if (plugin.getGame() != null) {
-            return;
-        }
-
         LobbyPlayer player = this.players.get(nexusPlayer.getUniqueId());
 
         for (Entry<Integer, Location> entry : this.mapSigns.entrySet()) {
@@ -777,7 +846,7 @@ public class Lobby {
                     playerCount++;
                 }
             }
-            
+
             this.timer.setLengthAndReset(TimeUnit.SECONDS.toMillis(settings.getTimerLength()));
 
             if (playerCount < this.lobbySettings.getMinPlayers()) {
@@ -848,20 +917,7 @@ public class Lobby {
                 '}';
     }
 
-    public void recalculateVisibility() {
-        for (LobbyPlayer player : this.getPlayers()) {
-            Player bukkitPlayer = Bukkit.getPlayer(player.getUniqueId());
-            boolean vanish = player.getToggleValue("vanish");
-            for (LobbyPlayer other : this.getPlayers()) {
-                Player otherBukkit = Bukkit.getPlayer(other.getUniqueId());
-                if (!vanish) {
-                    otherBukkit.showPlayer(bukkitPlayer);
-                } else {
-                    if (other.getRank().ordinal() > Rank.HELPER.ordinal()) {
-                        otherBukkit.hidePlayer(bukkitPlayer);
-                    }
-                }
-            }
-        }
+    public World getWorld() {
+        return this.world;
     }
 }

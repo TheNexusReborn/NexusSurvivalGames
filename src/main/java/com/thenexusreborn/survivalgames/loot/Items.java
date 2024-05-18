@@ -5,7 +5,7 @@ import org.bukkit.Material;
 import java.util.*;
 
 public final class Items {
-    public static final List<LootItem> REGISTRY = new ArrayList<>();
+    public static final ItemRegistry REGISTRY = new ItemRegistry();
     
     public static final LootItem PORKCHOP = new LootItem(Material.GRILLED_PORK, "Porkchop");
     public static final LootItem STEAK = new LootItem(Material.COOKED_BEEF, "Steak");
@@ -22,7 +22,7 @@ public final class Items {
     public static final LootItem VILE_CREATURE = new LootItem(Material.COOKED_FISH, "Vile Creature");
     public static final LootItem GOLDEN_CARROT = new LootItem(Material.GOLDEN_CARROT);
     public static final LootItem APPLE = new LootItem(Material.APPLE);
-    public static final LootItem MELON = new LootItem(Material.MELON);
+    public static final LootItem MELON = new LootItem(Material.MELON, "turq Melon");
     public static final LootItem GOLDEN_MUNCHIE = new LootItem(Material.GOLDEN_APPLE, "Golden Munchie");
     public static final LootItem COOKIE = new LootItem(Material.COOKIE);
     public static final LootItem MUSHROOM_SOUP = new LootItem(Material.MUSHROOM_SOUP);

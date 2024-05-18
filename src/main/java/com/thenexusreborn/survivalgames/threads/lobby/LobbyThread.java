@@ -8,6 +8,7 @@ import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
+import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -15,89 +16,89 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 public class LobbyThread extends NexusThread<SurvivalGames> {
-    
+
     private int secondsInPrepareGame;
-    
+
     public LobbyThread(SurvivalGames plugin) {
         super(plugin, 20L, false);
     }
-    
+
     @Override
     public void onRun() {
-        if (plugin.getGame() != null) {
-            return;
-        }
-        
-        World world = Bukkit.getWorld(ServerProperties.getLevelName());
-        for (Entity entity : world.getEntities()) {
-            if (!(entity instanceof Player)) {
-                entity.remove();
+        for (SGVirtualServer server : plugin.getServers()) {
+            Lobby lobby = server.getLobby();
+            if (lobby == null) {
+                continue;
             }
-        }
+            World world = Bukkit.getWorld(ServerProperties.getLevelName());
+            for (Entity entity : world.getEntities()) {
+                if (!(entity instanceof Player)) {
+                    entity.remove();
+                }
+            }
 
-        Lobby lobby = plugin.getLobby();
-        for (LobbyPlayer player : lobby.getPlayers()) {
-            SGUtils.updatePlayerHealthAndFood(Bukkit.getPlayer(player.getUniqueId()));
-        }
-        
-        world.setThundering(false);
-        world.setStorm(false);
-        
-        world.setGameRuleValue("doFireSpread", "false");
+            LobbyState state = lobby.getState();
+            for (LobbyPlayer lobbyPlayer : lobby.getPlayers()) {
+                Player player = Bukkit.getPlayer(lobbyPlayer.getUniqueId());
+                SGUtils.updatePlayerHealthAndFood(Bukkit.getPlayer(player.getUniqueId()));
 
-        LobbyState state = lobby.getState();
-        if (state != LobbyState.MAP_EDITING) {
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                if (player.getLocation().getBlockY() < lobby.getSpawnpoint().getBlockY() - 20) {
-                    player.teleport(lobby.getSpawnpoint());
+                if (state != LobbyState.MAP_EDITING) {
+                    if (player.getLocation().getBlockY() < lobby.getSpawnpoint().getBlockY() - 20) {
+                        player.teleport(lobby.getSpawnpoint());
+                    }
                 }
             }
-        }
-        
-        for (LobbyPlayer player : lobby.getPlayers()) {
-            Player bukkitPlayer = Bukkit.getPlayer(player.getUniqueId());
-            for (LobbyPlayer other : lobby.getPlayers()) {
-                Player otherBukkitPlayer = Bukkit.getPlayer(other.getUniqueId());
-                if (player.getToggleValue("vanish")) {
-                    if (other.getRank().ordinal() > Rank.HELPER.ordinal()) {
-                        otherBukkitPlayer.hidePlayer(bukkitPlayer);
+
+            world.setThundering(false);
+            world.setStorm(false);
+
+            world.setGameRuleValue("doFireSpread", "false");
+
+            for (LobbyPlayer player : lobby.getPlayers()) {
+                Player bukkitPlayer = Bukkit.getPlayer(player.getUniqueId());
+                for (LobbyPlayer other : lobby.getPlayers()) {
+                    Player otherBukkitPlayer = Bukkit.getPlayer(other.getUniqueId());
+                    if (player.getToggleValue("vanish")) {
+                        if (other.getRank().ordinal() > Rank.HELPER.ordinal()) {
+                            otherBukkitPlayer.hidePlayer(bukkitPlayer);
+                        }
+                    } else {
+                        otherBukkitPlayer.showPlayer(bukkitPlayer);
                     }
-                } else {
-                    otherBukkitPlayer.showPlayer(bukkitPlayer);
-                }
-                
-                if (other.getToggleValue("vanish")) {
-                    if (player.getRank().ordinal() > Rank.HELPER.ordinal()) {
-                        bukkitPlayer.hidePlayer(otherBukkitPlayer);
+
+                    if (other.getToggleValue("vanish")) {
+                        if (player.getRank().ordinal() > Rank.HELPER.ordinal()) {
+                            bukkitPlayer.hidePlayer(otherBukkitPlayer);
+                        }
+                    } else {
+                        bukkitPlayer.showPlayer(otherBukkitPlayer);
                     }
-                } else {
-                    bukkitPlayer.showPlayer(otherBukkitPlayer);
                 }
             }
-        }
-        
-        boolean resetLobby = false;
-        if (!(state == LobbyState.WAITING || state == LobbyState.MAP_EDITING)) {
-            if (lobby.getTimer() == null) {
-                resetLobby = true;
-            } else if (TimeUnit.SECONDS.fromMillis(lobby.getTimer().getTime()) <= 0) {
-                if (state == LobbyState.PREPARING_GAME || state == LobbyState.STARTING || state == LobbyState.GAME_PREPARED) {
-                    this.secondsInPrepareGame++;
-                    if (this.secondsInPrepareGame >= 10) {
+
+            boolean resetLobby = false;
+            if (!(state == LobbyState.WAITING || state == LobbyState.MAP_EDITING)) {
+                if (lobby.getTimer() == null) {
+                    resetLobby = true;
+                } else if (TimeUnit.SECONDS.fromMillis(lobby.getTimer().getTime()) <= 0) {
+                    if (state == LobbyState.PREPARING_GAME || state == LobbyState.STARTING || state == LobbyState.GAME_PREPARED) {
+                        this.secondsInPrepareGame++;
+                        if (this.secondsInPrepareGame >= 10) {
+                            resetLobby = true;
+                        }
+                    } else {
                         resetLobby = true;
                     }
-                } else {
-                    resetLobby = true;
                 }
+
+//                if (Bukkit.getOnlinePlayers().size() <= 1) {
+//                    resetLobby = true;
+//                } //TODO Reimplement the bad lobby state detection
             }
-            
-            if (Bukkit.getOnlinePlayers().size() <= 1) {
-                resetLobby = true;
+
+            if (resetLobby) {
+                //lobby.resetInvalidState();
             }
-        }
-        
-        if (resetLobby) {
-            //lobby.resetInvalidState();
         }
     }
 }

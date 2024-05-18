@@ -1,25 +1,27 @@
 package com.thenexusreborn.survivalgames.lobby;
 
-import com.stardevllc.starclock.clocks.Timer;
+import com.stardevllc.starlib.clock.clocks.Timer;
 import com.stardevllc.starlib.time.TimeUnit;
-import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.IActionBar;
 import com.thenexusreborn.survivalgames.ControlType;
+import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 
 public class LobbyActionBar implements IActionBar {
     
     private final SurvivalGames plugin;
-    
-    public LobbyActionBar(SurvivalGames plugin) {
+    private final SGPlayer player;
+
+    public LobbyActionBar(SurvivalGames plugin, SGPlayer player) {
         this.plugin = plugin;
+        this.player = player;
     }
     
     @Override
     public String getText() {
-        Lobby lobby = plugin.getLobby();
-        if (plugin.getGame() != null) {
-            return "";
+        Lobby lobby = player.getLobby();
+        if (player.getLobby() == null) {
+            return null;
         }
         
         if (lobby.getControlType() == ControlType.MANUAL) {
@@ -28,7 +30,7 @@ public class LobbyActionBar implements IActionBar {
 
         Timer timer = lobby.getTimer();
         if (lobby.getState() == LobbyState.WAITING || timer == null) {
-            return "&d&lNEXUS &7- &fPlaying on &f&l" + NexusAPI.getApi().getServerManager().getCurrentServer().getName();
+            return "&d&lNEXUS &7- &fPlaying on &f&l" + lobby.getServer().getName();
         }
         
         if (lobby.getState() == LobbyState.COUNTDOWN) {

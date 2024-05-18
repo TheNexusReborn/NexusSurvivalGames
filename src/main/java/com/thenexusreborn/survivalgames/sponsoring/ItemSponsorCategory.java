@@ -1,14 +1,16 @@
 package com.thenexusreborn.survivalgames.sponsoring;
 
-import com.thenexusreborn.nexuscore.util.MCUtils;
+import com.stardevllc.starcore.color.ColorHandler;
+import com.stardevllc.starcore.xseries.XMaterial;
 import com.thenexusreborn.survivalgames.loot.LootItem;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ItemSponsorCategory extends SponsorCategory<LootItem> {
-    public ItemSponsorCategory(String name, Material icon) {
+    public ItemSponsorCategory(String name, XMaterial icon) {
         super(name, icon);
     }
     
@@ -21,7 +23,7 @@ public class ItemSponsorCategory extends SponsorCategory<LootItem> {
     public List<String> getListOfEntries() {
         List<String> entriesList = new LinkedList<>();
         for (LootItem entry : this.getEntries()) {
-            entriesList.add(ChatColor.stripColor(MCUtils.color(entry.getName())));
+            entriesList.add(ChatColor.stripColor(ColorHandler.getInstance().color(entry.getName())));
         }
         return entriesList;
     }

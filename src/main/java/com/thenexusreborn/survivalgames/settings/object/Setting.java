@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.settings.object;
 
-import com.stardevllc.starlib.Value;
+import com.stardevllc.starlib.misc.Value;
 import com.thenexusreborn.api.sql.annotations.column.ColumnCodec;
 import com.thenexusreborn.api.sql.annotations.column.ColumnIgnored;
 import com.thenexusreborn.api.sql.annotations.column.ColumnName;

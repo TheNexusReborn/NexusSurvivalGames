@@ -3,6 +3,7 @@ package com.thenexusreborn.survivalgames.threads.lobby;
 import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.*;
+import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 
 public class MapChatOptionsMsgThread extends NexusThread<SurvivalGames> {
     
@@ -11,22 +12,22 @@ public class MapChatOptionsMsgThread extends NexusThread<SurvivalGames> {
     }
     
     public void onRun() {
-        Lobby lobby = plugin.getLobby();
-        
-        if (plugin.getGame() != null) {
-            return;
-        }
-    
-        if (lobby.getPlayers().isEmpty()) {
-            return;
-        }
-    
-        if (!(lobby.getState() == LobbyState.WAITING || lobby.getState() == LobbyState.COUNTDOWN)) {
-            return;
-        }
-    
-        for (LobbyPlayer nexusPlayer : lobby.getPlayers()) {
-            lobby.sendMapOptions(nexusPlayer.getPlayer());
+        for (SGVirtualServer server : plugin.getServers()) {
+            Lobby lobby = server.getLobby();
+            if (lobby == null) {
+                continue;
+            }
+            if (lobby.getPlayers().isEmpty()) {
+                continue;
+            }
+
+            if (!(lobby.getState() == LobbyState.WAITING || lobby.getState() == LobbyState.COUNTDOWN)) {
+                continue;
+            }
+
+            for (LobbyPlayer nexusPlayer : lobby.getPlayers()) {
+                lobby.sendMapOptions(nexusPlayer.getPlayer());
+            }
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.game.death;
 
-import com.thenexusreborn.api.helper.NumberHelper;
-import com.thenexusreborn.nexuscore.util.EntityNames;
+import com.stardevllc.starcore.color.ColorHandler;
+import com.stardevllc.starcore.utils.EntityNames;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
@@ -128,11 +128,11 @@ public class DeathInfo {
             }
             
             if (killer.getDistance() > 0) {
-                deathMessage = deathMessage.replace("%distance%", "&f" + NumberHelper.formatNumber(killer.getDistance()));
+                deathMessage = deathMessage.replace("%distance%", "&f" + MCUtils.formatNumber(killer.getDistance()));
             }
         }
         
-        return MCUtils.color("&4&l>> &7" + deathMessage + "&7.");
+        return ColorHandler.getInstance().color("&4&l>> &7" + deathMessage + "&7.");
     }
     
     public long getTime() {

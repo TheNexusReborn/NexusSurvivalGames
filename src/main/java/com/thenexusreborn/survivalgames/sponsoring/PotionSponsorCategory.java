@@ -1,14 +1,14 @@
 package com.thenexusreborn.survivalgames.sponsoring;
 
-import com.thenexusreborn.nexuscore.util.PotionNames;
-import org.bukkit.Material;
+import com.stardevllc.starcore.utils.PotionNames;
+import com.stardevllc.starcore.xseries.XMaterial;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.*;
 
 import java.util.*;
 
 public class PotionSponsorCategory extends SponsorCategory<PotionEffectType> {
-    public PotionSponsorCategory(String name, Material icon) {
+    public PotionSponsorCategory(String name, XMaterial icon) {
         super(name, icon);
     }
     

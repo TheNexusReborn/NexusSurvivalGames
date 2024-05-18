@@ -5,6 +5,7 @@ import com.thenexusreborn.survivalgames.ControlType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
+import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 
 public class TimerCountdownCheckThread extends NexusThread<SurvivalGames> {
     
@@ -14,25 +15,29 @@ public class TimerCountdownCheckThread extends NexusThread<SurvivalGames> {
     
     @Override
     public void onRun() {
-        Lobby lobby = plugin.getLobby();
-        
-        if (lobby.getState() != LobbyState.WAITING) {
-            return;
-        }
-        
-        if (lobby.getControlType() == ControlType.MANUAL) {
-            return;
-        }
-        
-        if (lobby.getTimer() != null) {
-            return;
-        }
-        
-        int playerCount = lobby.getPlayingCount();
-        
-        if (playerCount >= lobby.getLobbySettings().getMinPlayers()) {
-            lobby.startTimer();
-            lobby.sendMessage("&eMinimum player count has been met, starting countdown to game start.");
+        for (SGVirtualServer server : plugin.getServers()) {
+            Lobby lobby = server.getLobby();
+            if (lobby == null) {
+                continue;
+            }
+            if (lobby.getState() != LobbyState.WAITING) {
+                continue;
+            }
+
+            if (lobby.getControlType() == ControlType.MANUAL) {
+                continue;
+            }
+
+            if (lobby.getTimer() != null) {
+                continue;
+            }
+
+            int playerCount = lobby.getPlayingCount();
+
+            if (playerCount >= lobby.getLobbySettings().getMinPlayers()) {
+                lobby.startTimer();
+                lobby.sendMessage("&eMinimum player count has been met, starting countdown to game start.");
+            }
         }
     }
 }

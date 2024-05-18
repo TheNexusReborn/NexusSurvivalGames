@@ -1,10 +1,11 @@
 package com.thenexusreborn.survivalgames.scoreboard.lobby;
 
-import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.api.scoreboard.*;
+import com.stardevllc.starcore.color.ColorHandler;
+import com.thenexusreborn.api.scoreboard.NexusScoreboard;
+import com.thenexusreborn.api.scoreboard.TeamBuilder;
 import com.thenexusreborn.nexuscore.scoreboard.SpigotScoreboardView;
-import com.thenexusreborn.nexuscore.util.MCUtils;
-import com.thenexusreborn.survivalgames.lobby.*;
+import com.thenexusreborn.survivalgames.lobby.Lobby;
+import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.ChatColor;
 
@@ -13,7 +14,7 @@ public class LobbyBoard extends SpigotScoreboardView {
     private final Lobby lobby;
     
     public LobbyBoard(NexusScoreboard scoreboard, Lobby lobby) {
-        super(scoreboard, "lobby", MCUtils.color("&a&lLobby"));
+        super(scoreboard, "lobby", ColorHandler.getInstance().color("&a&lLobby"));
         this.lobby = lobby;
     }
     
@@ -24,7 +25,7 @@ public class LobbyBoard extends SpigotScoreboardView {
             if (lobby.getGameMap() != null) {
                 SGUtils.setMapNameForScoreboard(lobby.getGameMap(), team);
             } else {
-                team.setPrefix(MCUtils.color("&7Voting"));
+                team.setPrefix(ColorHandler.getInstance().color("&7Voting"));
                 team.setSuffix("");
             }
         }));
@@ -41,6 +42,6 @@ public class LobbyBoard extends SpigotScoreboardView {
         }));
         createTeam(new TeamBuilder("neededValue").entry("&fNeeded: &e").score(10).valueUpdater((player, team) -> team.setSuffix(lobby.getLobbySettings().getMinPlayers() + "")));
         createTeam(new TeamBuilder("blank2").entry(ChatColor.DARK_PURPLE).score(9));
-        createTeam(new TeamBuilder("serverValue").entry(NexusAPI.getApi().getServerManager().getCurrentServer().getName()).score(1));
+        createTeam(new TeamBuilder("serverValue").entry("&f" + lobby.getServer().getName()));
     }
 }

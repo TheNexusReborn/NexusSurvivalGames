@@ -1,14 +1,24 @@
 package com.thenexusreborn.survivalgames.util;
 
+import com.stardevllc.starcore.color.ColorHandler;
+import com.thenexusreborn.api.NexusAPI;
+import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.scoreboard.wrapper.ITeam;
+import com.thenexusreborn.api.server.NexusServer;
+import com.thenexusreborn.api.util.NetworkType;
 import com.thenexusreborn.gamemaps.model.SGMap;
-import com.thenexusreborn.nexuscore.util.*;
+import com.thenexusreborn.nexuscore.util.MsgType;
+import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import net.minecraft.server.v1_8_R3.EntityTNTPrimed;
-import org.bukkit.*;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_8_R3.entity.*;
-import org.bukkit.entity.*;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftTNTPrimed;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Field;
@@ -62,7 +72,29 @@ public final class SGUtils {
     }
     
     public static void sendToHub(Player player) {
-        //TODO Handle this
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
+
+        NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(player.getUniqueId());
+        if (sgPlayer.getGame() != null) {
+            sgPlayer.getGame().getServer().quit(nexusPlayer);
+        } else if (sgPlayer.getLobby() != null) {
+            sgPlayer.getLobby().getServer().quit(nexusPlayer);
+        }
+        
+        for (NexusServer nexusServer : NexusAPI.getApi().getServerRegistry()) {
+            if (nexusServer.getMode().equalsIgnoreCase("hub")) {
+                if (nexusServer.getPlayers().size() < nexusServer.getMaxPlayers()) {
+                    if (NexusAPI.NETWORK_TYPE == NetworkType.SINGLE && plugin.getNexusHubHook() != null) {
+                        nexusServer.join(nexusPlayer);
+                        break;
+                    } else {
+                        //TODO Implement sending to bungee server later
+                    }
+                }
+            }
+        }
+        
+        player.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "Server is not set up to send to a hub."));
     }
     
     public static String getMapNameFromCommand(String[] args, int startIndex) {
@@ -80,7 +112,7 @@ public final class SGUtils {
         }
         
         if (gameMap.getWorld() == null) {
-            actor.sendMessage(MCUtils.color(MsgType.WARN + "That map is not loaded, please load before teleporting."));
+            actor.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "That map is not loaded, please load before teleporting."));
             return null;
         }
         return gameMap;
@@ -95,7 +127,7 @@ public final class SGUtils {
         }
         
         if (gameMap == null) {
-            actor.sendMessage(MCUtils.color(MsgType.WARN + "Could not find a map with that name or file name."));
+            actor.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "Could not find a map with that name or file name."));
         }
         
         return gameMap;

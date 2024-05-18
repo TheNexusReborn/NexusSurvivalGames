@@ -1,9 +1,10 @@
 package com.thenexusreborn.survivalgames.threads.lobby;
 
+import com.stardevllc.starcore.color.ColorHandler;
 import com.thenexusreborn.nexuscore.api.NexusThread;
-import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.*;
+import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -13,32 +14,29 @@ public class StatSignUpdateThread extends NexusThread<SurvivalGames> {
     }
     
     public void onRun() {
-        Lobby lobby = plugin.getLobby();
-        if (lobby == null) {
-            return;
-        }
-    
-        if (plugin.getGame() != null) {
-            return;
-        }
-    
-        if (lobby.getState() == LobbyState.MAP_EDITING) {
-            return;
-        }
-    
-        if (lobby.getStatSigns().isEmpty()) {
-            return;
-        }
-    
-        for (StatSign statSign : lobby.getStatSigns()) {
-            for (LobbyPlayer lobbyPlayer : lobby.getPlayers()) {
-                Player player = Bukkit.getPlayer(lobbyPlayer.getUniqueId());
-                if (player.getWorld() != statSign.getLocation().getWorld()) {
-                    continue;
+        for (SGVirtualServer server : plugin.getServers()) {
+            Lobby lobby = server.getLobby();
+            if (lobby == null) {
+                continue;
+            }
+            if (lobby.getState() == LobbyState.MAP_EDITING) {
+                continue;
+            }
+
+            if (lobby.getStatSigns().isEmpty()) {
+                continue;
+            }
+
+            for (StatSign statSign : lobby.getStatSigns()) {
+                for (LobbyPlayer lobbyPlayer : lobby.getPlayers()) {
+                    Player player = Bukkit.getPlayer(lobbyPlayer.getUniqueId());
+                    if (player.getWorld() != statSign.getLocation().getWorld()) {
+                        continue;
+                    }
+
+                    String[] lines = {ColorHandler.getInstance().color("&n" + statSign.getDisplayName()), "", lobbyPlayer.getStats().getValue(statSign.getStat()) + "", ""};
+                    player.sendSignChange(statSign.getLocation(), lines);
                 }
-                
-                String[] lines = {MCUtils.color("&n" + statSign.getDisplayName()), "", lobbyPlayer.getStats().getValue(statSign.getStat()) + "", ""};
-                player.sendSignChange(statSign.getLocation(), lines);
             }
         }
     }

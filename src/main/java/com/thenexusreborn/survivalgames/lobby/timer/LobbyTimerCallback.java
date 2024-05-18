@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.lobby.timer;
 
-import com.stardevllc.starclock.callback.ClockCallback;
-import com.stardevllc.starclock.snapshot.TimerSnapshot;
+import com.stardevllc.starlib.clock.callback.ClockCallback;
+import com.stardevllc.starlib.clock.snapshot.TimerSnapshot;
 import com.stardevllc.starlib.time.TimeUnit;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import org.bukkit.Sound;

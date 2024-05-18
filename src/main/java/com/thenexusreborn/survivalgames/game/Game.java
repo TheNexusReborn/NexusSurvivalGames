@@ -1,26 +1,30 @@
 package com.thenexusreborn.survivalgames.game;
 
+import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
+import com.stardevllc.starcore.color.ColorHandler;
+import com.stardevllc.starcore.utils.Cuboid;
+import com.stardevllc.starlib.clock.clocks.Timer;
+import com.stardevllc.starlib.helper.StringHelper;
 import com.stardevllc.starlib.registry.StringRegistry;
 import com.stardevllc.starlib.time.TimeFormat;
 import com.stardevllc.starlib.time.TimeUnit;
-import com.stardevllc.starmclib.actor.Actor;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.gamearchive.GameAction;
 import com.thenexusreborn.api.gamearchive.GameInfo;
-import com.thenexusreborn.api.helper.NumberHelper;
-import com.thenexusreborn.api.helper.StringHelper;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
+import com.thenexusreborn.api.sql.objects.SQLDatabase;
 import com.thenexusreborn.api.tags.Tag;
 import com.thenexusreborn.gamemaps.model.MapSpawn;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
-import com.thenexusreborn.nexuscore.util.timer.Timer;
 import com.thenexusreborn.survivalgames.ControlType;
+import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
+import com.thenexusreborn.survivalgames.chat.GameChatRoom;
 import com.thenexusreborn.survivalgames.chat.GameTeamChatroom;
 import com.thenexusreborn.survivalgames.disguises.DisguiseAPI;
 import com.thenexusreborn.survivalgames.disguises.disguisetypes.MobDisguise;
@@ -28,28 +32,24 @@ import com.thenexusreborn.survivalgames.game.Bounty.Type;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.game.death.DeathType;
 import com.thenexusreborn.survivalgames.game.death.KillerInfo;
-import com.thenexusreborn.survivalgames.game.state.GamePhase;
-import com.thenexusreborn.survivalgames.game.state.phase.AssignTeamsPhase;
-import com.thenexusreborn.survivalgames.game.state.phase.SetupPhase;
-import com.thenexusreborn.survivalgames.game.state.phase.TeleportToMapPhase;
-import com.thenexusreborn.survivalgames.game.timer.old.*;
+import com.thenexusreborn.survivalgames.game.timer.callbacks.GameMinutesCallback;
+import com.thenexusreborn.survivalgames.game.timer.callbacks.GameSecondsCallback;
+import com.thenexusreborn.survivalgames.game.timer.endconditions.*;
+import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
+import com.thenexusreborn.survivalgames.lobby.LobbyType;
 import com.thenexusreborn.survivalgames.loot.Items;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
 import com.thenexusreborn.survivalgames.mutations.MutationEffect;
 import com.thenexusreborn.survivalgames.mutations.MutationItem;
 import com.thenexusreborn.survivalgames.mutations.MutationType;
+import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.sponsoring.SponsorManager;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
@@ -62,23 +62,23 @@ import java.util.stream.Stream;
 
 import static com.thenexusreborn.survivalgames.game.GameState.*;
 
-@SuppressWarnings({"unused", "ExtractMethodRecommender"})
+@SuppressWarnings({"unused"})
 public class Game {
     private static final SurvivalGames plugin = SurvivalGames.getPlugin(SurvivalGames.class);
-    public static final TimeFormat SHORT_TIME_FORMAT = new TimeFormat("%*00h%%*#0m%%*#0s%");
+    public static final TimeFormat SHORT_TIME_FORMAT = new TimeFormat("%*#0h%%*#0m%%*#0s%");
     public static final TimeFormat TIME_FORMAT = new TimeFormat("%*00h%%#0m%%00s%");
     public static final TimeFormat LONG_TIME_FORMAT = new TimeFormat("%*00h%%00m%%00s%");
 
-    private final int localId;
     private final SGMap gameMap;
-    private ControlType controlType = ControlType.AUTOMATIC;
+    private final SGVirtualServer server;
+    private ControlType controlType = ControlType.AUTO;
     private final GameSettings settings;
     private final Map<UUID, GamePlayer> players = new HashMap<>();
     private final Map<Integer, UUID> spawns = new HashMap<>();
     private final ChatRoom gameChatroom;
     private final Map<GameTeam, GameTeamChatroom> chatRooms = new HashMap<>();
     private GameState state = UNDEFINED;
-    private Timer timer, graceperiodTimer, restockTimer, ratingPromptTimer;
+    private Timer timer, graceperiodTimer;
     private final List<Location> lootedChests = new ArrayList<>();
     private final GameInfo gameInfo;
     private long start, end;
@@ -89,33 +89,35 @@ public class Game {
     private boolean debugMode; //Debug Mode. This may be replaced with a class with other settings
     private Graceperiod graceperiod = Graceperiod.INACTIVE;
 
-    private GamePhase setupPhase, assignTeamsPhase, teleportToMapPhase;
+    private UUID restockCallbackId;
+    private int timedRestockCount;
 
-    public Game(SGMap gameMap, GameSettings settings, Collection<LobbyPlayer> players) {
-        this.localId = plugin.getLastLocalGameId();
-        plugin.setLastLocalGameId(plugin.getLastLocalGameId() + 1);
+    public Game(SGVirtualServer server, SGMap gameMap, GameSettings settings, Collection<LobbyPlayer> players) {
         this.gameMap = gameMap;
+        this.server = server;
         this.settings = settings;
         this.gameInfo = new GameInfo();
-        
-        this.gameChatroom = new ChatRoom(plugin, "room-game-" + this.localId + "-main", Actor.getServerActor(), "{message}", "{message}");
-        plugin.getStarChat().getRoomRegistry().register(gameChatroom.getSimplifiedName(), gameChatroom);
+
+        this.gameChatroom = new GameChatRoom(this);
+        plugin.getStarChat().getRoomRegistry().register(gameChatroom.getName(), gameChatroom);
 
         for (GameTeam team : GameTeam.values()) {
             GameTeamChatroom chatroom = new GameTeamChatroom(plugin, this, team);
             this.chatRooms.put(team, chatroom);
-            plugin.getStarChat().getRoomRegistry().register(chatroom.getSimplifiedName(), chatroom);
+            plugin.getStarChat().getRoomRegistry().register(chatroom.getName(), chatroom);
         }
-        
+
         gameInfo.setMapName(this.gameMap.getName().replace("'", "''"));
-        gameInfo.setServerName(NexusAPI.getApi().getServerManager().getCurrentServer().getName());
+        gameInfo.setServerName(server.getName());
         for (MapSpawn spawn : this.gameMap.getSpawns()) {
             this.spawns.put(spawn.getIndex(), null);
         }
         List<String> playerNames = new ArrayList<>();
         int tributeCount = 0;
         for (LobbyPlayer player : players) {
+            SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
             GamePlayer gamePlayer = new GamePlayer(player.getPlayer(), this, player.getStats());
+            sgPlayer.setGame(this, gamePlayer);
             if (player.isSpectating()) {
                 gamePlayer.setTeam(GameTeam.SPECTATORS);
             } else {
@@ -129,31 +131,15 @@ public class Game {
         }
         gameInfo.setPlayerCount(tributeCount);
         gameInfo.setPlayers(playerNames.toArray(new String[0]));
-
-        this.setupPhase = new SetupPhase(this);
-        this.assignTeamsPhase = new AssignTeamsPhase(this);
-        this.teleportToMapPhase = new TeleportToMapPhase(this);
     }
-
-    public int getLocalId() {
-        return localId;
+    
+    public SGVirtualServer getServer() {
+        return server;
     }
 
     public void setState(GameState state) {
         this.state = state;
         this.gameInfo.getActions().add(new GameAction(System.currentTimeMillis(), "statechange", state.name()));
-    }
-
-    public GamePhase getSetupPhase() {
-        return setupPhase;
-    }
-
-    public GamePhase getAssignTeamsPhase() {
-        return assignTeamsPhase;
-    }
-
-    public GamePhase getTeleportToMapPhase() {
-        return teleportToMapPhase;
     }
 
     public void handleShutdown() {
@@ -165,14 +151,6 @@ public class Game {
 
         if (this.graceperiodTimer != null) {
             this.graceperiodTimer.cancel();
-        }
-
-        if (this.ratingPromptTimer != null) {
-            this.ratingPromptTimer.cancel();
-        }
-
-        if (this.restockTimer != null) {
-            this.restockTimer.cancel();
         }
 
         if (this.gameMap != null) {
@@ -187,15 +165,13 @@ public class Game {
     public void setControlType(ControlType controlType) {
         this.controlType = controlType;
         if (controlType == ControlType.MANUAL) {
-            if (plugin.getGame() != null) {
-                if (plugin.getGame().getTimer() != null) {
-                    plugin.getGame().getTimer().cancel();
-                    plugin.getGame().timer = null;
-                }
-                if (plugin.getGame().getGraceperiodTimer() != null) {
-                    plugin.getGame().getGraceperiodTimer().cancel();
-                    plugin.getGame().graceperiodTimer = null;
-                }
+            if (getTimer() != null) {
+                getTimer().cancel();
+                timer = null;
+            }
+            if (getGraceperiodTimer() != null) {
+                getGraceperiodTimer().cancel();
+                graceperiodTimer = null;
             }
         }
     }
@@ -212,17 +188,10 @@ public class Game {
         return graceperiodTimer;
     }
 
-    public Timer getRestockTimer() {
-        if (this.restockTimer != null) {
-            if (this.restockTimer.getTimeLeft() <= 0) {
-                this.restockTimer = null;
-            }
-        }
-        return restockTimer;
-    }
-
     public void addPlayer(NexusPlayer nexusPlayer, SGPlayerStats stats) {
         GamePlayer gamePlayer = new GamePlayer(nexusPlayer, this, stats);
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId());
+        sgPlayer.setGame(this, gamePlayer);
         gamePlayer.setStatus(GamePlayer.Status.ADDING_TO_GAME);
         gamePlayer.setTeam(GameTeam.SPECTATORS);
         gamePlayer.sendMessage(GameTeam.SPECTATORS.getJoinMessage());
@@ -260,7 +229,6 @@ public class Game {
         gamePlayer.setStatus(GamePlayer.Status.SETTING_UP_ACTIONBAR);
         gamePlayer.applyActionBar();
         gamePlayer.setStatus(GamePlayer.Status.READY);
-        recalculateVisibility();
     }
 
     public void removePlayer(NexusPlayer nexusPlayer) {
@@ -273,9 +241,19 @@ public class Game {
         EnumSet<GameState> ignoreStates = EnumSet.of(UNDEFINED, SETTING_UP, SETUP_COMPLETE, ASSIGN_TEAMS, TEAMS_ASSIGNED, TELEPORT_START, TELEPORT_START_DONE, ERROR, ENDING, ENDED);
         if (!ignoreStates.contains(this.state)) {
             if (gamePlayer.getTeam() == GameTeam.TRIBUTES || gamePlayer.getTeam() == GameTeam.MUTATIONS) {
-                killPlayer(gamePlayer, new DeathInfo(plugin.getGame(), System.currentTimeMillis(), gamePlayer, DeathType.SUICIDE));
+                killPlayer(gamePlayer, new DeathInfo(this, System.currentTimeMillis(), gamePlayer, DeathType.SUICIDE));
             }
         }
+
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId());
+        sgPlayer.setGame(null, null);
+
+        NexusAPI.getApi().getScheduler().runTaskAsynchronously(() -> {
+            SQLDatabase database = NexusAPI.getApi().getPrimaryDatabase();
+            database.saveSilent(sgPlayer.getStats());
+            database.saveSilent(sgPlayer.getNexusPlayer().getBalance());
+            database.saveSilent(sgPlayer.getNexusPlayer().getExperience());
+        });
 
         this.players.remove(nexusPlayer.getUniqueId());
 
@@ -321,10 +299,6 @@ public class Game {
         }
     }
 
-    public void ingameComplete() {
-        setState(GameState.INGAME_DONE);
-    }
-
     private void teleportToGameSpawn(Player player, Location spawn, GameTeam gameTeam) {
         player.teleport(spawn);
         Bukkit.getScheduler().runTaskLater(plugin, () -> player.setGameMode(gameTeam.getGameMode()), 1L);
@@ -353,37 +327,6 @@ public class Game {
         }
     }
 
-    public void recalculateVisibility() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            GamePlayer gamePlayer = getPlayer(player.getUniqueId());
-            if (gamePlayer == null) {
-                continue;
-            }
-            for (Player other : Bukkit.getOnlinePlayers()) {
-                GamePlayer otherGamePlayer = getPlayer(other.getUniqueId());
-
-                if (otherGamePlayer == null) {
-                    continue;
-                }
-
-                if (gamePlayer.getToggleValue("vanish")) {
-                    player.showPlayer(other);
-                    if (otherGamePlayer.getRank().ordinal() > Rank.HELPER.ordinal()) {
-                        other.hidePlayer(player);
-                    }
-                } else if (gamePlayer.getTeam() != GameTeam.SPECTATORS && otherGamePlayer.getTeam() != GameTeam.SPECTATORS) {
-                    player.showPlayer(other);
-                    other.showPlayer(player);
-                } else if (gamePlayer.getTeam() == GameTeam.SPECTATORS && otherGamePlayer.getTeam() != GameTeam.SPECTATORS) {
-                    player.showPlayer(other);
-                    other.hidePlayer(player);
-                } else {
-                    player.hidePlayer(other);
-                }
-            }
-        }
-    }
-
     public void teleportSpectators(List<UUID> spectators, Location mapSpawn) {
         for (UUID spectator : spectators) {
             Player player = Bukkit.getPlayer(spectator);
@@ -393,29 +336,125 @@ public class Game {
 
     public void teleportStart() {
         setState(TELEPORT_START);
-        this.teleportToMapPhase.beginphase(); //TODO Temporary until it can be fully implemented
+        resetSpawns();
+        List<UUID> tributes = new ArrayList<>(), spectators = new ArrayList<>();
+        for (GamePlayer player : getPlayers().values()) {
+            player.clearInventory();
+            player.clearPotionEffects();
+            player.setFood(20, getSettings().getStartingSaturation());
+            if (player.getTeam() == GameTeam.TRIBUTES) {
+                tributes.add(player.getUniqueId());
+                player.setFlight(false, false);
+            } else if (player.getTeam() == GameTeam.SPECTATORS) {
+                spectators.add(player.getUniqueId());
+                player.setFlight(true, true);
+                player.giveSpectatorItems(this);
+            }
+        }
+
+        Location mapSpawn = getGameMap().getCenter().toLocation(getGameMap().getWorld());
+        teleportTributes(tributes, mapSpawn);
+        teleportSpectators(spectators, mapSpawn);
+        for (Entity entity : getGameMap().getWorld().getEntities()) {
+            if (entity instanceof Monster) {
+                entity.remove();
+            }
+        }
+        setState(TELEPORT_START_DONE);
     }
 
     public void assignStartingTeams() {
         setState(ASSIGN_TEAMS);
-        this.assignTeamsPhase.beginphase(); //TODO Temporary until it can be fully implemented
+        //TODO Add a secondary check for total games played as well
+        SortedSet<GamePlayer> players = new TreeSet<>((player, other) -> {
+            SGPlayer sgPlayer = SurvivalGames.getInstance().getPlayerRegistry().get(player.getUniqueId());
+            SGPlayer otherPlayer = SurvivalGames.getInstance().getPlayerRegistry().get(other.getUniqueId());
+            return Long.compare(otherPlayer.getJoinTime(), sgPlayer.getJoinTime());
+        });
+
+        players.addAll(getPlayers().values());
+
+        List<UUID> tributes = new LinkedList<>();
+        for (GamePlayer player : players) {
+            if (player.getTeam() == null) {
+                if (tributes.size() >= getGameMap().getSpawns().size()) {
+                    player.setTeam(GameTeam.SPECTATORS);
+                } else {
+                    player.setTeam(GameTeam.TRIBUTES);
+                    tributes.add(player.getUniqueId());
+                }
+            }
+            player.applyScoreboard();
+        }
+        setState(TEAMS_ASSIGNED);
     }
 
     public void setup() {
         setState(SETTING_UP);
-        this.setupPhase.beginphase(); //TODO Temporary until it can be fully fully implemented
+        if (!getGameMap().download(Game.getPlugin())) {
+            handleError("Could not download map");
+            return;
+        }
+
+        if (!getGameMap().unzip(Game.getPlugin())) {
+            handleError("Could not unzip map");
+            return;
+        }
+
+        if (!getGameMap().copyFolder(Game.getPlugin(), getServer().getName() + "-", false)) {
+            handleError("Could not copy map folder");
+            return;
+        }
+
+        if (!getGameMap().load(Game.getPlugin())) {
+            handleError("Could not load map");
+            return;
+        }
+
+        int radius = gameMap.getDeathmatchBorderDistance();
+        Location center = gameMap.getCenter().toLocation(gameMap.getWorld());
+        Location corner1 = center.clone();
+        corner1.add(radius, radius, radius);
+        Location corner2 = center.clone();
+        corner2.subtract(radius, radius, radius);
+        gameMap.setDeathmatchArea(new Cuboid(corner1, corner2));
+
+        try {
+            for (int i = 0; i < getGameMap().getSpawns().size(); i++) {
+                setSpawn(i, null);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            handleError("Could not setup the spawns.");
+            return;
+        }
+
+        try {
+            gameMap.getWorld().setGameRuleValue("naturalRegeneration", "" + settings.isRegeneration());
+            gameMap.getWorld().setGameRuleValue("doDaylightCycle", "" + settings.isTimeProgression());
+            gameMap.getWorld().setGameRuleValue("doWeatherCycle", "" + settings.isWeatherProgression());
+            gameMap.getWorld().setGameRuleValue("doMobSpawning", "false");
+            gameMap.getWorld().setGameRuleValue("announceAdvancements", "false");
+            gameMap.getWorld().setGameRuleValue("doFireTick", "false");
+            gameMap.getWorld().setGameRuleValue("keepInventory", "false");
+            gameMap.getWorld().setDifficulty(Difficulty.EASY);
+        } catch (Exception e) {
+            e.printStackTrace();
+            handleError("Could not setup the world settings..");
+        }
+        
+        setState(SETUP_COMPLETE);
     }
 
     public void handleError(String message) {
         setState(ERROR);
         sendMessage("&4&l>> &4" + message + " Resetting back to lobby.");
-        plugin.getLobby().resetLobby();
-        plugin.getLobby().fromGame(this);
+        Lobby lobby = new Lobby(plugin, server, LobbyType.CUSTOM);
+        lobby.fromGame(this);
     }
 
     public void sendMessage(String message) {
-        this.gameChatroom.sendMessage(message);
-        Bukkit.getConsoleSender().sendMessage(MCUtils.color(message));
+        this.gameChatroom.sendMessage(new ChatContext(message));
     }
 
     public GameState getState() {
@@ -424,34 +463,71 @@ public class Game {
 
     public void startWarmup() {
         setState(WARMUP);
-        this.timer = new Timer(new CountdownTimerCallback(this)).run(TimeUnit.SECONDS.toMillis(settings.getWarmupLength()) + 50L);
+        this.timer = Game.getPlugin().getClockManager().createTimer(TimeUnit.SECONDS.toMillis(getSettings().getWarmupLength()) + 50L);
+        this.timer.setEndCondition(new WarmupEndCondition(this));
+        this.timer.addRepeatingCallback(new GameSecondsCallback(this, "&6&l>> &eThe game begins in &b{time}&e."), TimeUnit.SECONDS, 1);
+        this.timer.addCallback(timerSnapshot -> {
+            if (getSettings().isSounds()) {
+                playSound(Sound.WOLF_HOWL);
+            }
+            sendMessage("&5&l/ / / / / / &d&lTHE NEXUS REBORN &5&l/ / / / / /");
+            sendMessage("&6&lSurvival Games &7&oFree-for-all Deathmatch &8- &3Classic Mode");
+            sendMessage("&8- &7Loot chests scattered around the map for gear.");
+            sendMessage("&8- &7Outlast the other tributes and be the last one standing!");
+            sendMessage("&8- &7Arena deathmatch begins after &e" + getSettings().getGameLength() + " minutes&7.");
+            sendMessage("");
+            StringBuilder creatorBuilder = new StringBuilder();
+            for (String creator : getGameMap().getCreators()) {
+                creatorBuilder.append("&e").append(creator).append("&7, ");
+            }
+
+            if (creatorBuilder.length() < 2) {
+                creatorBuilder.append("&eNot Configured, ");
+            }
+
+            sendMessage("&d&l>> &7Playing on &a" + getGameMap().getName() + " &7created by " + creatorBuilder.substring(0, creatorBuilder.length() - 2));
+            if (getSettings().isGracePeriod()) {
+                sendMessage("&d&l>> &7There is a &e" + getSettings().getGracePeriodLength() + " second &7grace period.");
+            }
+        }, TimeUnit.SECONDS.toMillis(getSettings().getWarmupLength()) / 2);
+        this.timer.start();
     }
 
     public void startGame() {
-        this.timer = new Timer(new GameTimerCallback(this)).run(TimeUnit.MINUTES.toMillis(settings.getGameLength()) + 50);
-        this.ratingPromptTimer = new Timer(snapshot -> {
-            if (snapshot.getSecondsLeft() == 0) {
-                sendMessage("");
-                sendMessage("&6&l>> &9&lWHAT DO YOU THINK OF &e&l" + getGameMap().getName().toUpperCase() + "&9&l?");
-                sendMessage("&6&l>> &7Type &8[&6/ratemap &4&l1 &c&l2 &6&l3 &e&l4 &a&l5&8] &7to submit a rating!");
-                sendMessage("");
-                return false;
-            }
-            return true;
-        }).run(TimeUnit.MINUTES.toMillis(settings.getGameLength()) / 4);
-        this.start = System.currentTimeMillis();
-        if (this.settings.isGracePeriod()) {
-            this.graceperiodTimer = new Timer(new GraceperiodCountdownCallback(this)).run(TimeUnit.SECONDS.toMillis(settings.getGracePeriodLength()) + 50L);
-            this.graceperiod = Graceperiod.ACTIVE;
-        }
-        setState(INGAME);
+        this.timer = plugin.getClockManager().createTimer(TimeUnit.MINUTES.toMillis(settings.getGameLength()) + 50);
+        this.timer.addRepeatingCallback(new GameMinutesCallback(this, "&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b{time}&e."), TimeUnit.MINUTES, 1);
+        this.timer.addRepeatingCallback(new GameSecondsCallback(this, "&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b{time}&e."), TimeUnit.SECONDS, 1);
+        this.timer.addCallback(timerSnapshot -> {
+            sendMessage("");
+            sendMessage("&6&l>> &9&lWHAT DO YOU THINK OF &e&l" + getGameMap().getName().toUpperCase() + "&9&l?");
+            sendMessage("&6&l>> &7Type &8[&6/ratemap &4&l1 &c&l2 &6&l3 &e&l4 &a&l5&8] &7to submit a rating!");
+            sendMessage("");
+        }, TimeUnit.MINUTES.toMillis(settings.getGameLength()) / 4);
+
         long restockLength;
         if (settings.isChestRestockRelative()) {
             restockLength = settings.getGameLength() / settings.getChestRestockDenomination();
         } else {
             restockLength = settings.getChestRestockInterval();
         }
-        this.restockTimer = new Timer(new RestockTimerCallback(this)).run(TimeUnit.MINUTES.toMillis(restockLength) + 50L);
+        this.restockCallbackId = this.timer.addRepeatingCallback(timerSnapshot -> {
+            timedRestockCount++;
+            restockChests();
+            sendMessage("&6&l>> &a&lALL CHESTS HAVE BEEN RESTOCKED");
+        }, TimeUnit.MINUTES, restockLength);
+
+        this.timer.setEndCondition(new InGameEndCondition(this));
+        this.timer.start();
+
+        this.start = System.currentTimeMillis();
+        if (this.settings.isGracePeriod()) {
+            this.graceperiodTimer = plugin.getClockManager().createTimer(TimeUnit.SECONDS.toMillis(settings.getGracePeriodLength()) + 50L);
+            this.graceperiodTimer.addRepeatingCallback(new GameSecondsCallback(this, "&6&l>> &eThe &c&lGRACE PERIOD &eends in &b{time}&e."), TimeUnit.SECONDS, 1);
+            this.graceperiodTimer.setEndCondition(new GraceperiodEndCondition(this));
+            this.graceperiodTimer.start();
+            this.graceperiod = Graceperiod.ACTIVE;
+        }
+        setState(INGAME);
         sendMessage("&6&l>> &a&lMAY THE ODDS BE EVER IN YOUR FAVOR.");
         if (this.settings.isTeamingAllowed()) {
             sendMessage("&6&l>> &d&lTHERE IS A MAX OF " + this.settings.getMaxTeamAmount() + " PLAYER TEAMS.");
@@ -462,7 +538,7 @@ public class Game {
         if (gameMap.getSwagShack() != null) {
             Villager entity = (Villager) gameMap.getWorld().spawnEntity(gameMap.getSwagShack().toLocation(gameMap.getWorld()), EntityType.VILLAGER);
             entity.setCustomNameVisible(true);
-            entity.setCustomName(MCUtils.color("&e&lSwag Shack"));
+            entity.setCustomName(ColorHandler.getInstance().color("&e&lSwag Shack"));
             entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 255, false, false));
         }
     }
@@ -503,7 +579,6 @@ public class Game {
                     gp.setTeam(GameTeam.SPECTATORS);
                     gp.sendMessage(gp.getTeam().getJoinMessage());
                     giveSpectatorItems(Bukkit.getPlayer(gp.getUniqueId()));
-                    recalculateVisibility();
                     gp.sendMessage("&6&l>> &cYou were made a spectator because deathmatch started.");
                 }
             }
@@ -523,7 +598,6 @@ public class Game {
             teleportTributes(tributes, mapSpawn);
             teleportSpectators(spectators, mapSpawn);
 
-            recalculateVisibility();
             setState(TELEPORT_DEATHMATCH_DONE);
         } catch (Exception e) {
             e.printStackTrace();
@@ -545,7 +619,10 @@ public class Game {
             }
         }
 
-        this.timer = new Timer(new DeathmatchCountdownCallback(this)).run(TimeUnit.SECONDS.toMillis(settings.getDeathmatchWarmupLength()) + 50L);
+        this.timer = plugin.getClockManager().createTimer(TimeUnit.SECONDS.toMillis(settings.getDeathmatchWarmupLength()) + 50L);
+        this.timer.addRepeatingCallback(new GameSecondsCallback(this, "&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b{time}&e."), TimeUnit.SECONDS, 1);
+        this.timer.setEndCondition(new DMWarmupEndCondition(this));
+        this.timer.start();
     }
 
     public void startDeathmatch() {
@@ -568,7 +645,11 @@ public class Game {
 
         this.gameMap.applyWorldBoarder("deathmatch", settings.getDeathmatchLength() * 60);
 
-        this.timer = new Timer(new GameEndTimerCallback(this)).run(TimeUnit.MINUTES.toMillis(settings.getDeathmatchLength()) + 50);
+        this.timer = plugin.getClockManager().createTimer(TimeUnit.MINUTES.toMillis(settings.getDeathmatchLength()) + 50L);
+        this.timer.addRepeatingCallback(new GameMinutesCallback(this, "&6&l>> &c&lGAME &eends &ein &b{time}&e."), TimeUnit.MINUTES, 1);
+        this.timer.addRepeatingCallback(new GameSecondsCallback(this, "&6&l>> &c&lGAME &eends &ein &b{time}&e."), TimeUnit.SECONDS, 1);
+        this.timer.setEndCondition(new DeathmatchEndCondition(this));
+        this.timer.start();
     }
 
     public void deathmatchWarmupDone() {
@@ -589,19 +670,15 @@ public class Game {
             this.graceperiodTimer = null;
         }
 
-        if (this.restockTimer != null) {
-            this.restockTimer.cancel();
-            this.restockTimer = null;
-        }
-
-        if (this.ratingPromptTimer != null) {
-            this.ratingPromptTimer.cancel();
-            this.ratingPromptTimer = null;
-        }
-
         for (Player player : Bukkit.getOnlinePlayers()) {
+            if (!this.players.containsKey(player.getUniqueId())) {
+                continue;
+            }
             player.setAllowFlight(true);
             for (Player p : Bukkit.getOnlinePlayers()) {
+                if (!this.players.containsKey(player.getUniqueId())) {
+                    continue;
+                }
                 player.showPlayer(p);
                 p.showPlayer(player);
             }
@@ -683,6 +760,7 @@ public class Game {
                     nexites *= multiplier;
                 }
 
+                winner.getBalance().addNexites(nexites);
                 String baseMessage = "&2&l>> &a&l" + nexites + " &9&lNEXITES&a&l!";
                 if (multiplier > 1 && winner.getRank().isNexiteBoost()) {
                     winner.sendMessage(baseMessage + multiplierMessage);
@@ -703,7 +781,7 @@ public class Game {
             for (Type type : Type.values()) {
                 double amount = bounty.getAmount(type);
                 if (amount > 0) {
-                    sendMessage("&6&l>> For winning the game, " + winner.getColoredName() + " &6&l has kept their &b&l" + NumberHelper.formatNumber(amount) + " " + StringHelper.capitalizeEveryWord(type.name()) + " &6&lbounty!");
+                    sendMessage("&6&l>> For winning the game, " + winner.getColoredName() + " &6&l has kept their &b&l" + MCUtils.formatNumber(amount) + " " + StringHelper.titlize(type.name()) + " &6&lbounty!");
                     if (type == Type.CREDIT) {
                         winner.getBalance().addCredits(amount);
                     } else if (type == Type.SCORE) {
@@ -751,11 +829,35 @@ public class Game {
                         });
                     }
                 }
+
+                for (GamePlayer gamePlayer : players.values()) {
+                    NexusAPI.getApi().getPrimaryDatabase().queue(gamePlayer.getStats());
+                    NexusAPI.getApi().getPrimaryDatabase().queue(gamePlayer.getBalance());
+                    NexusAPI.getApi().getPrimaryDatabase().queue(gamePlayer.getNexusPlayer().getExperience());
+                }
+
+                NexusAPI.getApi().getPrimaryDatabase().flush();
             }
         });
 
         if (!(this.players.isEmpty() || Bukkit.getOnlinePlayers().isEmpty())) {
-            this.timer = new Timer(new NextGameTimerCallback(this)).run(TimeUnit.SECONDS.toMillis(settings.getNextGameStart()));
+            this.timer = plugin.getClockManager().createTimer(TimeUnit.SECONDS.toMillis(settings.getNextGameStart()));
+            this.timer.addRepeatingCallback(new GameSecondsCallback(this, "&6&l>> &eNext game starts in &b{time}&e."), TimeUnit.SECONDS, 1);
+            this.timer.setEndCondition(snapshot -> {
+                if (snapshot.getTime() == 0) {
+                    if (getState() != ENDING) {
+                        return true;
+                    }
+                    if (getControlType() == ControlType.AUTO) {
+                        nextGame();
+                    } else {
+                        sendMessage("&eThe next game timer has concluded, but the mode is not automatic. Skipped automatically performing next game tasks.");
+                    }
+                    return true;
+                }
+                return false;
+            });
+            this.timer.start();
         } else {
             this.nextGame();
         }
@@ -774,25 +876,26 @@ public class Game {
     }
 
     public void nextGame() {
-        setState(ENDED);
         for (Player player : Bukkit.getOnlinePlayers()) {
-            resetPlayer(player);
+            if (this.players.containsKey(player.getUniqueId())) {
+                resetPlayer(player);
+            }
         }
 
         StringRegistry<ChatRoom> roomRegistry = plugin.getStarChat().getRoomRegistry();
-        roomRegistry.deregister(this.gameChatroom.getSimplifiedName());
+        roomRegistry.unregister(this.gameChatroom.getName());
         for (GameTeamChatroom chatroom : this.getChatRooms().values()) {
-            roomRegistry.deregister(chatroom.getSimplifiedName());
+            roomRegistry.unregister(chatroom.getName());
         }
 
-        plugin.getLobby().fromGame(this);
+        setState(ENDED);
+        server.getLobby().fromGame(this);
     }
 
     public void killPlayer(GamePlayer gamePlayer, DeathInfo deathInfo) {
         GameTeam oldTeam = gamePlayer.getTeam();
         gamePlayer.addDeathInfo(deathInfo);
         gamePlayer.setTeam(GameTeam.SPECTATORS);
-        recalculateVisibility();
         Player player = Bukkit.getPlayer(gamePlayer.getUniqueId());
         String strippedDeathMessage = ChatColor.stripColor(deathInfo.getDeathMessage());
         strippedDeathMessage = strippedDeathMessage.substring(3, strippedDeathMessage.length() - 1);
@@ -980,7 +1083,7 @@ public class Game {
         if (totalTributes <= settings.getDeathmatchThreshold()) {
             if (state == INGAME) {
                 if (totalTributes > 1) {
-                    if (controlType == ControlType.AUTOMATIC) {
+                    if (controlType == ControlType.AUTO) {
                         this.startDeathmatchTimer();
                     } else {
                         sendMessage("&eTribute count reached or went below the deathmatch threashold, but was not automatically started due to being in manual mode.");
@@ -1073,7 +1176,7 @@ public class Game {
 
         if (killerPlayer != null) {
             String killerName = killerPlayer.getColoredName();
-            String killerHealth = NumberHelper.formatNumber(killer.getHealth());
+            String killerHealth = MCUtils.formatNumber(killer.getHealth());
             gamePlayer.sendMessage("&4&l>> &cYour killer &8(" + killerName + "&8) &chad &4" + killerHealth + " HP &cremaining!");
         }
 
@@ -1133,6 +1236,10 @@ public class Game {
         return null;
     }
 
+    public void cleanup() {
+        //TODO Implement this method, this will just cleanup things that it did. Just moving some of the logic around.
+    }
+
     public void startDeathmatchTimer() {
         setState(INGAME_DEATHMATCH);
         if (this.timer != null) {
@@ -1144,13 +1251,11 @@ public class Game {
             this.graceperiodTimer = null;
         }
 
-        if (this.restockTimer != null) {
-            this.restockTimer.cancel();
-            this.restockTimer = null;
-        }
-
         sendMessage("&6&l>> &4&lTHE DEATHMATCH COUNTDOWN HAS STARTED");
-        this.timer = new Timer(new DeathmatchPlayingCallback(this)).run(TimeUnit.SECONDS.toMillis(settings.getDeathmatchTimerLength()) + 50);
+        this.timer = plugin.getClockManager().createTimer(TimeUnit.SECONDS.toMillis(settings.getDeathmatchTimerLength()) + 50L);
+        this.timer.addRepeatingCallback(new GameSecondsCallback(this, "&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b{time}&e."), TimeUnit.SECONDS, 1);
+        this.timer.setEndCondition(new DMTimerEndCondition(this));
+        this.timer.start();
     }
 
     public boolean isLootedChest(Block block) {
@@ -1189,7 +1294,6 @@ public class Game {
 
         gamePlayer.setMutated(true);
         teleportMutation(player, location);
-        recalculateVisibility();
         gamePlayer.clearInventory();
         gamePlayer.setFlight(false, false);
         gamePlayer.setCollisions(true);
@@ -1291,6 +1395,40 @@ public class Game {
         return chatRooms;
     }
 
+    public boolean willRestockChests() {
+        if (this.getState() != INGAME) {
+            return false;
+        }
+
+        if (this.restockCallbackId == null) {
+            return false;
+        }
+
+        return this.timer.shouldCallback(this.restockCallbackId);
+    }
+
+    public long getNextRestock() {
+        if (this.getState() != INGAME) {
+            return 0;
+        }
+
+        if (this.restockCallbackId == null) {
+            return 0;
+        }
+
+        long nextRun = this.timer.getNextRun(this.restockCallbackId);
+
+        if (nextRun < 0) {
+            return 0;
+        }
+
+        return timer.getTime() - nextRun;
+    }
+
+    public int getTimedRestockCount() {
+        return timedRestockCount;
+    }
+
     @Override
     public String toString() {
         return "Game{" +
@@ -1301,8 +1439,6 @@ public class Game {
                 ", state=" + state +
                 ", timer=" + timer +
                 ", graceperiodTimer=" + graceperiodTimer +
-                ", restockTimer=" + restockTimer +
-                ", ratingPromptTimer=" + ratingPromptTimer +
                 ", lootedChests=" + lootedChests +
                 ", gameInfo=" + gameInfo +
                 ", start=" + start +
@@ -1313,8 +1449,6 @@ public class Game {
                 ", mode=" + mode +
                 ", debugMode=" + debugMode +
                 ", graceperiod=" + graceperiod +
-                ", setupPhase=" + setupPhase +
-                ", assignTeamsPhase=" + assignTeamsPhase +
                 '}';
     }
 }

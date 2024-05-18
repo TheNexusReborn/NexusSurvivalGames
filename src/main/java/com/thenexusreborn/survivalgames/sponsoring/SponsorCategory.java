@@ -1,16 +1,17 @@
 package com.thenexusreborn.survivalgames.sponsoring;
 
-import org.bukkit.Material;
+import com.stardevllc.starcore.xseries.XMaterial;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class SponsorCategory<T> {
     private String name;
-    private Material icon;
+    private XMaterial icon;
     private List<T> entries = new ArrayList<>();
     
-    public SponsorCategory(String name, Material icon) {
+    public SponsorCategory(String name, XMaterial icon) {
         this.name = name;
         this.icon = icon;
     }
@@ -19,7 +20,7 @@ public abstract class SponsorCategory<T> {
         return name;
     }
     
-    public Material getIcon() {
+    public XMaterial getIcon() {
         return icon;
     }
     

@@ -1,16 +1,20 @@
 package com.thenexusreborn.survivalgames.scoreboard;
 
+import com.stardevllc.starcore.color.ColorHandler;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
-import com.thenexusreborn.api.scoreboard.*;
+import com.thenexusreborn.api.scoreboard.NexusScoreboard;
+import com.thenexusreborn.api.scoreboard.TablistHandler;
 import com.thenexusreborn.api.scoreboard.wrapper.ITeam;
-import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.*;
+import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.GamePlayer;
+import com.thenexusreborn.survivalgames.game.GameTeam;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.EnumMap;
+import java.util.Map;
 
 public class GameTablistHandler extends TablistHandler {
     
@@ -36,7 +40,7 @@ public class GameTablistHandler extends TablistHandler {
             NexusPlayer otherNexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(other.getUniqueId());
             if (otherNexusPlayer != null) {
                 NexusPlayer player = scoreboard.getPlayer();
-                GamePlayer gamePlayer = plugin.getGame().getPlayer(player.getUniqueId());
+                GamePlayer gamePlayer = plugin.getPlayerRegistry().get(player.getUniqueId()).getGamePlayer();
                 ITeam otherTeam = getPlayerTeams().get(otherNexusPlayer.getUniqueId());
                 String correctChar = BEGIN_CHARS.get(gamePlayer.getTeam());
                 if (otherTeam == null) {
@@ -65,7 +69,7 @@ public class GameTablistHandler extends TablistHandler {
     
     @Override
     public String getPlayerTeamName(NexusPlayer player) {
-        Game game = plugin.getGame();
+        Game game = plugin.getPlayerRegistry().get(player.getUniqueId()).getGame();
         if (game != null) {
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
             GameTeam gameTeam = gamePlayer.getTeam();
@@ -85,9 +89,10 @@ public class GameTablistHandler extends TablistHandler {
     
     @Override
     public void setDisplayOptions(NexusPlayer nexusPlayer, ITeam team) {
-        if (plugin.getGame() != null) {
-            GamePlayer gamePlayer = plugin.getGame().getPlayer(nexusPlayer.getUniqueId());
-            team.setPrefix(MCUtils.color(gamePlayer.getTeam().getColor()));
+        Game game = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId()).getGame();
+        if (game != null) {
+            GamePlayer gamePlayer = game.getPlayer(nexusPlayer.getUniqueId());
+            team.setPrefix(ColorHandler.getInstance().color(gamePlayer.getTeam().getColor()));
         }
     }
 }

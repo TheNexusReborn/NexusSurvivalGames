@@ -1,8 +1,9 @@
 package com.thenexusreborn.survivalgames.mutations;
 
-import com.thenexusreborn.api.helper.StringHelper;
-import com.thenexusreborn.nexuscore.util.ArmorType;
-import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
+import com.stardevllc.starcore.item.ItemBuilder;
+import com.stardevllc.starcore.utils.ArmorSet;
+import com.stardevllc.starcore.xseries.XMaterial;
+import com.stardevllc.starlib.helper.StringHelper;
 import com.thenexusreborn.survivalgames.disguises.disguisetypes.DisguiseType;
 import com.thenexusreborn.survivalgames.mutations.impl.*;
 import org.bukkit.Material;
@@ -13,29 +14,29 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 
-import static com.thenexusreborn.nexuscore.util.ArmorType.*;
+import static com.stardevllc.starcore.utils.ArmorSet.*;
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.*;
 import static org.bukkit.potion.PotionEffectType.*;
 
 public class MutationType {
-    private static final ItemBuilder UNBREAKABLE_GOLD_SWORD = ItemBuilder.start(Material.GOLD_SWORD).unbreakable(true);
+    private static final ItemBuilder UNBREAKABLE_GOLD_SWORD = ItemBuilder.of(XMaterial.GOLDEN_SWORD).unbreakable(true);
     
     public static final Set<MutationType> TYPES = new HashSet<>();
     
-    public static final MutationType PIG_ZOMBIE = new Builder("pig_zombie", PigZombieMutation.class, DisguiseType.PIG_ZOMBIE).icon(Material.PORK).armor(LEATHER).addDamageImmunity(FIRE).weapon(UNBREAKABLE_GOLD_SWORD.build()).addDamageImmunity(FIRE_TICK).addEffect(SPEED, 1).healthRegen(false).create();
-    public static final MutationType ZOMBIE = new Builder("zombie", ZombieMutation.class, DisguiseType.ZOMBIE).icon(Material.ROTTEN_FLESH).armor(IRON).weapon(UNBREAKABLE_GOLD_SWORD.build()).unlockCost(3000).addEffect(SLOW, 0).create();
-    public static final MutationType ENDERMAN = new Builder("enderman", EndermanMutation.class, DisguiseType.ENDERMAN).armor(LEATHER).icon(Material.ENDER_PEARL).weapon(UNBREAKABLE_GOLD_SWORD.build()).unlockCost(5000).addItem(1, new ItemStack(Material.ENDER_PEARL, 32)).create();
-    public static final MutationType SKELETON = new Builder("skeleton", SkeletonMutation.class, DisguiseType.SKELETON).armor(LEATHER).icon(Material.BOW).weapon(new ItemStack(Material.WOOD_SWORD)).unlockCost(3000).addItem(1, ItemBuilder.start(Material.BOW).addEnchantment(Enchantment.ARROW_INFINITE, 1).unbreakable(true).build()).addItem(2, new ItemStack(Material.ARROW)).addEffect(SPEED, 0).create();
-    public static final MutationType CHICKEN = new Builder("chicken", ChickenMutation.class, DisguiseType.CHICKEN).icon(Material.FEATHER).weapon(ItemBuilder.start(Material.WOOD_SWORD).displayName("&bEgg Launcher").addItemFlag(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS).addEnchantment(Enchantment.ARROW_DAMAGE, 1).build()).health(4).unlockCost(5000).addItem(1, ItemBuilder.start(Material.SLIME_BALL).displayName("&bChicken Launch").build()).addItem(2, ItemBuilder.start(Material.FEATHER).displayName("&bChicken Chute").build()).addDamageImmunity(FALL).create();
-    public static final MutationType CREEPER = new Builder("creeper", CreeperMutation.class, DisguiseType.CREEPER).icon(Material.SULPHUR).armor(CHAINMAIL).weapon(new ItemStack(Material.TNT, 64)).health(10).unlockCost(3000).addDamageImmunity(BLOCK_EXPLOSION).addDamageImmunity(ENTITY_EXPLOSION).addEffect(SPEED, 0).addItem(1, ItemBuilder.start(Material.SULPHUR).displayName("&cSuicide").build()).create();
+    public static final MutationType PIG_ZOMBIE = new Builder("pig_zombie", PigZombieMutation.class, DisguiseType.PIG_ZOMBIE).icon(XMaterial.PORKCHOP).armor(LEATHER).addDamageImmunity(FIRE).weapon(UNBREAKABLE_GOLD_SWORD.build()).addDamageImmunity(FIRE_TICK).addEffect(SPEED, 1).healthRegen(false).create();
+    public static final MutationType ZOMBIE = new Builder("zombie", ZombieMutation.class, DisguiseType.ZOMBIE).icon(XMaterial.ROTTEN_FLESH).armor(IRON).weapon(UNBREAKABLE_GOLD_SWORD.build()).unlockCost(3000).addEffect(SLOW, 0).create();
+    public static final MutationType ENDERMAN = new Builder("enderman", EndermanMutation.class, DisguiseType.ENDERMAN).armor(LEATHER).icon(XMaterial.ENDER_PEARL).weapon(UNBREAKABLE_GOLD_SWORD.build()).unlockCost(5000).addItem(1, new ItemStack(Material.ENDER_PEARL, 32)).create();
+    public static final MutationType SKELETON = new Builder("skeleton", SkeletonMutation.class, DisguiseType.SKELETON).armor(LEATHER).icon(XMaterial.BOW).weapon(new ItemStack(Material.WOOD_SWORD)).unlockCost(3000).addItem(1, ItemBuilder.of(XMaterial.BOW).addEnchant(Enchantment.ARROW_INFINITE, 1).unbreakable(true).build()).addItem(2, new ItemStack(Material.ARROW)).addEffect(SPEED, 0).create();
+    public static final MutationType CHICKEN = new Builder("chicken", ChickenMutation.class, DisguiseType.CHICKEN).icon(XMaterial.FEATHER).weapon(ItemBuilder.of(XMaterial.WOODEN_SWORD).displayName("&bEgg Launcher").addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS).addEnchant(Enchantment.ARROW_DAMAGE, 1).build()).health(4).unlockCost(5000).addItem(1, ItemBuilder.of(XMaterial.SLIME_BALL).displayName("&bChicken Launch").build()).addItem(2, ItemBuilder.of(XMaterial.FEATHER).displayName("&bChicken Chute").build()).addDamageImmunity(FALL).create();
+    public static final MutationType CREEPER = new Builder("creeper", CreeperMutation.class, DisguiseType.CREEPER).icon(XMaterial.GUNPOWDER).armor(CHAINMAIL).weapon(new ItemStack(Material.TNT, 64)).health(10).unlockCost(3000).addDamageImmunity(BLOCK_EXPLOSION).addDamageImmunity(ENTITY_EXPLOSION).addEffect(SPEED, 0).addItem(1, ItemBuilder.of(XMaterial.GUNPOWDER).displayName("&cSuicide").build()).create();
     
 //  (These are MVP only) Blaze, Spider, Witch and Wither Skeleton
     
     protected String id;
     protected String displayName;
     protected Class<? extends Mutation> clazz;
-    protected Material icon;
-    protected ArmorType armorType;
+    protected XMaterial icon;
+    protected ArmorSet armorType;
     protected ItemStack weapon;
     protected DisguiseType disguiseType;
     protected int unlockCost;
@@ -45,7 +46,7 @@ public class MutationType {
     protected List<MutationEffect> effects;
     protected List<MutationItem> items;
     
-    MutationType(String id, String displayName, Class<? extends Mutation> clazz, Material icon, ArmorType armorType, ItemStack weapon, DisguiseType disguiseType, int unlockCost, int health, boolean healthRegen, List<DamageCause> damageImmunities, List<MutationEffect> effects, List<MutationItem> items) {
+    MutationType(String id, String displayName, Class<? extends Mutation> clazz, XMaterial icon, ArmorSet armorType, ItemStack weapon, DisguiseType disguiseType, int unlockCost, int health, boolean healthRegen, List<DamageCause> damageImmunities, List<MutationEffect> effects, List<MutationItem> items) {
         this.id = id;
         this.displayName = displayName;
         this.clazz = clazz;
@@ -79,11 +80,11 @@ public class MutationType {
         return displayName;
     }
     
-    public ArmorType getArmorType() {
+    public ArmorSet getArmorType() {
         return armorType;
     }
     
-    public Material getIcon() {
+    public XMaterial getIcon() {
         return icon;
     }
     
@@ -140,8 +141,8 @@ public class MutationType {
         private String id;
         private String displayName;
         private Class<? extends Mutation> clazz;
-        private Material icon;
-        private ArmorType armorType;
+        private XMaterial icon;
+        private ArmorSet armorType;
         private ItemStack weapon;
         private DisguiseType disguiseType;
         private int unlockCost;
@@ -192,12 +193,12 @@ public class MutationType {
             return this;
         }
         
-        public Builder icon(Material icon) {
+        public Builder icon(XMaterial icon) {
             this.icon = icon;
             return this;
         }
         
-        public Builder armor(ArmorType armorType) {
+        public Builder armor(ArmorSet armorType) {
             this.armorType = armorType;
             return this;
         }
@@ -209,11 +210,11 @@ public class MutationType {
         
         public MutationType create() {
             if (this.displayName == null || this.displayName.isEmpty()) {
-                this.displayName = StringHelper.capitalizeEveryWord(this.id);
+                this.displayName = StringHelper.titlize(this.id);
             }
             
             if (armorType == null) {
-                armorType = ArmorType.NONE;
+                armorType = ArmorSet.NONE;
             }
             
             if (health == 0) {

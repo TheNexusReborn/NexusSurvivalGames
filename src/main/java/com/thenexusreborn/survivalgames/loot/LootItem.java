@@ -1,11 +1,14 @@
 package com.thenexusreborn.survivalgames.loot;
 
-import com.thenexusreborn.nexuscore.util.*;
+import com.stardevllc.starcore.color.ColorHandler;
+import com.stardevllc.starcore.utils.MaterialNames;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public class LootItem {
     protected final Material material;
@@ -17,7 +20,7 @@ public class LootItem {
         this.name = name;
         this.lore.addAll(lore);
         
-        Items.REGISTRY.add(this);
+        Items.REGISTRY.register(this);
     }
     
     public LootItem(Material material, String name) {
@@ -44,7 +47,7 @@ public class LootItem {
         ItemStack itemStack = new ItemStack(getMaterial());
         ItemMeta itemMeta = itemStack.getItemMeta();
         if (!getName().equalsIgnoreCase(getMaterial().name().replace("_", " "))) {
-            itemMeta.setDisplayName(MCUtils.color("&f" + this.getName()));
+            itemMeta.setDisplayName(ColorHandler.getInstance().color("&f" + this.getName()));
         }
         
         if (this.getMaterial() == Material.FLINT_AND_STEEL) {
@@ -53,7 +56,7 @@ public class LootItem {
         
         List<String> lore = new LinkedList<>();
         for (String line : this.getLore()) {
-            lore.add(MCUtils.color(line));
+            lore.add(ColorHandler.getInstance().color(line));
         }
         itemMeta.setLore(lore);
         itemStack.setItemMeta(itemMeta);

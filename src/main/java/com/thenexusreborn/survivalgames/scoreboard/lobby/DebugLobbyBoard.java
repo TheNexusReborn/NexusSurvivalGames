@@ -1,12 +1,12 @@
 package com.thenexusreborn.survivalgames.scoreboard.lobby;
 
-import com.stardevllc.starclock.clocks.Timer;
+import com.stardevllc.starcore.color.ColorHandler;
+import com.stardevllc.starlib.clock.clocks.Timer;
 import com.stardevllc.starlib.time.TimeFormat;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.scoreboard.TeamBuilder;
 import com.thenexusreborn.nexuscore.scoreboard.SpigotScoreboardView;
-import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
 import com.thenexusreborn.survivalgames.util.SGUtils;
@@ -17,7 +17,7 @@ public class DebugLobbyBoard extends SpigotScoreboardView {
     private final Lobby lobby;
     
     public DebugLobbyBoard(NexusScoreboard scoreboard, Lobby lobby) {
-        super(scoreboard, "debuglobbyboard", MCUtils.color("&e&lDEBUG LOBBY"));
+        super(scoreboard, "debuglobbyboard", ColorHandler.getInstance().color("&e&lDEBUG LOBBY"));
         this.lobby = lobby;
     }
     
@@ -55,7 +55,7 @@ public class DebugLobbyBoard extends SpigotScoreboardView {
             if (lobby.getGameMap() != null) {
                 SGUtils.setMapNameForScoreboard(lobby.getGameMap(), team);
             } else {
-                team.setPrefix(MCUtils.color("&7None"));
+                team.setPrefix(ColorHandler.getInstance().color("&7None"));
                 team.setSuffix("");
             }
         }));

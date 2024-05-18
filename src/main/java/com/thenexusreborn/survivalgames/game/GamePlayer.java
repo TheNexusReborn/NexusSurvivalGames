@@ -1,15 +1,15 @@
 package com.thenexusreborn.survivalgames.game;
 
 import com.stardevllc.starchat.rooms.DefaultPermissions;
-import com.stardevllc.starlib.Pair;
+import com.stardevllc.starcore.item.ItemBuilder;
+import com.stardevllc.starcore.utils.ArmorSet;
+import com.stardevllc.starcore.xseries.XMaterial;
+import com.stardevllc.starlib.misc.Pair;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.PlayerBalance;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.tags.Tag;
-import com.thenexusreborn.nexuscore.util.ArmorType;
-import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
-import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.chat.GameTeamChatroom;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
@@ -17,7 +17,6 @@ import com.thenexusreborn.survivalgames.scoreboard.GameTablistHandler;
 import com.thenexusreborn.survivalgames.scoreboard.game.GameBoard;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -53,7 +52,7 @@ public class GamePlayer {
         this.nexusPlayer = nexusPlayer;
         this.game = game;
         this.bounty = new Bounty(nexusPlayer.getUniqueId());
-        this.combatTag = new CombatTag(nexusPlayer.getUniqueId());
+        this.combatTag = new CombatTag(game, nexusPlayer.getUniqueId());
         this.damageInfo = new DamageInfo(nexusPlayer.getUniqueId());
         this.stats = stats;
     }
@@ -119,20 +118,25 @@ public class GamePlayer {
         GameTeamChatroom chatroom = game.getChatRooms().get(this.team);
         chatroom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES, DefaultPermissions.SEND_MESSAGES);
         Game.getPlugin().getStarChat().setPlayerFocus(Bukkit.getPlayer(getUniqueId()), chatroom);
-        
+
+        GameTeamChatroom mutationsRoom = game.getChatRooms().get(GameTeam.MUTATIONS);
+        GameTeamChatroom zombiesRoom = game.getChatRooms().get(GameTeam.ZOMBIES);
         if (this.team == GameTeam.TRIBUTES) {
-            game.getChatRooms().get(GameTeam.MUTATIONS).addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
-            game.getChatRooms().get(GameTeam.ZOMBIES).addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
-        } else if (this.team == GameTeam.MUTATIONS) {
-            game.getChatRooms().get(GameTeam.TRIBUTES).addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
-            game.getChatRooms().get(GameTeam.ZOMBIES).addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
-        } else if (this.team == GameTeam.ZOMBIES) {
-            game.getChatRooms().get(GameTeam.TRIBUTES).addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
-            game.getChatRooms().get(GameTeam.MUTATIONS).addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
-        } else if (this.team == GameTeam.SPECTATORS) {
-            game.getChatRooms().get(GameTeam.TRIBUTES).addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
-            game.getChatRooms().get(GameTeam.MUTATIONS).addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
-            game.getChatRooms().get(GameTeam.ZOMBIES).addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+            mutationsRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+            zombiesRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+        } else {
+            GameTeamChatroom tributesRoom = game.getChatRooms().get(GameTeam.TRIBUTES);
+            if (this.team == GameTeam.MUTATIONS) {
+                tributesRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+                zombiesRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+            } else if (this.team == GameTeam.ZOMBIES) {
+                tributesRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+                mutationsRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+            } else if (this.team == GameTeam.SPECTATORS) {
+                tributesRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+                mutationsRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+                zombiesRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+            }
         }
     }
     
@@ -223,7 +227,6 @@ public class GamePlayer {
     }
     
     public Pair<Boolean, String> canMutate() {
-        Game game = SurvivalGames.getPlugin(SurvivalGames.class).getGame();
         if (game == null) {
             return new Pair<>(false, "You cannot mutate because there is not game running.");
         }
@@ -400,9 +403,9 @@ public class GamePlayer {
     }
     
     public void giveSpectatorItems(Game game) {
-        ItemStack tributesBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&a&lTributes &7&o(Right Click)").build();
-        ItemStack mutationsBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&d&lMutations &7&o(Right Click)").build();
-        ItemStack spectatorsBook = ItemBuilder.start(Material.ENCHANTED_BOOK).displayName("&c&lSpectators &7&o(Right Click)").build();
+        ItemStack tributesBook = ItemBuilder.of(XMaterial.ENCHANTED_BOOK).displayName("&a&lTributes &7&o(Right Click)").build();
+        ItemStack mutationsBook = ItemBuilder.of(XMaterial.ENCHANTED_BOOK).displayName("&d&lMutations &7&o(Right Click)").build();
+        ItemStack spectatorsBook = ItemBuilder.of(XMaterial.ENCHANTED_BOOK).displayName("&c&lSpectators &7&o(Right Click)").build();
         String mutateName;
         if (!game.getSettings().isAllowMutations()) {
             mutateName = "&cMutations Disabled";
@@ -412,8 +415,8 @@ public class GamePlayer {
             mutateName = "&cCan't mutate again.";
         } else {
             Pair<Boolean, String> mutateAllowedStatus = canMutate();
-            if (!mutateAllowedStatus.firstValue()) {
-                mutateName = "&c" + mutateAllowedStatus.secondValue();
+            if (!mutateAllowedStatus.key()) {
+                mutateName = "&c" + mutateAllowedStatus.value();
             } else {
                 GamePlayer killer = game.getPlayer(getKiller());
                 String passes;
@@ -425,10 +428,10 @@ public class GamePlayer {
                 mutateName = "&c&lTAKE REVENGE   &eTarget: " + killer.getColoredName() + "   &ePasses: &b" + passes;
             }
         }
-        ItemStack mutateItem = ItemBuilder.start(Material.ROTTEN_FLESH).displayName(mutateName).build();
-        ItemStack compass = ItemBuilder.start(Material.COMPASS).displayName("&fPlayer Tracker").build();
-        ItemStack tpCenter = ItemBuilder.start(Material.WATCH).displayName("&e&lTeleport to Map Center &7&o(Right Click)").build();
-        ItemStack hubItem = ItemBuilder.start(Material.WOOD_DOOR).displayName("&e&lReturn to Hub &7(Right Click)").build();
+        ItemStack mutateItem = ItemBuilder.of(XMaterial.ROTTEN_FLESH).displayName(mutateName).build();
+        ItemStack compass = ItemBuilder.of(XMaterial.COMPASS).displayName("&fPlayer Tracker").build();
+        ItemStack tpCenter = ItemBuilder.of(XMaterial.COMPASS).displayName("&e&lTeleport to Map Center &7&o(Right Click)").build();
+        ItemStack hubItem = ItemBuilder.of(XMaterial.OAK_DOOR).displayName("&e&lReturn to Hub &7(Right Click)").build();
         Player p = Bukkit.getPlayer(getUniqueId());
         PlayerInventory inv = p.getInventory();
         inv.setItem(0, tributesBook);
@@ -483,14 +486,14 @@ public class GamePlayer {
         }
     }
 
-    public void setArmor(ArmorType armorType) {
+    public void setArmor(ArmorSet armorType) {
         Player player = Bukkit.getPlayer(getUniqueId());
         if (player != null) {
             PlayerInventory inv = player.getInventory();
-            inv.setHelmet(new ItemStack(armorType.getHelmet()));
-            inv.setChestplate(new ItemStack(armorType.getChestplate()));
-            inv.setLeggings(new ItemStack(armorType.getLeggings()));
-            inv.setBoots(new ItemStack(armorType.getBoots()));
+            inv.setHelmet(new ItemStack(armorType.getHelmet().parseMaterial()));
+            inv.setChestplate(new ItemStack(armorType.getChestplate().parseMaterial()));
+            inv.setLeggings(new ItemStack(armorType.getLeggings().parseMaterial()));
+            inv.setBoots(new ItemStack(armorType.getBoots().parseMaterial()));
         }
     }
 

@@ -1,16 +1,19 @@
 package com.thenexusreborn.survivalgames.listener;
 
-import com.stardevllc.starlib.Pair;
-import com.stardevllc.starui.GuiManager;
+import com.stardevllc.starcore.color.ColorHandler;
+import com.stardevllc.starcore.gui.GuiManager;
+import com.stardevllc.starcore.item.ItemBuilder;
+import com.stardevllc.starcore.xseries.XMaterial;
+import com.stardevllc.starlib.misc.Pair;
+import com.stardevllc.starlib.time.TimeUnit;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.player.Toggle;
 import com.thenexusreborn.nexuscore.api.events.NexusPlayerLoadEvent;
 import com.thenexusreborn.nexuscore.api.events.ToggleChangeEvent;
-import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
-import com.thenexusreborn.nexuscore.util.builder.ItemBuilder;
+import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
@@ -69,7 +72,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
 
-@SuppressWarnings("ExtractMethodRecommender")
+@SuppressWarnings({"ExtractMethodRecommender", "DuplicatedCode"})
 public class PlayerListener implements Listener {
     private final SurvivalGames plugin;
     private final GuiManager manager;
@@ -81,13 +84,16 @@ public class PlayerListener implements Listener {
     
     @EventHandler
     public void onItemDrop(PlayerDropItemEvent e) {
-        if (plugin.getLobby().checkMapEditing(e.getPlayer())) {
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(e.getPlayer().getUniqueId());
+        Lobby lobby = sgPlayer.getLobby();
+        Game game = sgPlayer.getGame();
+        
+        if (lobby != null && lobby.checkMapEditing(e.getPlayer())) {
             return;
         }
-        if (plugin.getGame() == null) {
+        if (game == null) {
             e.setCancelled(true);
         } else {
-            Game game = plugin.getGame();
             GamePlayer gamePlayer = game.getPlayer(e.getPlayer().getUniqueId());
             if (gamePlayer.getTeam() != GameTeam.TRIBUTES) {
                 e.setCancelled(true);
@@ -115,11 +121,18 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent e) {
         Player player = e.getPlayer();
-        if (plugin.getLobby().checkMapEditing(player)) {
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
+        Lobby lobby = sgPlayer.getLobby();
+        Game game = sgPlayer.getGame();
+        
+        if (lobby == null && game == null) {
+            return;
+        }
+
+        if (lobby != null && lobby.checkMapEditing(e.getPlayer())) {
             return;
         }
         
-        Game game = plugin.getGame();
         if (game != null) {
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
             if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
@@ -140,15 +153,15 @@ public class PlayerListener implements Listener {
                                 }
                                 
                                 if (team != null) {
-                                    manager.openGUI(new TeamMenu(plugin, team), player);
+                                    manager.openGUI(new TeamMenu(plugin, team, game), player);
                                 }
                             }
                         } else if (item.getType() == Material.ROTTEN_FLESH) {
                             Pair<Boolean, String> canMutateResult = gamePlayer.canMutate();
-                            if (canMutateResult.firstValue()) {
+                            if (canMutateResult.key()) {
                                 manager.openGUI(new MutateGui(plugin, gamePlayer), player);
                             } else {
-                                gamePlayer.sendMessage(MsgType.WARN + canMutateResult.secondValue());
+                                gamePlayer.sendMessage(MsgType.WARN + canMutateResult.value());
                             }
                         } else if (item.getType() == Material.WATCH) {
                             player.teleport(game.getGameMap().getCenter().toLocation(game.getGameMap().getWorld()));
@@ -184,7 +197,7 @@ public class PlayerListener implements Listener {
                             player.setVelocity(new Vector(0, 2, 0));
                             chickenMutation.startLaunchCooldown();
                         } else {
-                            player.sendMessage(MCUtils.color(MsgType.WARN + "Chicken Launch is still on cooldown: &e" + chickenMutation.getLaunchCooldownTimer().getSecondsLeft() + "s&c!"));
+                            player.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "Chicken Launch is still on cooldown: &e" + TimeUnit.MILLISECONDS.toSeconds(chickenMutation.getLaunchCooldownTimer().getTime()) + "s&c!"));
                         }
                     } else if (item.getType() == Material.FEATHER) {
                         if (!chickenMutation.isParachuteOnCooldown()) {
@@ -194,7 +207,7 @@ public class PlayerListener implements Listener {
                                 chickenMutation.activateChute();
                             }
                         } else {
-                            player.sendMessage(MCUtils.color(MsgType.WARN + "Chicken Chute is still on cooldown: &e" + chickenMutation.getParachuteCooldownTimer().getSecondsLeft() + "s&c!"));
+                            player.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "Chicken Chute is still on cooldown: &e" + TimeUnit.MILLISECONDS.toSeconds(chickenMutation.getParachuteCooldownTimer().getTime()) + "s&c!"));
                         }
                     }
                 }
@@ -220,7 +233,7 @@ public class PlayerListener implements Listener {
                 }
     
                 LobbyPlayer lobbyPlayer = null;
-                for (LobbyPlayer lp : plugin.getLobby().getPlayers()) {
+                for (LobbyPlayer lp : lobby.getPlayers()) {
                     if (lp.getUniqueId().equals(player.getUniqueId())) {
                         lobbyPlayer = lp;
                     }
@@ -234,8 +247,8 @@ public class PlayerListener implements Listener {
                     boolean sponsorsValue = lobbyPlayer.getToggleValue("allowsponsors");
                     lobbyPlayer.getPlayer().setToggleValue("allowsponsors", !sponsorsValue);
                     sponsorsValue = lobbyPlayer.getToggleValue("allowsponsors");
-                    Material sponsorsItemMaterial = sponsorsValue ? Material.GLOWSTONE_DUST : Material.SULPHUR;
-                    player.getInventory().setItem(0, ItemBuilder.start(sponsorsItemMaterial).displayName("&e&lSponsors &7&o(Right click to toggle)").build());
+                    XMaterial sponsorsItemMaterial = sponsorsValue ? XMaterial.GLOWSTONE_DUST : XMaterial.GUNPOWDER;
+                    player.getInventory().setItem(0, ItemBuilder.of(sponsorsItemMaterial).displayName("&e&lSponsors &7&o(Right click to toggle)").build());
                 } else if (e.getItem().getItemMeta().getDisplayName().contains("Return to Hub")) {
                     SGUtils.sendToHub(player);
                 }
@@ -319,7 +332,7 @@ public class PlayerListener implements Listener {
                             } else {
                                 boolean withinCenter = game.getGameMap().getDeathmatchArea().contains(player);
                                 if (game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_DEATHMATCH) {
-                                    boolean afterRestock = game.getRestockTimer() == null;
+                                    boolean afterRestock = game.getTimedRestockCount() > 0;
                                     if (withinCenter) {
                                         if (afterRestock) {
                                             lootTable = lootManager.getLootTable("tierThree");
@@ -338,7 +351,7 @@ public class PlayerListener implements Listener {
                         }
                         
                         if (lootTable == null) {
-                            player.sendMessage(MCUtils.color(MsgType.ERROR + "Error while determining the loot table."));
+                            player.sendMessage(ColorHandler.getInstance().color(MsgType.ERROR + "Error while determining the loot table."));
                             return;
                         }
                         
@@ -372,8 +385,8 @@ public class PlayerListener implements Listener {
                             nexusPlayer.sendMessage(MsgType.WARN + "You cannot vote for a map while in vanish.");
                             return;
                         }
-                        if (plugin.getLobby().getState() == LobbyState.WAITING || plugin.getLobby().getState() == LobbyState.COUNTDOWN) {
-                            plugin.getLobby().addMapVote(nexusPlayer, block.getLocation());
+                        if (lobby.getState() == LobbyState.WAITING || lobby.getState() == LobbyState.COUNTDOWN) {
+                            lobby.addMapVote(nexusPlayer, block.getLocation());
                         }
                     } else {
                         if (e.getItem() != null) {
@@ -411,8 +424,13 @@ public class PlayerListener implements Listener {
         boolean incognito = nexusPlayer.getToggleValue("incognito");
         Player player = Bukkit.getPlayer(nexusPlayer.getUniqueId());
         Toggle toggle = e.getToggle();
-        Game game = plugin.getGame();
-        Lobby lobby = plugin.getLobby();
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
+        Lobby lobby = sgPlayer.getLobby();
+        Game game = sgPlayer.getGame();
+
+        if (lobby != null && lobby.checkMapEditing(player)) {
+            return;
+        }
         
         if (toggle.getInfo().getName().equalsIgnoreCase("fly")) {
             if (game != null) {
@@ -431,7 +449,9 @@ public class PlayerListener implements Listener {
         
         Collection<NexusPlayer> players = new ArrayList<>();
         if (game == null) {
-            plugin.getLobby().getPlayers().forEach(p -> players.add(p.getPlayer()));
+            if (lobby != null) {
+                lobby.getPlayers().forEach(p -> players.add(p.getPlayer()));
+            }
         } else {
             for (GamePlayer value : game.getPlayers().values()) {
                 players.add(value.getNexusPlayer());
@@ -453,8 +473,9 @@ public class PlayerListener implements Listener {
             }
         } else {
             if (game == null) {
-                Bukkit.getScheduler().runTaskLater(plugin, lobby::recalculateVisibility, 1L);
-                lobby.sendMessage(message);
+                if (lobby != null) {
+                    lobby.sendMessage(message);
+                }
             } else {
                 if (e.newValue()) {
                     GamePlayer gamePlayer = game.getPlayer(nexusPlayer.getUniqueId());
@@ -462,7 +483,6 @@ public class PlayerListener implements Listener {
                         game.killPlayer(gamePlayer, new DeathInfo(game, System.currentTimeMillis(), gamePlayer, DeathType.VANISH));
                     }
                 }
-                Bukkit.getScheduler().runTaskLater(plugin, game::recalculateVisibility, 1L);
                 game.sendMessage(message);
             }
         }
@@ -470,7 +490,12 @@ public class PlayerListener implements Listener {
     
     @EventHandler
     public void onPlayerEntityInteract(PlayerInteractAtEntityEvent e) {
-        if (plugin.getLobby().checkMapEditing(e.getPlayer())) {
+        Player player = e.getPlayer();
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
+        Lobby lobby = sgPlayer.getLobby();
+        Game game = sgPlayer.getGame();
+
+        if (lobby != null && lobby.checkMapEditing(player)) {
             return;
         }
         if (e.getRightClicked() instanceof ArmorStand || e.getRightClicked() instanceof ItemFrame || e.getRightClicked() instanceof Painting) {
@@ -481,14 +506,13 @@ public class PlayerListener implements Listener {
         if (e.getRightClicked() instanceof Villager villager) {
             e.setCancelled(true);
             if (villager.getCustomName().contains("Swag Shack")) {
-                Game game = plugin.getGame();
                 if (game == null) {
-                    e.getPlayer().sendMessage(MCUtils.color(MsgType.WARN + "You cannot open the Swag Shack when not in a game."));
+                    e.getPlayer().sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "You cannot open the Swag Shack when not in a game."));
                     return;
                 }
                 
                 if (!game.getSettings().isAllowSwagShack()) {
-                    e.getPlayer().sendMessage(MCUtils.color(MsgType.WARN + "The Swag Shack is disabled for this game."));
+                    e.getPlayer().sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "The Swag Shack is disabled for this game."));
                     return;
                 }
                 
@@ -516,13 +540,13 @@ public class PlayerListener implements Listener {
         } else if (inv.getRecipe().getResult().getType() == Material.DIAMOND_AXE) {
             ItemStack itemStack = new ItemStack(Material.DIAMOND_AXE);
             ItemMeta itemMeta = itemStack.getItemMeta();
-            itemMeta.setDisplayName(MCUtils.color("&fBetty"));
+            itemMeta.setDisplayName(ColorHandler.getInstance().color("&fBetty"));
             itemStack.setItemMeta(itemMeta);
             inv.setResult(itemStack);
         } else if (inv.getRecipe().getResult().getType() == Material.IRON_AXE) {
             ItemStack itemStack = new ItemStack(Material.IRON_AXE);
             ItemMeta itemMeta = itemStack.getItemMeta();
-            itemMeta.setDisplayName(MCUtils.color("&fFrederick"));
+            itemMeta.setDisplayName(ColorHandler.getInstance().color("&fFrederick"));
             itemStack.setItemMeta(itemMeta);
             inv.setResult(itemStack);
         }
@@ -530,9 +554,17 @@ public class PlayerListener implements Listener {
     
     @EventHandler
     public void onPlayerOpenEnchant(InventoryOpenEvent e) {
-        if (plugin.getGame() != null) {
+        Player player = (Player) e.getPlayer();
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
+        Lobby lobby = sgPlayer.getLobby();
+        Game game = sgPlayer.getGame();
+
+        if (lobby != null && lobby.checkMapEditing(player)) {
+            return;
+        }
+        
+        if (game != null) {
             if (e.getInventory() instanceof EnchantingInventory enchantingInventory) {
-                Game game = plugin.getGame();
                 if (game.getPlayer(e.getPlayer().getUniqueId()).getTeam() != GameTeam.TRIBUTES) {
                     e.setCancelled(true);
                     return;
@@ -546,11 +578,14 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
         Player player = (Player) e.getWhoClicked();
-        if (plugin.getLobby().checkMapEditing(player)) {
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
+        Lobby lobby = sgPlayer.getLobby();
+        Game game = sgPlayer.getGame();
+
+        if (lobby != null && lobby.checkMapEditing(player)) {
             return;
         }
         
-        Game game = plugin.getGame();
         if (game != null) {
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
             if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
@@ -577,53 +612,33 @@ public class PlayerListener implements Listener {
     
     @EventHandler
     public void onItemPickup(PlayerPickupItemEvent e) {
-        if (plugin.getLobby().checkMapEditing(e.getPlayer())) {
+        Player player = e.getPlayer();
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
+        Lobby lobby = sgPlayer.getLobby();
+        Game game = sgPlayer.getGame();
+
+        if (lobby != null && lobby.checkMapEditing(player)) {
             return;
         }
-        if (plugin.getGame() != null) {
-            Game game = plugin.getGame();
+        if (game != null) {
             e.setCancelled(game.getPlayer(e.getPlayer().getUniqueId()).getTeam() != GameTeam.TRIBUTES);
         } else {
             e.setCancelled(true);
         }
     }
     
-    //@EventHandler
-    public void onPlayerMove(PlayerMoveEvent e) {
-        if (plugin.getLobby().checkMapEditing(e.getPlayer())) {
-            return;
-        }
-        if (plugin.getGame() == null) {
-            return;
-        }
-        
-        Location from = e.getFrom(), to = e.getTo();
-        
-        Game game = plugin.getGame();
-        GamePlayer gamePlayer = game.getPlayer(e.getPlayer().getUniqueId());
-        if (gamePlayer != null) {
-            if (gamePlayer.getTeam() != GameTeam.TRIBUTES) {
-                return;
-            }
-        }
-        
-        if (Stream.of(GameState.WARMUP, GameState.WARMUP_DONE, GameState.DEATHMATCH_WARMUP, GameState.DEATHMATCH_WARMUP_DONE, GameState.TELEPORT_START, GameState.TELEPORT_DEATHMATCH, GameState.TELEPORT_START_DONE, GameState.TELEPORT_DEATHMATCH_DONE).anyMatch(gameState -> game.getState() == gameState)) {
-            if (from.getBlockX() != to.getBlockX() || from.getBlockZ() != to.getBlockZ()) {
-                e.getPlayer().teleport(from);
-            }
-        }
-    }
-    
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent e) {
-        Game game = plugin.getGame();
+        Player player = e.getEntity();
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
+        Game game = sgPlayer.getGame();
+        
         if (game == null) {
             return;
         }
 
         e.setDeathMessage(null);
     
-        Player player = e.getEntity();
         GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
         Location deathLocation = player.getLocation().clone();
         EntityDamageEvent lastDamageCause = player.getLastDamageCause();
@@ -717,6 +732,8 @@ public class PlayerListener implements Listener {
     public void onNexusPlayerLoad(NexusPlayerLoadEvent e) {
         NexusPlayer nexusPlayer = e.getNexusPlayer();
 
+        SGPlayer sgPlayer = new SGPlayer(nexusPlayer);
+
         SGPlayerStats stats;
         try {
             stats = NexusAPI.getApi().getPrimaryDatabase().get(SGPlayerStats.class, "uniqueid", e.getNexusPlayer().getUniqueId()).get(0);
@@ -724,53 +741,29 @@ public class PlayerListener implements Listener {
             stats = new SGPlayerStats(e.getNexusPlayer().getUniqueId());
         }
         
-        SurvivalGames.PLAYER_STATS.put(nexusPlayer.getUniqueId(), stats);
-        
-        if (plugin.getGame() == null) {
-            if (plugin.getLobby().getPlayingCount() >= plugin.getLobby().getLobbySettings().getMaxPlayers()) {
-                boolean isStaff = nexusPlayer.getRank().ordinal() <= Rank.HELPER.ordinal();
-                boolean isInVanish = nexusPlayer.getToggleValue("vanish");
-                if (!(isStaff && isInVanish)) {
-                    nexusPlayer.sendMessage("&cThe lobby is full.");
-                    //TODO This will need to be handled.
-                    return;
-                }
-            }
-        }
+        sgPlayer.setStats(stats);
 
         SurvivalGames.PLAYER_QUEUE.offer(e.getNexusPlayer().getUniqueId());
-        if (plugin.getGame() != null) {
-            GameState state = plugin.getGame().getState();
-            if (state == GameState.ASSIGN_TEAMS) {
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        if (plugin.getGame().getState() != GameState.ASSIGN_TEAMS) {
-                            plugin.getGame().addPlayer(nexusPlayer, SurvivalGames.PLAYER_STATS.get(nexusPlayer.getUniqueId()));
-                            cancel();
-                        }
-                    }
-                }.runTaskTimer(plugin, 1L, 1L);
-            } else {
-                plugin.getGame().addPlayer(nexusPlayer, stats);
-            }
-        } else {
-            plugin.getLobby().addPlayer(nexusPlayer, stats);
-        }
+        
+        plugin.getPlayerRegistry().register(sgPlayer);
         e.setJoinMessage(null);
     }
     
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerQuit(PlayerQuitEvent e) {
         SurvivalGames.PLAYER_QUEUE.remove(e.getPlayer().getUniqueId());
-        NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(e.getPlayer().getUniqueId());
-        if (plugin.getGame() != null) {
-            plugin.getGame().removePlayer(nexusPlayer);
-        } else {
-            plugin.getLobby().removePlayer(nexusPlayer);
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(e.getPlayer().getUniqueId());
+        NexusPlayer nexusPlayer = sgPlayer.getNexusPlayer();
+        if (sgPlayer.getGame() != null) {
+            sgPlayer.getGame().removePlayer(nexusPlayer);
         }
+        
+        if (sgPlayer.getLobby() != null) {
+            sgPlayer.getLobby().removePlayer(nexusPlayer);
+        }
+        
         e.setQuitMessage(null);
-        SGPlayerStats stats = SurvivalGames.PLAYER_STATS.get(e.getPlayer().getUniqueId());
-        NexusAPI.getApi().getPrimaryDatabase().saveSilent(stats);
+        NexusAPI.getApi().getPrimaryDatabase().saveSilent(sgPlayer.getStats());
+        plugin.getPlayerRegistry().unregister(e.getPlayer().getUniqueId());
     }
 }

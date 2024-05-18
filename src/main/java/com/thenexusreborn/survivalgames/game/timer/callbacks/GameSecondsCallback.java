@@ -1,7 +1,8 @@
 package com.thenexusreborn.survivalgames.game.timer.callbacks;
 
-import com.stardevllc.starclock.callback.ClockCallback;
-import com.stardevllc.starclock.snapshot.TimerSnapshot;
+import com.stardevllc.starlib.clock.callback.ClockCallback;
+import com.stardevllc.starlib.clock.snapshot.TimerSnapshot;
+import com.stardevllc.starlib.time.TimeUnit;
 import com.thenexusreborn.survivalgames.game.Game;
 import org.bukkit.Sound;
 
@@ -22,7 +23,7 @@ public class GameSecondsCallback implements ClockCallback<TimerSnapshot> {
 
     @Override
     public void callback(TimerSnapshot timerSnapshot) {
-        int remainingSeconds = (int) Math.ceil(timerSnapshot.getTime() * 1.0 / getPeriod());
+        int remainingSeconds = (int) TimeUnit.MILLISECONDS.toSeconds(timerSnapshot.getTime());
         if (ANNOUNCE.contains(remainingSeconds)) {
             game.sendMessage(message.replace("{time}", Game.LONG_TIME_FORMAT.format(timerSnapshot.getTime())));
             if (game.getSettings().isSounds()) {

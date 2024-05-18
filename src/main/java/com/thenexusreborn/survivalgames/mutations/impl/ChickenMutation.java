@@ -1,12 +1,23 @@
 package com.thenexusreborn.survivalgames.mutations.impl;
 
-import com.thenexusreborn.nexuscore.util.timer.Timer;
-import com.thenexusreborn.survivalgames.mutations.*;
-import com.thenexusreborn.survivalgames.mutations.timer.*;
-import org.bukkit.*;
-import org.bukkit.entity.*;
+import com.stardevllc.starcore.color.ColorHandler;
+import com.stardevllc.starlib.clock.clocks.Timer;
+import com.thenexusreborn.nexuscore.util.MsgType;
+import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.mutations.Mutation;
+import com.thenexusreborn.survivalgames.mutations.MutationType;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.entity.Chicken;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 public class ChickenMutation extends Mutation {
     
@@ -18,8 +29,8 @@ public class ChickenMutation extends Mutation {
     
     private List<Entity> chickens = new ArrayList<>();
     
-    protected ChickenMutation(UUID player, UUID target) {
-        super(MutationType.CHICKEN, player, target);
+    protected ChickenMutation(Game game, UUID player, UUID target) {
+        super(game, MutationType.CHICKEN, player, target);
     }
     
     public boolean isLaunchOnCooldown() {
@@ -27,7 +38,7 @@ public class ChickenMutation extends Mutation {
             return false;
         }
         
-        return launchCooldownTimer.getSecondsLeft() > 0;
+        return launchCooldownTimer.getTime() > 0;
     }
     
     public boolean isParachuteOnCooldown() {
@@ -35,7 +46,7 @@ public class ChickenMutation extends Mutation {
             return false;
         }
         
-        return parachuteCooldownTimer.getSecondsLeft() > 0;
+        return parachuteCooldownTimer.getTime() > 0;
     }
     
     public Timer getLaunchCooldownTimer() {
@@ -43,9 +54,13 @@ public class ChickenMutation extends Mutation {
     }
     
     public void startLaunchCooldown() {
-        launchCooldownTimer = new Timer(new LaunchCooldownCallback(this));
-        launchCooldownTimer.setLength(5000);
-        launchCooldownTimer.run();
+        if (launchCooldownTimer == null) {
+            launchCooldownTimer = Game.getPlugin().getClockManager().createTimer(5000L);
+            launchCooldownTimer.addCallback(timerSnapshot -> Bukkit.getPlayer(getPlayer()).sendMessage(ColorHandler.getInstance().color(MsgType.INFO + "Chicken Launch is ready!")), 0L);
+            launchCooldownTimer.start();
+        } else {
+            launchCooldownTimer.reset();
+        }
     }
     
     public Timer getParachuteCooldownTimer() {
@@ -53,9 +68,13 @@ public class ChickenMutation extends Mutation {
     }
     
     public void startParachuteCooldown() {
-        parachuteCooldownTimer = new Timer(new ParachuteCooldownCallback(this));
-        parachuteCooldownTimer.setLength(5000);
-        parachuteCooldownTimer.run();
+        if (parachuteCooldownTimer == null) {
+            parachuteCooldownTimer = Game.getPlugin().getClockManager().createTimer(5000L);
+            parachuteCooldownTimer.addCallback(timerSnapshot -> Bukkit.getPlayer(getPlayer()).sendMessage(ColorHandler.getInstance().color(MsgType.INFO + "Chicken Chute is ready!")), 0L);
+            parachuteCooldownTimer.start();
+        } else {
+            parachuteCooldownTimer.reset();
+        }
     }
     
     public int getAmmunition() {
@@ -68,20 +87,6 @@ public class ChickenMutation extends Mutation {
     
     public void incrementAmmunition() {
         this.ammunition++;
-    }
-    
-    public void resetLaunchCooldown() {
-        if (this.launchCooldownTimer != null) {
-            this.launchCooldownTimer.cancel();
-            this.launchCooldownTimer = null;
-        }
-    }
-    
-    public void resetParachuteCooldown() {
-        if (this.parachuteCooldownTimer != null) {
-            this.parachuteCooldownTimer.cancel();
-            this.parachuteCooldownTimer = null;
-        }
     }
     
     public void decrementAmmunition() {

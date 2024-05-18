@@ -1,8 +1,8 @@
 package com.thenexusreborn.survivalgames.scoreboard.game;
 
+import com.stardevllc.starcore.color.ColorHandler;
 import com.thenexusreborn.api.scoreboard.*;
 import com.thenexusreborn.nexuscore.scoreboard.SpigotScoreboardView;
-import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
@@ -15,7 +15,7 @@ public class MutationBoard extends SpigotScoreboardView {
     private SurvivalGames plugin;
     
     public MutationBoard(NexusScoreboard scoreboard, SurvivalGames plugin) {
-        super(scoreboard, "combattag", MCUtils.color("&d&lMutation"));
+        super(scoreboard, "combattag", ColorHandler.getInstance().color("&d&lMutation"));
         this.plugin = plugin;
     }
     
@@ -29,17 +29,15 @@ public class MutationBoard extends SpigotScoreboardView {
         
         createTeam(new TeamBuilder("blank1").entry(ChatColor.AQUA).score(14));
     
-        Game game = plugin.getGame();
-        
         createTeam(new TeamBuilder("targetLabel").entry("&6&lTARGET:").score(13));
         createTeam(new TeamBuilder("targetValue").entry(ChatColor.WHITE).score(12).valueUpdater((player, team) -> {
-            GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
+            GamePlayer gamePlayer = plugin.getPlayerRegistry().get(player.getUniqueId()).getGamePlayer();
             if (gamePlayer.getTeam() != GameTeam.MUTATIONS) {
                 team.setSuffix("None");
                 return;
             }
             Mutation mutation = gamePlayer.getMutation();
-            GamePlayer target = game.getPlayer(mutation.getTarget());
+            GamePlayer target = plugin.getPlayerRegistry().get(mutation.getTarget()).getGamePlayer();
             if (target == null) {
                 team.setSuffix("None");
                 return;
@@ -51,7 +49,7 @@ public class MutationBoard extends SpigotScoreboardView {
         
         createTeam(new TeamBuilder("typeLabel").entry("&6&lTYPE:").score(10));
         createTeam(new TeamBuilder("typeValue").entry(ChatColor.BLACK).score(9).valueUpdater((player, team) -> {
-            GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
+            GamePlayer gamePlayer = plugin.getPlayerRegistry().get(player.getUniqueId()).getGamePlayer();
             if (gamePlayer.getTeam() != GameTeam.MUTATIONS) {
                 team.setSuffix("None");
                 return;

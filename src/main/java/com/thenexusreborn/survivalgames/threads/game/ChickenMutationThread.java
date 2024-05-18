@@ -1,6 +1,7 @@
 package com.thenexusreborn.survivalgames.threads.game;
 
 import com.thenexusreborn.nexuscore.api.NexusThread;
+import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
@@ -23,12 +24,17 @@ public class ChickenMutationThread extends NexusThread<SurvivalGames> {
     
     @Override
     public void onRun() {
-        Game game = plugin.getGame();
-        if (game == null) {
-            return;
-        }
-        
         for (Player player : Bukkit.getOnlinePlayers()) {
+            SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
+            if (sgPlayer == null) {
+                continue;
+            }
+            Game game = sgPlayer.getGame();
+            
+            if (game == null) {
+                continue;
+            }
+            
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
             if (gamePlayer == null) {
                 continue;
