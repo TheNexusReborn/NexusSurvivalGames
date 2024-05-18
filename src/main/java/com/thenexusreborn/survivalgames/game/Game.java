@@ -5,11 +5,11 @@ import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.starcore.color.ColorHandler;
 import com.stardevllc.starcore.utils.Cuboid;
+import com.stardevllc.starlib.clock.clocks.Timer;
 import com.stardevllc.starlib.helper.StringHelper;
 import com.stardevllc.starlib.registry.StringRegistry;
 import com.stardevllc.starlib.time.TimeFormat;
 import com.stardevllc.starlib.time.TimeUnit;
-import com.stardevllc.starlib.clock.clocks.Timer;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.gamearchive.GameAction;
 import com.thenexusreborn.api.gamearchive.GameInfo;
@@ -384,6 +384,7 @@ public class Game {
                     tributes.add(player.getUniqueId());
                 }
             }
+            player.applyScoreboard();
         }
         setState(TEAMS_ASSIGNED);
     }
