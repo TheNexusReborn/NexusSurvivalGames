@@ -24,7 +24,6 @@ public class TeamMenu extends InventoryGUI {
             for (GamePlayer player : game.getPlayers().values()) {
                 if (!player.getToggleValue("vanish")) {
                     if (player.getTeam() == team) {
-                        plugin.getLogger().info("Player is of team " + team.name());
                         Button button = new Button().iconCreator(p -> {
                             ItemStack skull = SpigotUtils.getPlayerSkull(Bukkit.getPlayer(player.getUniqueId()));
                             ItemMeta meta = skull.getItemMeta();
@@ -33,7 +32,6 @@ public class TeamMenu extends InventoryGUI {
                             return skull;
                         }).consumer(e -> manager.openGUI(new PlayerMenu(plugin, player), (Player) e.getWhoClicked()));
                         setElement(0, index++, button);
-                        plugin.getLogger().info("Set element.");
                     }
                 }
             }
