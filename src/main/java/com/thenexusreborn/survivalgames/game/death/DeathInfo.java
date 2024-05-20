@@ -107,7 +107,7 @@ public class DeathInfo {
                     } else {
                         killerName = killerPlayer.getRank().getColor() + killerPlayer.getName();
                     }
-                } else {
+                } else { //TODO Maybe just reset the dead player?
                     killerName = "&r" + killer.getName();
                 }
                 deathMessage = deathMessage.replace("%killername%", killerName + "&7");
