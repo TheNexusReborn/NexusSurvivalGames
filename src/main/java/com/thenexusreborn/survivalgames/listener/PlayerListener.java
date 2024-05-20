@@ -385,8 +385,10 @@ public class PlayerListener implements Listener {
                             nexusPlayer.sendMessage(MsgType.WARN + "You cannot vote for a map while in vanish.");
                             return;
                         }
-                        if (lobby.getState() == LobbyState.WAITING || lobby.getState() == LobbyState.COUNTDOWN) {
-                            lobby.addMapVote(nexusPlayer, block.getLocation());
+                        if (lobby != null) {
+                            if (lobby.getState() == LobbyState.WAITING || lobby.getState() == LobbyState.COUNTDOWN) {
+                                lobby.addMapVote(nexusPlayer, block.getLocation());
+                            }
                         }
                     } else {
                         if (e.getItem() != null) {
