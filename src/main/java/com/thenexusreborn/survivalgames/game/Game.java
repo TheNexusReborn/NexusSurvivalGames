@@ -1026,10 +1026,12 @@ public class Game {
                     }
 
                     GamePlayer assisterPlayer = getPlayer(damager);
-                    assisterPlayer.setAssists(assisterPlayer.getAssists() + 1);
-                    assisterPlayer.getStats().addAssists(1);
-                    assistors.add(new AssisterInfo(this, assisterPlayer));
-                    this.gameInfo.getActions().add(new GameAction(System.currentTimeMillis(), "assist", assisterPlayer.getName() + " assisted the death of " + gamePlayer.getName()));
+                    if (assisterPlayer != null) {
+                        assisterPlayer.setAssists(assisterPlayer.getAssists() + 1);
+                        assisterPlayer.getStats().addAssists(1);
+                        assistors.add(new AssisterInfo(this, assisterPlayer));
+                        this.gameInfo.getActions().add(new GameAction(System.currentTimeMillis(), "assist", assisterPlayer.getName() + " assisted the death of " + gamePlayer.getName()));
+                    }
                 }
             }
         }
