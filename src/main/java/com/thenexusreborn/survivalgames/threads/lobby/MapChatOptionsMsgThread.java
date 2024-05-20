@@ -1,11 +1,13 @@
 package com.thenexusreborn.survivalgames.threads.lobby;
 
-import com.thenexusreborn.nexuscore.api.NexusThread;
+import com.stardevllc.starcore.utils.StarThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.lobby.*;
+import com.thenexusreborn.survivalgames.lobby.Lobby;
+import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
+import com.thenexusreborn.survivalgames.lobby.LobbyState;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 
-public class MapChatOptionsMsgThread extends NexusThread<SurvivalGames> {
+public class MapChatOptionsMsgThread extends StarThread<SurvivalGames> {
     
     public MapChatOptionsMsgThread(SurvivalGames plugin) {
         super(plugin, 2400L, 60L, true);

@@ -1,8 +1,8 @@
 package com.thenexusreborn.survivalgames.threads.lobby;
 
 import com.stardevllc.starcore.color.ColorHandler;
+import com.stardevllc.starcore.utils.StarThread;
 import com.thenexusreborn.gamemaps.model.SGMap;
-import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
@@ -17,7 +17,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Map.Entry;
 
-public class MapSignUpdateThread extends NexusThread<SurvivalGames> {
+public class MapSignUpdateThread extends StarThread<SurvivalGames> {
     
     public MapSignUpdateThread(SurvivalGames plugin) {
         super(plugin, 20L, false);

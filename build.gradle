@@ -38,9 +38,9 @@ processResources {
 
 dependencies {
     compileOnly 'com.thenexusreborn:NexusAPI:1.13-ALPHA'
-    compileOnly 'com.thenexusreborn:NexusCore:1.12-ALPHA'
+    compileOnly 'com.thenexusreborn:NexusCore:1.12.1-ALPHA'
     compileOnly 'com.thenexusreborn:NexusMaps:1.0-ALPHA'
-    compileOnly 'com.thenexusreborn:NexusHub:1.6-ALPHA'
+    compileOnly 'com.thenexusreborn:NexusHub:1.6.1-ALPHA'
     compileOnly 'com.github.StarDevelopmentLLC:StarCore:1.0.0-alpha.33'
     compileOnly 'com.github.StarDevelopmentLLC:StarChat:1.0.0-alpha.16'
     compileOnly 'me.clip:placeholderapi:2.11.5'
@@ -49,7 +49,7 @@ dependencies {
 }
 
 group = 'com.thenexusreborn'
-version = '1.17-ALPHA'
+version = '1.17.1-ALPHA'
 description = 'NexusSurvivalGames'
 java.sourceCompatibility = JavaVersion.VERSION_17
 

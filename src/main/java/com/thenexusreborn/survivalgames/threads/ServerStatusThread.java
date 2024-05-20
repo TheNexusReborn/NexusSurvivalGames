@@ -3,15 +3,15 @@ package com.thenexusreborn.survivalgames.threads;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.stardevllc.starcore.utils.StarThread;
 import com.stardevllc.starlib.time.TimeUnit;
-import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 
-public class ServerStatusThread extends NexusThread<SurvivalGames> {
+public class ServerStatusThread extends StarThread<SurvivalGames> {
     
     private static final Gson gson = new GsonBuilder().create();
     

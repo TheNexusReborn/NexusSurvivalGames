@@ -1,8 +1,8 @@
 package com.thenexusreborn.survivalgames.threads.game;
 
+import com.stardevllc.starcore.utils.StarThread;
 import com.thenexusreborn.gamemaps.model.MapSpawn;
 import com.thenexusreborn.gamemaps.model.SGMap;
-import com.thenexusreborn.nexuscore.api.NexusThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-public class WarmupSpawnThread extends NexusThread<SurvivalGames> {
+public class WarmupSpawnThread extends StarThread<SurvivalGames> {
     
     public static final GameState[] states = new GameState[] {GameState.WARMUP, GameState.WARMUP_DONE, GameState.DEATHMATCH_WARMUP, GameState.DEATHMATCH_WARMUP_DONE, GameState.TELEPORT_START, GameState.TELEPORT_DEATHMATCH, GameState.TELEPORT_START_DONE, GameState.TELEPORT_DEATHMATCH_DONE};
     

@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.threads.game;
 
-import com.thenexusreborn.nexuscore.api.NexusThread;
+import com.stardevllc.starcore.utils.StarThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
@@ -9,7 +9,7 @@ import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.Bukkit;
 
-public class PlayerUpdateThread extends NexusThread<SurvivalGames> {
+public class PlayerUpdateThread extends StarThread<SurvivalGames> {
     public PlayerUpdateThread(SurvivalGames plugin) {
         super(plugin, 20L, false);
     }

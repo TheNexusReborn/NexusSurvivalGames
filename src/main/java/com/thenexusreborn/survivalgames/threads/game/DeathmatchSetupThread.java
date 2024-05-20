@@ -1,13 +1,13 @@
 package com.thenexusreborn.survivalgames.threads.game;
 
-import com.thenexusreborn.nexuscore.api.NexusThread;
+import com.stardevllc.starcore.utils.StarThread;
 import com.thenexusreborn.survivalgames.ControlType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GameState;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 
-public class DeathmatchSetupThread extends NexusThread<SurvivalGames> {
+public class DeathmatchSetupThread extends StarThread<SurvivalGames> {
     public DeathmatchSetupThread(SurvivalGames plugin) {
         super(plugin, 1L, 0L, false);
     }

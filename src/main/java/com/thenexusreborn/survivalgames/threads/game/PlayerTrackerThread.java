@@ -1,18 +1,21 @@
 package com.thenexusreborn.survivalgames.threads.game;
 
-import com.thenexusreborn.nexuscore.api.NexusThread;
+import com.stardevllc.starcore.utils.StarThread;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
-public class PlayerTrackerThread extends NexusThread<SurvivalGames> {
+public class PlayerTrackerThread extends StarThread<SurvivalGames> {
 
     public PlayerTrackerThread(SurvivalGames plugin) {
         super(plugin, 2L, true);

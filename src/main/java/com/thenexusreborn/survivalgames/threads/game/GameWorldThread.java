@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.threads.game;
 
-import com.thenexusreborn.nexuscore.api.NexusThread;
+import com.stardevllc.starcore.utils.StarThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GameState;
@@ -8,7 +8,7 @@ import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import com.thenexusreborn.survivalgames.settings.object.enums.Weather;
 import org.bukkit.World;
 
-public class GameWorldThread extends NexusThread<SurvivalGames> {
+public class GameWorldThread extends StarThread<SurvivalGames> {
     
     public GameWorldThread(SurvivalGames plugin) {
         super(plugin, 20L, false);
