@@ -204,19 +204,21 @@ public class EntityListener implements Listener {
                 TNTPrimed tntPrimed = (TNTPrimed) e.getDamager();
                 if (tntPrimed.getSource() instanceof Player) {
                     GamePlayer sourcePlayer = game.getPlayer(tntPrimed.getSource().getUniqueId());
-                    if (sourcePlayer.getTeam() == GameTeam.MUTATIONS) {
-                        if (!sourcePlayer.getMutation().getTarget().equals(e.getEntity().getUniqueId())) {
-                            e.setCancelled(true);
-                            return;
+                    if (sourcePlayer != null) {
+                        if (sourcePlayer.getTeam() == GameTeam.MUTATIONS) {
+                            if (!sourcePlayer.getMutation().getTarget().equals(e.getEntity().getUniqueId())) {
+                                e.setCancelled(true);
+                                return;
+                            }
                         }
+                        GamePlayer targetPlayer = game.getPlayer(target.getUniqueId());
+                        GamePlayer damagerPlayer = game.getPlayer(sourcePlayer.getUniqueId());
+                        if (targetPlayer.getUniqueId() != damagerPlayer.getUniqueId()) {
+                            targetPlayer.getDamageInfo().addDamager(damagerPlayer.getUniqueId());
+                        }
+                        damagerPlayer.setCombat(targetPlayer);
+                        targetPlayer.setCombat(damagerPlayer);
                     }
-                    GamePlayer targetPlayer = game.getPlayer(target.getUniqueId());
-                    GamePlayer damagerPlayer = game.getPlayer(sourcePlayer.getUniqueId());
-                    if (targetPlayer.getUniqueId() != damagerPlayer.getUniqueId()) {
-                        targetPlayer.getDamageInfo().addDamager(damagerPlayer.getUniqueId());
-                    }
-                    damagerPlayer.setCombat(targetPlayer);
-                    targetPlayer.setCombat(damagerPlayer);
                 }
             }
         }
