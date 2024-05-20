@@ -15,7 +15,8 @@ public class KillerInfo {
     protected ItemStack handItem;
     protected boolean mutationKill;
     protected double distance;
-    
+    private String name;
+
     public static KillerInfo createPlayerKiller(GamePlayer killer) {
         Player player = Bukkit.getPlayer(killer.getUniqueId());
         
@@ -26,6 +27,7 @@ public class KillerInfo {
         killerInfo.killer = killer.getUniqueId();
         killerInfo.mutationKill = killer.getTeam() == GameTeam.MUTATIONS;
         killerInfo.handItem = player.getItemInHand();
+        killerInfo.name = player.getName();
         return killerInfo;
     }
     
@@ -73,5 +75,9 @@ public class KillerInfo {
     
     public double getDistance() {
         return distance;
+    }
+
+    public String getName() {
+        return name;
     }
 }

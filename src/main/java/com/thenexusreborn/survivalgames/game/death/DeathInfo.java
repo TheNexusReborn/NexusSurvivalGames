@@ -101,10 +101,14 @@ public class DeathInfo {
             if (killer.getType() == EntityType.PLAYER) {
                 String killerName;
                 GamePlayer killerPlayer = game.getPlayer(killer.getKiller());
-                if (game.getSettings().getColorMode() == ColorMode.GAME_TEAM) {
-                    killerName = killer.getTeamColor() + killerPlayer.getName();
+                if (killerPlayer != null) {
+                    if (game.getSettings().getColorMode() == ColorMode.GAME_TEAM) {
+                        killerName = killer.getTeamColor() + killerPlayer.getName();
+                    } else {
+                        killerName = killerPlayer.getRank().getColor() + killerPlayer.getName();
+                    }
                 } else {
-                    killerName = killerPlayer.getRank().getColor() + killerPlayer.getName();
+                    killerName = "&r" + killer.getName();
                 }
                 deathMessage = deathMessage.replace("%killername%", killerName + "&7");
 
