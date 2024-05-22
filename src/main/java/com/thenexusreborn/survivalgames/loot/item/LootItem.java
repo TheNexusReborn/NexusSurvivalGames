@@ -17,20 +17,32 @@ public class LootItem {
     protected final Material material;
     protected final String name;
     protected final List<String> lore = new LinkedList<>();
+    protected final int amount;
     
-    public LootItem(LootCategory category, Material material, String name, List<String> lore) {
+    public LootItem(LootCategory category, Material material, String name, int amount, List<String> lore) {
         this.category = category;
         this.material = material;
         this.name = name;
         this.lore.addAll(lore);
-        
-        Items.REGISTRY.register(this);
+        this.amount = amount;
     }
     
+    public LootItem(LootCategory category, Material material, String name, int amount) {
+        this(category, material, name, amount, new ArrayList<>());
+    }
+    
+    public LootItem(LootCategory category, Material material, int amount) {
+        this(category, material, MaterialNames.getDefaultName(material), amount);
+    }
+
+    public LootItem(LootCategory category, Material material, String name, List<String> lore) {
+        this(category, material, name, 1, lore);
+    }
+
     public LootItem(LootCategory category, Material material, String name) {
         this(category, material, name, new ArrayList<>());
     }
-    
+
     public LootItem(LootCategory category, Material material) {
         this(category, material, MaterialNames.getDefaultName(material));
     }
@@ -64,7 +76,12 @@ public class LootItem {
         }
         itemMeta.setLore(lore);
         itemStack.setItemMeta(itemMeta);
+        itemStack.setAmount(amount);
         return itemStack;
+    }
+    
+    public LootItem setAmount(int amount) {
+        return new LootItem(category, material, name, amount, lore);
     }
 
     public LootCategory getCategory() {
