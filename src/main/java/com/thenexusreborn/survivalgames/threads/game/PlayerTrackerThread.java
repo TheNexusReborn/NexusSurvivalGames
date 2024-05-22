@@ -27,7 +27,7 @@ public class PlayerTrackerThread extends StarThread<SurvivalGames> {
             if (game == null) {
                 continue;
             }
-            
+
             long start = System.currentTimeMillis();
             if (game == null) {
                 continue;
@@ -47,28 +47,22 @@ public class PlayerTrackerThread extends StarThread<SurvivalGames> {
                 if (player == null) {
                     continue;
                 }
-                boolean trackerInHotbar = false;
                 boolean holdingTracker = false;
-                for (int i = 0; i < 9; i++) {
-                    if (!trackerInHotbar) {
-                        ItemStack item = player.getInventory().getItem(i);
-                        if (item == null) {
-                            continue;
-                        }
-                        trackerInHotbar = item.getType() == Material.COMPASS;
-                    }
+
+                ItemStack hand = player.getInventory().getItemInHand();
+                if (hand != null) {
+                    holdingTracker = hand.getType() == Material.COMPASS;
                 }
 
-                if (trackerInHotbar) {
-                    ItemStack hand = player.getInventory().getItemInHand();
-                    if (hand != null) {
-                        holdingTracker = hand.getType() == Material.COMPASS;
-                    }
+                GamePlayer gamePlayer = game.getPlayer(p);
+
+                if (!holdingTracker) {
+                    gamePlayer.setTrackerInfo(null);
+                    continue;
                 }
 
                 Player target = null;
                 double distance = -1;
-                GamePlayer gamePlayer = game.getPlayer(p);
                 if (gamePlayer.getTeam() == GameTeam.MUTATIONS) {
                     target = Bukkit.getPlayer(gamePlayer.getMutation().getTarget());
                 } else {
@@ -119,11 +113,7 @@ public class PlayerTrackerThread extends StarThread<SurvivalGames> {
                 String health = MCUtils.formatNumber(target.getHealth());
                 String maxHealth = MCUtils.formatNumber(target.getMaxHealth());
 
-                if (holdingTracker) {
-                    gamePlayer.setTrackerInfo(new TrackerInfo(target.getName(), (int) distance, health, maxHealth));
-                } else {
-                    gamePlayer.setTrackerInfo(null);
-                }
+                gamePlayer.setTrackerInfo(new TrackerInfo(target.getName(), (int) distance, health, maxHealth));
             }
 
             long end = System.currentTimeMillis();
