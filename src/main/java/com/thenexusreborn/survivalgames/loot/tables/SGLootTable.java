@@ -1,7 +1,6 @@
 package com.thenexusreborn.survivalgames.loot.tables;
 
 import com.thenexusreborn.survivalgames.SGPlayer;
-import com.thenexusreborn.survivalgames.loot.LootTable;
 
 public abstract class SGLootTable extends LootTable {
     

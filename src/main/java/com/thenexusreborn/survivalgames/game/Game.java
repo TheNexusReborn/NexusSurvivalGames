@@ -38,7 +38,7 @@ import com.thenexusreborn.survivalgames.game.timer.endconditions.*;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
 import com.thenexusreborn.survivalgames.lobby.LobbyType;
-import com.thenexusreborn.survivalgames.loot.Items;
+import com.thenexusreborn.survivalgames.loot.item.Items;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
 import com.thenexusreborn.survivalgames.mutations.MutationEffect;
 import com.thenexusreborn.survivalgames.mutations.MutationItem;

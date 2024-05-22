@@ -1,4 +1,4 @@
-package com.thenexusreborn.survivalgames.loot;
+package com.thenexusreborn.survivalgames.loot.category;
 
 public final class Categories {
     public static final CategoryRegistry REGISTRY = new CategoryRegistry();

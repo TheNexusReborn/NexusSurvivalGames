@@ -1,7 +1,8 @@
-package com.thenexusreborn.survivalgames.loot;
+package com.thenexusreborn.survivalgames.loot.item;
 
 import com.stardevllc.starcore.color.ColorHandler;
 import com.stardevllc.starcore.utils.MaterialNames;
+import com.thenexusreborn.survivalgames.loot.category.LootCategory;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;

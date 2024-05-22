@@ -1,5 +1,6 @@
-package com.thenexusreborn.survivalgames.loot;
+package com.thenexusreborn.survivalgames.loot.item;
 
+import com.thenexusreborn.survivalgames.loot.category.Categories;
 import org.bukkit.Material;
 
 import java.util.*;

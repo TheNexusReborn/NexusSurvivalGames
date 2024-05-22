@@ -2,7 +2,7 @@ package com.thenexusreborn.survivalgames.sponsoring;
 
 import com.stardevllc.starcore.color.ColorHandler;
 import com.stardevllc.starcore.xseries.XMaterial;
-import com.thenexusreborn.survivalgames.loot.LootItem;
+import com.thenexusreborn.survivalgames.loot.item.LootItem;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 

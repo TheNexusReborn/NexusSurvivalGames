@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.loot.tables;
 
-import com.thenexusreborn.survivalgames.loot.Items;
+import com.thenexusreborn.survivalgames.loot.item.Items;
 
 public class TierThreeLootTable extends SGLootTable {
     public TierThreeLootTable() {

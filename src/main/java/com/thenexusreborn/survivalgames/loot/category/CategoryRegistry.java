@@ -1,4 +1,4 @@
-package com.thenexusreborn.survivalgames.loot;
+package com.thenexusreborn.survivalgames.loot.category;
 
 import com.stardevllc.starcore.color.ColorHandler;
 import com.stardevllc.starlib.registry.StringRegistry;

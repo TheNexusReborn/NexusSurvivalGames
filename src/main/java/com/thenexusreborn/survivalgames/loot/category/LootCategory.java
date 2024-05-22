@@ -1,4 +1,4 @@
-package com.thenexusreborn.survivalgames.loot;
+package com.thenexusreborn.survivalgames.loot.category;
 
 import java.util.Objects;
 
