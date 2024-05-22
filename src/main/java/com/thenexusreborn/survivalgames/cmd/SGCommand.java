@@ -27,7 +27,6 @@ import com.thenexusreborn.survivalgames.loot.LootItem;
 import com.thenexusreborn.survivalgames.map.SQLMapManager;
 import com.thenexusreborn.survivalgames.settings.SettingRegistry;
 import com.thenexusreborn.survivalgames.settings.collection.SettingList;
-import com.thenexusreborn.survivalgames.settings.object.Setting;
 import com.thenexusreborn.survivalgames.settings.object.Setting.Info;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
 import com.thenexusreborn.survivalgames.util.SGUtils;
@@ -685,7 +684,7 @@ public class SGCommand implements CommandExecutor {
             }
 
             String settingName = args[2].toLowerCase();
-            Setting.Info settingInfo = registry.get(settingName);
+            Info settingInfo = registry.get(settingName);
 
             if (settingInfo == null) {
                 sender.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "A setting with that name does not exist."));

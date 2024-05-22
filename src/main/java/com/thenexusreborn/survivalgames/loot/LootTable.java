@@ -1,107 +1,72 @@
 package com.thenexusreborn.survivalgames.loot;
 
-import com.stardevllc.starlib.range.Range;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class LootTable {
-    private final String name;
-    private final List<LootCategory> categories;
+    protected final String name;
+
+    private LootItem[] items = new LootItem[0];
+    private int lastIndex = 0;
     
-    private final Set<Range<LootCategory>> categoryProbabilities = new HashSet<>();
-    private int categoryTotal, maxPossibleItems;
-    
-    public LootTable(String name, List<LootCategory> categories) {
+    public LootTable(String name) {
         this.name = name;
-        this.categories = categories;
     }
     
-    public void generateNewProbabilities(Random random) {
-        int index = 0;
-        for (LootCategory category : this.categories) {
-            if (category.getEntries().isEmpty()) {
-                continue;
-            }
-            category.generateNewProbabilities(random);
-            int min = index;
-            index += category.getWeight();
-            categoryProbabilities.add(new Range<>(min, index, category));
-            index++;
+    public void addItem(LootItem item, int weight) {
+        int targetLength = weight + items.length;
+        if (items.length < targetLength) {
+            LootItem[] newItems = new LootItem[targetLength];
+            System.arraycopy(items, 0, newItems, 0, items.length);
+            items = newItems;
         }
-        this.categoryTotal = index;
+        
+        for (int w = 0; w < weight; w++) {
+            items[lastIndex] = item;
+            lastIndex++;
+        }
     }
     
-    public List<ItemStack> generateLoot(int minAmount, int maxAmount) {
+    public void addItems(int weight, LootItem... items) {
+        if (items == null) {
+            return;
+        }
+        
+        int targetLength = this.items.length + (weight * items.length);
+        if (this.items.length < targetLength) {
+            LootItem[] newItems = new LootItem[targetLength];
+            System.arraycopy(this.items, 0, newItems, 0, this.items.length);
+            this.items = newItems;
+        }
+
+        for (LootItem item : items) {
+            for (int w = 0; w < weight; w++) {
+                this.items[lastIndex] = item;
+                lastIndex++;
+            }
+        }
+    }
+
+    public LootItem[] getItems() {
+        LootItem[] items = new LootItem[this.items.length];
+        System.arraycopy(this.items, 0, items, 0, this.items.length);
+        return items;
+    }
+
+    public List<ItemStack> generateLoot(int rolls) {
         List<ItemStack> loot = new ArrayList<>();
-        
-        if (maxAmount < minAmount) {
-            return loot;
-        }
-        
-        if (maxAmount > this.maxPossibleItems) {
-            return loot;
-        }
-        
         Random random = new Random();
-        
-        Set<Range<LootCategory>> categoryProbabilities = new HashSet<>(this.categoryProbabilities);
-        
-        Map<LootCategory, Integer> categoryAmounts = new HashMap<>();
-        int totalItems = random.nextInt(maxAmount - minAmount) + minAmount;
-        int itemCount = 0;
-        while (itemCount < totalItems) {
-            int rand = random.nextInt(categoryTotal + 1);
-            for (Range<LootCategory> range : categoryProbabilities) {
-                if (range.contains(rand)) {
-                    LootCategory category = range.value();
-                    int current = categoryAmounts.getOrDefault(category, 0);
-                    if (current < category.getMaxAmountPerChest()) {
-                        categoryAmounts.put(category, current + 1);
-                        itemCount++;
-                    }
-                    break;
-                }
-            }
-        }
-    
-        for (Entry<LootCategory, Integer> entry : categoryAmounts.entrySet()) {
-            for (int i = 0; i < entry.getValue(); i++) {
-                LootEntry lootEntry = entry.getKey().generateLoot(random);
-                if (lootEntry != null) {
-                    loot.add(lootEntry.generateItemStack());
-                }
-            }
+        for (int i = 0; i < rolls; i++) {
+            loot.add(items[random.nextInt(items.length)].getItemStack());
         }
         
         return loot;
     }
-    
-    public void addCategory(LootCategory category) {
-        this.maxPossibleItems += category.getMaxAmountPerChest();
-        this.categories.add(category);
-    }
-    
-    public LootCategory getCategory(String name) {
-        for (LootCategory category : this.categories) {
-            if (category.getName().equalsIgnoreCase(name)) {
-                return category;
-            }
-        }
-        
-        return null;
-    }
-    
-    public LootTable(String name) {
-        this(name, new ArrayList<>());
-    }
-    
+
     public String getName() {
         return name;
-    }
-    
-    public List<LootCategory> getCategories() {
-        return new ArrayList<>(categories);
     }
 }

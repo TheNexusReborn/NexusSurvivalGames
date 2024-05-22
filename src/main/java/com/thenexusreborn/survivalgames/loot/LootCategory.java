@@ -1,114 +1,30 @@
 package com.thenexusreborn.survivalgames.loot;
 
-import com.stardevllc.starlib.range.Range;
-import com.thenexusreborn.survivalgames.SurvivalGames;
-import org.bukkit.Material;
-
-import java.util.*;
+import java.util.Objects;
 
 public class LootCategory {
     private final String name;
-    private final int weight;
-    private final List<LootEntry> entries;
-    private final int maxAmountPerChest;
-    
-    private final Set<Range<LootEntry>> entryProbabilities = new HashSet<>();
-    private int entryTotal;
-    
-    public LootCategory(String name, int weight, int maxAmountPerChest, List<LootEntry> entries) {
+    private int maxAmountPerChest;
+
+    public LootCategory(String name) {
         this.name = name;
-        this.weight = weight;
-        this.entries = entries;
+        
+        Categories.REGISTRY.register(this);
+    }
+
+    public LootCategory(String name, int maxAmountPerChest) {
+        this(name);
         this.maxAmountPerChest = maxAmountPerChest;
     }
-    
-    public LootCategory(String name, int weight, int maxAmountPerChest) {
-        this(name, weight, maxAmountPerChest, new ArrayList<>());
-    }
-    
-    public LootCategory(String name, int weight) {
-        this(name, weight, 2);
-    }
-    
-    public void addEntries(int weight, LootItem... items) {
-        if (items != null) {
-            for (LootItem item : items) {
-                this.entries.add(new LootEntry(item, weight));
-            }
-        }
-    }
-    
-    public LootEntry getEntry(String name) {
-        for (LootEntry entry : this.entries) {
-            if (entry.getName().equalsIgnoreCase(name)) {
-                return entry;
-            }
-        }
-        
-        return null;
-    }
-    
-    public LootEntry getEntry(Material material) {
-        for (LootEntry entry : this.entries) {
-            if (entry.getMaterial() == material) {
-                return entry;
-            }
-        }
-        
-        return null;
-    }
-    
-    public void addEntry(int rarity, LootItem item) {
-        this.entries.add(new LootEntry(item, rarity));
-    }
-    
-    public void addEntry(LootEntry lootEntry) {
-        this.entries.add(lootEntry);
-    }
-    
+
     public String getName() {
         return name;
     }
-    
-    public int getWeight() {
-        return weight;
-    }
-    
-    public List<LootEntry> getEntries() {
-        return entries;
-    }
-    
+
     public int getMaxAmountPerChest() {
         return maxAmountPerChest;
     }
-    
-    public void generateNewProbabilities(Random random) {
-        int index = 0;
-        for (LootEntry entry : this.entries) {
-            int min = index;
-            index += entry.getWeight();
-            entryProbabilities.add(new Range<>(min, index, entry));
-            index++;
-        }
-        this.entryTotal = index;
-    }
-    
-    public LootEntry generateLoot(Random random) {
-        Set<Range<LootEntry>> entryProbabilties = new HashSet<>(this.entryProbabilities);
-        int rand = random.nextInt(entryTotal + 1);
-        for (Range<LootEntry> range : entryProbabilties) {
-            if (range.contains(rand)) {
-                if (range.value() == null) {
-                    SurvivalGames.getPlugin(SurvivalGames.class).getLogger().severe("A range has a null object " + range.min() + " - " + range.max());
-                }
-                return range.value();
-            }
-        }
-        
-        SurvivalGames.getPlugin(SurvivalGames.class).getLogger().severe("Could not find an object for the generated number " + rand);
-        return null;
-    }
-    
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

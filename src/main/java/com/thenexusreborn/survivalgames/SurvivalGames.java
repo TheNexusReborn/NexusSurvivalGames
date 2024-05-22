@@ -27,8 +27,6 @@ import com.thenexusreborn.survivalgames.listener.BlockListener;
 import com.thenexusreborn.survivalgames.listener.EntityListener;
 import com.thenexusreborn.survivalgames.listener.PlayerListener;
 import com.thenexusreborn.survivalgames.listener.ServerListener;
-import com.thenexusreborn.survivalgames.loot.LootManager;
-import com.thenexusreborn.survivalgames.loot.LootTable;
 import com.thenexusreborn.survivalgames.map.SQLMapManager;
 import com.thenexusreborn.survivalgames.mutations.PlayerMutations;
 import com.thenexusreborn.survivalgames.mutations.UnlockedMutation;
@@ -188,10 +186,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
             e.printStackTrace();
         }
         getLogger().info("Unlocked mutations loaded.");
-
-        for (LootTable lootTable : LootManager.getInstance().getLootTables()) {
-            lootTable.generateNewProbabilities(new Random());
-        }
 
         getCommand("votestart").setExecutor(new VoteStartCommand(this));
         getCommand("stats").setExecutor(new StatsCommand(this));
