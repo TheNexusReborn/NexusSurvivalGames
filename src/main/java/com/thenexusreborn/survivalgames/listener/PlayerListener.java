@@ -355,7 +355,7 @@ public class PlayerListener implements Listener {
                             return;
                         }
                         
-                        List<ItemStack> items = lootTable.generateLoot(maxAmount);
+                        List<ItemStack> items = lootTable.generateLoot(new Random().nextInt(maxAmount - 2) + 2);
                         
                         for (ItemStack item : items) {
                             int slot;

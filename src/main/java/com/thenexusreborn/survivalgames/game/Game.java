@@ -511,6 +511,9 @@ public class Game {
             restockLength = settings.getChestRestockInterval();
         }
         this.restockCallbackId = this.timer.addRepeatingCallback(timerSnapshot -> {
+            if (timerSnapshot.getTime() == timerSnapshot.getLength()) {
+                return;
+            }
             timedRestockCount++;
             restockChests();
             sendMessage("&6&l>> &a&lALL CHESTS HAVE BEEN RESTOCKED");
