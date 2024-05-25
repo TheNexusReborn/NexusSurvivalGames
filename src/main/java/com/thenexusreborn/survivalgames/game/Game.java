@@ -132,7 +132,7 @@ public class Game {
         gameInfo.setPlayerCount(tributeCount);
         gameInfo.setPlayers(playerNames.toArray(new String[0]));
     }
-    
+
     public SGVirtualServer getServer() {
         return server;
     }
@@ -442,7 +442,7 @@ public class Game {
             e.printStackTrace();
             handleError("Could not setup the world settings..");
         }
-        
+
         setState(SETUP_COMPLETE);
     }
 
@@ -1204,9 +1204,7 @@ public class Game {
                     cancel();
                     return;
                 }
-                if (Stream.of(INGAME, DEATHMATCH, INGAME_DEATHMATCH, WARMUP).anyMatch(gameState -> state == gameState)) {
-                    checkGameEnd();
-                }
+                checkGameEnd();
             }
         }.runTaskLater(plugin, 1L);
     }
@@ -1217,16 +1215,25 @@ public class Game {
     }
 
     public void checkGameEnd() {
-        if (Stream.of(INGAME, INGAME_DEATHMATCH, DEATHMATCH).anyMatch(gameState -> this.state == gameState)) {
-            int totalTributes = 0;
-            for (GamePlayer player : this.players.values()) {
-                if (player.getTeam() == GameTeam.TRIBUTES) {
-                    totalTributes++;
-                }
+        //Count total tributes
+        int totalTributes = 0;
+        for (GamePlayer player : this.players.values()) {
+            if (player.getTeam() == GameTeam.TRIBUTES) {
+                totalTributes++;
             }
+        }
 
+        //Check to see if the game is in progress, if it is in progress and one or less players remain, mark game complete, this will detect the winner
+        if (Stream.of(INGAME, INGAME_DEATHMATCH, DEATHMATCH, TELEPORT_DEATHMATCH, TELEPORT_DEATHMATCH_DONE, DEATHMATCH_WARMUP, DEATHMATCH_WARMUP_DONE).anyMatch(gameState -> this.state == gameState)) {
             if (totalTributes <= 1) {
                 gameComplete();
+            }
+        }
+
+        //Check to see if the game is still setting up, if it is, reset the game back to the lobby, don't save stats, prevents stat farming for games and games won
+        if (Stream.of(TEAMS_ASSIGNED, TELEPORT_START, TELEPORT_START_DONE, WARMUP, WARMUP_DONE).anyMatch(gameState -> this.state == gameState)) {
+            if (totalTributes <= 1) {
+                nextGameReady();
             }
         }
     }
