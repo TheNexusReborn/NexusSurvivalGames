@@ -2,9 +2,15 @@ package com.thenexusreborn.survivalgames.loot.tables;
 
 import com.thenexusreborn.survivalgames.loot.item.Items;
 
+import java.io.File;
+
 public class TierFourLootTable extends SGLootTable {
-    public TierFourLootTable() {
-        super("tierFour");
+    public TierFourLootTable(File folder) {
+        super("tierFour", new File(folder, "tierFour.yml"));
+    }
+
+    @Override
+    public void loadDefaultData() {
         addItems(40, Items.PORKCHOP, Items.STEAK, Items.GRILLED_CHICKEN, Items.PUMPKIN_PIE);
         addItems(30, Items.GOLDEN_CARROT, Items.GOLDEN_MUNCHIE);
 

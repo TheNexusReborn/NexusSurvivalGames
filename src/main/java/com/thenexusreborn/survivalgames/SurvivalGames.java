@@ -27,6 +27,7 @@ import com.thenexusreborn.survivalgames.listener.BlockListener;
 import com.thenexusreborn.survivalgames.listener.EntityListener;
 import com.thenexusreborn.survivalgames.listener.PlayerListener;
 import com.thenexusreborn.survivalgames.listener.ServerListener;
+import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.map.SQLMapManager;
 import com.thenexusreborn.survivalgames.mutations.PlayerMutations;
 import com.thenexusreborn.survivalgames.mutations.UnlockedMutation;
@@ -81,6 +82,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
     private int gamesPlayed;
     
     private ClockManager clockManager;
+    private LootManager lootManager;
 
     public static SurvivalGames getInstance() {
         return INSTANCE;
@@ -186,6 +188,9 @@ public class SurvivalGames extends NexusSpigotPlugin {
             e.printStackTrace();
         }
         getLogger().info("Unlocked mutations loaded.");
+        
+        this.lootManager = new LootManager(this);
+        this.lootManager.loadData();
 
         getCommand("votestart").setExecutor(new VoteStartCommand(this));
         getCommand("stats").setExecutor(new StatsCommand(this));
@@ -363,6 +368,8 @@ public class SurvivalGames extends NexusSpigotPlugin {
         } else if (mapManager instanceof YamlMapManager) {
             getConfig().set("map-source", "yml");
         }
+        
+        this.lootManager.saveData();
 
         saveConfig();
     }
@@ -373,6 +380,10 @@ public class SurvivalGames extends NexusSpigotPlugin {
 
     public NexusCore getNexusCore() {
         return nexusCore;
+    }
+
+    public LootManager getLootManager() {
+        return lootManager;
     }
 
     public LobbySettings getLobbySettings(String type) {

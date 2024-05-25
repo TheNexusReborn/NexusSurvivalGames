@@ -24,6 +24,7 @@ import com.thenexusreborn.survivalgames.lobby.StatSign;
 import com.thenexusreborn.survivalgames.lobby.TributeSign;
 import com.thenexusreborn.survivalgames.loot.item.Items;
 import com.thenexusreborn.survivalgames.loot.item.LootItem;
+import com.thenexusreborn.survivalgames.loot.tables.SGLootTable;
 import com.thenexusreborn.survivalgames.map.SQLMapManager;
 import com.thenexusreborn.survivalgames.settings.SettingRegistry;
 import com.thenexusreborn.survivalgames.settings.collection.SettingList;
@@ -950,6 +951,62 @@ public class SGCommand implements CommandExecutor {
             Block targetBlock = player.getTargetBlock((Set<Material>) null, 10);
             Skull skull = (Skull) targetBlock.getState();
             player.sendMessage(skull.getOwner());
+        } else if (args[0].equalsIgnoreCase("loottable")) {
+            // /sg loottable <name> setitemweight|siw <item> <weight>
+            // /sg loottable <name> reload
+            
+            if (!(args.length > 1)) {
+                sender.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "You must provide a Loot Table name."));
+                return true;
+            }
+
+            SGLootTable lootTable = plugin.getLootManager().getLootTable(args[1]);
+            if (lootTable == null) {
+                sender.sendMessage(MsgType.WARN.format("The value %v is not a valid loot table", args[1]));
+                return true;
+            }
+            
+            if (!(args.length > 2)) {
+                sender.sendMessage(MsgType.WARN.format("You must provide a sub command."));
+                return true;
+            }
+            
+            if (args[2].equalsIgnoreCase("reload")) {
+                lootTable.setReloading(true);
+                try {
+                    lootTable.saveData();
+                    lootTable.loadData();
+                    if (lootTable.getItemWeights().isEmpty()) {
+                        lootTable.loadDefaultData();
+                    }
+                } catch (Throwable throwable) {
+                    sender.sendMessage(MsgType.ERROR .format("There was an error reloading that loot table: " + throwable.getMessage()));
+                }
+                lootTable.setReloading(false);
+            } else if (args[2].equalsIgnoreCase("setitemweight") || args[2].equalsIgnoreCase("siw")) {
+                if (!(args.length > 4)) {
+                    sender.sendMessage(MsgType.WARN.format(String.format("Usage: /%s %s %s %s <item> <weight>", label, args[0], args[1], args[2])));
+                    return true;
+                }
+
+                String itemName = args[3].toLowerCase().replace("'", "");
+                if (!lootTable.getItemWeights().containsKey(itemName)) {
+                    sender.sendMessage(MsgType.WARN.format("The loot table %v does not contain an item entry with the id of %v", lootTable.getName(), itemName));
+                    return true;
+                }
+                
+                int weight;
+                try {
+                    weight = Integer.parseInt(args[4]);
+                } catch (NumberFormatException e) {
+                    sender.sendMessage(MsgType.WARN.format("The input value %v is not a valid whole number.", args[4]));
+                    return true;
+                }
+                
+                lootTable.getItemWeights().put(itemName, weight);
+                sender.sendMessage(MsgType.INFO.format("You set the item %v's weight to %v in loot table %v", itemName, weight, lootTable.getName()));
+                sender.sendMessage(MsgType.INFO.format(String.format("You must use /%s %s %s reload", label, args[0], args[1]) + " to apply your changes."));
+            }
         }
 
         return true;

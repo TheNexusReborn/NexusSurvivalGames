@@ -2,9 +2,15 @@ package com.thenexusreborn.survivalgames.loot.tables;
 
 import com.thenexusreborn.survivalgames.loot.item.Items;
 
+import java.io.File;
+
 public class TierTwoLootTable extends SGLootTable {
-    public TierTwoLootTable() {
-        super("tierTwo");
+    public TierTwoLootTable(File folder) {
+        super("tierTwo", new File(folder, "tierTwo.yml"));
+    }
+
+    @Override
+    public void loadDefaultData() {
         addItems(40, Items.PORKCHOP, Items.STEAK, Items.GRILLED_CHICKEN, Items.PUMPKIN_PIE, Items.VILE_CREATURE, Items.BAKED_POTATO);
         addItems(50, Items.RAW_PORKCHOP, Items.RAW_BEEF, Items.RAW_FISH);
         addItems(45, Items.APPLE, Items.CAKE, Items.GOLDEN_CARROT);

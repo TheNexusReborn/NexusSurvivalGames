@@ -23,7 +23,7 @@ import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
 import com.thenexusreborn.survivalgames.loot.LootManager;
-import com.thenexusreborn.survivalgames.loot.tables.LootTable;
+import com.thenexusreborn.survivalgames.loot.tables.SGLootTable;
 import com.thenexusreborn.survivalgames.menu.MutateGui;
 import com.thenexusreborn.survivalgames.menu.SwagShackMenu;
 import com.thenexusreborn.survivalgames.menu.TeamMenu;
@@ -265,7 +265,7 @@ public class PlayerListener implements Listener {
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
             if (e.getClickedBlock() != null) {
                 if (Stream.of(Material.DISPENSER, Material.FURNACE, Material.BURNING_FURNACE, Material.WORKBENCH, Material.ENCHANTMENT_TABLE, Material.ANVIL).noneMatch(material -> block.getType() == material)) {
-                    LootManager lootManager = LootManager.getInstance();
+                    LootManager lootManager = plugin.getLootManager();
                     if (Stream.of(Material.CHEST, Material.TRAPPED_CHEST, Material.ENDER_CHEST).anyMatch(material -> block.getType() == material)) {
                         if (game == null) {
                             return;
@@ -321,7 +321,7 @@ public class PlayerListener implements Listener {
                         
                         inv.clear();
                         
-                        LootTable lootTable = null;
+                        SGLootTable lootTable = null;
                         
                         boolean useTieredLoot = game.getSettings().isUseNewLoot();
                         if (!useTieredLoot) {
@@ -352,6 +352,11 @@ public class PlayerListener implements Listener {
                         
                         if (lootTable == null) {
                             player.sendMessage(ColorHandler.getInstance().color(MsgType.ERROR + "Error while determining the loot table."));
+                            return;
+                        }
+                        
+                        if (lootTable.isReloading()) {
+                            player.sendMessage(MsgType.WARN.format("That loot table is being reloaded, try again in a few seconds."));
                             return;
                         }
                         
