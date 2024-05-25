@@ -979,6 +979,7 @@ public class SGCommand implements CommandExecutor {
                     if (lootTable.getItemWeights().isEmpty()) {
                         lootTable.loadDefaultData();
                     }
+                    sender.sendMessage(MsgType.INFO.format("Reload of loot table %v was successful.", lootTable.getName()));
                 } catch (Throwable throwable) {
                     sender.sendMessage(MsgType.ERROR .format("There was an error reloading that loot table: " + throwable.getMessage()));
                 }
