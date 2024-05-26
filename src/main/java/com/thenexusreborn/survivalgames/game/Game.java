@@ -56,6 +56,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
@@ -812,11 +813,14 @@ public class Game {
 
         NexusAPI.getApi().getScheduler().runTaskAsynchronously(() -> {
             NexusAPI.getApi().getPrimaryDatabase().saveSilent(gameInfo);
+            try {
+                NexusAPI.getApi().getGameLogExporter().exportGameInfo(gameInfo);
+            } catch (IOException e) {}
             if (gameInfo.getId() == 0) {
                 sendMessage("&4&l>> &cThere was a database error archiving the game. Please report with date and time.");
             } else {
                 sendMessage("&6&l>> &aThis game has been archived!");
-                sendMessage("&6&l>> &aGame ID: &b" + gameInfo.getId() + " &7&oCustom Website Coming Soon.");
+                sendMessage("&6&l>> &aGame Log: &bhttp://thenexusreborn.com:8051/game?id=" + gameInfo.getId());
 
                 if (gameInfo.getId() % 1000 == 0) {
                     for (String p : gameInfo.getPlayers()) {
