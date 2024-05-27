@@ -4,6 +4,9 @@ import com.stardevllc.starcore.color.ColorHandler;
 import com.stardevllc.starlib.clock.clocks.Timer;
 import com.stardevllc.starlib.misc.Value;
 import com.stardevllc.starlib.misc.Value.Type;
+import com.stardevllc.starlib.time.TimeFormat;
+import com.stardevllc.starlib.time.TimeParser;
+import com.thenexusreborn.api.gamearchive.GameAction;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.sql.objects.typehandlers.ValueHandler;
 import com.thenexusreborn.gamemaps.MapManager;
@@ -150,6 +153,7 @@ public class SGCommand implements CommandExecutor {
                 }
                 case "assignstartingteams", "ast" -> {
                     if (game.getState() == GameState.SETUP_COMPLETE) {
+                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " ran the assignstartingteams command."));
                         game.assignStartingTeams();
                         if (game.getState() == GameState.TEAMS_ASSIGNED) {
                             sender.sendMessage(ColorHandler.getInstance().color(MsgType.INFO + "Starting teams have been assigned."));
@@ -162,6 +166,7 @@ public class SGCommand implements CommandExecutor {
                 }
                 case "teleportplayers", "tpp" -> {
                     if (game.getState() == GameState.TEAMS_ASSIGNED) {
+                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " ran the teleportplayers command."));
                         game.teleportStart();
                         if (game.getState() == GameState.TELEPORT_START_DONE) {
                             sender.sendMessage(ColorHandler.getInstance().color(MsgType.INFO + "Players have been teleported."));
@@ -174,6 +179,7 @@ public class SGCommand implements CommandExecutor {
                 }
                 case "startwarmupcountdown", "swcd" -> {
                     if (game.getState() == GameState.TELEPORT_START_DONE) {
+                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " ran the startwarmupcountdown command."));
                         game.startWarmup();
                         if (game.getState() == GameState.WARMUP || game.getState() == GameState.WARMUP_DONE) {
                             sender.sendMessage(ColorHandler.getInstance().color(MsgType.INFO + "The warmup countdown has been started successfully."));
@@ -186,6 +192,7 @@ public class SGCommand implements CommandExecutor {
                 }
                 case "start" -> {
                     if (game.getState() == GameState.WARMUP_DONE || game.getState() == GameState.TELEPORT_START_DONE) {
+                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " ran the start command."));
                         game.startGame();
                     } else if (game.getState() == GameState.WARMUP) {
                         if (game.getTimer() != null) {
@@ -206,6 +213,7 @@ public class SGCommand implements CommandExecutor {
                 }
                 case "startdeathmatchcountdown", "sdmcd" -> {
                     if (game.getState() == GameState.INGAME) {
+                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " ran the startdeathmatchcountdown command."));
                         game.startDeathmatchTimer();
                         if (game.getState() == GameState.INGAME_DEATHMATCH) {
                             sender.sendMessage(ColorHandler.getInstance().color(MsgType.INFO + "You started the deathmatch timer"));
@@ -218,6 +226,7 @@ public class SGCommand implements CommandExecutor {
                 }
                 case "teleportdeathmatch", "tpdm" -> {
                     if (game.getState().ordinal() >= GameState.INGAME.ordinal() && game.getState().ordinal() <= GameState.INGAME_DEATHMATCH.ordinal()) {
+                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " ran the teleportdeathmatch command."));
                         game.teleportDeathmatch();
                         if (game.getState() == GameState.TELEPORT_DEATHMATCH_DONE) {
                             sender.sendMessage(ColorHandler.getInstance().color(MsgType.INFO + "You teleported everyone to the deathmatch"));
@@ -230,6 +239,7 @@ public class SGCommand implements CommandExecutor {
                 }
                 case "startdeathmatchwarmup", "sdmw" -> {
                     if (game.getState() == GameState.TELEPORT_DEATHMATCH_DONE) {
+                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " ran the startdeathmatchwarmup command."));
                         game.startDeathmatchWarmup();
                         sender.sendMessage(ColorHandler.getInstance().color(MsgType.INFO + "You started the deathmatch warmup"));
                     } else {
@@ -238,6 +248,7 @@ public class SGCommand implements CommandExecutor {
                 }
                 case "startdeathmatch", "sdm" -> {
                     if (Stream.of(GameState.TELEPORT_DEATHMATCH_DONE, GameState.DEATHMATCH_WARMUP, GameState.DEATHMATCH_WARMUP_DONE).anyMatch(gameState -> game.getState() == gameState)) {
+                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " ran the startdeathmatch command."));
                         game.startDeathmatch();
                         sender.sendMessage(ColorHandler.getInstance().color(MsgType.INFO + "You started the deathmatch"));
                     } else {
@@ -246,6 +257,7 @@ public class SGCommand implements CommandExecutor {
                 }
                 case "end" -> {
                     if (game.getState() != GameState.ENDING && game.getState() != GameState.ENDED) {
+                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " ran the end command."));
                         game.end();
                         sender.sendMessage(ColorHandler.getInstance().color(MsgType.INFO + "You ended the game."));
                     } else {
@@ -254,6 +266,7 @@ public class SGCommand implements CommandExecutor {
                 }
                 case "restockchests", "rc" -> {
                     if (game.getState().ordinal() >= GameState.INGAME.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal()) {
+                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " ran the restockchests command."));
                         game.restockChests();
                         game.sendMessage("&6&l>> &a&lALL CHESTS HAVE BEEN RESTOCKED");
                     } else {
@@ -262,6 +275,7 @@ public class SGCommand implements CommandExecutor {
                 }
                 case "nextgame", "ng" -> {
                     if (game.getState() == GameState.ENDING || game.getState() == GameState.ENDED) {
+                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " ran the nextgame command."));
                         game.nextGame();
                         sender.sendMessage(ColorHandler.getInstance().color(MsgType.INFO + "Moved everyone to the next game"));
                     } else {
@@ -282,7 +296,8 @@ public class SGCommand implements CommandExecutor {
                     
                     if (args.length == 3) {
                         player.getInventory().addItem(lootItem.getItemStack());
-                        player.sendMessage(MsgType.WARN.format("You gave yourself %v", lootItem.getName()));
+                        player.sendMessage(MsgType.INFO.format("You gave yourself %v", lootItem.getName()));
+                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " gave themselves " + lootItem.getName()));
                     } else {
                         Player target = Bukkit.getPlayer(args[3]);
                         if (target == null) {
@@ -294,6 +309,10 @@ public class SGCommand implements CommandExecutor {
                             sender.sendMessage(MsgType.WARN.format("Unknown player %v", args[3]));
                             return true;
                         }
+                        
+                        target.getInventory().addItem(lootItem.getItemStack());
+                        target.sendMessage(MsgType.INFO.format("You were given %v by %v", lootItem.getName(), sgPlayer.getNexusPlayer().getColoredName()));
+                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " gave " + target.getName() + " " + lootItem.getName()));
                     }
                     
                 } case "giveall" -> {
@@ -318,6 +337,7 @@ public class SGCommand implements CommandExecutor {
                     }
                     
                     game.sendMessage(MsgType.INFO.format("All players were given %v by %v", lootItem.getName(), player.getName()));
+                    game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " gave all players " + lootItem.getName()));
                 }
             }
         } else if (subCommand.equals("lobby") || subCommand.equals("l")) {
@@ -877,74 +897,45 @@ public class SGCommand implements CommandExecutor {
                     sender.sendMessage(ColorHandler.getInstance().color(MsgType.INFO + "You reset the timer."));
                 }
                 case "modify" -> {
-                    if (!(args.length > 2)) {
-                        sender.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "You must provide a value."));
+                    if (!(args.length > 3)) {
+                        sender.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "Usage: /survivalgames timer modify set|add|subtract <value>"));
                         return true;
                     }
                     
-                    sender.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "This command is currently a WIP"));
+                    // /sg timer modify set|add|substract <value>
+                    String operation = args[2];
+                    String rawValue = args[3];
+
+                    TimeFormat timeFormat = new TimeFormat("%*#0h%%*#0m%%*#0s%");
+                    TimeParser timeParser = new TimeParser();
+                    long timeValue = timeParser.parseTime(rawValue);
                     
-//                    String input = args[2];
-//                    Operations operator = null;
-//                    if (input.startsWith("+")) {
-//                        operator = Operations.
-//                    }
-//                    if (operator != null) {
-//                        input = input.substring(1);
-//                    }
-//                    int seconds;
-//                    try {
-//                        seconds = Integer.parseInt(input);
-//                    } catch (NumberFormatException e) {
-//                        sender.sendMessage(MsgType.WARN + "You provided an invalid integer value.");
-//                        return true;
-//                    }
-//                    long milliseconds = seconds * 1000L + 50;
-//                    if (operator == null) {
-//                        timer.setLength(milliseconds);
-//                    } else {
-//                        switch (operator) {
-//                            case ADD -> {
-//                                long newTime = timer.getTime() + milliseconds;
-//                                if (newTime > timer.getLength()) {
-//                                    newTime = timer.getLength();
-//                                    sender.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "The new timer length exceeds the specified length of the timer. Using the max length. Please use this command without an operator to change the specified length"));
-//                                }
-//                                timer.setLength(newTime);
-//                            }
-//                            case SUBTRACT -> {
-//                                long newTime = timer.getTime() - milliseconds;
-//                                if (newTime <= 0) {
-//                                    sender.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "The new timer length is less than or equal to 0. Please use the timer cancel command instead."));
-//                                    return true;
-//                                }
-//
-//                                timer.setLength(newTime);
-//                            }
-//                            case MULTIPLY -> {
-//                                long newTime = timer.getTime() * milliseconds;
-//                                if (newTime > timer.getLength()) {
-//                                    newTime = timer.getLength();
-//                                    sender.sendMessage(ColorHandler.getInstance().color(MsgType.VERBOSE + "The new timer length exceeds the specified length of the timer. Using the max length. Please use this command without an operator to change the specified length"));
-//                                }
-//                                timer.setLength(newTime);
-//                            }
-//                            case DIVIDE -> {
-//                                if (milliseconds == 0) {
-//                                    sender.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "Cannot divide by zero"));
-//                                    return true;
-//                                }
-//                                long newTime = timer.getTime() / milliseconds;
-//                                if (newTime <= 0) {
-//                                    sender.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "The new timer length is less than or equal to 0. Please use the timer cancel command instead."));
-//                                    return true;
-//                                }
-//
-//                                timer.setTime(newTime);
-//                            }
-//                        }
-//                        sender.sendMessage(ColorHandler.getInstance().color(MsgType.INFO + "You modified the " + timerType + " timer."));
-//                    }
+                    long oldValue = timer.getTime();
+                    
+                    if (operation.equalsIgnoreCase("subtract")) {
+                        timer.setTime(timer.getTime() - timeValue);
+                        sender.sendMessage(MsgType.INFO.format("You subtracted %v from the %v's timer.", timeFormat.format(timeValue), timerType));
+                    } else if (operation.equalsIgnoreCase("add")) {
+                        long newTime = timer.getTime() + timeValue;
+                        if (newTime > timer.getLength()) {
+                            timer.setLength(newTime);
+                        }
+                        timer.setTime(newTime);
+                        sender.sendMessage(MsgType.INFO.format("You added %v to the %v's timer.", timeFormat.format(timeValue), timerType));
+                    } else if (operation.equalsIgnoreCase("set")) {
+                        long newTime = timer.getTime() + timeValue;
+                        if (newTime > timer.getLength()) {
+                            timer.setLength(newTime);
+                        }
+                        timer.setTime(newTime);
+                        sender.sendMessage(MsgType.INFO.format("You set %v's timer to %v.", timerType, timeFormat.format(timeValue)));
+                    }
+                    
+                    long newValue = timer.getTime();
+                    
+                    if (timerType.equalsIgnoreCase("game")) {
+                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " modified the timer from " + oldValue + " to " + newValue));
+                    }
                 }
             }
         } else if (args[0].equalsIgnoreCase("skull")) {
@@ -952,9 +943,6 @@ public class SGCommand implements CommandExecutor {
             Skull skull = (Skull) targetBlock.getState();
             player.sendMessage(skull.getOwner());
         } else if (args[0].equalsIgnoreCase("loottable")) {
-            // /sg loottable <name> setitemweight|siw <item> <weight>
-            // /sg loottable <name> reload
-            
             if (!(args.length > 1)) {
                 sender.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "You must provide a Loot Table name."));
                 return true;
