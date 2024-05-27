@@ -48,7 +48,7 @@ public class MutationCountdownCallback implements ClockCallback<TimerSnapshot> {
             t.sendMessage(ColorHandler.getInstance().color("&6&l>> " + nexusPlayer.getColoredName().toUpperCase() + " &c&lIS AFTER YOU! RUN!"));
 
             game.addMutation(mutation);
-            game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "mutation", nexusPlayer.getName() + " mutated agaisnt " + t.getName()));
+            game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "mutation", nexusPlayer.getName() + " mutated agaisnt " + t.getName() + " as a " + mutation.getType().getDisplayName()));
         }
     }
 
