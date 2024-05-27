@@ -578,11 +578,10 @@ public class Game {
 
             for (GamePlayer gp : this.players.values()) {
                 if (gp.getTeam() == GameTeam.MUTATIONS) {
+                    gp.setTeam(GameTeam.SPECTATORS);
                     removeMutation(gp.getMutation());
                     gp.sendMessage(gp.getTeam().getLeaveMessage());
-                    gp.setTeam(GameTeam.SPECTATORS);
                     gp.sendMessage(gp.getTeam().getJoinMessage());
-                    giveSpectatorItems(Bukkit.getPlayer(gp.getUniqueId()));
                     gp.sendMessage("&6&l>> &cYou were made a spectator because deathmatch started.");
                 }
             }
@@ -1067,13 +1066,12 @@ public class Game {
 
                 if (!playerKiller) {
                     gp.sendMessage("&6&l>> &cYour target died without a killer, you have been set back as a spectator.");
+                    gp.setTeam(GameTeam.SPECTATORS);
                     removeMutation(mutation);
                     gp.sendMessage(gp.getTeam().getLeaveMessage());
-                    gp.setTeam(GameTeam.SPECTATORS);
                     Player mutationPlayer = Bukkit.getPlayer(gp.getUniqueId());
                     mutationPlayer.spigot().setCollidesWithEntities(false);
                     mutationPlayer.setAllowFlight(true);
-                    giveSpectatorItems(mutationPlayer);
                     gp.sendMessage(gp.getTeam().getJoinMessage());
                 } else {
                     mutation.setTarget(killer.getKiller());
