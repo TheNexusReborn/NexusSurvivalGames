@@ -44,7 +44,7 @@ public class GamePlayer {
     private Bounty bounty;
     private CombatTag combatTag;
     private DamageInfo damageInfo;
-    private Map<Long, DeathInfo> deaths = new TreeMap<>();
+    private TreeMap<Long, DeathInfo> deaths = new TreeMap<>();
     private Status status;
     private SGPlayerStats stats;
     
@@ -335,10 +335,11 @@ public class GamePlayer {
     }
 
     public UUID getKiller() {
-        for (DeathInfo death : this.deaths.values()) {
-            if (death.getKiller() != null) {
-                if (death.getKiller().getType() == EntityType.PLAYER) {
-                    return death.getKiller().getKiller();
+        DeathInfo mostRecentDeath = this.getMostRecentDeath();
+        if (mostRecentDeath != null) {
+            if (mostRecentDeath.getKiller() != null) {
+                if (mostRecentDeath.getKiller().getType() == EntityType.PLAYER) {
+                    return mostRecentDeath.getKiller().getKiller();
                 }
             }
         }
@@ -503,6 +504,20 @@ public class GamePlayer {
 
     public Tag getActiveTag() {
         return this.nexusPlayer.getActiveTag();
+    }
+
+    public void addItem(ItemStack itemStack) {
+        Player player = Bukkit.getPlayer(getUniqueId());
+        if (player == null) {
+            return;
+        }
+        
+        player.getInventory().addItem(itemStack);
+    }
+
+    public DeathInfo getMostRecentDeath() {
+        Map.Entry<Long, DeathInfo> mostRecentDeath = this.deaths.lastEntry();
+        return mostRecentDeath != null ? mostRecentDeath.getValue() : null;
     }
 
     public enum Status {

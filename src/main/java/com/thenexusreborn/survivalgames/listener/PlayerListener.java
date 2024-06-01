@@ -487,7 +487,7 @@ public class PlayerListener implements Listener {
                 if (e.newValue()) {
                     GamePlayer gamePlayer = game.getPlayer(nexusPlayer.getUniqueId());
                     if (gamePlayer.getTeam() != GameTeam.SPECTATORS) {
-                        game.killPlayer(gamePlayer, new DeathInfo(game, System.currentTimeMillis(), gamePlayer, DeathType.VANISH));
+                        game.killPlayer(gamePlayer, new DeathInfo(game, System.currentTimeMillis(), gamePlayer, DeathType.VANISH, player.getLocation()));
                     }
                 }
                 game.sendMessage(message);
@@ -637,6 +637,7 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent e) {
         Player player = e.getEntity();
+        Location deathLocation = player.getLocation().clone();
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
         Game game = sgPlayer.getGame();
         
@@ -647,7 +648,6 @@ public class PlayerListener implements Listener {
         e.setDeathMessage(null);
     
         GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
-        Location deathLocation = player.getLocation().clone();
         EntityDamageEvent lastDamageCause = player.getLastDamageCause();
     
         if (gamePlayer.getTeam() != GameTeam.TRIBUTES) {
@@ -710,7 +710,7 @@ public class PlayerListener implements Listener {
             }
         }
         
-        DeathInfo deathInfo = new DeathInfo(game, System.currentTimeMillis(), gamePlayer, deathType, killerInfo);
+        DeathInfo deathInfo = new DeathInfo(game, System.currentTimeMillis(), gamePlayer, deathType, deathLocation, killerInfo);
     
         new BukkitRunnable() {
             public void run() {

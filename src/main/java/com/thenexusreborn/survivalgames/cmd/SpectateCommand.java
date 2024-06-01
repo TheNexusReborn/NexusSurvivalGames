@@ -59,7 +59,7 @@ public class SpectateCommand implements CommandExecutor {
             }
         
             if (gamePlayer.getTeam() == GameTeam.TRIBUTES || gamePlayer.getTeam() == GameTeam.MUTATIONS) {
-                game.killPlayer(gamePlayer, new DeathInfo(game, System.currentTimeMillis(), gamePlayer, DeathType.SPECTATE));
+                game.killPlayer(gamePlayer, new DeathInfo(game, System.currentTimeMillis(), gamePlayer, DeathType.SPECTATE, player.getLocation()));
             } else {
                 player.sendMessage(MsgType.WARN + "You are already spectating the game.");
             }

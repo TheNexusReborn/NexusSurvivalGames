@@ -8,6 +8,7 @@ import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.settings.object.enums.ColorMode;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -26,18 +27,21 @@ public class DeathInfo {
     protected String teamColor;
     protected KillerInfo killer;
     protected GameTeam team;
-    private long time;
+    protected long time;
+    protected Location deathLocation;
     
-    public DeathInfo(Game game, long time, GamePlayer player, DeathType type) {
+    public DeathInfo(Game game, long time, GamePlayer player, DeathType type, Location deathLocation) {
         this.game = game;
         this.player = player.getUniqueId();
         this.type = type;
         this.teamColor = player.getTeam().getColor();
         this.team = player.getTeam();
+        this.time = time;
+        this.deathLocation = deathLocation;
     }
     
-    public DeathInfo(Game game, long time, GamePlayer player, DeathType type, KillerInfo killer) {
-        this(game, time, player, type);
+    public DeathInfo(Game game, long time, GamePlayer player, DeathType type, Location deathLocation, KillerInfo killer) {
+        this(game, time, player, type, deathLocation);
         this.killer = killer;
     }
     
@@ -141,6 +145,10 @@ public class DeathInfo {
     
     public long getTime() {
         return this.time;
+    }
+
+    public Location getDeathLocation() {
+        return deathLocation;
     }
 
     @Override
