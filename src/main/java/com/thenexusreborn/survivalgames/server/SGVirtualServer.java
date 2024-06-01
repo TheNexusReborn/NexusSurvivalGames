@@ -55,23 +55,27 @@ public class SGVirtualServer extends VirtualServer {
         if (game == null) {
             if (playerIsVanished && otherPlayerIsVanished) {
                 if (playerRank.ordinal() >= otherPlayerRank.ordinal()) {
-                    player.showPlayer(otherPlayer);
-                    otherPlayer.showPlayer(player);
+                    return false;
+//                    player.showPlayer(otherPlayer);
+//                    otherPlayer.hidePlayer(player);
                 } else {
-                    otherPlayer.hidePlayer(player);
-                    player.showPlayer(otherPlayer);
+                    return true;
+//                    otherPlayer.hidePlayer(player);
+//                    player.showPlayer(otherPlayer);
                 }
             } else if (playerIsVanished && !otherPlayerIsVanished) {
-                otherPlayer.hidePlayer(player);
-                player.showPlayer(otherPlayer);
+                return true;
+//                otherPlayer.hidePlayer(player);
+//                player.showPlayer(otherPlayer);
             } else if (otherPlayerIsVanished && !playerIsVanished) {
-                player.hidePlayer(otherPlayer);
-                otherPlayer.showPlayer(player);
+                return false;
+//                player.hidePlayer(otherPlayer);
+//                otherPlayer.showPlayer(player);
             }
         } else {
             if (game.getState() == GameState.ENDING) {
-                player.showPlayer(otherPlayer);
-                otherPlayer.showPlayer(player);
+//                player.showPlayer(otherPlayer);
+//                otherPlayer.showPlayer(player);
                 return true;
             }
             
@@ -82,14 +86,19 @@ public class SGVirtualServer extends VirtualServer {
             boolean otherPlayerIsSpectator = otherGamePlayer.getTeam() == GameTeam.SPECTATORS;
             
             if (playerIsSpectator && otherPlayerIsSpectator) {
-                player.hidePlayer(otherPlayer);
-                otherPlayer.hidePlayer(player);
+                return false;
+//                player.hidePlayer(otherPlayer);
+//                otherPlayer.hidePlayer(player);
             } else if (playerIsSpectator && !otherPlayerIsSpectator) {
-                player.showPlayer(otherPlayer);
-                otherPlayer.hidePlayer(player);
+                return true;
+//                player.showPlayer(otherPlayer);
+//                otherPlayer.hidePlayer(player);
+            } else if (!playerIsSpectator && otherPlayerIsSpectator) {
+                return false;
             } else {
-                player.showPlayer(otherPlayer);
-                otherPlayer.showPlayer(player);
+                return true;
+//                player.showPlayer(otherPlayer);
+//                otherPlayer.showPlayer(player);
             }
         }
         
