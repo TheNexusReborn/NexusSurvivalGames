@@ -54,7 +54,7 @@ public class GameActionBar implements IActionBar {
         }
 
         if (game.getState() == GameState.WARMUP_DONE) {
-            return "&aWarmup done, waiting for game...";
+            return "&aWarmup done, waiting for game to start...";
         }
 
         if (game.getState().ordinal() >= GameState.INGAME.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal()) {

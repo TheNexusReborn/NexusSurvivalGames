@@ -1446,10 +1446,14 @@ public class Game {
     @Override
     public String toString() {
         return "Game{" +
-                "gameMap=" + gameMap.getName() +
+                "gameMap=" + gameMap +
+                ", server=" + server +
+                ", controlType=" + controlType +
                 ", settings=" + settings +
                 ", players=" + players +
                 ", spawns=" + spawns +
+                ", gameChatroom=" + gameChatroom +
+                ", chatRooms=" + chatRooms +
                 ", state=" + state +
                 ", timer=" + timer +
                 ", graceperiodTimer=" + graceperiodTimer +
@@ -1463,6 +1467,8 @@ public class Game {
                 ", mode=" + mode +
                 ", debugMode=" + debugMode +
                 ", graceperiod=" + graceperiod +
+                ", restockCallbackId=" + restockCallbackId +
+                ", timedRestockCount=" + timedRestockCount +
                 '}';
     }
 }

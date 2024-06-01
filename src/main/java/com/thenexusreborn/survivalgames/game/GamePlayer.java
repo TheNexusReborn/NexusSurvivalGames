@@ -528,7 +528,8 @@ public class GamePlayer {
     @Override
     public String toString() {
         return "GamePlayer{" +
-                "name=" + nexusPlayer.getName() +
+                "nexusPlayer=" + nexusPlayer +
+                ", game=" + game +
                 ", team=" + team +
                 ", spectatorByDeath=" + spectatorByDeath +
                 ", newPersonalBestNotified=" + newPersonalBestNotified +
@@ -545,6 +546,7 @@ public class GamePlayer {
                 ", damageInfo=" + damageInfo +
                 ", deaths=" + deaths +
                 ", status=" + status +
+                ", stats=" + stats +
                 '}';
     }
 }

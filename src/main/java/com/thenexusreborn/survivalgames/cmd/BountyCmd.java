@@ -34,24 +34,24 @@ public class BountyCmd implements CommandExecutor {
         Game game = sgPlayer.getGame();
 
         if (game == null) {
-            player.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "You can only bounty a player during a game."));
+            player.sendMessage(MsgType.WARN.format("You can only bounty a player during a game."));
             return true;
         }
 
         if (!(args.length > 1)) {
-            player.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "Usage: /" + label + " <player> <amount> [type: default score]"));
+            player.sendMessage(MsgType.WARN.format("Usage: /" + label + " <player> <amount> [type: default score]"));
             return true;
         }
 
         GamePlayer senderPlayer = game.getPlayer(player.getUniqueId());
         GamePlayer gamePlayer = game.getPlayer(args[0]);
         if (gamePlayer == null) {
-            player.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "The name you provided is not a player in the game."));
+            player.sendMessage(MsgType.WARN.format("The name you provided is not a player in the game."));
             return true;
         }
 
         if (gamePlayer.getTeam() != GameTeam.TRIBUTES) {
-            player.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "You can only set a bounty on a Tribute."));
+            player.sendMessage(MsgType.WARN.format("You can only set a bounty on a Tribute."));
             return true;
         }
 
@@ -59,7 +59,7 @@ public class BountyCmd implements CommandExecutor {
         try {
             amount = Integer.parseInt(args[1]);
         } catch (NumberFormatException e) {
-            player.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "You provided an invalid number value."));
+            player.sendMessage(MsgType.WARN.format("You provided an invalid number value."));
             return true;
         }
 
@@ -68,7 +68,7 @@ public class BountyCmd implements CommandExecutor {
             try {
                 type = Bounty.Type.valueOf(args[2].toUpperCase());
             } catch (Exception e) {
-                player.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "Invalid Bounty Type. Valid Options: CREDIT, SCORE"));
+                player.sendMessage(MsgType.WARN.format("Invalid Bounty Type. Valid Options: CREDIT, SCORE"));
                 return true;
             }
         }
@@ -76,7 +76,7 @@ public class BountyCmd implements CommandExecutor {
         int max = 0;
         if (type == Type.SCORE) {
             if (senderPlayer.getStats().getScore() < amount) {
-                senderPlayer.sendMessage(MsgType.WARN + "You do not have enough score to set a bounty of " + amount);
+                senderPlayer.sendMessage(MsgType.WARN.format("You do not have enough score to set a bounty of %v.", amount));
                 return true;
             } else {
                 senderPlayer.getStats().addScore(-amount);
@@ -84,7 +84,7 @@ public class BountyCmd implements CommandExecutor {
             max = game.getSettings().getMaxScoreBounty();
         } else if (type == Type.CREDIT) {
             if (senderPlayer.getBalance().getCredits() < amount) {
-                senderPlayer.sendMessage(MsgType.WARN + "You do not have enough credits to set a bounty of " + amount);
+                senderPlayer.sendMessage(MsgType.WARN.format("You do not have enough credits to set a bounty of %v.", amount));
                 return true;
             } else {
                 senderPlayer.getBalance().addCredits(-amount);
@@ -96,7 +96,7 @@ public class BountyCmd implements CommandExecutor {
 
         double currentAmount = bounty.getAmount(type);
         if (currentAmount + amount >= max) {
-            senderPlayer.sendMessage(MsgType.WARN + "You cannot set the bounty higher than " + max + " " + type.name().toLowerCase());
+            senderPlayer.sendMessage(MsgType.WARN.format("You cannot set the bounty higher than %v %v", max, type.name().toLowerCase()));
             return true;
         }
 

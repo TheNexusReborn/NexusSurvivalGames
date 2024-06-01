@@ -1,6 +1,5 @@
 package com.thenexusreborn.survivalgames.cmd;
 
-import com.stardevllc.starcore.color.ColorHandler;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
@@ -38,12 +37,12 @@ public class SpectateCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         Rank senderRank = MCUtils.getSenderRank(plugin.getNexusCore(), sender);
         if (senderRank.ordinal() > Rank.MEDIA.ordinal()) {
-            sender.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "You do not have permission to use that command."));
+            sender.sendMessage(MsgType.WARN.format("You do not have permission to use that command."));
             return true;
         }
         
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "Only players can use that command."));
+            sender.sendMessage(MsgType.WARN.format("Only players can use that command."));
             return true;
         }
 
@@ -54,14 +53,14 @@ public class SpectateCommand implements CommandExecutor {
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
         
             if (INVALID_GAME_STATES.contains(game.getState())) {
-                player.sendMessage(MsgType.WARN + "Invalid game state to use that command. Please wait to try again.");
+                player.sendMessage(MsgType.WARN.format("Invalid game state to use that command. Please wait to try again."));
                 return true;
             }
         
             if (gamePlayer.getTeam() == GameTeam.TRIBUTES || gamePlayer.getTeam() == GameTeam.MUTATIONS) {
                 game.killPlayer(gamePlayer, new DeathInfo(game, System.currentTimeMillis(), gamePlayer, DeathType.SPECTATE, player.getLocation()));
             } else {
-                player.sendMessage(MsgType.WARN + "You are already spectating the game.");
+                player.sendMessage(MsgType.WARN.format("You are already spectating the game."));
             }
         } else {
             Lobby lobby = sgPlayer.getLobby();
@@ -75,13 +74,13 @@ public class SpectateCommand implements CommandExecutor {
             
                 if (spectating) {
                     lobby.removeSpectatingPlayer(player.getUniqueId());
-                    sender.sendMessage(ColorHandler.getInstance().color(MsgType.INFO + "You will no longer be spectating the game"));
+                    sender.sendMessage(MsgType.INFO.format("You will no longer be spectating the game"));
                 } else {
                     lobby.addSpectatingPlayer(player.getUniqueId());
-                    sender.sendMessage(ColorHandler.getInstance().color(MsgType.INFO + "You will be spectating the game."));
+                    sender.sendMessage(MsgType.INFO.format("You will be spectating the game."));
                 }
             } else {
-                sender.sendMessage(MsgType.WARN + "Invalid lobby state. Can only be done before or during the game start countdown");
+                sender.sendMessage(MsgType.WARN.format("Invalid lobby state. Can only be done before or during the game start countdown"));
             }
         }
         return true;
