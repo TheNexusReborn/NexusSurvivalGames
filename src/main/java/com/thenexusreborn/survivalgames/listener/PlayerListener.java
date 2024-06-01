@@ -750,15 +750,12 @@ public class PlayerListener implements Listener {
         
         sgPlayer.setStats(stats);
 
-        SurvivalGames.PLAYER_QUEUE.offer(e.getNexusPlayer().getUniqueId());
-        
         plugin.getPlayerRegistry().register(sgPlayer);
         e.setJoinMessage(null);
     }
     
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerQuit(PlayerQuitEvent e) {
-        SurvivalGames.PLAYER_QUEUE.remove(e.getPlayer().getUniqueId());
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(e.getPlayer().getUniqueId());
         NexusPlayer nexusPlayer = sgPlayer.getNexusPlayer();
         if (sgPlayer.getGame() != null) {

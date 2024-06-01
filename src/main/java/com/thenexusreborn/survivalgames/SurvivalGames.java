@@ -56,7 +56,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
     public static SurvivalGames INSTANCE;
     public static final String MAP_URL = "https://starmediadev.com/files/nexusreborn/sgmaps/";
-    public static final Queue<UUID> PLAYER_QUEUE = new LinkedList<>();
     
     private NexusCore nexusCore;
     private StarChat starChat;
