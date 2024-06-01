@@ -302,8 +302,8 @@ public class SGCommand implements CommandExecutor {
 
                     if (args.length == 3) {
                         player.getInventory().addItem(lootItem.getItemStack());
-                        player.sendMessage(MsgType.INFO.format("You gave yourself %v", lootItem.getName()));
                         game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " gave themselves " + lootItem.getName()));
+                        player.sendMessage(MsgType.INFO.format("You gave yourself %v", lootItem.getName()));
                     } else {
                         Player target = Bukkit.getPlayer(args[3]);
                         if (target == null) {
@@ -317,14 +317,14 @@ public class SGCommand implements CommandExecutor {
                         }
 
                         target.getInventory().addItem(lootItem.getItemStack());
-                        target.sendMessage(MsgType.INFO.format("You were given %v by %v", lootItem.getName(), sgPlayer.getNexusPlayer().getColoredName()));
                         game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " gave " + target.getName() + " " + lootItem.getName()));
+                        target.sendMessage(MsgType.INFO.format("You were given %v by %v", lootItem.getName(), sgPlayer.getNexusPlayer().getColoredName()));
                     }
 
                 }
                 case "giveall" -> {
                     if (!(args.length > 2)) {
-                        sender.sendMessage(MsgType.WARN.format("Usage: /" + label + " " + args[0] + " " + args[1] + " <item> [player]"));
+                        sender.sendMessage(MsgType.WARN.format("Usage: /" + label + " " + args[0] + " " + args[1] + " <item>"));
                         return true;
                     }
 
@@ -343,8 +343,8 @@ public class SGCommand implements CommandExecutor {
                         Bukkit.getPlayer(gamePlayer.getUniqueId()).getInventory().addItem(lootItem.getItemStack());
                     }
 
-                    game.sendMessage(MsgType.INFO.format("All players were given %v by %v", lootItem.getName(), player.getName()));
                     game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " gave all players " + lootItem.getName()));
+                    game.sendMessage(MsgType.INFO.format("All players were given %v by %v", lootItem.getName(), player.getName()));
                 }
                 case "player" -> {
                     if (!(args.length > 3)) {
@@ -415,9 +415,9 @@ public class SGCommand implements CommandExecutor {
 
                             game.sendMessage(MsgType.INFO.format("%v was added to the game by %v.", target.getColoredName(), sgPlayer.getNexusPlayer().getColoredName()));
                             if (lootTable != null && amountOfItems > 1) {
-                                game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", player.getName() + " added " + target.getName() + " with " + amountOfItems + " from the loot table " + lootTable.getName() + " as a tribute to the game."));
+                                //game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", player.getName() + " added " + target.getName() + " with " + amountOfItems + " from the loot table " + lootTable.getName() + " as a tribute to the game."));
                             } else {
-                                game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", player.getName() + " added " + target.getName() + " as a tribute to the game."));
+                                //game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", player.getName() + " added " + target.getName() + " as a tribute to the game."));
                             }
                         }
                         case "remove", "rm" -> {
@@ -433,7 +433,7 @@ public class SGCommand implements CommandExecutor {
 
                             game.teleportSpectator(Bukkit.getPlayer(target.getUniqueId()), game.getGameMap().getCenterLocation());
                             game.sendMessage(MsgType.INFO.format("%v was removed from the game by %v.", target.getColoredName(), sgPlayer.getNexusPlayer().getColoredName()));
-                            game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", player.getName() + " removed " + target.getName() + " from the game."));
+                            //game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", player.getName() + " removed " + target.getName() + " from the game."));
                         }
                         case "revive", "rv" -> {
                             // /sg game player revive|rv <player> [<loottable>:<amount>]
@@ -497,9 +497,9 @@ public class SGCommand implements CommandExecutor {
 
                             game.sendMessage(MsgType.INFO.format("%v was revived by %v.", target.getColoredName(), sgPlayer.getNexusPlayer().getColoredName()));
                             if (lootTable != null && amountOfItems > 1) {
-                                game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", player.getName() + " revived " + target.getName() + " with " + amountOfItems + " from the loot table " + lootTable.getName() + " as a tribute."));
+                                //game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", player.getName() + " revived " + target.getName() + " with " + amountOfItems + " from the loot table " + lootTable.getName() + " as a tribute."));
                             } else {
-                                game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", player.getName() + " revived " + target.getName() + " as a tribute."));
+                                //game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", player.getName() + " revived " + target.getName() + " as a tribute."));
                             }
                         }
 
