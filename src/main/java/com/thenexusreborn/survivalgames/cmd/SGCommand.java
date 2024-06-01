@@ -347,7 +347,7 @@ public class SGCommand implements CommandExecutor {
                     game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " gave all players " + lootItem.getName()));
                 }
                 case "player" -> {
-                    if (!(args.length > 4)) {
+                    if (!(args.length > 3)) {
                         sender.sendMessage(MsgType.WARN.format("Invalid argument count."));
                         return true;
                     }
@@ -370,8 +370,8 @@ public class SGCommand implements CommandExecutor {
 
                             SGLootTable lootTable = null;
                             int amountOfItems = 0;
-                            if (args.length > 3) {
-                                String[] lootSplit = args[3].split(":");
+                            if (args.length > 4) {
+                                String[] lootSplit = args[4].split(":");
                                 if (lootSplit.length != 2) {
                                     sender.sendMessage(MsgType.WARN.format("Invalid loot format. Must be %v", "<loottable>:<amount>"));
                                     return true;
@@ -404,7 +404,7 @@ public class SGCommand implements CommandExecutor {
                             int index = new Random().nextInt(game.getSpawns().size());
                             MapSpawn spawnPosition = game.getGameMap().getSpawns().get(index);
                             Location spawn = spawnPosition.toGameLocation(game.getGameMap().getWorld(), game.getGameMap().getCenterLocation());
-                            game.teleportTribute(player, spawn);
+                            game.teleportTribute(Bukkit.getPlayer(target.getUniqueId()), spawn);
 
                             if (lootTable != null && amountOfItems > 1) {
                                 List<ItemStack> loot = lootTable.generateLoot(amountOfItems);
@@ -413,7 +413,7 @@ public class SGCommand implements CommandExecutor {
                                 }
                             }
 
-                            game.sendMessage(MsgType.INFO.format("%v was added to the game by %v.", target.getName(), sgPlayer.getNexusPlayer().getColoredName()));
+                            game.sendMessage(MsgType.INFO.format("%v was added to the game by %v.", target.getColoredName(), sgPlayer.getNexusPlayer().getColoredName()));
                             if (lootTable != null && amountOfItems > 1) {
                                 game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", player.getName() + " added " + target.getName() + " with " + amountOfItems + " from the loot table " + lootTable.getName() + " as a tribute to the game."));
                             } else {
@@ -432,7 +432,7 @@ public class SGCommand implements CommandExecutor {
                             target.sendMessage(target.getTeam().getJoinMessage());
 
                             game.teleportSpectator(Bukkit.getPlayer(target.getUniqueId()), game.getGameMap().getCenterLocation());
-                            game.sendMessage(MsgType.INFO.format("%v was remove from the game by %v.", target.getName(), sgPlayer.getNexusPlayer().getColoredName()));
+                            game.sendMessage(MsgType.INFO.format("%v was removed from the game by %v.", target.getColoredName(), sgPlayer.getNexusPlayer().getColoredName()));
                             game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", player.getName() + " removed " + target.getName() + " from the game."));
                         }
                         case "revive", "rv" -> {
@@ -457,8 +457,8 @@ public class SGCommand implements CommandExecutor {
 
                             SGLootTable lootTable = null;
                             int amountOfItems = 0;
-                            if (args.length > 3) {
-                                String[] lootSplit = args[3].split(":");
+                            if (args.length > 4) {
+                                String[] lootSplit = args[4].split(":");
                                 if (lootSplit.length != 2) {
                                     sender.sendMessage(MsgType.WARN.format("Invalid loot format. Must be %v", "<loottable>:<amount>"));
                                     return true;
@@ -495,7 +495,7 @@ public class SGCommand implements CommandExecutor {
                                 }
                             }
 
-                            game.sendMessage(MsgType.INFO.format("%v was revived by %v.", target.getName(), sgPlayer.getNexusPlayer().getColoredName()));
+                            game.sendMessage(MsgType.INFO.format("%v was revived by %v.", target.getColoredName(), sgPlayer.getNexusPlayer().getColoredName()));
                             if (lootTable != null && amountOfItems > 1) {
                                 game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", player.getName() + " revived " + target.getName() + " with " + amountOfItems + " from the loot table " + lootTable.getName() + " as a tribute."));
                             } else {
@@ -504,7 +504,7 @@ public class SGCommand implements CommandExecutor {
                         }
 
                         case "mutate", "m" -> {
-                            // /sg game player mutate|m <player> <type|random|select> [target] [bypasstimer]
+                            // /sg game player mutate|m <player> <type|random|select> [target|killer] [bypasstimer]
                             // The select option needs some backend reworks for mutations to work properly
                             // The random option will bot be available yet
 
@@ -521,16 +521,35 @@ public class SGCommand implements CommandExecutor {
 
                             GamePlayer mutationTarget;
                             if (args.length > 5) {
-                                mutationTarget = game.getPlayer(args[5]);
+                                if (args[5].equalsIgnoreCase("killer")) {
+                                    UUID killerUUID = target.getKiller();
+                                    if (killerUUID == null) {
+                                        player.sendMessage(MsgType.WARN.format("%v does not have a recent player killer."));
+                                        return true;
+                                    }
 
-                                if (mutationTarget == null) {
-                                    player.sendMessage(MsgType.WARN.format("%v is not a valid player for that game."));
-                                    return true;
+                                    mutationTarget = game.getPlayer(killerUUID);
+                                    if (mutationTarget == null) {
+                                        player.sendMessage(MsgType.WARN.format("%v's killer is no longer part of the game."));
+                                        return true;
+                                    }
+
+                                    if (mutationTarget.getTeam() != GameTeam.TRIBUTES) {
+                                        player.sendMessage(MsgType.WARN.format("%v's killer is no longer a tribute."));
+                                        return true;
+                                    }
+                                } else {
+                                    mutationTarget = game.getPlayer(args[5]);
+
+                                    if (mutationTarget == null) {
+                                        player.sendMessage(MsgType.WARN.format("%v is not a valid player for that game.", args[5]));
+                                        return true;
+                                    }
                                 }
                             } else {
                                 UUID killerUUID = target.getKiller();
                                 if (killerUUID == null) {
-                                    player.sendMessage(MsgType.WARN.format("%v does not have a recent player killer."));
+                                    player.sendMessage(MsgType.WARN.format("%v does not have a recent player killer.", target.getName()));
                                     return true;
                                 }
 
@@ -541,7 +560,7 @@ public class SGCommand implements CommandExecutor {
                                 }
 
                                 if (mutationTarget.getTeam() != GameTeam.TRIBUTES) {
-                                    player.sendMessage(MsgType.WARN.format("%v's killer is no longer a tribute."));
+                                    player.sendMessage(MsgType.WARN.format("%v's killer is no longer a tribute.", target.getName()));
                                     return true;
                                 }
                             }
