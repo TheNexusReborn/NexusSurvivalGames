@@ -547,8 +547,8 @@ public class SGCommand implements CommandExecutor {
                             }
 
                             if (mutationTarget == null) {
-                                player.sendMessage(MsgType.ERROR.format("You shouldn't see this message. Invalid Target, report as a bug."));
-                                player.sendMessage(MsgType.ERROR.format("This message comes up as a result of an unhandled check."));
+                                player.sendMessage(MsgType.SEVERE.format("You shouldn't see this message. Invalid Target, report as a bug."));
+                                player.sendMessage(MsgType.SEVERE.format("This message comes up as a result of an unhandled check."));
                                 return true;
                             }
 
@@ -845,7 +845,7 @@ public class SGCommand implements CommandExecutor {
                             tributeSign.setHeadLocation(headLocation);
                             player.sendMessage(MsgType.INFO.format("You set the head location of the tribute sign at index %v", index));
                         } else {
-                            player.sendMessage(MsgType.ERROR.format("Unknown error occured. Please report as a bug."));
+                            player.sendMessage(MsgType.SEVERE.format("Unknown error occured. Please report as a bug."));
                             return true;
                         }
                     }
@@ -1003,7 +1003,7 @@ public class SGCommand implements CommandExecutor {
             settingList.setValue(settingName, value.get());
             Object settingValue = settingList.get(settingName).getValue().get();
             if (!Objects.equals(value.get(), settingValue)) {
-                sender.sendMessage(MsgType.ERROR.format("The setting did not update correctly. Please report this as a bug."));
+                sender.sendMessage(MsgType.SEVERE.format("The setting did not update correctly. Please report this as a bug."));
                 return true;
             }
 
