@@ -139,8 +139,8 @@ public class Game {
     }
 
     public void setState(GameState state) {
+        this.gameInfo.getActions().add(new GameAction(System.currentTimeMillis(), "statechange", "").addValueData("oldvalue", this.state.name()).addValueData("newvalue", state.name()));
         this.state = state;
-        this.gameInfo.getActions().add(new GameAction(System.currentTimeMillis(), "statechange", state.name()));
     }
 
     public void handleShutdown() {
@@ -905,7 +905,26 @@ public class Game {
         Player player = Bukkit.getPlayer(gamePlayer.getUniqueId());
         String strippedDeathMessage = ChatColor.stripColor(deathInfo.getDeathMessage());
         strippedDeathMessage = strippedDeathMessage.substring(3, strippedDeathMessage.length() - 1);
-        this.gameInfo.getActions().add(new GameAction(System.currentTimeMillis(), "death", strippedDeathMessage));
+        GameAction deathAction = new GameAction(deathInfo.getTime(), "death", "");
+        gameInfo.getActions().add(deathAction);
+        deathAction.addValueData("message", strippedDeathMessage);
+        deathAction.addValueData("type", deathInfo.getType().name());
+        deathAction.addValueData("team", deathInfo.getTeam().name());
+        if (deathInfo.getKiller() != null) {
+            KillerInfo killer = deathInfo.getKiller();
+            deathAction.addValueData("killerType", killer.getType().name());
+            if (killer.getDistance() > 0) {
+                deathAction.addValueData("killerDistance", killer.getDistance());
+            }
+            if (killer.getType() == EntityType.PLAYER) {
+                deathAction.addValueData("killerIsMutation", killer.isMutationKill());
+                deathAction.addValueData("killerName", killer.getName());
+                deathAction.addValueData("killerHealth", killer.getHealth());
+                if (killer.getHandItem() != null) {
+                    deathAction.addValueData("killerHand", killer.getHandItem().getType().name().toLowerCase());
+                }
+            }
+        }
         if (player != null) {
             resetPlayer(player);
             player.setGameMode(GameTeam.SPECTATORS.getGameMode());
@@ -1024,6 +1043,7 @@ public class Game {
 
         List<UUID> damagers = gamePlayer.getDamageInfo().getDamagers();
         List<AssisterInfo> assistors = new ArrayList<>();
+        List<String> assistorNames = new ArrayList<>();
         if (settings.isAllowAssists()) {
             if (!damagers.isEmpty()) {
                 for (UUID damager : damagers) {
@@ -1033,13 +1053,22 @@ public class Game {
 
                     GamePlayer assisterPlayer = getPlayer(damager);
                     if (assisterPlayer != null) {
+                        assistorNames.add(assisterPlayer.getName());
                         assisterPlayer.setAssists(assisterPlayer.getAssists() + 1);
                         assisterPlayer.getStats().addAssists(1);
                         assistors.add(new AssisterInfo(this, assisterPlayer));
-                        this.gameInfo.getActions().add(new GameAction(System.currentTimeMillis(), "assist", assisterPlayer.getName() + " assisted the death of " + gamePlayer.getName()));
                     }
                 }
             }
+        }
+        
+        if (!assistorNames.isEmpty()) {
+            StringBuilder assistorBuilder = new StringBuilder();
+            for (String assistorName : assistorNames) {
+                assistorBuilder.append(assistorName).append(",");
+            }
+            assistorBuilder.deleteCharAt(assistorBuilder.length() - 1);
+            deathAction.addValueData("assistors", assistorBuilder.toString());
         }
 
         int oldTeamRemaining = 0;

@@ -23,6 +23,7 @@ import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.game.GameState;
 import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
+import com.thenexusreborn.survivalgames.gamelog.*;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
 import com.thenexusreborn.survivalgames.lobby.StatSign;
@@ -158,7 +159,7 @@ public class SGCommand implements CommandExecutor {
                 }
                 case "assignstartingteams", "ast" -> {
                     if (game.getState() == GameState.SETUP_COMPLETE) {
-                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " ran the assignstartingteams command."));
+                        game.getGameInfo().getActions().add(new GameCmdAction(sender.getName(), "assignstartingteams"));
                         game.assignStartingTeams();
                         if (game.getState() == GameState.TEAMS_ASSIGNED) {
                             sender.sendMessage(MsgType.INFO.format("Starting teams have been assigned."));
@@ -171,7 +172,7 @@ public class SGCommand implements CommandExecutor {
                 }
                 case "teleportplayers", "tpp" -> {
                     if (game.getState() == GameState.TEAMS_ASSIGNED) {
-                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " ran the teleportplayers command."));
+                        game.getGameInfo().getActions().add(new GameCmdAction(sender.getName(), "teleportplayers"));
                         game.teleportStart();
                         if (game.getState() == GameState.TELEPORT_START_DONE) {
                             sender.sendMessage(MsgType.INFO.format("Players have been teleported."));
@@ -184,7 +185,7 @@ public class SGCommand implements CommandExecutor {
                 }
                 case "startwarmupcountdown", "swcd" -> {
                     if (game.getState() == GameState.TELEPORT_START_DONE) {
-                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " ran the startwarmupcountdown command."));
+                        game.getGameInfo().getActions().add(new GameCmdAction(sender.getName(), "startupwarmupcountdown"));
                         game.startWarmup();
                         if (game.getState() == GameState.WARMUP || game.getState() == GameState.WARMUP_DONE) {
                             sender.sendMessage(MsgType.INFO.format("The warmup countdown has been started successfully."));
@@ -197,7 +198,7 @@ public class SGCommand implements CommandExecutor {
                 }
                 case "start" -> {
                     if (game.getState() == GameState.WARMUP_DONE || game.getState() == GameState.TELEPORT_START_DONE) {
-                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " ran the start command."));
+                        game.getGameInfo().getActions().add(new GameCmdAction(sender.getName(), "start"));
                         game.startGame();
                     } else if (game.getState() == GameState.WARMUP) {
                         if (game.getTimer() != null) {
@@ -218,7 +219,7 @@ public class SGCommand implements CommandExecutor {
                 }
                 case "startdeathmatchcountdown", "sdmcd" -> {
                     if (game.getState() == GameState.INGAME) {
-                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " ran the startdeathmatchcountdown command."));
+                        game.getGameInfo().getActions().add(new GameCmdAction(sender.getName(), "startdeathmatchcountdown"));
                         game.startDeathmatchTimer();
                         if (game.getState() == GameState.INGAME_DEATHMATCH) {
                             sender.sendMessage(MsgType.INFO.format("You started the deathmatch timer"));
@@ -231,7 +232,7 @@ public class SGCommand implements CommandExecutor {
                 }
                 case "teleportdeathmatch", "tpdm" -> {
                     if (game.getState().ordinal() >= GameState.INGAME.ordinal() && game.getState().ordinal() <= GameState.INGAME_DEATHMATCH.ordinal()) {
-                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " ran the teleportdeathmatch command."));
+                        game.getGameInfo().getActions().add(new GameCmdAction(sender.getName(), "teleportdeathmatch"));
                         game.teleportDeathmatch();
                         if (game.getState() == GameState.TELEPORT_DEATHMATCH_DONE) {
                             sender.sendMessage(MsgType.INFO.format("You teleported everyone to the deathmatch"));
@@ -244,7 +245,7 @@ public class SGCommand implements CommandExecutor {
                 }
                 case "startdeathmatchwarmup", "sdmw" -> {
                     if (game.getState() == GameState.TELEPORT_DEATHMATCH_DONE) {
-                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " ran the startdeathmatchwarmup command."));
+                        game.getGameInfo().getActions().add(new GameCmdAction(sender.getName(), "startdeathmatchwarmup"));
                         game.startDeathmatchWarmup();
                         sender.sendMessage(MsgType.INFO.format("You started the deathmatch warmup"));
                     } else {
@@ -253,7 +254,7 @@ public class SGCommand implements CommandExecutor {
                 }
                 case "startdeathmatch", "sdm" -> {
                     if (Stream.of(GameState.TELEPORT_DEATHMATCH_DONE, GameState.DEATHMATCH_WARMUP, GameState.DEATHMATCH_WARMUP_DONE).anyMatch(gameState -> game.getState() == gameState)) {
-                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " ran the startdeathmatch command."));
+                        game.getGameInfo().getActions().add(new GameCmdAction(sender.getName(), "startdeathmatch"));
                         game.startDeathmatch();
                         sender.sendMessage(MsgType.INFO.format("You started the deathmatch"));
                     } else {
@@ -262,7 +263,7 @@ public class SGCommand implements CommandExecutor {
                 }
                 case "end" -> {
                     if (game.getState() != GameState.ENDING && game.getState() != GameState.ENDED) {
-                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " ran the end command."));
+                        game.getGameInfo().getActions().add(new GameCmdAction(sender.getName(), "end"));
                         game.end();
                         sender.sendMessage(MsgType.INFO.format("You ended the game."));
                     } else {
@@ -271,7 +272,7 @@ public class SGCommand implements CommandExecutor {
                 }
                 case "restockchests", "rc" -> {
                     if (game.getState().ordinal() >= GameState.INGAME.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal()) {
-                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " ran the restockchests command."));
+                        game.getGameInfo().getActions().add(new GameCmdAction(sender.getName(), "restockchests"));
                         game.restockChests();
                         game.sendMessage("&6&l>> &a&lALL CHESTS HAVE BEEN RESTOCKED");
                     } else {
@@ -280,7 +281,7 @@ public class SGCommand implements CommandExecutor {
                 }
                 case "nextgame", "ng" -> {
                     if (game.getState() == GameState.ENDING || game.getState() == GameState.ENDED) {
-                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " ran the nextgame command."));
+                        game.getGameInfo().getActions().add(new GameCmdAction(sender.getName(), "nextgame"));
                         game.nextGame();
                         sender.sendMessage(MsgType.INFO.format("Moved everyone to the next game"));
                     } else {
@@ -302,7 +303,7 @@ public class SGCommand implements CommandExecutor {
 
                     if (args.length == 3) {
                         player.getInventory().addItem(lootItem.getItemStack());
-                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " gave themselves " + lootItem.getName()));
+                        game.getGameInfo().getActions().add(new GameGiveAction(sender.getName(), "themselves", lootItem.getName().toLowerCase().replace(" ", "_")));
                         player.sendMessage(MsgType.INFO.format("You gave yourself %v", lootItem.getName()));
                     } else {
                         Player target = Bukkit.getPlayer(args[3]);
@@ -317,7 +318,7 @@ public class SGCommand implements CommandExecutor {
                         }
 
                         target.getInventory().addItem(lootItem.getItemStack());
-                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " gave " + target.getName() + " " + lootItem.getName()));
+                        game.getGameInfo().getActions().add(new GameGiveAction(sender.getName(), target.getName(), lootItem.getName().toLowerCase().replace(" ", "_")));
                         target.sendMessage(MsgType.INFO.format("You were given %v by %v", lootItem.getName(), sgPlayer.getNexusPlayer().getColoredName()));
                     }
 
@@ -343,7 +344,7 @@ public class SGCommand implements CommandExecutor {
                         Bukkit.getPlayer(gamePlayer.getUniqueId()).getInventory().addItem(lootItem.getItemStack());
                     }
 
-                    game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " gave all players " + lootItem.getName()));
+                    game.getGameInfo().getActions().add(new GameGiveAction(sender.getName(), "all", lootItem.getName().toLowerCase().replace(" ", "_")));
                     game.sendMessage(MsgType.INFO.format("All players were given %v by %v", lootItem.getName(), player.getName()));
                 }
                 case "player" -> {
@@ -415,9 +416,9 @@ public class SGCommand implements CommandExecutor {
 
                             game.sendMessage(MsgType.INFO.format("%v was added to the game by %v.", target.getColoredName(), sgPlayer.getNexusPlayer().getColoredName()));
                             if (lootTable != null && amountOfItems > 1) {
-                                //game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", player.getName() + " added " + target.getName() + " with " + amountOfItems + " from the loot table " + lootTable.getName() + " as a tribute to the game."));
+                                game.getGameInfo().getActions().add(new GamePlayerAddAction(player.getName(), target.getName(), lootTable.getName(), amountOfItems));
                             } else {
-                                //game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", player.getName() + " added " + target.getName() + " as a tribute to the game."));
+                                game.getGameInfo().getActions().add(new GamePlayerAddAction(player.getName(), target.getName()));
                             }
                         }
                         case "remove", "rm" -> {
@@ -433,7 +434,7 @@ public class SGCommand implements CommandExecutor {
 
                             game.teleportSpectator(Bukkit.getPlayer(target.getUniqueId()), game.getGameMap().getCenterLocation());
                             game.sendMessage(MsgType.INFO.format("%v was removed from the game by %v.", target.getColoredName(), sgPlayer.getNexusPlayer().getColoredName()));
-                            //game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", player.getName() + " removed " + target.getName() + " from the game."));
+                            game.getGameInfo().getActions().add(new GamePlayerRemoveAction(player.getName(), target.getName()));
                         }
                         case "revive", "rv" -> {
                             // /sg game player revive|rv <player> [<loottable>:<amount>]
@@ -497,9 +498,9 @@ public class SGCommand implements CommandExecutor {
 
                             game.sendMessage(MsgType.INFO.format("%v was revived by %v.", target.getColoredName(), sgPlayer.getNexusPlayer().getColoredName()));
                             if (lootTable != null && amountOfItems > 1) {
-                                //game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", player.getName() + " revived " + target.getName() + " with " + amountOfItems + " from the loot table " + lootTable.getName() + " as a tribute."));
+                                game.getGameInfo().getActions().add(new GamePlayerReviveAction(player.getName(), target.getName(), lootTable.getName(), amountOfItems));
                             } else {
-                                //game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", player.getName() + " revived " + target.getName() + " as a tribute."));
+                                game.getGameInfo().getActions().add(new GamePlayerReviveAction(player.getName(), target.getName()));
                             }
                         }
 
@@ -578,14 +579,16 @@ public class SGCommand implements CommandExecutor {
 
                             Mutation mutation = Mutation.createInstance(game, type, target.getUniqueId(), mutationTarget.getUniqueId());
                             target.setMutation(mutation);
+                            
+                            game.getGameInfo().getActions().add(new GamePlayerForceMutateAction(player.getName(), target.getName(), type, mutationTarget.getName(), bypassTimer));
 
                             if (!bypassTimer) {
                                 mutation.startCountdown();
                             } else {
                                 mutationTarget.sendMessage(ColorHandler.getInstance().color("&6&l>> " + target.getColoredName().toUpperCase() + " &c&lIS AFTER YOU! RUN!"));
-
+                                
+                                game.getGameInfo().getActions().add(new GameMutateAction(target.getName(), mutationTarget.getName(), mutation.getType()));
                                 game.addMutation(mutation);
-                                game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "mutation", target.getName() + " mutated agaisnt " + mutationTarget.getName() + " as a " + mutation.getType().getDisplayName()));
                             }
                         }
 
@@ -1189,7 +1192,7 @@ public class SGCommand implements CommandExecutor {
                     long newValue = timer.getTime();
 
                     if (timerType.equalsIgnoreCase("game")) {
-                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "admincommand", sender.getName() + " modified the timer from " + oldValue + " to " + newValue));
+                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "timermodification", "").addValueData("actor", sender.getName()).addValueData("oldvalue", oldValue).addValueData("newvalue", newValue));
                     }
                 }
             }
