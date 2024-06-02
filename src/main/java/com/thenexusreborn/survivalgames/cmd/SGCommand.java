@@ -1192,7 +1192,7 @@ public class SGCommand implements CommandExecutor {
                     long newValue = timer.getTime();
 
                     if (timerType.equalsIgnoreCase("game")) {
-                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "timermodification", "").addValueData("actor", sender.getName()).addValueData("oldvalue", oldValue).addValueData("newvalue", newValue));
+                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "timermodification").addValueData("actor", sender.getName()).addValueData("oldvalue", oldValue).addValueData("newvalue", newValue));
                     }
                 }
             }

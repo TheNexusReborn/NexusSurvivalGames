@@ -5,7 +5,7 @@ import com.thenexusreborn.api.gamearchive.GameAction;
 
 public class GameChatAction extends GameAction {
     public GameChatAction(ChatRoom chatRoom, String sender, String message) {
-        super(System.currentTimeMillis(), "chat", "");
+        super(System.currentTimeMillis(), "chat");
         addValueData("sender", sender);
         addValueData("message", message);
         addValueData("chatroom", chatRoom.getName());

@@ -139,7 +139,7 @@ public class Game {
     }
 
     public void setState(GameState state) {
-        this.gameInfo.getActions().add(new GameAction(System.currentTimeMillis(), "statechange", "").addValueData("oldvalue", this.state.name()).addValueData("newvalue", state.name()));
+        this.gameInfo.getActions().add(new GameAction(System.currentTimeMillis(), "statechange").addValueData("oldvalue", this.state.name()).addValueData("newvalue", state.name()));
         this.state = state;
     }
 
@@ -905,7 +905,7 @@ public class Game {
         Player player = Bukkit.getPlayer(gamePlayer.getUniqueId());
         String strippedDeathMessage = ChatColor.stripColor(deathInfo.getDeathMessage());
         strippedDeathMessage = strippedDeathMessage.substring(3, strippedDeathMessage.length() - 1);
-        GameAction deathAction = new GameAction(deathInfo.getTime(), "death", "");
+        GameAction deathAction = new GameAction(deathInfo.getTime(), "death");
         gameInfo.getActions().add(deathAction);
         deathAction.addValueData("message", strippedDeathMessage);
         deathAction.addValueData("type", deathInfo.getType().name());

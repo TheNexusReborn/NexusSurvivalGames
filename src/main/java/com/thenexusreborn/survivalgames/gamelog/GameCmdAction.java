@@ -4,7 +4,7 @@ import com.thenexusreborn.api.gamearchive.GameAction;
 
 public class GameCmdAction extends GameAction {
     public GameCmdAction(String sender, String command, String... cmdArgs) {
-        super(System.currentTimeMillis(), "admincommand", "");
+        super(System.currentTimeMillis(), "admincommand");
         addValueData("sender", sender).addValueData("command", command);
         if (cmdArgs != null) {
             StringBuilder argBuilder = new StringBuilder();
