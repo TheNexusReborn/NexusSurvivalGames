@@ -42,6 +42,10 @@ public class GameTablistHandler extends TablistHandler {
                 NexusPlayer player = scoreboard.getPlayer();
                 GamePlayer gamePlayer = plugin.getPlayerRegistry().get(player.getUniqueId()).getGamePlayer();
                 ITeam otherTeam = getPlayerTeams().get(otherNexusPlayer.getUniqueId());
+                if (gamePlayer == null) {
+                    continue;
+                }
+                
                 String correctChar = BEGIN_CHARS.get(gamePlayer.getTeam());
                 if (otherTeam == null) {
                     createPlayerTeam(otherNexusPlayer);
