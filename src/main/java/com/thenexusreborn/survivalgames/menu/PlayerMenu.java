@@ -40,7 +40,13 @@ public class PlayerMenu extends InventoryGUI {
         Button sponsorButton = new Button().iconCreator(p -> ItemBuilder.of(XMaterial.CHEST).displayName("&e&lSponsor").build())
                 .consumer(e -> {
                     GuiManager manager = plugin.getServer().getServicesManager().getRegistration(GuiManager.class).getProvider();
-                    GamePlayer gp = sgPlayer.getGamePlayer();
+                    SGPlayer actor = plugin.getPlayerRegistry().get(e.getWhoClicked().getUniqueId());
+                    if (actor.getGame() == null) {
+                        e.getWhoClicked().sendMessage(MsgType.WARN.format("You are not in a game."));
+                        return;
+                    }
+                    
+                    GamePlayer gp = actor.getGamePlayer();
                     if (!sgPlayer.getGame().getSettings().isAllowSponsoring()) {
                         gp.sendMessage(MsgType.WARN + "Sponsoring is disabled for this game.");
                         return;
