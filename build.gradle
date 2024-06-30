@@ -48,7 +48,7 @@ dependencies {
 }
 
 group = 'com.thenexusreborn'
-version = '1.17.3-ALPHA'
+version = '1.17.4-ALPHA'
 description = 'NexusSurvivalGames'
 java.sourceCompatibility = JavaVersion.VERSION_17
 
