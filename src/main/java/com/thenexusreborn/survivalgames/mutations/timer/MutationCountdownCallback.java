@@ -35,7 +35,7 @@ public class MutationCountdownCallback implements ClockCallback<TimerSnapshot> {
             return;
         }
 
-        long secondsLeft = TimeUnit.MILLISECONDS.toSeconds(timerSnapshot.getTime());
+        long secondsLeft = (long) TimeUnit.MILLISECONDS.toSeconds(timerSnapshot.getTime());
 
         p.sendMessage(ColorHandler.getInstance().color(MsgType.INFO + "&lMUTATING: " + secondsLeft) + "s...");
 
