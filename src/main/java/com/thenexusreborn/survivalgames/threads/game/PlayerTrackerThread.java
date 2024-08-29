@@ -13,7 +13,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 public class PlayerTrackerThread extends StarThread<SurvivalGames> {
 
@@ -37,13 +36,10 @@ public class PlayerTrackerThread extends StarThread<SurvivalGames> {
                 continue;
             }
 
-            Set<UUID> players = new HashSet<>();
-            for (GamePlayer player : game.getPlayers().values()) {
-                players.add(player.getUniqueId());
-            }
+            Set<GamePlayer> players = new HashSet<>(game.getPlayers().values());
 
-            for (UUID p : players) {
-                Player player = Bukkit.getPlayer(p);
+            for (GamePlayer gamePlayer : players) {
+                Player player = Bukkit.getPlayer(gamePlayer.getUniqueId());
                 if (player == null) {
                     continue;
                 }
@@ -53,8 +49,6 @@ public class PlayerTrackerThread extends StarThread<SurvivalGames> {
                 if (hand != null) {
                     holdingTracker = hand.getType() == Material.COMPASS;
                 }
-
-                GamePlayer gamePlayer = game.getPlayer(p);
 
                 if (!holdingTracker) {
                     gamePlayer.setTrackerInfo(null);
@@ -66,13 +60,13 @@ public class PlayerTrackerThread extends StarThread<SurvivalGames> {
                 if (gamePlayer.getTeam() == GameTeam.MUTATIONS) {
                     target = Bukkit.getPlayer(gamePlayer.getMutation().getTarget());
                 } else {
-                    for (UUID u : players) {
-                        Player t = Bukkit.getPlayer(u);
-                        if (u.equals(p)) {
+                    for (GamePlayer targetPlayer : players) {
+                        if (targetPlayer.getUniqueId().equals(gamePlayer.getUniqueId())) {
                             continue;
                         }
-
-                        GamePlayer targetPlayer = game.getPlayer(u);
+                        
+                        Player t = Bukkit.getPlayer(targetPlayer.getUniqueId());
+                        
                         if (targetPlayer.getTeam() != GameTeam.TRIBUTES) {
                             continue;
                         }
