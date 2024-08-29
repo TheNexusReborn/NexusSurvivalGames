@@ -27,9 +27,6 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.function.Consumer;
 
-import static com.thenexusreborn.survivalgames.game.GameState.INGAME;
-import static com.thenexusreborn.survivalgames.game.GameState.INGAME_DEATHMATCH;
-
 public class GamePlayer {
     private final NexusPlayer nexusPlayer;
     private Game game;
@@ -232,7 +229,7 @@ public class GamePlayer {
         }
 
         if (!(game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_DEATHMATCH)) {
-            return new Pair<>(false, "You cannot mutate in the current game phase.");
+            return new Pair<>(false, "You cannot mutate in the current game state.");
         }
 
         if (!game.getSettings().isAllowMutations()) {
@@ -407,28 +404,24 @@ public class GamePlayer {
         ItemStack tributesBook = ItemBuilder.of(XMaterial.ENCHANTED_BOOK).displayName("&a&lTributes &7&o(Right Click)").build();
         ItemStack mutationsBook = ItemBuilder.of(XMaterial.ENCHANTED_BOOK).displayName("&d&lMutations &7&o(Right Click)").build();
         ItemStack spectatorsBook = ItemBuilder.of(XMaterial.ENCHANTED_BOOK).displayName("&c&lSpectators &7&o(Right Click)").build();
+
+        Pair<Boolean, String> canMutateStatus = canMutate();
+        
         String mutateName;
-        if (!game.getSettings().isAllowMutations()) {
-            mutateName = "&cMutations Disabled";
-        } else if (!(game.getState() == INGAME || game.getState() == INGAME_DEATHMATCH)) {
-            mutateName = "&cCannot mutate.";
-        } else if (hasMutated()) {
-            mutateName = "&cCan't mutate again.";
-        } else {
-            Pair<Boolean, String> mutateAllowedStatus = canMutate();
-            if (!mutateAllowedStatus.key()) {
-                mutateName = "&c" + mutateAllowedStatus.value();
+        
+        if (canMutateStatus.key()) {
+            GamePlayer killer = game.getPlayer(getKiller());
+            String passes;
+            if (game.getSettings().isUnlimitedPasses()) {
+                passes = "Unlimited";
             } else {
-                GamePlayer killer = game.getPlayer(getKiller());
-                String passes;
-                if (game.getSettings().isUnlimitedPasses()) {
-                    passes = "Unlimited";
-                } else {
-                    passes = getStats().getMutationPasses() + "";
-                }
-                mutateName = "&c&lTAKE REVENGE   &eTarget: " + killer.getColoredName() + "   &ePasses: &b" + passes;
+                passes = getStats().getMutationPasses() + "";
             }
+            mutateName = "&c&lTAKE REVENGE   &eTarget: " + killer.getColoredName() + "   &ePasses: &b" + passes;
+        } else {
+            mutateName = "&c" + canMutateStatus.value();
         }
+        
         ItemStack mutateItem = ItemBuilder.of(XMaterial.ROTTEN_FLESH).displayName(mutateName).build();
         ItemStack compass = ItemBuilder.of(XMaterial.COMPASS).displayName("&fPlayer Tracker").build();
         ItemStack tpCenter = ItemBuilder.of(XMaterial.CLOCK).displayName("&e&lTeleport to Map Center &7&o(Right Click)").build();
