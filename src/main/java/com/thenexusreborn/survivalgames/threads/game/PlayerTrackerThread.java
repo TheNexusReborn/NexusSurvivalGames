@@ -112,7 +112,7 @@ public class PlayerTrackerThread extends StarThread<SurvivalGames> {
 
             long end = System.currentTimeMillis();
             long totalTime = end - start;
-            if (totalTime > 20) {
+            if (totalTime > 30) {
                 plugin.getLogger().severe("Player Tracker task took " + totalTime);
             }
         }
