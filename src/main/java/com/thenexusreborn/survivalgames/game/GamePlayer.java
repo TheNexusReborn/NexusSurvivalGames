@@ -431,7 +431,7 @@ public class GamePlayer {
         }
         ItemStack mutateItem = ItemBuilder.of(XMaterial.ROTTEN_FLESH).displayName(mutateName).build();
         ItemStack compass = ItemBuilder.of(XMaterial.COMPASS).displayName("&fPlayer Tracker").build();
-        ItemStack tpCenter = ItemBuilder.of(XMaterial.COMPASS).displayName("&e&lTeleport to Map Center &7&o(Right Click)").build();
+        ItemStack tpCenter = ItemBuilder.of(XMaterial.CLOCK).displayName("&e&lTeleport to Map Center &7&o(Right Click)").build();
         ItemStack hubItem = ItemBuilder.of(XMaterial.OAK_DOOR).displayName("&e&lReturn to Hub &7(Right Click)").build();
         Player p = Bukkit.getPlayer(getUniqueId());
         PlayerInventory inv = p.getInventory();
