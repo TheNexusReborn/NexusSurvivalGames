@@ -513,6 +513,11 @@ public class SGCommand implements CommandExecutor {
                                 sender.sendMessage(MsgType.WARN.format("%v is not a spectator.", target.getName()));
                                 return true;
                             }
+                            
+                            if (!(args.length > 4)) {
+                                sender.sendMessage(MsgType.WARN.format("You must specify a mutation type."));
+                                return true;
+                            }
 
                             MutationType type = MutationType.getType(args[4]);
                             if (type == null) {
