@@ -3,6 +3,7 @@ package com.thenexusreborn.survivalgames.scoreboard.game;
 import com.stardevllc.starcore.color.ColorHandler;
 import com.thenexusreborn.api.scoreboard.*;
 import com.thenexusreborn.nexuscore.scoreboard.SpigotScoreboardView;
+import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
@@ -34,10 +35,14 @@ public class MutationBoard extends SpigotScoreboardView {
             GamePlayer gamePlayer = plugin.getPlayerRegistry().get(player.getUniqueId()).getGamePlayer();
             if (gamePlayer.getTeam() != GameTeam.MUTATIONS) {
                 team.setSuffix("None");
-                return;
+                return; 
             }
             Mutation mutation = gamePlayer.getMutation();
-            GamePlayer target = plugin.getPlayerRegistry().get(mutation.getTarget()).getGamePlayer();
+            SGPlayer targetPlayer = plugin.getPlayerRegistry().get(mutation.getTarget());
+            if (targetPlayer == null) {
+                return;
+            }
+            GamePlayer target = targetPlayer.getGamePlayer();
             if (target == null) {
                 team.setSuffix("None");
                 return;
