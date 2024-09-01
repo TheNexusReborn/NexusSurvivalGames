@@ -79,6 +79,9 @@ public class DeathInfo {
     
     public String getDeathMessage() {
         GamePlayer gamePlayer = game.getPlayer(player);
+        if (gamePlayer == null) {
+            return "";
+        }
         FileConfiguration deathMessagesConfig = plugin.getDeathMessagesConfig();
         String deathMessage;
         
