@@ -16,7 +16,7 @@ public class MutationBoard extends SpigotScoreboardView {
     private SurvivalGames plugin;
     
     public MutationBoard(NexusScoreboard scoreboard, SurvivalGames plugin) {
-        super(scoreboard, "combattag", ColorHandler.getInstance().color("&d&lMutation"));
+        super(scoreboard, "mutationinfo", ColorHandler.getInstance().color("&d&lMutation"));
         this.plugin = plugin;
     }
     
