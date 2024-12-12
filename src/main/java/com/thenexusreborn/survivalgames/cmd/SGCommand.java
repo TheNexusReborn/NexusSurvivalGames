@@ -1,14 +1,14 @@
 package com.thenexusreborn.survivalgames.cmd;
 
+import com.stardevllc.clock.clocks.Timer;
+import com.stardevllc.converter.string.StringConverter;
+import com.stardevllc.converter.string.StringConverters;
+import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starcore.color.ColorHandler;
-import com.stardevllc.starlib.clock.clocks.Timer;
-import com.stardevllc.starlib.misc.Value;
-import com.stardevllc.starlib.misc.Value.Type;
-import com.stardevllc.starlib.time.TimeFormat;
-import com.stardevllc.starlib.time.TimeParser;
+import com.stardevllc.time.TimeFormat;
+import com.stardevllc.time.TimeParser;
 import com.thenexusreborn.api.gamearchive.GameAction;
 import com.thenexusreborn.api.player.Rank;
-import com.thenexusreborn.api.sql.objects.typehandlers.ValueHandler;
 import com.thenexusreborn.gamemaps.MapManager;
 import com.thenexusreborn.gamemaps.YamlMapManager;
 import com.thenexusreborn.gamemaps.model.MapSpawn;
@@ -34,14 +34,10 @@ import com.thenexusreborn.survivalgames.loot.tables.SGLootTable;
 import com.thenexusreborn.survivalgames.map.SQLMapManager;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
 import com.thenexusreborn.survivalgames.mutations.MutationType;
-import com.thenexusreborn.survivalgames.settings.SettingRegistry;
-import com.thenexusreborn.survivalgames.settings.collection.SettingList;
-import com.thenexusreborn.survivalgames.settings.object.Setting.Info;
+import com.thenexusreborn.survivalgames.settings.GameSettings;
+import com.thenexusreborn.survivalgames.settings.LobbySettings;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
 import com.thenexusreborn.survivalgames.util.SGUtils;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.HoverEvent.Action;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -56,6 +52,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
@@ -63,6 +60,8 @@ import java.util.stream.Stream;
 public class SGCommand implements CommandExecutor {
 
     private final SurvivalGames plugin;
+    
+    private Map<UUID, Runnable> settingsConfirmation = new HashMap<>();
 
     public SGCommand(SurvivalGames plugin) {
         this.plugin = plugin;
@@ -513,7 +512,7 @@ public class SGCommand implements CommandExecutor {
                                 sender.sendMessage(MsgType.WARN.format("%v is not a spectator.", target.getName()));
                                 return true;
                             }
-                            
+
                             if (!(args.length > 4)) {
                                 sender.sendMessage(MsgType.WARN.format("You must specify a mutation type."));
                                 return true;
@@ -584,14 +583,14 @@ public class SGCommand implements CommandExecutor {
 
                             Mutation mutation = Mutation.createInstance(game, type, target.getUniqueId(), mutationTarget.getUniqueId());
                             target.setMutation(mutation);
-                            
+
                             game.getGameInfo().getActions().add(new GamePlayerForceMutateAction(player.getName(), target.getName(), type, mutationTarget.getName(), bypassTimer));
 
                             if (!bypassTimer) {
                                 mutation.startCountdown();
                             } else {
                                 mutationTarget.sendMessage(ColorHandler.getInstance().color("&6&l>> " + target.getColoredName().toUpperCase() + " &c&lIS AFTER YOU! RUN!"));
-                                
+
                                 game.getGameInfo().getActions().add(new GameMutateAction(target.getName(), mutationTarget.getName(), mutation.getType()));
                                 game.addMutation(mutation);
                             }
@@ -916,22 +915,76 @@ public class SGCommand implements CommandExecutor {
                 return true;
             }
 
+            if (args[1].equalsIgnoreCase("confirm")) {
+                Runnable task = this.settingsConfirmation.get(player.getUniqueId());
+                if (task == null) {
+                    sender.sendMessage(MsgType.WARN.format("You have nothing to confirm."));
+                    return true;
+                }
+
+                task.run();
+                this.settingsConfirmation.remove(player.getUniqueId());
+                return true;
+            }
+
+            boolean confirm = false;
+            boolean global = false;
+            boolean allRunning = false;
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 1; i < args.length; i++) {
+                if (args[i].equalsIgnoreCase("-c")) {
+                    confirm = true;
+                } else if (args[i].equalsIgnoreCase("-g")) {
+                    global = true;
+                } else if (args[i].equalsIgnoreCase("-r")) {
+                    allRunning = true;
+                } else if (args[i].equalsIgnoreCase("-gr") || args[i].equalsIgnoreCase("-rg")) {
+                    allRunning = true;
+                    global = true;
+                }
+                // TODO Add more permutations
+                else {
+                    sb.append(args[i]).append(" ");
+                }
+            }
+
+            args = sb.toString().trim().split(" ");
+
             String type = switch (args[1].toLowerCase()) {
                 case "game", "g" -> "game";
                 case "lobby", "l" -> "lobby";
                 default -> null;
             };
 
+            Class<?> settingClass = switch (type) {
+                case "game" -> GameSettings.class;
+                case "lobby" -> LobbySettings.class;
+                default -> null; //Can ignore this really as it will never be null
+            };
+
+            Field[] declaredFields = settingClass.getDeclaredFields();
+
+            Map<Field, StringConverter<?>> fields = new HashMap<>();
+            for (Field declaredField : declaredFields) {
+                if (Modifier.isStatic(declaredField.getModifiers())) {
+                    continue;
+                }
+
+                if (Modifier.isFinal(declaredField.getModifiers())) {
+                    continue;
+                }
+
+                StringConverter<?> converter = StringConverters.getConverter(declaredField.getType());
+                if (converter != null) {
+                    fields.put(declaredField, converter);
+                }
+            }
+
             if (type == null) {
                 sender.sendMessage(MsgType.WARN.format("Invalid setting type. Can only be game (g) or lobby (l)"));
                 return true;
             }
-
-            SettingRegistry registry = switch (type) {
-                case "game" -> plugin.getGameSettingRegistry();
-                case "lobby" -> plugin.getLobbySettingRegistry();
-                default -> null;
-            };
 
             if (args[2].equalsIgnoreCase("save")) {
                 sender.sendMessage(MsgType.WARN.format("This functionality is temporarily disabled."));
@@ -939,102 +992,112 @@ public class SGCommand implements CommandExecutor {
             }
 
             if (args[2].equalsIgnoreCase("list")) {
+                List<String> lines = new LinkedList<>();
+                for (Field field : fields.keySet()) {
+                    lines.add("  &8 - &a" + field.getName().toLowerCase());
+                }
+
+                if (lines.isEmpty()) {
+                    sender.sendMessage(MsgType.WARN.format("Could not find any settings to list."));
+                    return true;
+                }
+
                 sender.sendMessage(MsgType.INFO.format("List of &b" + type + " settings."));
+                lines.forEach(line -> ColorHandler.getInstance().coloredMessage(sender, line));
 
-                SettingRegistry settingRegistry = switch (type) {
-                    case "game" -> plugin.getGameSettingRegistry();
-                    case "lobby" -> plugin.getLobbySettingRegistry();
-                    default -> null;
-                };
+                return true;
+            }
+            
+            String setting = args[2].toLowerCase();
+            Field field = null;
+            StringConverter<?> converter = null;
 
-                for (Info setting : settingRegistry.getObjects().values()) {
-                    TextComponent component = new TextComponent(TextComponent.fromLegacyText(ColorHandler.getInstance().color(" &8- &a" + setting.getName())));
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("&dName: &e").append(setting.getDisplayName()).append("\n");
-                    sb.append("&dDescription: &e").append(setting.getDescription());
-                    if (setting.getMinValue() != null) {
-                        sb.append("\n").append("&dMin: &e").append(setting.getMinValue().get());
-                    }
-                    if (setting.getMaxValue() != null) {
-                        sb.append("\n").append("&dMax: &e").append(setting.getMaxValue().get());
-                    }
-                    component.setHoverEvent(new HoverEvent(Action.SHOW_TEXT, TextComponent.fromLegacyText(ColorHandler.getInstance().color(sb.toString()))));
-                    if (sender instanceof Player) {
-                        player.spigot().sendMessage(component);
-                    }
+            for (Entry<Field, StringConverter<?>> entry : fields.entrySet()) {
+                if (entry.getKey().getName().equalsIgnoreCase(setting)) {
+                    field = entry.getKey();
+                    converter = entry.getValue();
+                    break;
                 }
+            }
 
+            if (field == null) {
+                sender.sendMessage(MsgType.WARN.format("Could not find a setting named %v.", args[2]));
                 return true;
             }
 
-            String settingName = args[2].toLowerCase();
-            Info settingInfo = registry.get(settingName);
-
-            if (settingInfo == null) {
-                sender.sendMessage(MsgType.WARN.format("A setting with that name does not exist."));
-                return true;
-            }
-
-            Value value;
-            try {
-                value = (Value) new ValueHandler().getDeserializer().deserialize(null, settingInfo.getDefaultValue().getType() + ":" + args[3]);
-            } catch (Exception e) {
-                sender.sendMessage(MsgType.WARN.format("There was an error parsing the value: " + e.getMessage()));
-                return true;
-            }
-
+            Object value = converter.convertTo(args[3]);
             if (value == null) {
-                sender.sendMessage(MsgType.WARN.format("There was a problem parsing the value."));
+                sender.sendMessage(MsgType.WARN.format("Could not convert %v to a(n) %v", args[3], field.getType().getSimpleName()));
                 return true;
             }
+            
+            boolean isGameType = type.equalsIgnoreCase("game");
+            boolean isLobbyType = type.equalsIgnoreCase("lobby");
 
-            Value minValue = settingInfo.getMinValue();
-            Value maxValue = settingInfo.getMaxValue();
-            if (minValue != null && maxValue != null) {
-                if (List.of(Type.INTEGER, Type.DOUBLE, Type.LONG).contains(value.getType())) {
-                    boolean lowerInBounds, upperInBounds;
-                    if (value.getType() == Type.INTEGER) {
-                        lowerInBounds = value.getAsInt() >= minValue.getAsInt();
-                        upperInBounds = value.getAsInt() <= maxValue.getAsInt();
-                    } else if (value.getType() == Type.DOUBLE) {
-                        lowerInBounds = value.getAsDouble() >= minValue.getAsDouble();
-                        upperInBounds = value.getAsDouble() <= maxValue.getAsDouble();
-                    } else {
-                        lowerInBounds = value.getAsLong() >= minValue.getAsLong();
-                        upperInBounds = value.getAsLong() <= maxValue.getAsLong();
-                    }
-
-                    if (!lowerInBounds) {
-                        sender.sendMessage(MsgType.WARN.format("%v is less than the minimum allowed value %v.", value.get(), minValue.get()));
-                        return true;
-                    }
-
-                    if (!upperInBounds) {
-                        sender.sendMessage(MsgType.WARN.format("%v is greater than the maxiumum allowed value %v", value.get(), maxValue.get()));
-                        return true;
-                    }
+            Set<Object> settingsInstances = new HashSet<>();
+            if (global) {
+                if (isGameType) {
+                    settingsInstances.add(SurvivalGames.globalGameSettings);
+                } else if (isLobbyType) {
+                    settingsInstances.add(SurvivalGames.globalLobbySettings);
                 }
             }
 
-            SettingList<?> settingList;
-            if (type.equalsIgnoreCase("game")) {
-                if (game == null) {
-                    settingList = lobby.getGameSettings();
-                } else {
-                    settingList = game.getSettings();
+            if (allRunning) {
+                if (isGameType) {
+                    plugin.getServers().forEach(server -> {
+                        if (server.getGame() != null) {
+                            settingsInstances.add(server.getGame().getSettings());
+                        }
+                    });
+                } else if (isLobbyType) {
+                    plugin.getServers().forEach(server -> {
+                        if (server.getLobby() != null) {
+                            settingsInstances.add(server.getGame().getSettings());
+                        }
+                    });
                 }
+            }
+
+            //TODO Add instanceof check here when sender limit fixed
+            if (isGameType) {
+                if (sgPlayer.getGame() != null) {
+                    settingsInstances.add(sgPlayer.getGame().getSettings());
+                }
+                
+                if (sgPlayer.getLobby() != null) {
+                    settingsInstances.add(sgPlayer.getLobby().getGameSettings());
+                }
+            } else if (isLobbyType) {
+                if (sgPlayer.getLobby() != null) {
+                    settingsInstances.add(sgPlayer.getLobby().getLobbySettings());
+                }
+            }
+
+            Field finalField = field;
+            Runnable task = () -> {
+                for (Object instance : settingsInstances) {
+                    try {
+                        finalField.set(instance, value);
+                    } catch (IllegalAccessException e) {
+                        sender.sendMessage(MsgType.ERROR.format("Failed to set the %v setting to %v.", type, value));
+                        return;
+                    }
+                }
+//                sender.sendMessage(MsgType.INFO.format("You set the %v setting %v to %v.", type, finalField.getName(), value));
+                plugin.getNexusCore().getStaffChannel().sendMessage(new ChatContext(sender, sgPlayer.getNexusPlayer().getColoredName() + " set the " + type + " setting " + finalField.getName() + " to " + value + "."));
+            };
+            
+            if (confirm) {
+                task.run();
             } else {
-                settingList = lobby.getLobbySettings();
+                this.settingsConfirmation.put(player.getUniqueId(), task);
+                sender.sendMessage("");
+                sender.sendMessage(MsgType.IMPORTANT.format("Please confirm the following action..."));
+                sender.sendMessage(MsgType.IMPORTANT.format("Setting the %v setting %v to %v in %v %v.", type, field.getName(), value, settingsInstances.size(), type.equals("game") ? "games" : type.equals("lobby") ? "lobbies": "unknown"));
+                sender.sendMessage(MsgType.IMPORTANT.format("Please type %v to confirm.", "/survivalgames settings confirm"));
+                sender.sendMessage("");
             }
-
-            settingList.setValue(settingName, value.get());
-            Object settingValue = settingList.get(settingName).getValue().get();
-            if (!Objects.equals(value.get(), settingValue)) {
-                sender.sendMessage(MsgType.SEVERE.format("The setting did not update correctly. Please report this as a bug."));
-                return true;
-            }
-
-            sender.sendMessage(MsgType.INFO.format("You set the %v setting %v to %v.", type.toLowerCase(), settingInfo.getName(), value.get()));
         } else if (subCommand.equals("maps") || subCommand.equals("m")) {
             if (!(args.length > 2)) {
                 sender.sendMessage(MsgType.WARN.format("Usage: /" + label + " " + subCommand + " <export|import|setsource> <sql|yml>"));

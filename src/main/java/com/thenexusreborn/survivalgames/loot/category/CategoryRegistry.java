@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.loot.category;
 
+import com.stardevllc.registry.StringRegistry;
 import com.stardevllc.starcore.color.ColorHandler;
-import com.stardevllc.starlib.registry.StringRegistry;
 
 public class CategoryRegistry extends StringRegistry<LootCategory> {
 

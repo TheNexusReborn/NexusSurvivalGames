@@ -1,258 +1,305 @@
 package com.thenexusreborn.survivalgames.settings;
 
 import com.thenexusreborn.api.sql.annotations.table.TableName;
-import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.settings.collection.SettingList;
-import com.thenexusreborn.survivalgames.settings.object.Setting;
-import com.thenexusreborn.survivalgames.settings.object.enums.*;
-import com.thenexusreborn.survivalgames.settings.object.impl.*;
+import com.thenexusreborn.survivalgames.settings.enums.ColorMode;
+import com.thenexusreborn.survivalgames.settings.enums.Time;
+import com.thenexusreborn.survivalgames.settings.enums.Weather;
 
 @TableName("sggamesettings")
-public class GameSettings extends SettingList<GameSetting> {
-    public GameSettings() {
-        super("game");
-    }
-    
-    public GameSettings(String type) {
-        super(type);
-    }
-    
-    @Override
-    public GameSetting createSetting(String name) {
-        Setting.Info info = SurvivalGames.getPlugin(SurvivalGames.class).getGameSettingRegistry().get(name);
-        return new GameSetting(info, getCategory(), info.getDefaultValue());
-    }
-    
+public class GameSettings implements Cloneable {
+
+    private int chestRestockInterval = 5;
+    private int chestRestockDenomination = 2;
+    private boolean chestRestockRelative = true;
+    private boolean allowSwagShack = true;
+    private int sponsorScoreCost = 100;
+    private int sponsorCreditCost = 200;
+    private boolean allowSponsoring = true;
+    private int combatTagLength = 10;
+    private int maxScoreBounty = 10000;
+    private int maxCreditBounty = 10000;
+    private int assistNexiteGain = 1;
+    private int assistXpGain = 1;
+    private int assistCreditGain = 1;
+    private int killNexiteGain = 2;
+    private int killXpGain = 2;
+    private int killCreditGain = 2;
+    private int winNexiteBaseGain = 10;
+    private int winXpBaseGain = 10;
+    private int winCreditsBaseGain = 10;
+    private int winScoreBaseGain = 50;
+    private int maxMutationsAllowed = 10;
+    private boolean allowAssists = true;
+    private boolean earnNexites = false;
+    private int maxMutationAmount = 1;
+    private double firstBloodMultiplier = 1.25;
+    private double scoreDivisor = 10;
+    private float startingSaturation = 5;
+    private boolean useAllMutationTypes = true;
+    private double passUseChance = 0.99;
+    private double passAwardChance = 0.75;
+    private int mutationSpawnDelay = 10; //Default: 15
+    private boolean enderchestsEnabled = true;
+    private boolean useTieredLoot = true;
+    private boolean earnNetworkXp = true;
+    private boolean earnCredits = true;
+    private ColorMode colorMode = ColorMode.RANK;
+    private boolean sounds = true;
+    private Weather worldWeather = Weather.CLEAR;
+    private Time worldTime = Time.NOON;
+    private boolean applyMultipliers = true;
+    private boolean weatherProgression = false;
+    private boolean timeProgression = false;
+    private boolean unlimitedMutationPasses = true; //Default: false
+    private boolean gracePeriod = false;
+    private boolean regeneration = true;
+    private boolean mutationsEnabled = true;
+    private int nextGameTimerLength = 10;
+    private int deathmatchThreshold = 2; //Default: 4
+    private int warmupLength = 10; // Default: 30
+    private int deathmatchLength = 5;
+    private int gameLength = 10; //Default: 20
+    private int gracePeriodLength = 60;
+    private int maxHealth = 20;
+    private int deathmatchWarmupLength = 10;
+    private int deathmatchCountdownLength = 60;
+    private int maxTeamAmount = 2;
+    private boolean allowTeaming = true;
+
     public boolean isTeamingAllowed() {
-        return getValue("allow_teaming").getAsBoolean();
+        return allowTeaming;
     }
     
     public int getMaxTeamAmount() {
-        return getValue("max_team_amount").getAsInt();
+        return maxTeamAmount;
     }
     
     public int getDeathmatchTimerLength() {
-        return getValue("deathmatch_countdown_length").getAsInt();
+        return deathmatchCountdownLength;
     }
     
     public int getDeathmatchWarmupLength() {
-        return getValue("deathmatch_warmup_length").getAsInt();
+        return deathmatchWarmupLength;
     }
     
     public int getMaxHealth() {
-        return getValue("max_health").getAsInt();
+        return maxHealth;
     }
     
     public int getGracePeriodLength() {
-        return getValue("grace_period_length").getAsInt();
+        return gracePeriodLength;
     }
     
     public int getGameLength() {
-        return getValue("game_length").getAsInt();
+        return gameLength;
     }
     
     public int getDeathmatchLength() {
-        return getValue("deathmatch_length").getAsInt();
+        return deathmatchLength;
     }
     
     public int getWarmupLength() {
-        return getValue("warmup_length").getAsInt();
+        return warmupLength;
     }
     
     public int getDeathmatchThreshold() {
-        return getValue("deathmatch_threshold").getAsInt();
+        return deathmatchThreshold;
     }
     
     public int getNextGameStart() {
-        return getValue("next_game_timer_length").getAsInt();
+        return nextGameTimerLength;
     }
     
     public boolean isAllowMutations() {
-        return getValue("mutations_enabled").getAsBoolean();
+        return mutationsEnabled;
     }
     
     public boolean isRegeneration() {
-        return getValue("regeneration").getAsBoolean();
+        return regeneration;
     }
     
     public boolean isGracePeriod() {
-        return getValue("grace_period").getAsBoolean();
+        return gracePeriod;
     }
     
     public boolean isUnlimitedPasses() {
-        return getValue("unlimited_mutation_passes").getAsBoolean();
+        return unlimitedMutationPasses;
     }
     
     public boolean isTimeProgression() {
-        return getValue("time_progression").getAsBoolean();
+        return timeProgression;
     }
     
     public boolean isWeatherProgression() {
-        return getValue("weather_progression").getAsBoolean();
+        return weatherProgression;
     }
     
     public boolean isMultiplier() {
-        return getValue("apply_multipliers").getAsBoolean();
+        return applyMultipliers;
     }
     
     public Time getTime() {
-        return getValue("world_time").getAsEnum(Time.class);
+        return worldTime;
     }
     
     public Weather getWeather() {
-        return getValue("world_weather").getAsEnum(Weather.class);
+        return worldWeather;
     }
     
     public boolean isSounds() {
-        return getValue("sounds").getAsBoolean();
+        return sounds;
     }
     
     public ColorMode getColorMode() {
-        return getValue("color_mode").getAsEnum(ColorMode.class);
+        return colorMode;
     }
     
     public boolean isGiveCredits() {
-        return getValue("earn_credits").getAsBoolean();
+        return earnCredits;
     }
     
     public boolean isGiveXp() {
-        return getValue("earn_network_xp").getAsBoolean();
+        return earnNetworkXp;
     }
     
     public boolean isUseNewLoot() {
-        return getValue("use_tiered_loot").getAsBoolean();
+        return useTieredLoot;
     }
     
     public boolean isAllowEnderchests() {
-        return getValue("enderchests_enabled").getAsBoolean();
+        return enderchestsEnabled;
     }
     
     public int getMutationSpawnDelay() {
-        return getValue("mutation_spawn_delay").getAsInt();
+        return mutationSpawnDelay;
     }
     
     public double getPassRewardChance() {
-        return getValue("pass_award_chance").getAsDouble();
+        return passAwardChance;
     }
     
     public double getPassUseChance() {
-        return getValue("pass_use_chance").getAsDouble();
+        return passUseChance;
     }
     
     public boolean isUseAllMutations() {
-        return getValue("use_all_mutation_types").getAsBoolean();
+        return useAllMutationTypes;
     }
     
     public float getStartingSaturation() {
-        return (float) getValue("starting_saturation").getAsDouble();
+        return startingSaturation;
     }
     
     public double getScoreDivisor() {
-        return getValue("score_divisor").getAsDouble();
+        return scoreDivisor;
     }
     
     public double getFirstBloodMultiplier() {
-        return getValue("first_blood_multiplier").getAsDouble();
+        return firstBloodMultiplier;
     }
     
     public int getMaxMutationAmount() {
-        return getValue("max_mutation_amount").getAsInt();
+        return maxMutationAmount;
     }
     
     public boolean isEarnNexites() {
-        return getValue("earn_nexites").getAsBoolean();
+        return earnNexites;
     }
     
     public boolean isAllowAssists() {
-        return getValue("allow_assists").getAsBoolean();
+        return allowAssists;
     }
     
     public int getMaxMutationsAllowed() {
-        return getValue("max_mutations_allowed").getAsInt();
+        return maxMutationsAllowed;
     }
     
     public int getWinScoreBaseGain() {
-        return getValue("win_score_base_gain").getAsInt();
+        return winScoreBaseGain;
     }
     
     public int getWinCreditsBaseGain() {
-        return getValue("win_credits_base_gain").getAsInt();
+        return winCreditsBaseGain;
     }
     
     public int getWinXPBaseGain() {
-        return getValue("win_xp_base_gain").getAsInt();
+        return winXpBaseGain;
     }
     
     public int getWinNexiteBaseGain() {
-        return getValue("win_nexite_base_gain").getAsInt();
+        return winNexiteBaseGain;
     }
     
     public int getKillCreditGain() {
-        return getValue("kill_credit_gain").getAsInt();
+        return killCreditGain;
     }
     
     public int getKillXPGain() {
-        return getValue("kill_xp_gain").getAsInt();
+        return killXpGain;
     }
     
     public int getKillNexiteGain() {
-        return getValue("kill_nexite_gain").getAsInt();
+        return killNexiteGain;
     }
     
     public int getAssistCreditGain() {
-        return getValue("assist_credit_gain").getAsInt();
+        return assistCreditGain;
     }
     
     public int getAssistXPGain() {
-        return getValue("assist_xp_gain").getAsInt();
+        return assistXpGain;
     }
     
     public int getAssistNexiteGain() {
-        return getValue("assist_nexite_gain").getAsInt();
+        return assistNexiteGain;
     }
     
     public int getMaxCreditBounty() {
-        return getValue("max_credit_bounty").getAsInt();
+        return maxCreditBounty;
     }
     
     public int getMaxScoreBounty() {
-        return getValue("max_score_bounty").getAsInt();
+        return maxScoreBounty;
     }
     
     public int getCombatTagLength() {
-        return getValue("combat_tag_length").getAsInt();
+        return combatTagLength;
     }
     
     public boolean isAllowSponsoring() {
-        return getValue("allow_sponsoring").getAsBoolean();
+        return allowSponsoring;
     }
     
     public int getSponsorCreditCost() {
-        return getValue("sponsor_credit_cost").getAsInt();
+        return sponsorCreditCost;
     }
     
     public int getSponsorScoreCost() {
-        return getValue("sponsor_score_cost").getAsInt();
+        return sponsorScoreCost;
     }
     
     public boolean isAllowSwagShack() {
-        return getValue("allow_swag_shack").getAsBoolean();
+        return allowSwagShack;
     }
     
     public boolean isChestRestockRelative() {
-        return getValue("chest_restock_relative").getAsBoolean();
+        return chestRestockRelative;
     }
     
     public int getChestRestockDenomination() {
-        return getValue("chest_restock_denomination").getAsInt();
+        return chestRestockDenomination;
     }
     
     public int getChestRestockInterval() {
-        return getValue("chest_restock_interval").getAsInt();
+        return chestRestockInterval;
     }
-    
+
     @Override
     public GameSettings clone() {
-        return (GameSettings) super.clone();
+        try {
+            return (GameSettings) super.clone();
+        } catch (CloneNotSupportedException e) {
+            return new GameSettings();
+        }
     }
 }

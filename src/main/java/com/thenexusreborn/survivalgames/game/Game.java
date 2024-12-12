@@ -1,15 +1,15 @@
 package com.thenexusreborn.survivalgames.game;
 
+import com.stardevllc.helper.StringHelper;
+import com.stardevllc.registry.StringRegistry;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.starcore.color.ColorHandler;
 import com.stardevllc.starcore.utils.Cuboid;
-import com.stardevllc.starlib.clock.clocks.Timer;
-import com.stardevllc.starlib.helper.StringHelper;
-import com.stardevllc.starlib.registry.StringRegistry;
-import com.stardevllc.starlib.time.TimeFormat;
-import com.stardevllc.starlib.time.TimeUnit;
+import com.stardevllc.time.TimeFormat;
+import com.stardevllc.time.TimeUnit;
+import com.stardevllc.clock.clocks.Timer;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.gamearchive.GameAction;
 import com.thenexusreborn.api.gamearchive.GameInfo;
@@ -249,7 +249,7 @@ public class Game {
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId());
         sgPlayer.setGame(null, null);
 
-        NexusAPI.getApi().getScheduler().runTaskAsynchronously(() -> {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             SQLDatabase database = NexusAPI.getApi().getPrimaryDatabase();
             database.saveSilent(sgPlayer.getStats());
             database.saveSilent(sgPlayer.getNexusPlayer().getBalance());
@@ -810,7 +810,7 @@ public class Game {
 
         gameInfo.setLength(this.end - this.start);
 
-        NexusAPI.getApi().getScheduler().runTaskAsynchronously(() -> {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             NexusAPI.getApi().getPrimaryDatabase().saveSilent(gameInfo);
             try {
                 NexusAPI.getApi().getGameLogExporter().exportGameInfo(gameInfo);
@@ -824,7 +824,7 @@ public class Game {
 
                 if (gameInfo.getId() % 1000 == 0) {
                     for (String p : gameInfo.getPlayers()) {
-                        NexusAPI.getApi().getScheduler().runTaskAsynchronously(() -> {
+                        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                             UUID uuid = NexusAPI.getApi().getPlayerManager().getUUIDFromName(p);
 
                             Tag tag = new Tag(uuid, gameInfo.getId() + "th", System.currentTimeMillis());

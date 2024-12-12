@@ -1,69 +1,66 @@
 package com.thenexusreborn.survivalgames.settings;
 
 import com.thenexusreborn.api.sql.annotations.table.TableName;
-import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.settings.collection.SettingList;
-import com.thenexusreborn.survivalgames.settings.object.Setting;
-import com.thenexusreborn.survivalgames.settings.object.impl.LobbySetting;
 
 @TableName("sglobbysettings")
-public class LobbySettings extends SettingList<LobbySetting> {
-    public LobbySettings() {
-        super("lobby");
-    }
-    
-    public LobbySettings(String type) {
-        super(type);
-    }
-    
-    @Override
-    public LobbySetting createSetting(String name) {
-        Setting.Info info = SurvivalGames.getPlugin(SurvivalGames.class).getLobbySettingRegistry().get(name);
-        return new LobbySetting(info, getCategory(), info.getDefaultValue());
-    }
-    
+public class LobbySettings implements Cloneable {
+    private int voteStartAvailableThreshold = 4;
+    private boolean allowVoteStart = true;
+    private int voteStartThreshold = 2;
+    private boolean sounds = true;
+    private boolean keepPreviousGameSettings = true;
+    private boolean allowVoteWeight = true;
+    private int timerLength = 10; //Later Default will be 45
+    private int maxGames = 10;
+    private int minPlayers = 4;
+    private int maxPlayers = 24;
+
     public int getMaxPlayers() {
-        return getValue("max_players").getAsInt();
+        return maxPlayers;
     }
     
     public int getMinPlayers() {
-        return getValue("min_players").getAsInt();
+        return minPlayers;
     }
     
     public int getMaxGames() {
-        return getValue("max_games").getAsInt();
+        return maxGames;
     }
     
     public int getTimerLength() {
-        return getValue("timer_length").getAsInt();
+        return timerLength;
     }
     
     public boolean isVoteWeight() {
-        return getValue("allow_vote_weight").getAsBoolean();
+        return allowVoteWeight;
     }
     
     public boolean isKeepPreviousGameSettings() {
-        return getValue("keep_previous_game_settings").getAsBoolean();
+        return keepPreviousGameSettings;
     }
     
     public boolean isSounds() {
-        return getValue("sounds").getAsBoolean();
+        return sounds;
     }
     
     public int getVoteStartThreshold() {
-        return getValue("vote_start_threshold").getAsInt();
+        return voteStartThreshold;
     }
     
     public boolean isAllowVoteStart() {
-        return getValue("allow_vote_start").getAsBoolean();
+        return allowVoteStart;
     }
     
     public int getVoteStartAvailableThreshold() {
-        return getValue("vote_start_available_threshold").getAsInt();
+        return voteStartAvailableThreshold;
     }
-    
+
     @Override
     public LobbySettings clone() {
-        return (LobbySettings) super.clone();
+        try {
+            return (LobbySettings) super.clone();
+        } catch (CloneNotSupportedException e) {
+            return new LobbySettings();
+        }
     }
 }

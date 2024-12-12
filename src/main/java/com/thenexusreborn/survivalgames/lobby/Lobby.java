@@ -1,14 +1,14 @@
 package com.thenexusreborn.survivalgames.lobby;
 
+import com.stardevllc.helper.FileHelper;
+import com.stardevllc.clock.clocks.Timer;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.starcore.item.ItemBuilder;
 import com.stardevllc.starcore.utils.ProgressBar;
 import com.stardevllc.starcore.xseries.XMaterial;
-import com.stardevllc.starlib.helper.FileHelper;
-import com.stardevllc.starlib.time.TimeUnit;
-import com.stardevllc.starlib.clock.clocks.Timer;
+import com.stardevllc.time.TimeUnit;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
@@ -198,8 +198,8 @@ public class Lobby {
             }
         }
 
-        this.lobbySettings = plugin.getLobbySettings("default");
-        this.gameSettings = plugin.getGameSettings("default");
+        this.lobbySettings = new LobbySettings();
+        this.gameSettings = new GameSettings();
 
         this.lobbyChatRoom = new LobbyChatRoom(this);
         plugin.getStarChat().getRoomRegistry().register(this.lobbyChatRoom.getName(), this.lobbyChatRoom);
@@ -307,7 +307,7 @@ public class Lobby {
         getPlayers().forEach(player -> player.setMapVote(-1));
 
         if (plugin.getMapManager().getMaps().size() == 1 && !this.mapSigns.isEmpty()) {
-            this.mapOptions.put(1, plugin.getMapManager().getMaps().get(0));
+            this.mapOptions.put(1, plugin.getMapManager().getMaps().getFirst());
         } else if (plugin.getMapManager().getMaps().size() >= this.mapSigns.size()) {
             List<SGMap> maps = new ArrayList<>(plugin.getMapManager().getMaps());
             for (Integer position : new HashSet<>(this.mapSigns.keySet())) {
@@ -712,7 +712,7 @@ public class Lobby {
         if (this.lobbySettings.isKeepPreviousGameSettings()) {
             this.gameSettings = game.getSettings();
         } else {
-            this.gameSettings = plugin.getGameSettings("default");
+            this.gameSettings = new GameSettings();
         }
 
         for (UUID player : game.getPlayers().keySet()) {

@@ -1,4 +1,4 @@
-package com.thenexusreborn.survivalgames.settings.object.enums;
+package com.thenexusreborn.survivalgames.settings.enums;
 
 public enum Time {
     DAWN(23000), DAY(1000), NOON(6000), AFTERNOON(9000), DUSK(12000), NIGHT(13000), MIDNIGHT(22812);

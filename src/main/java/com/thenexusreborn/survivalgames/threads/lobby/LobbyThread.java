@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.threads.lobby;
 
 import com.stardevllc.starcore.utils.StarThread;
-import com.stardevllc.starlib.time.TimeUnit;
+import com.stardevllc.time.TimeUnit;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.nexuscore.util.ServerProperties;
 import com.thenexusreborn.survivalgames.SurvivalGames;

@@ -5,7 +5,7 @@ import com.stardevllc.starcore.utils.EntityNames;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
-import com.thenexusreborn.survivalgames.settings.object.enums.ColorMode;
+import com.thenexusreborn.survivalgames.settings.enums.ColorMode;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;

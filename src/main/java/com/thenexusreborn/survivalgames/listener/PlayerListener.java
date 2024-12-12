@@ -1,11 +1,11 @@
 package com.thenexusreborn.survivalgames.listener;
 
+import com.stardevllc.helper.Pair;
 import com.stardevllc.starcore.color.ColorHandler;
 import com.stardevllc.starcore.gui.GuiManager;
 import com.stardevllc.starcore.item.ItemBuilder;
 import com.stardevllc.starcore.xseries.XMaterial;
-import com.stardevllc.starlib.misc.Pair;
-import com.stardevllc.starlib.time.TimeUnit;
+import com.stardevllc.time.TimeUnit;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;

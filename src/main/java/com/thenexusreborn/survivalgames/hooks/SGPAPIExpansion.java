@@ -1,8 +1,8 @@
 package com.thenexusreborn.survivalgames.hooks;
 
+import com.stardevllc.clock.clocks.Timer;
 import com.stardevllc.starcore.utils.Position;
-import com.stardevllc.starlib.clock.clocks.Timer;
-import com.stardevllc.starlib.time.TimeFormat;
+import com.stardevllc.time.TimeFormat;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.util.MCUtils;
