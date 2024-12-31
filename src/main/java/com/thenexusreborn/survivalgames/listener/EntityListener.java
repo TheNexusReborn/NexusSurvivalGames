@@ -17,11 +17,8 @@ import org.bukkit.World;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.hanging.HangingBreakEvent.RemoveCause;
 import org.bukkit.potion.PotionEffect;
@@ -41,6 +38,20 @@ public class EntityListener implements Listener {
         this.plugin = plugin;
     }
 
+    @EventHandler
+    public void onEntityTarget(EntityTargetEvent e) {
+        if (!(e.getTarget() instanceof Player target)) {
+            return;
+        }
+
+        SGPlayer targetPlayer = plugin.getPlayerRegistry().get(target.getUniqueId());
+        if (targetPlayer.getGame() != null) {
+            if (targetPlayer.getGamePlayer().getTeam() == GameTeam.SPECTATORS || targetPlayer.getGamePlayer().getTeam() == GameTeam.MUTATIONS) {
+                e.setCancelled(true);
+            }
+        }
+    }
+    
     @EventHandler
     public void onEntityExplode(EntityExplodeEvent e) {
         e.setCancelled(true);
