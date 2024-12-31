@@ -1,6 +1,7 @@
 package com.thenexusreborn.survivalgames.listener;
 
 import com.stardevllc.helper.Pair;
+import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.starcore.color.ColorHandler;
 import com.stardevllc.starcore.gui.GuiManager;
 import com.stardevllc.starcore.item.ItemBuilder;
@@ -15,6 +16,7 @@ import com.thenexusreborn.nexuscore.api.events.ToggleChangeEvent;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
+import com.thenexusreborn.survivalgames.chat.GameTeamChatroom;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.game.death.DeathType;
@@ -72,22 +74,22 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
 
-@SuppressWarnings({"ExtractMethodRecommender", "DuplicatedCode"})
+@SuppressWarnings({"DuplicatedCode"})
 public class PlayerListener implements Listener {
     private final SurvivalGames plugin;
     private final GuiManager manager;
-    
+
     public PlayerListener(SurvivalGames plugin) {
         this.plugin = plugin;
         manager = plugin.getServer().getServicesManager().getRegistration(GuiManager.class).getProvider();
     }
-    
+
     @EventHandler
     public void onItemDrop(PlayerDropItemEvent e) {
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(e.getPlayer().getUniqueId());
         Lobby lobby = sgPlayer.getLobby();
         Game game = sgPlayer.getGame();
-        
+
         if (lobby != null && lobby.checkMapEditing(e.getPlayer())) {
             return;
         }
@@ -100,31 +102,31 @@ public class PlayerListener implements Listener {
             }
         }
     }
-    
+
     @EventHandler
     public void onBucketFill(PlayerBucketFillEvent e) {
         e.setCancelled(true);
     }
-    
+
     @EventHandler
     public void onBucketPlace(PlayerBucketEmptyEvent e) {
         e.setCancelled(true);
     }
-    
+
     @EventHandler
     public void onPlayerFish(PlayerFishEvent e) {
         if (e.getState() == State.CAUGHT_FISH) {
             e.setCancelled(true);
         }
     }
-    
+
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent e) {
         Player player = e.getPlayer();
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
         Lobby lobby = sgPlayer.getLobby();
         Game game = sgPlayer.getGame();
-        
+
         if (lobby == null && game == null) {
             return;
         }
@@ -132,7 +134,7 @@ public class PlayerListener implements Listener {
         if (lobby != null && lobby.checkMapEditing(e.getPlayer())) {
             return;
         }
-        
+
         if (game != null) {
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
             if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
@@ -151,7 +153,7 @@ public class PlayerListener implements Listener {
                                 } else if (displayName.toLowerCase().contains("spectators")) {
                                     team = GameTeam.SPECTATORS;
                                 }
-                                
+
                                 if (team != null) {
                                     manager.openGUI(new TeamMenu(plugin, team, game), player);
                                 }
@@ -172,7 +174,7 @@ public class PlayerListener implements Listener {
                         }
                     }
                 }
-                
+
                 e.setCancelled(true);
                 return;
             } else if (gamePlayer.getTeam() == GameTeam.MUTATIONS) {
@@ -223,26 +225,26 @@ public class PlayerListener implements Listener {
                 if (e.getItem() == null) {
                     return;
                 }
-    
+
                 if (e.getItem().getItemMeta() == null) {
                     return;
                 }
-    
+
                 if (e.getItem().getItemMeta().getDisplayName() == null) {
                     return;
                 }
-    
+
                 LobbyPlayer lobbyPlayer = null;
                 for (LobbyPlayer lp : lobby.getPlayers()) {
                     if (lp.getUniqueId().equals(player.getUniqueId())) {
                         lobbyPlayer = lp;
                     }
                 }
-    
+
                 if (lobbyPlayer == null) {
                     return;
                 }
-    
+
                 if (e.getItem().getItemMeta().getDisplayName().contains("Sponsors")) {
                     boolean sponsorsValue = lobbyPlayer.getToggleValue("allowsponsors");
                     lobbyPlayer.getPlayer().setToggleValue("allowsponsors", !sponsorsValue);
@@ -254,14 +256,14 @@ public class PlayerListener implements Listener {
                 }
             }
         }
-        
+
         Block block = e.getClickedBlock();
         if (block != null) {
             if (block.getType().name().contains("_DOOR") || block.getType().name().contains("_BUTTON") || block.getType() == Material.LEVER || block.getType().name().contains("_GATE")) {
                 return;
             }
         }
-        
+
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
             if (e.getClickedBlock() != null) {
                 if (Stream.of(Material.DISPENSER, Material.FURNACE, Material.BURNING_FURNACE, Material.WORKBENCH, Material.ENCHANTMENT_TABLE, Material.ANVIL).noneMatch(material -> block.getType() == material)) {
@@ -274,7 +276,7 @@ public class PlayerListener implements Listener {
                             e.setCancelled(true);
                             return;
                         }
-                        
+
                         Inventory inv;
                         if (block.getType() == Material.ENDER_CHEST) {
                             inv = game.getEnderchestInventories().get(block.getLocation());
@@ -289,15 +291,15 @@ public class PlayerListener implements Listener {
                         } else {
                             inv = ((Chest) block.getState()).getBlockInventory();
                         }
-    
+
                         if (game.isLootedChest(block)) {
                             return;
                         }
-    
+
                         game.getPlayer(player.getUniqueId()).getStats().addChestsLooted(1);
-                        
+
                         int maxAmount = 8;
-                        
+
                         Block secondHalf = null;
                         if (block.getType() != Material.ENDER_CHEST) {
                             Block north = block.getRelative(BlockFace.NORTH);
@@ -313,16 +315,16 @@ public class PlayerListener implements Listener {
                             } else if (west != null && west.getType() == Material.CHEST) {
                                 secondHalf = west;
                             }
-                            
+
                             if (secondHalf != null) {
                                 maxAmount += 3;
                             }
                         }
-                        
+
                         inv.clear();
-                        
+
                         SGLootTable lootTable = null;
-                        
+
                         boolean useTieredLoot = game.getSettings().isUseNewLoot();
                         if (!useTieredLoot) {
                             lootTable = lootManager.getLootTable("tierOne");
@@ -349,19 +351,19 @@ public class PlayerListener implements Listener {
                                 }
                             }
                         }
-                        
+
                         if (lootTable == null) {
                             player.sendMessage(ColorHandler.getInstance().color(MsgType.ERROR + "Error while determining the loot table."));
                             return;
                         }
-                        
+
                         if (lootTable.isReloading()) {
                             player.sendMessage(MsgType.WARN.format("That loot table is being reloaded, try again in a few seconds."));
                             return;
                         }
-                        
+
                         List<ItemStack> items = lootTable.generateLoot(new Random().nextInt(maxAmount - 2) + 2);
-                        
+
                         for (ItemStack item : items) {
                             int slot;
                             do {
@@ -369,7 +371,7 @@ public class PlayerListener implements Listener {
                             } while (inv.getItem(slot) != null);
                             inv.setItem(slot, item);
                         }
-                        
+
                         if (block.getType() == Material.ENDER_CHEST) {
                             Inventory finalInventory = inv;
                             new BukkitRunnable() {
@@ -379,7 +381,7 @@ public class PlayerListener implements Listener {
                                 }
                             }.runTaskLater(plugin, 1L);
                         }
-                        
+
                         game.addLootedChest(block.getLocation());
                         if (secondHalf != null) {
                             game.addLootedChest(secondHalf.getLocation());
@@ -399,19 +401,19 @@ public class PlayerListener implements Listener {
                         if (e.getItem() != null) {
                             return;
                         }
-                        
+
                         if (BlockListener.ALLOWED_PLACE.contains(block.getType())) {
                             return;
                         }
-                        
+
                         if (BlockListener.ALLOWED_BREAK.contains(block.getType())) {
                             return;
                         }
-                        
+
                         if (block.getState() instanceof Openable) {
                             return;
                         }
-                        
+
                         e.setCancelled(true);
                     }
                 }
@@ -424,7 +426,19 @@ public class PlayerListener implements Listener {
             }
         }
     }
-    
+
+    @EventHandler
+    public void onSpecchatToggleChange(ToggleChangeEvent e) {
+        NexusPlayer nexusPlayer = e.getNexusPlayer();
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId());
+        GameTeamChatroom specatorChatroom = sgPlayer.getGame().getChatRooms().get(GameTeam.SPECTATORS);
+        if (sgPlayer.getGame() != null) {
+            if (!specatorChatroom.isMember(nexusPlayer.getUniqueId())) {
+                specatorChatroom.addMember(nexusPlayer.getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+            }
+        }
+    }
+
     @EventHandler
     public void onToggleChange(ToggleChangeEvent e) {
         NexusPlayer nexusPlayer = e.getNexusPlayer();
@@ -438,7 +452,7 @@ public class PlayerListener implements Listener {
         if (lobby != null && lobby.checkMapEditing(player)) {
             return;
         }
-        
+
         if (toggle.getInfo().getName().equalsIgnoreCase("fly")) {
             if (game != null) {
                 e.setCancelled(true);
@@ -446,14 +460,14 @@ public class PlayerListener implements Listener {
             } else {
                 player.setAllowFlight(e.newValue());
             }
-            
+
             return;
         }
-        
+
         if (!toggle.getInfo().getName().equalsIgnoreCase("vanish")) {
             return;
         }
-        
+
         Collection<NexusPlayer> players = new ArrayList<>();
         if (game == null) {
             if (lobby != null) {
@@ -464,14 +478,14 @@ public class PlayerListener implements Listener {
                 players.add(value.getNexusPlayer());
             }
         }
-        
+
         String symbolColor = e.newValue() ? "a" : "c";
         String symbol = !e.newValue() ? ">>" : "<<";
         String action = !e.newValue() ? "joined" : "left";
         String silent = incognito ? " &e&osilently" : "";
-        
+
         String message = "&" + symbolColor + "&l" + symbol + " " + nexusPlayer.getColoredName() + " &e" + action + silent + "&e.";
-        
+
         if (incognito) {
             for (NexusPlayer p : players) {
                 if (p.getRank().ordinal() <= Rank.HELPER.ordinal() || p.getUniqueId().equals(e.getNexusPlayer().getUniqueId())) {
@@ -494,7 +508,7 @@ public class PlayerListener implements Listener {
             }
         }
     }
-    
+
     @EventHandler
     public void onPlayerEntityInteract(PlayerInteractAtEntityEvent e) {
         Player player = e.getPlayer();
@@ -509,7 +523,7 @@ public class PlayerListener implements Listener {
             e.setCancelled(true);
             return;
         }
-        
+
         if (e.getRightClicked() instanceof Villager villager) {
             e.setCancelled(true);
             if (villager.getCustomName().contains("Swag Shack")) {
@@ -517,23 +531,23 @@ public class PlayerListener implements Listener {
                     e.getPlayer().sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "You cannot open the Swag Shack when not in a game."));
                     return;
                 }
-                
+
                 if (!game.getSettings().isAllowSwagShack()) {
                     e.getPlayer().sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "The Swag Shack is disabled for this game."));
                     return;
                 }
-                
+
                 GamePlayer gamePlayer = game.getPlayer(e.getPlayer().getUniqueId());
                 if (gamePlayer.getTeam() != GameTeam.TRIBUTES) {
                     gamePlayer.sendMessage(MsgType.WARN + "You can only open the Swag Shack as a Tribute.");
                     return;
                 }
-                
+
                 manager.openGUI(new SwagShackMenu(plugin, game, gamePlayer), e.getPlayer());
             }
         }
     }
-    
+
     @EventHandler
     public void onPrepareCraft(PrepareItemCraftEvent e) {
         CraftingInventory inv = e.getInventory();
@@ -558,7 +572,7 @@ public class PlayerListener implements Listener {
             inv.setResult(itemStack);
         }
     }
-    
+
     @EventHandler
     public void onPlayerOpenEnchant(InventoryOpenEvent e) {
         Player player = (Player) e.getPlayer();
@@ -569,19 +583,19 @@ public class PlayerListener implements Listener {
         if (lobby != null && lobby.checkMapEditing(player)) {
             return;
         }
-        
+
         if (game != null) {
             if (e.getInventory() instanceof EnchantingInventory enchantingInventory) {
                 if (game.getPlayer(e.getPlayer().getUniqueId()).getTeam() != GameTeam.TRIBUTES) {
                     e.setCancelled(true);
                     return;
                 }
-    
+
                 enchantingInventory.setSecondary(new ItemStack(Material.INK_SACK, 64, (short) 4));
             }
         }
     }
-    
+
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
         Player player = (Player) e.getWhoClicked();
@@ -592,13 +606,13 @@ public class PlayerListener implements Listener {
         if (lobby != null && lobby.checkMapEditing(player)) {
             return;
         }
-        
+
         if (game != null) {
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
             if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
                 e.setCancelled(true);
             }
-            
+
             if (e.getInventory() instanceof EnchantingInventory) {
                 if (e.getCurrentItem() != null && e.getCurrentItem().getType() == Material.INK_SACK) {
                     e.setCancelled(true);
@@ -606,7 +620,7 @@ public class PlayerListener implements Listener {
             }
         }
     }
-    
+
     @EventHandler
     public void onPlayerCloseEnchant(InventoryCloseEvent e) {
         try {
@@ -616,7 +630,7 @@ public class PlayerListener implements Listener {
         } catch (Exception ex) {
         }
     }
-    
+
     @EventHandler
     public void onItemPickup(PlayerPickupItemEvent e) {
         Player player = e.getPlayer();
@@ -633,28 +647,28 @@ public class PlayerListener implements Listener {
             e.setCancelled(true);
         }
     }
-    
+
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent e) {
         Player player = e.getEntity();
         Location deathLocation = player.getLocation().clone();
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
         Game game = sgPlayer.getGame();
-        
+
         if (game == null) {
             return;
         }
 
         e.setDeathMessage(null);
-    
+
         GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
         EntityDamageEvent lastDamageCause = player.getLastDamageCause();
-    
+
         if (gamePlayer.getTeam() != GameTeam.TRIBUTES) {
             e.getDrops().clear();
             e.setDroppedExp(0);
         }
-    
+
         DeathType deathType = switch (lastDamageCause.getCause()) {
             case CONTACT -> DeathType.CACTUS;
             case SUFFOCATION -> DeathType.SUFFOCATION;
@@ -676,9 +690,9 @@ public class PlayerListener implements Listener {
             case CUSTOM -> DeathType.UNKNOWN;
             default -> null;
         };
-    
+
         KillerInfo killerInfo = null;
-    
+
         if (deathType == null) {
             if (player.getKiller() != null) {
                 Player killer = player.getKiller();
@@ -695,23 +709,23 @@ public class PlayerListener implements Listener {
                 if (edee.getDamager() instanceof Projectile projectile) {
                     Entity shooter = (Entity) projectile.getShooter();
                     killerInfo = KillerInfo.createMobProjectileKiller(shooter, player.getLocation().distance(shooter.getLocation()));
-                    deathType = DeathType.ENTITY_PROJECTILE;                
+                    deathType = DeathType.ENTITY_PROJECTILE;
                 } else {
                     killerInfo = KillerInfo.createMobKiller(edee.getDamager());
                     deathType = DeathType.ENTITY;
                 }
             }
         }
-        
+
         if (killerInfo == null) {
             CombatTag combatTag = gamePlayer.getCombatTag();
             if (combatTag.isInCombat()) {
                 killerInfo = KillerInfo.createPlayerKiller(game.getPlayer(combatTag.getOther()));
             }
         }
-        
+
         DeathInfo deathInfo = new DeathInfo(game, System.currentTimeMillis(), gamePlayer, deathType, deathLocation, killerInfo);
-    
+
         new BukkitRunnable() {
             public void run() {
                 player.spigot().respawn();
@@ -724,7 +738,7 @@ public class PlayerListener implements Listener {
             }
         }.runTaskLater(plugin, 2L);
     }
-    
+
     @EventHandler
     public void onConsume(PlayerItemConsumeEvent e) {
         if (e.getItem().getType() == Material.ROTTEN_FLESH) {
@@ -734,7 +748,7 @@ public class PlayerListener implements Listener {
             }
         }
     }
-    
+
     @EventHandler
     public void onNexusPlayerLoad(NexusPlayerLoadEvent e) {
         NexusPlayer nexusPlayer = e.getNexusPlayer();
@@ -747,13 +761,13 @@ public class PlayerListener implements Listener {
         } catch (Throwable ex) {
             stats = new SGPlayerStats(e.getNexusPlayer().getUniqueId());
         }
-        
+
         sgPlayer.setStats(stats);
 
         plugin.getPlayerRegistry().register(sgPlayer);
         e.setJoinMessage(null);
     }
-    
+
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerQuit(PlayerQuitEvent e) {
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(e.getPlayer().getUniqueId());
@@ -761,11 +775,11 @@ public class PlayerListener implements Listener {
         if (sgPlayer.getGame() != null) {
             sgPlayer.getGame().removePlayer(nexusPlayer);
         }
-        
+
         if (sgPlayer.getLobby() != null) {
             sgPlayer.getLobby().removePlayer(nexusPlayer);
         }
-        
+
         e.setQuitMessage(null);
         NexusAPI.getApi().getPrimaryDatabase().saveSilent(sgPlayer.getStats());
         plugin.getPlayerRegistry().unregister(e.getPlayer().getUniqueId());

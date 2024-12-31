@@ -129,6 +129,10 @@ public class Game {
             player.setActionBar(new GameActionBar(plugin, gamePlayer));
             this.players.put(gamePlayer.getUniqueId(), gamePlayer);
             this.gameChatroom.addMember(player.getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+            
+            if (sgPlayer.getNexusPlayer().getToggleValue("spectatorchat")) {
+                this.chatRooms.get(GameTeam.SPECTATORS).addMember(player.getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+            }
         }
         gameInfo.setPlayerCount(tributeCount);
         gameInfo.setPlayers(playerNames.toArray(new String[0]));
