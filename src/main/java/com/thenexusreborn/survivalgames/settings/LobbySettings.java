@@ -10,7 +10,7 @@ public class LobbySettings implements Cloneable {
     private boolean sounds = true;
     private boolean keepPreviousGameSettings = true;
     private boolean allowVoteWeight = true;
-    private int timerLength = 10; //Later Default will be 45
+    private int timerLength = 30; //Later Default will be 45
     private int maxGames = 10;
     private int minPlayers = 4;
     private int maxPlayers = 24;

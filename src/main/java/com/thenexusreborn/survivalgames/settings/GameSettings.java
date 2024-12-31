@@ -56,7 +56,7 @@ public class GameSettings implements Cloneable {
     private boolean mutationsEnabled = true;
     private int nextGameTimerLength = 10;
     private int deathmatchThreshold = 2; //Default: 4
-    private int warmupLength = 10; // Default: 30
+    private int warmupLength = 20; // Default: 30
     private int deathmatchLength = 5;
     private int gameLength = 10; //Default: 20
     private int gracePeriodLength = 60;
