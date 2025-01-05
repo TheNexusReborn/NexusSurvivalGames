@@ -90,4 +90,10 @@ public abstract class Mutation {
     public Game getGame() {
         return game;
     }
+
+    public void cancelTimer() {
+        if (this.countdownTimer != null) {
+            this.countdownTimer.cancel();
+        }
+    }
 }

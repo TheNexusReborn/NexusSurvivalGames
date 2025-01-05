@@ -29,6 +29,10 @@ public class MutationEndCondition implements ClockEndCondition<TimerSnapshot> {
         if (p == null) {
             return true;
         }
+        
+        if (game.getPlayer(mutation.getPlayer()).getTeam() != GameTeam.MUTATIONS) {
+            return true;
+        }
 
         Player t = Bukkit.getPlayer(mutation.getTarget());
         if (t == null) {
