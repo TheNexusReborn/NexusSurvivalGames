@@ -264,7 +264,7 @@ public class GamePlayer {
             return new Pair<>(false, "You have already selected your mutation type.");
         }
 
-        if (!isSpectatorByDeath()) {
+        if (getTeam() != GameTeam.SPECTATORS) {
             return new Pair<>(false, "You can only mutate if you have died.");
         }
         
