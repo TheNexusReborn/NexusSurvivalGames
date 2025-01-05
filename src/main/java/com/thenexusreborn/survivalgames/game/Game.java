@@ -915,8 +915,11 @@ public class Game {
         deathAction.addValueData("message", strippedDeathMessage);
         deathAction.addValueData("type", deathInfo.getType().name());
         deathAction.addValueData("team", deathInfo.getTeam().name());
+        boolean deathByLeave = deathInfo.getType() == DeathType.SUICIDE;
+        gamePlayer.setSpectatorByDeath(!deathByLeave);
+        KillerInfo killer = deathInfo.getKiller();
+        gamePlayer.setDeathByMutation(killer != null && killer.isMutationKill());
         if (deathInfo.getKiller() != null) {
-            KillerInfo killer = deathInfo.getKiller();
             deathAction.addValueData("killerType", killer.getType().name());
             if (killer.getDistance() > 0) {
                 deathAction.addValueData("killerDistance", killer.getDistance());
@@ -938,12 +941,7 @@ public class Game {
             player.setAllowFlight(true);
             player.setFlying(true);
         }
-
-        boolean deathByLeave = deathInfo.getType() == DeathType.SUICIDE;
-        gamePlayer.setSpectatorByDeath(!deathByLeave);
-        KillerInfo killer = deathInfo.getKiller();
-        gamePlayer.setDeathByMutation(killer != null && killer.isMutationKill());
-
+       
         boolean deathByVanish = deathInfo.getType() == DeathType.VANISH;
         int score = gamePlayer.getStats().getScore();
         int lost = (int) Math.ceil(score / settings.getScoreDivisor());
@@ -1350,6 +1348,7 @@ public class Game {
         gamePlayer.setFlight(false, false);
         gamePlayer.setCollisions(true);
         gamePlayer.setFood(20, 20F);
+        mutation.cancelTimer();
 
         MutationType type = mutation.getType();
         gamePlayer.setHealth(20, type.getHealth());
