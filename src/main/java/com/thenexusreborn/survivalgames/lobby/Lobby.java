@@ -495,10 +495,17 @@ public class Lobby {
     }
 
     public GameSettings getGameSettings() {
+        if (this.gameSettings == null) {
+            this.gameSettings = new GameSettings();
+        }
+        
         return gameSettings;
     }
 
     public LobbySettings getLobbySettings() {
+        if (this.lobbySettings == null) {
+            this.lobbySettings = new LobbySettings();
+        }
         return lobbySettings;
     }
 
