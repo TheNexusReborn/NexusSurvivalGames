@@ -207,7 +207,7 @@ public abstract class Disguise {
                                     try {
                                         ProtocolLibrary.getProtocolManager().sendServerPacket((Player) getEntity(),
                                                 selfLookPacket, false);
-                                    } catch (InvocationTargetException e) {
+                                    } catch (Exception e) {
                                         e.printStackTrace(System.out);
                                     }
                                 }
@@ -253,12 +253,12 @@ public abstract class Disguise {
                                     try {
                                         ProtocolLibrary.getProtocolManager().sendServerPacket((Player) getEntity(), selfPacket,
                                                 false);
-                                    } catch (InvocationTargetException e) {
+                                    } catch (Exception e) {
                                         e.printStackTrace(System.out);
                                     }
                                 }
                             }
-                        } catch (InvocationTargetException e) {
+                        } catch (Exception e) {
                             e.printStackTrace(System.out);
                         }
                     }

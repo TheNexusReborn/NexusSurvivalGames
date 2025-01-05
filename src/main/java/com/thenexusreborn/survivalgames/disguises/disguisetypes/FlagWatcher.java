@@ -276,7 +276,7 @@ public class FlagWatcher {
             for (Player player : DisguiseUtilities.getPerverts(getDisguise())) {
                 try {
                     ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
-                } catch (InvocationTargetException e) {
+                } catch (Exception e) {
                     e.printStackTrace(System.out);
                 }
             }
@@ -369,7 +369,7 @@ public class FlagWatcher {
             for (Player player : DisguiseUtilities.getPerverts(getDisguise())) {
                 try {
                     ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
-                } catch (InvocationTargetException e) {
+                } catch (Exception e) {
                     e.printStackTrace(System.out);
                 }
             }

@@ -688,7 +688,7 @@ public class PacketsManager {
                                         mods.write(5, (int) pitch);
                                         try {
                                             ProtocolLibrary.getProtocolManager().sendServerPacket(observer, packet);
-                                        } catch (InvocationTargetException e) {
+                                        } catch (Exception e) {
                                             e.printStackTrace();
                                         }
                                     }
@@ -733,7 +733,7 @@ public class PacketsManager {
                             }
                             try {
                                 ProtocolLibrary.getProtocolManager().sendServerPacket(observer, packet, false);
-                            } catch (InvocationTargetException e) {
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
                         }
@@ -743,7 +743,7 @@ public class PacketsManager {
                                     for (PacketContainer packet : delayedPackets) {
                                         ProtocolLibrary.getProtocolManager().sendServerPacket(observer, packet, false);
                                     }
-                                } catch (InvocationTargetException e) {
+                                } catch (Exception e) {
                                     e.printStackTrace();
                                 }
                             }, 2);
@@ -772,7 +772,7 @@ public class PacketsManager {
                             packet.getWatchableCollectionModifier().write(0, watchableList);
                             try {
                                 ProtocolLibrary.getProtocolManager().sendServerPacket(observer, packet);
-                            } catch (InvocationTargetException e) {
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
                         } else if (event.getPacketType() == PacketType.Play.Server.ANIMATION) {
@@ -829,7 +829,7 @@ public class PacketsManager {
                                         try {
                                             ProtocolLibrary.getProtocolManager().sendServerPacket(event.getPlayer(), packet,
                                                     false);
-                                        } catch (InvocationTargetException e) {
+                                        } catch (Exception e) {
                                             e.printStackTrace();
                                         }
                                     }
@@ -848,7 +848,7 @@ public class PacketsManager {
                                             try {
                                                 ProtocolLibrary.getProtocolManager().sendServerPacket(event.getPlayer(), packet,
                                                         false);
-                                            } catch (InvocationTargetException e) {
+                                            } catch (Exception e) {
                                                 e.printStackTrace();
                                             }
                                         }
@@ -873,7 +873,7 @@ public class PacketsManager {
                                     mods.write(2, ReflectionManager.getNmsItem(currentlyHeld));
                                     try {
                                         ProtocolLibrary.getProtocolManager().sendServerPacket(event.getPlayer(), packet, false);
-                                    } catch (InvocationTargetException e) {
+                                    } catch (Exception e) {
                                         e.printStackTrace();
                                     }
                                 }
@@ -888,7 +888,7 @@ public class PacketsManager {
                                     mods.write(2, ReflectionManager.getNmsItem(new org.bukkit.inventory.ItemStack(0)));
                                     try {
                                         ProtocolLibrary.getProtocolManager().sendServerPacket(event.getPlayer(), packet, false);
-                                    } catch (InvocationTargetException e) {
+                                    } catch (Exception e) {
                                         e.printStackTrace();
                                     }
                                 }
@@ -925,7 +925,7 @@ public class PacketsManager {
                                         try {
                                             ProtocolLibrary.getProtocolManager().sendServerPacket(event.getPlayer(), packet,
                                                     false);
-                                        } catch (InvocationTargetException e) {
+                                        } catch (Exception e) {
                                             e.printStackTrace();
                                         }
                                     }
@@ -943,7 +943,7 @@ public class PacketsManager {
                                             try {
                                                 ProtocolLibrary.getProtocolManager().sendServerPacket(event.getPlayer(), packet,
                                                         false);
-                                            } catch (InvocationTargetException e) {
+                                            } catch (Exception e) {
                                                 e.printStackTrace();
                                             }
                                         }
@@ -1142,12 +1142,12 @@ public class PacketsManager {
                                         for (PacketContainer packet : delayed) {
                                             ProtocolLibrary.getProtocolManager().sendServerPacket(observer, packet, false);
                                         }
-                                    } catch (InvocationTargetException e) {
+                                    } catch (Exception e) {
                                         e.printStackTrace();
                                     }
                                 }, 2);
                             }
-                        } catch (InvocationTargetException ex) {
+                        } catch (Exception ex) {
                             ex.printStackTrace();
                         }
                     }

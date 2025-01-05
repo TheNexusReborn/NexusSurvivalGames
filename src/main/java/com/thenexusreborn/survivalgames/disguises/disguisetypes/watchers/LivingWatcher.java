@@ -160,7 +160,7 @@ public class LivingWatcher extends FlagWatcher {
             for (Player player : DisguiseUtilities.getPerverts(getDisguise())) {
                 try {
                     ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet, false);
-                } catch (InvocationTargetException e) {
+                } catch (Exception e) {
                     e.printStackTrace(System.out);
                 }
             }

@@ -1,9 +1,13 @@
 package com.thenexusreborn.survivalgames.disguises.utilities;
 
-import com.comphenix.protocol.*;
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.reflect.StructureModifier;
-import com.comphenix.protocol.wrappers.*;
+import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+import com.comphenix.protocol.wrappers.WrappedGameProfile;
+import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.disguises.DisguiseAPI;
 import com.thenexusreborn.survivalgames.disguises.NexusDisguises;
@@ -12,15 +16,24 @@ import com.thenexusreborn.survivalgames.disguises.disguisetypes.TargetedDisguise
 import com.thenexusreborn.survivalgames.disguises.disguisetypes.watchers.AgeableWatcher;
 import com.thenexusreborn.survivalgames.disguises.disguisetypes.watchers.PlayerWatcher;
 import com.thenexusreborn.survivalgames.disguises.disguisetypes.watchers.ZombieWatcher;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Ageable;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -844,12 +857,12 @@ public class DisguiseUtilities {
                         for (PacketContainer packet1 : delayed) {
                             ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet1, false);
                         }
-                    } catch (InvocationTargetException e) {
+                    } catch (Exception e) {
                         e.printStackTrace(System.out);
                     }
                 });
             }
-        } catch (InvocationTargetException e) {
+        } catch (Exception e) {
             e.printStackTrace(System.out);
         }
     }

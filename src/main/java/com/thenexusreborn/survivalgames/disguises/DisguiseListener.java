@@ -3,16 +3,22 @@ package com.thenexusreborn.survivalgames.disguises;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.disguises.disguisetypes.*;
-import com.thenexusreborn.survivalgames.disguises.utilities.*;
-import org.bukkit.*;
+import com.thenexusreborn.survivalgames.disguises.disguisetypes.Disguise;
+import com.thenexusreborn.survivalgames.disguises.disguisetypes.PlayerDisguise;
+import com.thenexusreborn.survivalgames.disguises.disguisetypes.TargetedDisguise;
+import com.thenexusreborn.survivalgames.disguises.utilities.DisguiseUtilities;
+import com.thenexusreborn.survivalgames.disguises.utilities.ReflectionManager;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.event.*;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.player.*;
-import org.bukkit.event.vehicle.*;
+import org.bukkit.event.vehicle.VehicleEnterEvent;
+import org.bukkit.event.vehicle.VehicleExitEvent;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 
 @SuppressWarnings("DuplicatedCode")
@@ -57,7 +63,7 @@ public class DisguiseListener implements Listener {
                     }
                 }
             }
-        } catch (InvocationTargetException e) {
+        } catch (Exception e) {
             e.printStackTrace(System.out);
         }
     }
