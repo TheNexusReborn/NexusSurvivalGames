@@ -349,6 +349,8 @@ public class Lobby {
         for (LobbyPlayer player : this.getPlayers()) {
             player.getPlayer().getScoreboard().setView(new MapEditingBoard(player.getPlayer().getScoreboard(), plugin));
         }
+        
+        plugin.getMapManager().setEditMode(true);
 
         sendMessage("&eThe lobby has been set to editing maps. Automatic actions are temporarily suspended");
     }
@@ -359,6 +361,8 @@ public class Lobby {
         for (LobbyPlayer player : this.getPlayers()) {
             player.getPlayer().getScoreboard().setView(new LobbyBoard(player.getPlayer().getScoreboard(), this));
         }
+        
+        plugin.getMapManager().setEditMode(false);
 
         sendMessage("&eThe lobby has been set to no longer editing maps. Automatic actions resumed.");
     }
@@ -510,6 +514,10 @@ public class Lobby {
     }
 
     public SGMap getGameMap() {
+        if (this.state == LobbyState.MAP_EDITING) {
+            return plugin.getMapManager().getMapBeingEdited();
+        }
+        
         return gameMap;
     }
 
