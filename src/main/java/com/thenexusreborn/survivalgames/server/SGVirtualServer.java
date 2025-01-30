@@ -1,7 +1,6 @@
 package com.thenexusreborn.survivalgames.server;
 
 import com.stardevllc.starchat.context.ChatContext;
-import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.server.InstanceServer;
@@ -9,14 +8,10 @@ import com.thenexusreborn.api.server.VirtualServer;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
-import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.game.GameState;
-import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyType;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.UUID;
@@ -37,76 +32,22 @@ public class SGVirtualServer extends VirtualServer {
         super(name, "survivalgames", 24);
         this.plugin = plugin;
     }
-
-    @Override
-    public boolean recalculateVisibility(UUID playerUUID, UUID otherPlayerUUID) {
-        Player player = Bukkit.getPlayer(playerUUID);
-        Player otherPlayer = Bukkit.getPlayer(otherPlayerUUID);
-        
-        NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(playerUUID);
-        NexusPlayer otherNexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(otherPlayerUUID);
-        
-        Rank playerRank = nexusPlayer.getRank();
-        Rank otherPlayerRank = otherNexusPlayer.getRank();
-        
-        boolean playerIsVanished = playerRank.ordinal() <= Rank.HELPER.ordinal() && nexusPlayer.getToggleValue("vanish");
-        boolean otherPlayerIsVanished = otherPlayerRank.ordinal() <= Rank.HELPER.ordinal() && otherNexusPlayer.getToggleValue("vanish");
-        
-        if (game == null) {
-            if (playerIsVanished && otherPlayerIsVanished) {
-                if (playerRank.ordinal() >= otherPlayerRank.ordinal()) {
-                    return false;
-//                    player.showPlayer(otherPlayer);
-//                    otherPlayer.hidePlayer(player);
-                } else {
-                    return true;
-//                    otherPlayer.hidePlayer(player);
-//                    player.showPlayer(otherPlayer);
-                }
-            } else if (playerIsVanished && !otherPlayerIsVanished) {
-                return true;
-//                otherPlayer.hidePlayer(player);
-//                player.showPlayer(otherPlayer);
-            } else if (otherPlayerIsVanished && !playerIsVanished) {
-                return false;
-//                player.hidePlayer(otherPlayer);
-//                otherPlayer.showPlayer(player);
-            }
+    
+    public void teleportToSpawn(UUID uuid) {
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(uuid);
+        if (sgPlayer.getGame() != null) {
+            sgPlayer.getSpigotPlayer().teleport(sgPlayer.getGame().getGameMap().getCenterLocation());
+        } else if (sgPlayer.getLobby() != null) {
+            sgPlayer.getSpigotPlayer().teleport(sgPlayer.getLobby().getSpawnpoint());
         } else {
-            if (game.getState() == GameState.ENDING) {
-//                player.showPlayer(otherPlayer);
-//                otherPlayer.showPlayer(player);
-                return true;
-            }
-            
-            GamePlayer gamePlayer = game.getPlayer(playerUUID);
-            GamePlayer otherGamePlayer = game.getPlayer(otherPlayerUUID);
-            
-            boolean playerIsSpectator = gamePlayer.getTeam() == GameTeam.SPECTATORS;
-            boolean otherPlayerIsSpectator = otherGamePlayer.getTeam() == GameTeam.SPECTATORS;
-            
-            if (playerIsSpectator && otherPlayerIsSpectator) {
-                return false;
-//                player.hidePlayer(otherPlayer);
-//                otherPlayer.hidePlayer(player);
-            } else if (playerIsSpectator && !otherPlayerIsSpectator) {
-                return true;
-//                player.showPlayer(otherPlayer);
-//                otherPlayer.hidePlayer(player);
-            } else if (!playerIsSpectator && otherPlayerIsSpectator) {
-                return false;
-            } else {
-                return true;
-//                player.showPlayer(otherPlayer);
-//                otherPlayer.showPlayer(player);
-            }
+            plugin.getServers().get(0).join(sgPlayer.getNexusPlayer());
         }
-        
-        return true;
     }
 
     @Override
     public void join(NexusPlayer nexusPlayer) {
+        nexusPlayer.setServer(this);
+        
         if (game == null) {
             if (lobby.getPlayingCount() >= lobby.getLobbySettings().getMaxPlayers()) {
                 boolean isStaff = nexusPlayer.getRank().ordinal() <= Rank.HELPER.ordinal();
