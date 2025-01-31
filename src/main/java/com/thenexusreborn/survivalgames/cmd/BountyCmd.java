@@ -106,7 +106,7 @@ public class BountyCmd implements CommandExecutor {
         }
 
         bounty.add(type, amount);
-        String coloredName = senderPlayer.getColoredName();
+        String coloredName = gamePlayer.getColoredName();
         String formattedAmount = MCUtils.formatNumber(amount);
         String totalFormattedAmount = MCUtils.formatNumber(bounty.getAmount(type));
         game.sendMessage("&6&l>> &dThe bounty on " + coloredName + " &dwas increased by &b" + formattedAmount + " " + type.name().toLowerCase() + "&d!");
