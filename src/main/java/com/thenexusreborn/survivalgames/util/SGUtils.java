@@ -1,14 +1,9 @@
 package com.thenexusreborn.survivalgames.util;
 
 import com.stardevllc.colors.StarColors;
-import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.scoreboard.wrapper.ITeam;
-import com.thenexusreborn.api.server.NexusServer;
-import com.thenexusreborn.api.util.NetworkType;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.util.MsgType;
-import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import net.minecraft.server.v1_8_R3.EntityTNTPrimed;
 import org.bukkit.Location;
@@ -72,29 +67,31 @@ public final class SGUtils {
     }
     
     public static void sendToHub(Player player) {
-        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
-
-        NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(player.getUniqueId());
-        if (sgPlayer.getGame() != null) {
-            sgPlayer.getGame().getServer().quit(nexusPlayer);
-        } else if (sgPlayer.getLobby() != null) {
-            sgPlayer.getLobby().getServer().quit(nexusPlayer);
-        }
+        player.performCommand("hub");
         
-        for (NexusServer nexusServer : NexusAPI.getApi().getServerRegistry()) {
-            if (nexusServer.getMode().equalsIgnoreCase("hub")) {
-                if (nexusServer.getPlayers().size() < nexusServer.getMaxPlayers()) {
-                    if (NexusAPI.NETWORK_TYPE == NetworkType.SINGLE && plugin.getNexusHubHook() != null) {
-                        nexusServer.join(nexusPlayer);
-                        break;
-                    } else {
-                        //TODO Implement sending to bungee server later
-                    }
-                }
-            }
-        }
-        
-        player.sendMessage(StarColors.color(MsgType.WARN + "Server is not set up to send to a hub."));
+//        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
+//
+//        NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(player.getUniqueId());
+//        if (sgPlayer.getGame() != null) {
+//            sgPlayer.getGame().getServer().quit(nexusPlayer);
+//        } else if (sgPlayer.getLobby() != null) {
+//            sgPlayer.getLobby().getServer().quit(nexusPlayer);
+//        }
+//        
+//        for (NexusServer nexusServer : NexusAPI.getApi().getServerRegistry()) {
+//            if (nexusServer.getMode().equalsIgnoreCase("hub")) {
+//                if (nexusServer.getPlayers().size() < nexusServer.getMaxPlayers()) {
+//                    if (NexusAPI.NETWORK_TYPE == NetworkType.SINGLE && plugin.getNexusHubHook() != null) {
+//                        nexusServer.join(nexusPlayer);
+//                        break;
+//                    } else {
+//                        //TODO Implement sending to bungee server later
+//                    }
+//                }
+//            }
+//        }
+//        
+//        player.sendMessage(StarColors.color(MsgType.WARN + "Server is not set up to send to a hub."));
     }
     
     public static String getMapNameFromCommand(String[] args, int startIndex) {
