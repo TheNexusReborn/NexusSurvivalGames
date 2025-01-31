@@ -910,7 +910,7 @@ public class SGCommand implements CommandExecutor {
                 }
             }
         } else if (List.of("settings", "setting", "s").contains(subCommand)) {
-            if (!(args.length > 2)) {
+            if (!(args.length > 1)) {
                 sender.sendMessage(MsgType.WARN.format("Usage: /" + label + " " + args[0] + " <type> <name | save | list> [value | savename]"));
                 return true;
             }
@@ -932,20 +932,20 @@ public class SGCommand implements CommandExecutor {
             boolean allRunning = false;
 
             StringBuilder sb = new StringBuilder();
-            for (int i = 1; i < args.length; i++) {
-                if (args[i].equalsIgnoreCase("-c")) {
+            for (String arg : args) {
+                if (arg.equalsIgnoreCase("-c")) {
                     confirm = true;
-                } else if (args[i].equalsIgnoreCase("-g")) {
+                } else if (arg.equalsIgnoreCase("-g")) {
                     global = true;
-                } else if (args[i].equalsIgnoreCase("-r")) {
+                } else if (arg.equalsIgnoreCase("-r")) {
                     allRunning = true;
-                } else if (args[i].equalsIgnoreCase("-gr") || args[i].equalsIgnoreCase("-rg")) {
+                } else if (arg.equalsIgnoreCase("-gr") || arg.equalsIgnoreCase("-rg")) {
                     allRunning = true;
                     global = true;
                 }
                 // TODO Add more permutations
                 else {
-                    sb.append(args[i]).append(" ");
+                    sb.append(arg).append(" ");
                 }
             }
 
@@ -1024,6 +1024,8 @@ public class SGCommand implements CommandExecutor {
                 sender.sendMessage(MsgType.WARN.format("Could not find a setting named %v.", args[2]));
                 return true;
             }
+            
+            field.setAccessible(true);
 
             Object value = converter.convertTo(args[3]);
             if (value == null) {
@@ -1081,11 +1083,12 @@ public class SGCommand implements CommandExecutor {
                         finalField.set(instance, value);
                     } catch (IllegalAccessException e) {
                         sender.sendMessage(MsgType.ERROR.format("Failed to set the %v setting to %v.", type, value));
+                        e.printStackTrace();
                         return;
                     }
                 }
 //                sender.sendMessage(MsgType.INFO.format("You set the %v setting %v to %v.", type, finalField.getName(), value));
-                plugin.getNexusCore().getStaffChannel().sendMessage(new ChatContext(sender, sgPlayer.getNexusPlayer().getColoredName() + " set the " + type + " setting " + finalField.getName() + " to " + value + "."));
+                plugin.getNexusCore().getStaffChannel().sendMessage(new ChatContext(sgPlayer.getNexusPlayer().getColoredName() + " &fset the " + type + " setting " + finalField.getName() + " to " + value + "."));
             };
             
             if (confirm) {

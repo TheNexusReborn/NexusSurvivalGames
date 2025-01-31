@@ -30,7 +30,7 @@ public class MutationEndCondition implements ClockEndCondition<TimerSnapshot> {
             return true;
         }
         
-        if (game.getPlayer(mutation.getPlayer()).getTeam() != GameTeam.MUTATIONS) {
+        if (game.getPlayer(mutation.getPlayer()).getTeam() != GameTeam.SPECTATORS) {
             return true;
         }
 
@@ -55,7 +55,7 @@ public class MutationEndCondition implements ClockEndCondition<TimerSnapshot> {
             p.sendMessage(StarColors.color(MsgType.WARN + "Your target is no longer a tribute, mutation cancelled."));
             return true;
         }
-        
+
         return false;
     }
 }
