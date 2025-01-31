@@ -429,8 +429,20 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onSpecchatToggleChange(ToggleChangeEvent e) {
+        if (!e.getToggle().getInfo().getName().equalsIgnoreCase("spectatorchat")) {
+            return;
+        }
+        
         NexusPlayer nexusPlayer = e.getNexusPlayer();
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId());
+        if (sgPlayer == null) {
+            return;
+        }
+        
+        if (sgPlayer.getGame() == null) {
+            return;
+        }
+        
         GameTeamChatroom specatorChatroom = sgPlayer.getGame().getChatRooms().get(GameTeam.SPECTATORS);
         if (sgPlayer.getGame() != null) {
             if (!specatorChatroom.isMember(nexusPlayer.getUniqueId())) {
