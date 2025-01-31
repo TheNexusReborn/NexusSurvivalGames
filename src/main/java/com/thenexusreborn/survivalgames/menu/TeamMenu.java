@@ -20,7 +20,6 @@ public class TeamMenu extends InventoryGUI {
         GuiManager manager = plugin.getServer().getServicesManager().getRegistration(GuiManager.class).getProvider();
         
         if (game != null) {
-            int index = 0;
             for (GamePlayer player : game.getPlayers().values()) {
                 if (!player.getToggleValue("vanish")) {
                     if (player.getTeam() == team) {
@@ -31,7 +30,7 @@ public class TeamMenu extends InventoryGUI {
                             skull.setItemMeta(meta);
                             return skull;
                         }).consumer(e -> manager.openGUI(new PlayerMenu(plugin, player), (Player) e.getWhoClicked()));
-                        setElement(0, index++, button);
+                        addElement(button);
                     }
                 }
             }
