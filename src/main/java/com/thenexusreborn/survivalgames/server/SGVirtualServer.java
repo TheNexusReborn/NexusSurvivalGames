@@ -1,6 +1,7 @@
 package com.thenexusreborn.survivalgames.server;
 
 import com.stardevllc.starchat.context.ChatContext;
+import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.server.InstanceServer;
@@ -8,10 +9,14 @@ import com.thenexusreborn.api.server.VirtualServer;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.game.GameState;
+import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyType;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.UUID;
@@ -32,22 +37,45 @@ public class SGVirtualServer extends VirtualServer {
         super(name, "survivalgames", 24);
         this.plugin = plugin;
     }
-    
-    public void teleportToSpawn(UUID uuid) {
-        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(uuid);
-        if (sgPlayer.getGame() != null) {
-            sgPlayer.getSpigotPlayer().teleport(sgPlayer.getGame().getGameMap().getCenterLocation());
-        } else if (sgPlayer.getLobby() != null) {
-            sgPlayer.getSpigotPlayer().teleport(sgPlayer.getLobby().getSpawnpoint());
+
+    @Override
+    public boolean recalculateVisibility(UUID playerUUID, UUID otherPlayerUUID) {
+        NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(playerUUID);
+        NexusPlayer otherNexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(otherPlayerUUID);
+
+        Rank playerRank = nexusPlayer.getRank();
+        Rank otherPlayerRank = otherNexusPlayer.getRank();
+
+        boolean playerIsVanished = playerRank.ordinal() <= Rank.HELPER.ordinal() && nexusPlayer.getToggleValue("vanish");
+        boolean otherPlayerIsVanished = otherPlayerRank.ordinal() <= Rank.HELPER.ordinal() && otherNexusPlayer.getToggleValue("vanish");
+
+        if (game == null) {
+            if (playerIsVanished && otherPlayerIsVanished) {
+                return playerRank.ordinal() < otherPlayerRank.ordinal();
+            } else if (playerIsVanished && !otherPlayerIsVanished) {
+                return true;
+            } else return !otherPlayerIsVanished || playerIsVanished;
         } else {
-            plugin.getServers().get(0).join(sgPlayer.getNexusPlayer());
+            if (game.getState() == GameState.ENDING) {
+                return true;
+            }
+
+            GamePlayer gamePlayer = game.getPlayer(playerUUID);
+            GamePlayer otherGamePlayer = game.getPlayer(otherPlayerUUID);
+
+            boolean playerIsSpectator = gamePlayer.getTeam() == GameTeam.SPECTATORS;
+            boolean otherPlayerIsSpectator = otherGamePlayer.getTeam() == GameTeam.SPECTATORS;
+
+            if (playerIsSpectator && otherPlayerIsSpectator) {
+                return false;
+            } else if (playerIsSpectator && !otherPlayerIsSpectator) {
+                return true;
+            } else return playerIsSpectator || !otherPlayerIsSpectator;
         }
     }
 
     @Override
     public void join(NexusPlayer nexusPlayer) {
-        nexusPlayer.setServer(this);
-        
         if (game == null) {
             if (lobby.getPlayingCount() >= lobby.getLobbySettings().getMaxPlayers()) {
                 boolean isStaff = nexusPlayer.getRank().ordinal() <= Rank.HELPER.ordinal();
@@ -58,7 +86,7 @@ public class SGVirtualServer extends VirtualServer {
                 }
             }
         }
-        
+
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId());
         SGPlayerStats stats = sgPlayer.getStats();
         if (game != null) {
@@ -83,22 +111,22 @@ public class SGVirtualServer extends VirtualServer {
         if (nexusPlayer.getRank().ordinal() <= Rank.MEDIA.ordinal()) {
             plugin.getNexusCore().getStaffChannel().sendMessage(new ChatContext(nexusPlayer.getDisplayName() + " &7&l-> &6" + name.get()));
         }
-        
+
         this.players.add(nexusPlayer.getUniqueId());
     }
 
     @Override
     public void quit(NexusPlayer nexusPlayer) {
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId());
-        
+
         if (sgPlayer.getGame() != null) {
             sgPlayer.getGame().removePlayer(nexusPlayer);
         }
-        
+
         if (sgPlayer.getLobby() != null) {
             sgPlayer.getLobby().removePlayer(nexusPlayer);
         }
-        
+
         this.players.remove(nexusPlayer.getUniqueId());
     }
 
