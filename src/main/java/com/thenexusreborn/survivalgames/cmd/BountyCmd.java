@@ -62,6 +62,11 @@ public class BountyCmd implements CommandExecutor {
             player.sendMessage(MsgType.WARN.format("You provided an invalid number value."));
             return true;
         }
+        
+        if (amount < 1) {
+            senderPlayer.sendMessage(MsgType.WARN.format("Invalid Bount Amount. Must be greater than 1"));
+            return true;
+        }
 
         Bounty.Type type = Bounty.Type.SCORE;
         if (args.length > 2) {
