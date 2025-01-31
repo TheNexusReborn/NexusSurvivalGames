@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.loot.item;
 
-import com.stardevllc.starcore.color.ColorHandler;
+import com.stardevllc.colors.StarColors;
 import com.stardevllc.starcore.utils.MaterialNames;
 import com.thenexusreborn.survivalgames.loot.category.LootCategory;
 import org.bukkit.Material;
@@ -63,7 +63,7 @@ public class LootItem {
         ItemStack itemStack = new ItemStack(getMaterial());
         ItemMeta itemMeta = itemStack.getItemMeta();
         if (!getName().equalsIgnoreCase(getMaterial().name().replace("_", " "))) {
-            itemMeta.setDisplayName(ColorHandler.getInstance().color("&f" + this.getName()));
+            itemMeta.setDisplayName(StarColors.color("&f" + this.getName()));
         }
         
         if (this.getMaterial() == Material.FLINT_AND_STEEL) {
@@ -72,7 +72,7 @@ public class LootItem {
         
         List<String> lore = new LinkedList<>();
         for (String line : this.getLore()) {
-            lore.add(ColorHandler.getInstance().color(line));
+            lore.add(StarColors.color(line));
         }
         itemMeta.setLore(lore);
         itemStack.setItemMeta(itemMeta);

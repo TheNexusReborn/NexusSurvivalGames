@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.sponsoring;
 
+import com.stardevllc.itembuilder.XMaterial;
 import com.stardevllc.starcore.utils.PotionNames;
-import com.stardevllc.starcore.xseries.XMaterial;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.*;
 

@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.scoreboard.game;
 
-import com.stardevllc.starcore.color.ColorHandler;
+import com.stardevllc.colors.StarColors;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.scoreboard.TeamBuilder;
 import com.thenexusreborn.api.scoreboard.ValueUpdater;
@@ -21,7 +21,7 @@ public class GameBoard extends SpigotScoreboardView {
     private final SurvivalGames plugin;
     
     public GameBoard(NexusScoreboard nexusScoreboard, SurvivalGames plugin) {
-        super(nexusScoreboard, "survivalgames", ColorHandler.getInstance().color("&d&lSurvival Games"));
+        super(nexusScoreboard, "survivalgames", StarColors.color("&d&lSurvival Games"));
         this.plugin = plugin;
     }
     

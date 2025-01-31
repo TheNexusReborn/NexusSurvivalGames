@@ -1,12 +1,12 @@
 package com.thenexusreborn.survivalgames.menu;
 
-import com.stardevllc.starcore.color.ColorHandler;
-import com.stardevllc.starcore.gui.GuiManager;
-import com.stardevllc.starcore.gui.element.Element;
-import com.stardevllc.starcore.gui.element.button.Button;
-import com.stardevllc.starcore.gui.gui.InventoryGUI;
-import com.stardevllc.starcore.item.ItemBuilder;
-import com.stardevllc.starcore.xseries.XMaterial;
+import com.stardevllc.colors.StarColors;
+import com.stardevllc.itembuilder.ItemBuilder;
+import com.stardevllc.itembuilder.XMaterial;
+import com.stardevllc.starui.GuiManager;
+import com.stardevllc.starui.element.Element;
+import com.stardevllc.starui.element.button.Button;
+import com.stardevllc.starui.gui.InventoryGUI;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -28,14 +28,14 @@ public class PlayerMenu extends InventoryGUI {
         Button teleportButton = new Button().iconCreator(p -> ItemBuilder.of(XMaterial.ENDER_PEARL).displayName("&e&lTeleport").build())
                 .consumer(e -> {
                     e.getWhoClicked().teleport(Bukkit.getPlayer(player.getUniqueId()).getLocation());
-                    e.getWhoClicked().sendMessage(ColorHandler.getInstance().color(MsgType.INFO + "Teleported to " + player.getColoredName() + "&e."));
+                    e.getWhoClicked().sendMessage(StarColors.color(MsgType.INFO + "Teleported to " + player.getColoredName() + "&e."));
                 });
 
         List<String> vitalsLore = player.getMenuVitals().stream().map(line -> "  " + line).collect(Collectors.toCollection(LinkedList::new));
         Element vitalsElement = new Element().iconCreator(p -> ItemBuilder.of(XMaterial.GLASS_BOTTLE).displayName("&e&lVitals").setLore(vitalsLore).build());
 
         Button viewInventoryButton = new Button().iconCreator(p -> ItemBuilder.of(XMaterial.ENDER_CHEST).displayName("Inventory").addLoreLine("&c&lNOT YET IMPLEMENTED").build())
-                .consumer(e -> e.getWhoClicked().sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "This feature is not yet implemented.")));
+                .consumer(e -> e.getWhoClicked().sendMessage(StarColors.color(MsgType.WARN + "This feature is not yet implemented.")));
 
         Button sponsorButton = new Button().iconCreator(p -> ItemBuilder.of(XMaterial.CHEST).displayName("&e&lSponsor").build())
                 .consumer(e -> {

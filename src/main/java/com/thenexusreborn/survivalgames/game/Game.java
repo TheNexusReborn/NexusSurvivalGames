@@ -5,7 +5,7 @@ import com.stardevllc.registry.StringRegistry;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
-import com.stardevllc.starcore.color.ColorHandler;
+import com.stardevllc.colors.StarColors;
 import com.stardevllc.starcore.utils.Cuboid;
 import com.stardevllc.time.TimeFormat;
 import com.stardevllc.time.TimeUnit;
@@ -546,7 +546,7 @@ public class Game {
         if (gameMap.getSwagShack() != null) {
             Villager entity = (Villager) gameMap.getWorld().spawnEntity(gameMap.getSwagShack().toLocation(gameMap.getWorld()), EntityType.VILLAGER);
             entity.setCustomNameVisible(true);
-            entity.setCustomName(ColorHandler.getInstance().color("&e&lSwag Shack"));
+            entity.setCustomName(StarColors.color("&e&lSwag Shack"));
             entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 255, false, false));
         }
     }

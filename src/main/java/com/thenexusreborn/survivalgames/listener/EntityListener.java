@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.listener;
 
-import com.stardevllc.starcore.color.ColorHandler;
+import com.stardevllc.colors.StarColors;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
@@ -177,7 +177,7 @@ public class EntityListener implements Listener {
             }
 
             if (game.isGraceperiod()) {
-                shooter.sendMessage(ColorHandler.getInstance().color("&6&l>> &cYou cannot harm others during grace period!"));
+                shooter.sendMessage(StarColors.color("&6&l>> &cYou cannot harm others during grace period!"));
                 e.setCancelled(true);
                 return;
             }

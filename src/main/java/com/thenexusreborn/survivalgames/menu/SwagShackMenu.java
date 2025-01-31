@@ -1,8 +1,8 @@
 package com.thenexusreborn.survivalgames.menu;
 
-import com.stardevllc.starcore.color.ColorHandler;
-import com.stardevllc.starcore.gui.element.button.Button;
-import com.stardevllc.starcore.gui.gui.InventoryGUI;
+import com.stardevllc.colors.StarColors;
+import com.stardevllc.starui.element.button.Button;
+import com.stardevllc.starui.gui.InventoryGUI;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
@@ -47,12 +47,12 @@ public class SwagShackMenu extends InventoryGUI {
             ItemMeta itemMeta = itemStack.getItemMeta();
             List<String> lore = new LinkedList<>();
             lore.add("");
-            lore.add(ColorHandler.getInstance().color("&e&lPrice:"));
-            lore.add(ColorHandler.getInstance().color("  &6SG Points: &b" + item.getPointsCost()));
-            lore.add(ColorHandler.getInstance().color("  &6Credits: &b" + item.getCreditsCost()));
+            lore.add(StarColors.color("&e&lPrice:"));
+            lore.add(StarColors.color("  &6SG Points: &b" + item.getPointsCost()));
+            lore.add(StarColors.color("  &6Credits: &b" + item.getCreditsCost()));
             lore.add("");
-            lore.add(ColorHandler.getInstance().color("&6&lLeft Click &7to buy with points."));
-            lore.add(ColorHandler.getInstance().color("&6&lRight Click &7to buy with credits."));
+            lore.add(StarColors.color("&6&lLeft Click &7to buy with points."));
+            lore.add(StarColors.color("&6&lRight Click &7to buy with credits."));
             itemMeta.setLore(lore);
             itemStack.setItemMeta(itemMeta);
             

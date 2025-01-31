@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.cmd;
 
-import com.stardevllc.starcore.color.ColorHandler;
+import com.stardevllc.colors.StarColors;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
@@ -25,7 +25,7 @@ public class BountyCmd implements CommandExecutor {
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "Only players can use that command."));
+            sender.sendMessage(StarColors.color(MsgType.WARN + "Only players can use that command."));
             return true;
         }
 

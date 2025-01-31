@@ -1,11 +1,11 @@
 package com.thenexusreborn.survivalgames.listener;
 
 import com.stardevllc.helper.Pair;
+import com.stardevllc.itembuilder.ItemBuilder;
+import com.stardevllc.itembuilder.XMaterial;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
-import com.stardevllc.starcore.color.ColorHandler;
-import com.stardevllc.starcore.gui.GuiManager;
-import com.stardevllc.starcore.item.ItemBuilder;
-import com.stardevllc.starcore.xseries.XMaterial;
+import com.stardevllc.colors.StarColors;
+import com.stardevllc.starui.GuiManager;
 import com.stardevllc.time.TimeUnit;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
@@ -199,7 +199,7 @@ public class PlayerListener implements Listener {
                             player.setVelocity(new Vector(0, 2, 0));
                             chickenMutation.startLaunchCooldown();
                         } else {
-                            player.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "Chicken Launch is still on cooldown: &e" + TimeUnit.MILLISECONDS.toSeconds(chickenMutation.getLaunchCooldownTimer().getTime()) + "s&c!"));
+                            player.sendMessage(StarColors.color(MsgType.WARN + "Chicken Launch is still on cooldown: &e" + TimeUnit.MILLISECONDS.toSeconds(chickenMutation.getLaunchCooldownTimer().getTime()) + "s&c!"));
                         }
                     } else if (item.getType() == Material.FEATHER) {
                         if (!chickenMutation.isParachuteOnCooldown()) {
@@ -209,7 +209,7 @@ public class PlayerListener implements Listener {
                                 chickenMutation.activateChute();
                             }
                         } else {
-                            player.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "Chicken Chute is still on cooldown: &e" + TimeUnit.MILLISECONDS.toSeconds(chickenMutation.getParachuteCooldownTimer().getTime()) + "s&c!"));
+                            player.sendMessage(StarColors.color(MsgType.WARN + "Chicken Chute is still on cooldown: &e" + TimeUnit.MILLISECONDS.toSeconds(chickenMutation.getParachuteCooldownTimer().getTime()) + "s&c!"));
                         }
                     }
                 }
@@ -353,7 +353,7 @@ public class PlayerListener implements Listener {
                         }
 
                         if (lootTable == null) {
-                            player.sendMessage(ColorHandler.getInstance().color(MsgType.ERROR + "Error while determining the loot table."));
+                            player.sendMessage(StarColors.color(MsgType.ERROR + "Error while determining the loot table."));
                             return;
                         }
 
@@ -528,12 +528,12 @@ public class PlayerListener implements Listener {
             e.setCancelled(true);
             if (villager.getCustomName().contains("Swag Shack")) {
                 if (game == null) {
-                    e.getPlayer().sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "You cannot open the Swag Shack when not in a game."));
+                    e.getPlayer().sendMessage(StarColors.color(MsgType.WARN + "You cannot open the Swag Shack when not in a game."));
                     return;
                 }
 
                 if (!game.getSettings().isAllowSwagShack()) {
-                    e.getPlayer().sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "The Swag Shack is disabled for this game."));
+                    e.getPlayer().sendMessage(StarColors.color(MsgType.WARN + "The Swag Shack is disabled for this game."));
                     return;
                 }
 
@@ -561,13 +561,13 @@ public class PlayerListener implements Listener {
         } else if (inv.getRecipe().getResult().getType() == Material.DIAMOND_AXE) {
             ItemStack itemStack = new ItemStack(Material.DIAMOND_AXE);
             ItemMeta itemMeta = itemStack.getItemMeta();
-            itemMeta.setDisplayName(ColorHandler.getInstance().color("&fBetty"));
+            itemMeta.setDisplayName(StarColors.color("&fBetty"));
             itemStack.setItemMeta(itemMeta);
             inv.setResult(itemStack);
         } else if (inv.getRecipe().getResult().getType() == Material.IRON_AXE) {
             ItemStack itemStack = new ItemStack(Material.IRON_AXE);
             ItemMeta itemMeta = itemStack.getItemMeta();
-            itemMeta.setDisplayName(ColorHandler.getInstance().color("&fFrederick"));
+            itemMeta.setDisplayName(StarColors.color("&fFrederick"));
             itemStack.setItemMeta(itemMeta);
             inv.setResult(itemStack);
         }
@@ -757,7 +757,7 @@ public class PlayerListener implements Listener {
 
         SGPlayerStats stats;
         try {
-            stats = NexusAPI.getApi().getPrimaryDatabase().get(SGPlayerStats.class, "uniqueid", e.getNexusPlayer().getUniqueId()).get(0);
+            stats = NexusAPI.getApi().getPrimaryDatabase().get(SGPlayerStats.class, "uniqueid", e.getNexusPlayer().getUniqueId()).getFirst();
         } catch (Throwable ex) {
             stats = new SGPlayerStats(e.getNexusPlayer().getUniqueId());
         }

@@ -1,10 +1,10 @@
 package com.thenexusreborn.survivalgames.game;
 
 import com.stardevllc.helper.Pair;
+import com.stardevllc.itembuilder.ItemBuilder;
+import com.stardevllc.itembuilder.XMaterial;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
-import com.stardevllc.starcore.item.ItemBuilder;
 import com.stardevllc.starcore.utils.ArmorSet;
-import com.stardevllc.starcore.xseries.XMaterial;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.PlayerBalance;
 import com.thenexusreborn.api.player.Rank;

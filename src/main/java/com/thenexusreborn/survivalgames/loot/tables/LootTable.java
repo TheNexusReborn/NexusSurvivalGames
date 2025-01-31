@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.loot.tables;
 
-import com.stardevllc.starcore.color.ColorHandler;
+import com.stardevllc.colors.StarColors;
 import com.thenexusreborn.survivalgames.loot.item.LootItem;
 import org.bukkit.inventory.ItemStack;
 
@@ -37,7 +37,7 @@ public class LootTable {
             lastIndex++;
         }
 
-        String normalizedName = ColorHandler.stripColor(item.getName()).replace(" ", "_").replace("'", "").toLowerCase();
+        String normalizedName = StarColors.stripColor(item.getName()).replace(" ", "_").replace("'", "").toLowerCase();
         if (itemWeights.containsKey(normalizedName)) {
             itemWeights.put(normalizedName, itemWeights.get(normalizedName) + weight);
         } else {

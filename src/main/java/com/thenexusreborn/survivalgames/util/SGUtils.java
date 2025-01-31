@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.util;
 
-import com.stardevllc.starcore.color.ColorHandler;
+import com.stardevllc.colors.StarColors;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.scoreboard.wrapper.ITeam;
@@ -94,7 +94,7 @@ public final class SGUtils {
             }
         }
         
-        player.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "Server is not set up to send to a hub."));
+        player.sendMessage(StarColors.color(MsgType.WARN + "Server is not set up to send to a hub."));
     }
     
     public static String getMapNameFromCommand(String[] args, int startIndex) {
@@ -112,7 +112,7 @@ public final class SGUtils {
         }
         
         if (gameMap.getWorld() == null) {
-            actor.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "That map is not loaded, please load before teleporting."));
+            actor.sendMessage(StarColors.color(MsgType.WARN + "That map is not loaded, please load before teleporting."));
             return null;
         }
         return gameMap;
@@ -127,7 +127,7 @@ public final class SGUtils {
         }
         
         if (gameMap == null) {
-            actor.sendMessage(ColorHandler.getInstance().color(MsgType.WARN + "Could not find a map with that name or file name."));
+            actor.sendMessage(StarColors.color(MsgType.WARN + "Could not find a map with that name or file name."));
         }
         
         return gameMap;

@@ -4,7 +4,7 @@ import com.stardevllc.clock.clocks.Timer;
 import com.stardevllc.converter.string.StringConverter;
 import com.stardevllc.converter.string.StringConverters;
 import com.stardevllc.starchat.context.ChatContext;
-import com.stardevllc.starcore.color.ColorHandler;
+import com.stardevllc.colors.StarColors;
 import com.stardevllc.time.TimeFormat;
 import com.stardevllc.time.TimeParser;
 import com.thenexusreborn.api.gamearchive.GameAction;
@@ -589,7 +589,7 @@ public class SGCommand implements CommandExecutor {
                             if (!bypassTimer) {
                                 mutation.startCountdown();
                             } else {
-                                mutationTarget.sendMessage(ColorHandler.getInstance().color("&6&l>> " + target.getColoredName().toUpperCase() + " &c&lIS AFTER YOU! RUN!"));
+                                mutationTarget.sendMessage(StarColors.color("&6&l>> " + target.getColoredName().toUpperCase() + " &c&lIS AFTER YOU! RUN!"));
 
                                 game.getGameInfo().getActions().add(new GameMutateAction(target.getName(), mutationTarget.getName(), mutation.getType()));
                                 game.addMutation(mutation);
@@ -780,7 +780,7 @@ public class SGCommand implements CommandExecutor {
                             sb.append(args[i]).append(" ");
                         }
 
-                        String displayName = ChatColor.stripColor(ColorHandler.getInstance().color(sb.toString().trim()));
+                        String displayName = ChatColor.stripColor(StarColors.color(sb.toString().trim()));
                         if (displayName.length() > 14) {
                             player.sendMessage(MsgType.WARN.format("The display name cannot be larger than 14 characters"));
                             return true;
@@ -860,7 +860,7 @@ public class SGCommand implements CommandExecutor {
                                 msg += "&e, however you still need to add a head to it. Just use the same command while looking at a head.";
                             }
                             lobby.getTributeSigns().add(tributeSign);
-                            player.sendMessage(ColorHandler.getInstance().color(MsgType.INFO + msg));
+                            player.sendMessage(StarColors.color(MsgType.INFO + msg));
                             return true;
                         }
 
@@ -1003,7 +1003,7 @@ public class SGCommand implements CommandExecutor {
                 }
 
                 sender.sendMessage(MsgType.INFO.format("List of &b" + type + " settings."));
-                lines.forEach(line -> ColorHandler.getInstance().coloredMessage(sender, line));
+                lines.forEach(line -> StarColors.coloredMessage(sender, line));
 
                 return true;
             }

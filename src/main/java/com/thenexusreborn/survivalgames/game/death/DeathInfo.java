@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.game.death;
 
-import com.stardevllc.starcore.color.ColorHandler;
+import com.stardevllc.colors.StarColors;
 import com.stardevllc.starcore.utils.EntityNames;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -143,7 +143,7 @@ public class DeathInfo {
             }
         }
         
-        return ColorHandler.getInstance().color("&4&l>> &7" + deathMessage + "&7.");
+        return StarColors.color("&4&l>> &7" + deathMessage + "&7.");
     }
     
     public long getTime() {
