@@ -40,6 +40,14 @@ public class SGVirtualServer extends VirtualServer {
     public boolean recalculateVisibility(UUID playerUUID, UUID otherPlayerUUID) {
         NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(playerUUID);
         NexusPlayer otherNexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(otherPlayerUUID);
+        
+        if (nexusPlayer == null) {
+            return false;
+        }
+        
+        if (otherNexusPlayer == null) {
+            return false;
+        }
 
         Rank playerRank = nexusPlayer.getRank();
         Rank otherPlayerRank = otherNexusPlayer.getRank();
