@@ -542,7 +542,7 @@ public class PlayerListener implements Listener {
 
         if (e.getRightClicked() instanceof Villager villager) {
             e.setCancelled(true);
-            if (villager.getCustomName().contains("Swag Shack")) {
+            if (villager.getCustomName() != null && villager.getCustomName().contains("Swag Shack")) {
                 if (game == null) {
                     e.getPlayer().sendMessage(StarColors.color(MsgType.WARN + "You cannot open the Swag Shack when not in a game."));
                     return;
