@@ -127,7 +127,7 @@ public class PlayerListener implements Listener {
         if (sgPlayer == null) {
             return;
         }
-        
+
         Lobby lobby = sgPlayer.getLobby();
         Game game = sgPlayer.getGame();
 
@@ -436,17 +436,17 @@ public class PlayerListener implements Listener {
         if (!e.getToggle().getInfo().getName().equalsIgnoreCase("spectatorchat")) {
             return;
         }
-        
+
         NexusPlayer nexusPlayer = e.getNexusPlayer();
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId());
         if (sgPlayer == null) {
             return;
         }
-        
+
         if (sgPlayer.getGame() == null) {
             return;
         }
-        
+
         GameTeamChatroom specatorChatroom = sgPlayer.getGame().getChatRooms().get(GameTeam.SPECTATORS);
         if (sgPlayer.getGame() != null) {
             if (!specatorChatroom.isMember(nexusPlayer.getUniqueId())) {
@@ -787,7 +787,14 @@ public class PlayerListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerQuit(PlayerQuitEvent e) {
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(e.getPlayer().getUniqueId());
+        if (sgPlayer == null) {
+            return;
+        }
+
         NexusPlayer nexusPlayer = sgPlayer.getNexusPlayer();
+        if (nexusPlayer != null) {
+            return;
+        }
         if (sgPlayer.getGame() != null) {
             sgPlayer.getGame().removePlayer(nexusPlayer);
         }
