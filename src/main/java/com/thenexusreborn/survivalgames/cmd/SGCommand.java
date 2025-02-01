@@ -962,6 +962,11 @@ public class SGCommand implements CommandExecutor {
                 case "lobby" -> LobbySettings.class;
                 default -> null; //Can ignore this really as it will never be null
             };
+            
+            if (!(args.length > 2)) {
+                MsgType.WARN.send(sender, "Not enough arguments");
+                return true;
+            }
 
             Field[] declaredFields = settingClass.getDeclaredFields();
 
@@ -1005,6 +1010,11 @@ public class SGCommand implements CommandExecutor {
                 sender.sendMessage(MsgType.INFO.format("List of &b" + type + " settings."));
                 lines.forEach(line -> StarColors.coloredMessage(sender, line));
 
+                return true;
+            }
+            
+            if (!(args.length > 3)) {
+                MsgType.WARN.send(sender, "Invalid argument count");
                 return true;
             }
             
