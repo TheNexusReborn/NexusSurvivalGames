@@ -6,13 +6,15 @@ public class GameCmdAction extends GameAction {
     public GameCmdAction(String sender, String command, String... cmdArgs) {
         super(System.currentTimeMillis(), "admincommand");
         addValueData("sender", sender).addValueData("command", command);
-        if (cmdArgs != null) {
+        if (cmdArgs != null && cmdArgs.length > 0) {
             StringBuilder argBuilder = new StringBuilder();
             for (String cmdArg : cmdArgs) {
                 argBuilder.append(cmdArg).append(",");
             }
             
-            argBuilder.deleteCharAt(argBuilder.length() - 1);
+            if (!argBuilder.isEmpty()) {
+                argBuilder.deleteCharAt(argBuilder.length() - 1);
+            }
             
             addValueData("args", argBuilder.toString());
         }
