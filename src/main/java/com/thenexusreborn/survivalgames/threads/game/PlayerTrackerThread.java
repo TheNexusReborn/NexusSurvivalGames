@@ -92,6 +92,10 @@ public class PlayerTrackerThread extends StarThread<SurvivalGames> {
                 if (target == null) {
                     continue;
                 }
+                
+                if (!player.getLocation().getWorld().getName().equals(target.getLocation().getWorld().getName())) {
+                    continue;
+                }
 
                 if (distance == -1) {
                     distance = player.getLocation().distance(target.getLocation());
