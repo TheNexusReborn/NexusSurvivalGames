@@ -124,6 +124,10 @@ public class PlayerListener implements Listener {
     public void onPlayerInteract(PlayerInteractEvent e) {
         Player player = e.getPlayer();
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
+        if (sgPlayer == null) {
+            return;
+        }
+        
         Lobby lobby = sgPlayer.getLobby();
         Game game = sgPlayer.getGame();
 
