@@ -58,7 +58,7 @@ public class BlockListener implements Listener {
             }
             if (Stream.of(GameState.INGAME, GameState.INGAME_DEATHMATCH, GameState.DEATHMATCH).anyMatch(gameState -> game.getState() == gameState)) {
                 if (e.getBlock().getType() == Material.TNT) {
-                    SGUtils.spawnTNTWithSource(e.getBlock().getLocation(), e.getPlayer(), 20, 3.0F);
+                    SGUtils.spawnTNTWithSource(e.getBlock().getLocation(), e.getPlayer(), game.getSettings().getTntFuseTicks(), game.getSettings().getTntYield());
                     new BukkitRunnable() {
                         public void run() {
                             e.getBlock().setType(AIR);

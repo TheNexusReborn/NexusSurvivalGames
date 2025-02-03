@@ -65,6 +65,16 @@ public class GameSettings implements Cloneable {
     private int deathmatchCountdownLength = 60;
     private int maxTeamAmount = 2;
     private boolean allowTeaming = true;
+    private float tntYield = 3.0F;
+    private int tntFuseTicks = 20;
+
+    public int getTntFuseTicks() {
+        return tntFuseTicks;
+    }
+
+    public float getTntYield() {
+        return tntYield;
+    }
 
     public boolean isTeamingAllowed() {
         return allowTeaming;
