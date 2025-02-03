@@ -33,7 +33,7 @@ processResources {
 }
 
 dependencies {
-    compileOnly 'com.thenexusreborn:NexusCore:1.14.1-ALPHA'
+    compileOnly 'com.thenexusreborn:NexusCore:1.14.2-ALPHA'
     compileOnly 'com.thenexusreborn:NexusMaps:1.1.1-ALPHA'
     compileOnly 'com.thenexusreborn:NexusHub:1.7-ALPHA'
     compileOnly 'com.github.StarDevelopmentLLC:converter:0.1.0'
