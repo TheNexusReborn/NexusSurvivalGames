@@ -582,9 +582,9 @@ public class Game {
 
             for (GamePlayer gp : this.players.values()) {
                 if (gp.getTeam() == GameTeam.MUTATIONS) {
-                    gp.setTeam(GameTeam.SPECTATORS);
-                    removeMutation(gp.getMutation());
                     gp.sendMessage(gp.getTeam().getLeaveMessage());
+                    removeMutation(gp.getMutation());
+                    gp.setTeam(GameTeam.SPECTATORS);
                     gp.sendMessage(gp.getTeam().getJoinMessage());
                     gp.sendMessage("&6&l>> &cYou were made a spectator because deathmatch started.");
                 }
