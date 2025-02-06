@@ -17,6 +17,7 @@ import com.thenexusreborn.gamemaps.model.MapSpawn;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.NexusCore;
 import com.thenexusreborn.nexuscore.api.NexusSpigotPlugin;
+import com.thenexusreborn.nexuscore.cmds.ToggleCmd;
 import com.thenexusreborn.survivalgames.cmd.*;
 import com.thenexusreborn.survivalgames.disguises.NexusDisguises;
 import com.thenexusreborn.survivalgames.hooks.NexusHubHook;
@@ -181,8 +182,8 @@ public class SurvivalGames extends NexusSpigotPlugin {
         getCommand("spectate").setExecutor(new SpectateCommand(this));
         getCommand("mapvote").setExecutor(new MapVoteCommand(this));
         getCommand("bounty").setExecutor(new BountyCmd(this));
-        getCommand("spectatorchat").setExecutor(nexusCore.getToggleCmdExecutor());
-        getCommand("sponsors").setExecutor(nexusCore.getToggleCmdExecutor());
+        new ToggleCmd(this, "spectatorchat", "specchat");
+        new ToggleCmd(this, "allowsponsors", "sponsors");
         getCommand("ratemap").setExecutor(new RateMapCmd(this));
 
         getLogger().info("Registered commands");
