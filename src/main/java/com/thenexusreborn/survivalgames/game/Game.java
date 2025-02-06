@@ -692,6 +692,10 @@ public class Game {
 
             GamePlayer gamePlayer = this.getPlayer(player.getUniqueId());
             gamePlayer.getCombatTag().setOther(null);
+            
+            if (gamePlayer.getMutation() != null) {
+                removeMutation(gamePlayer.getMutation());
+            }
         }
 
         GamePlayer winner = null;
