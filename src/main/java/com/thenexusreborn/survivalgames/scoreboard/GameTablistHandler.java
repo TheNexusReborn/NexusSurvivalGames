@@ -14,7 +14,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.EnumMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.UUID;
 
 public class GameTablistHandler extends TablistHandler {
     
@@ -36,6 +38,8 @@ public class GameTablistHandler extends TablistHandler {
     
     @Override
     public void update() {
+        removeDisconnectedPlayers();
+        
         for (Player other : Bukkit.getOnlinePlayers()) {
             NexusPlayer otherNexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(other.getUniqueId());
             if (otherNexusPlayer != null) {
@@ -60,6 +64,17 @@ public class GameTablistHandler extends TablistHandler {
                         refreshPlayerTeam(otherNexusPlayer);
                     }
                 }
+            }
+        }
+    }
+
+    public void removeDisconnectedPlayers() {
+        Iterator<Map.Entry<UUID, ITeam>> teamIterator = this.playerTeams.entrySet().iterator();
+        while (teamIterator.hasNext()) {
+            Map.Entry<UUID, ITeam> entry = teamIterator.next();
+            if (Bukkit.getPlayer(entry.getKey()) == null) {
+                entry.getValue().unregister();
+                teamIterator.remove();
             }
         }
     }
