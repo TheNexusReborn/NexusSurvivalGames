@@ -221,7 +221,7 @@ public class PlayerListener implements Listener {
         } else {
             Block block = e.getClickedBlock();
             if (block != null) {
-                if (block.getType() == Material.NOTE_BLOCK || block.getType() == Material.CHEST) {
+                if (block.getType() == Material.NOTE_BLOCK || block.getType() == Material.CHEST || block.getType().name().contains("REDSTONE")) {
                     e.setCancelled(true);
                     return;
                 }
