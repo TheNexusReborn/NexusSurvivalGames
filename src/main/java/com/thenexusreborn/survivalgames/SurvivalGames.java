@@ -3,10 +3,13 @@ package com.thenexusreborn.survivalgames;
 import com.stardevllc.clock.ClockManager;
 import com.stardevllc.registry.IntegerRegistry;
 import com.stardevllc.registry.UUIDRegistry;
+import com.stardevllc.starchat.ChatSelector;
 import com.stardevllc.starchat.StarChat;
+import com.stardevllc.starchat.rooms.ChatRoom;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.registry.ToggleRegistry;
+import com.thenexusreborn.api.server.InstanceServer;
 import com.thenexusreborn.api.sql.DatabaseRegistry;
 import com.thenexusreborn.api.sql.objects.SQLDatabase;
 import com.thenexusreborn.gamemaps.MapManager;
@@ -20,12 +23,14 @@ import com.thenexusreborn.nexuscore.api.NexusSpigotPlugin;
 import com.thenexusreborn.nexuscore.cmds.ToggleCmd;
 import com.thenexusreborn.survivalgames.cmd.*;
 import com.thenexusreborn.survivalgames.disguises.NexusDisguises;
+import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.hooks.NexusHubHook;
 import com.thenexusreborn.survivalgames.hooks.SGPAPIExpansion;
 import com.thenexusreborn.survivalgames.listener.BlockListener;
 import com.thenexusreborn.survivalgames.listener.EntityListener;
 import com.thenexusreborn.survivalgames.listener.PlayerListener;
 import com.thenexusreborn.survivalgames.listener.ServerListener;
+import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.map.SQLMapManager;
 import com.thenexusreborn.survivalgames.mutations.PlayerMutations;
@@ -40,6 +45,7 @@ import com.thenexusreborn.survivalgames.util.SGPlayerStats;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 
@@ -67,6 +73,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
     private File deathMessagesFile;
     private FileConfiguration deathMessagesConfig;
     
+    private InstanceServer instanceServer;
     private IntegerRegistry<SGVirtualServer> servers = new IntegerRegistry<>();
     
     private int gamesPlayed;
@@ -76,7 +83,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
     public static final GameSettings globalGameSettings = new GameSettings();
     public static final LobbySettings globalLobbySettings = new LobbySettings();
-
+    
     public static SurvivalGames getInstance() {
         return INSTANCE;
     }
@@ -123,6 +130,51 @@ public class SurvivalGames extends NexusSpigotPlugin {
         this.clockManager = getServer().getServicesManager().getRegistration(ClockManager.class).getProvider();
 
         this.starChat = (StarChat) getServer().getPluginManager().getPlugin("StarChat");
+        
+        this.starChat.addSelector(new ChatSelector("game") {
+            @Override
+            public ChatSelection getSelection(Player player, String[] args) {
+                if (!getInstanceServer().getPlayers().contains(player.getUniqueId())) {
+                    return null;
+                }
+                
+                SGPlayer sgPlayer = playerRegistry.get(player.getUniqueId());
+                if (sgPlayer == null) {
+                    return null;
+                }
+
+                Game game = sgPlayer.getGame();
+                if (game == null) {
+                    return null;
+                }
+
+                ChatRoom chatroom = game.getChatRooms().get(sgPlayer.getGamePlayer().getTeam());
+                return new ChatSelection(chatroom, "game");
+            }
+        });
+
+        this.starChat.addSelector(new ChatSelector("lobby") {
+            @Override
+            public ChatSelection getSelection(Player player, String[] args) {
+                if (!getInstanceServer().getPlayers().contains(player.getUniqueId())) {
+                    return null;
+                }
+
+                SGPlayer sgPlayer = playerRegistry.get(player.getUniqueId());
+                if (sgPlayer == null) {
+                    return null;
+                }
+
+                Lobby lobby = sgPlayer.getLobby();
+                if (lobby == null) {
+                    return null;
+                }
+
+                ChatRoom chatroom = lobby.getLobbyChatRoom();
+                return new ChatSelection(chatroom, "lobby");
+            }
+        });
+        
         getLogger().info("Hooked into StarChat");
 
         new SGPAPIExpansion(this).register();
@@ -326,5 +378,13 @@ public class SurvivalGames extends NexusSpigotPlugin {
 
     public ClockManager getClockManager() {
         return clockManager;
+    }
+
+    public InstanceServer getInstanceServer() {
+        if (this.instanceServer == null) {
+            this.instanceServer = ((NexusCore) Bukkit.getPluginManager().getPlugin("NexusCore")).getNexusServer();
+        }
+        
+        return instanceServer;
     }
 }
