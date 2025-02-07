@@ -4,6 +4,8 @@ import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.server.InstanceServer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 
+import java.util.UUID;
+
 public class SGInstanceServer extends InstanceServer {
     
     private SurvivalGames plugin;
@@ -24,6 +26,11 @@ public class SGInstanceServer extends InstanceServer {
     @Override
     public void quit(NexusPlayer nexusPlayer) {
         this.primaryVirtualServer.get().quit(nexusPlayer);
+    }
+    
+    @Override
+    public void quit(UUID uuid) {
+        this.primaryVirtualServer.get().quit(uuid);
     }
 
     @Override

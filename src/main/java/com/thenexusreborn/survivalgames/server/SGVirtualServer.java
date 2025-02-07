@@ -135,6 +135,19 @@ public class SGVirtualServer extends VirtualServer {
 
         this.players.remove(nexusPlayer.getUniqueId());
     }
+    
+    @Override
+    public void quit(UUID uuid) {
+        this.players.remove(uuid);
+        
+        if (this.lobby != null) {
+            this.lobby.removePlayer(uuid);
+        }
+        
+        if (this.game != null) {
+            this.game.removePlayer(uuid);
+        }
+    }
 
     @Override
     public void onStart() {

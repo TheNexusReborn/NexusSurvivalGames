@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.lobby;
 
-import com.stardevllc.helper.FileHelper;
 import com.stardevllc.clock.clocks.Timer;
+import com.stardevllc.helper.FileHelper;
 import com.stardevllc.itembuilder.ItemBuilder;
 import com.stardevllc.itembuilder.XMaterial;
 import com.stardevllc.starchat.context.ChatContext;
@@ -535,6 +535,12 @@ public class Lobby {
     }
 
     public void addPlayer(SGPlayer sgPlayer) {
+        Player player = Bukkit.getPlayer(sgPlayer.getUniqueId());
+        
+        if (player == null) {
+            return;
+        }
+        
         NexusPlayer nexusPlayer = sgPlayer.getNexusPlayer();
         SGPlayerStats stats = sgPlayer.getStats();
         if (nexusPlayer == null) {
@@ -549,11 +555,11 @@ public class Lobby {
         this.players.put(nexusPlayer.getUniqueId(), lobbyPlayer);
         sgPlayer.setLobby(this, lobbyPlayer);
         this.lobbyChatRoom.addMember(nexusPlayer.getUniqueId(), DefaultPermissions.VIEW_MESSAGES, DefaultPermissions.SEND_MESSAGES);
-        this.plugin.getStarChat().setPlayerFocus(Bukkit.getPlayer(nexusPlayer.getUniqueId()), this.lobbyChatRoom);
+        this.plugin.getStarChat().setPlayerFocus(player, this.lobbyChatRoom);
 
         int totalPlayers = 0;
-        for (LobbyPlayer player : getPlayers()) {
-            if (player.isSpectating()) {
+        for (LobbyPlayer otherLobbyPlayer : getPlayers()) {
+            if (otherLobbyPlayer.isSpectating()) {
                 continue;
             }
 
@@ -563,8 +569,6 @@ public class Lobby {
         if (totalPlayers > lobbySettings.getMaxPlayers()) {
             nexusPlayer.sendMessage("&eYou will be a spectator in the game as you joined with the player count above the maximum game amount. However, you can be a tribute if those before you leave or become spectators");
         }
-
-        Player player = Bukkit.getPlayer(nexusPlayer.getUniqueId());
 
         Location spawn = getSpawnpoint().clone();
         spawn.setY(spawn.getY() + 2);

@@ -235,6 +235,19 @@ public class Game {
         gamePlayer.applyActionBar();
         gamePlayer.setStatus(GamePlayer.Status.READY);
     }
+    
+    public void removePlayer(UUID uuid) {
+        NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(uuid);
+        if (nexusPlayer != null) {
+            removePlayer(nexusPlayer);
+        } else {
+            this.players.remove(uuid);
+            for (GameTeamChatroom gtc : this.chatRooms.values()) {
+                gtc.removeMember(uuid);
+                this.gameChatroom.removeMember(uuid);
+            }
+        }
+    }
 
     public void removePlayer(NexusPlayer nexusPlayer) {
         if (!this.players.containsKey(nexusPlayer.getUniqueId())) {
