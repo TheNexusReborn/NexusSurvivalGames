@@ -24,6 +24,6 @@ public class TierFourLootTable extends SGLootTable {
         addItems(20, Items.ARROW.setAmount(5));
         addItems(15, Items.FLINT_AND_STEEL, Items.FISHING_ROD);
 
-        addItems(15, Items.STICK, Items.GOLD_INGOT, Items.IRON_INGOT, Items.DIAMOND);
+        addItems(30, Items.STICK, Items.GOLD_INGOT, Items.IRON_INGOT, Items.DIAMOND);
     }
 }

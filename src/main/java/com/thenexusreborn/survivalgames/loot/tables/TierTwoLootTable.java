@@ -31,7 +31,7 @@ public class TierTwoLootTable extends SGLootTable {
         addItems(15, Items.PLAYER_TRACKER, Items.FLINT_AND_STEEL, Items.FISHING_ROD);
 
         addItems(25, Items.FEATHER, Items.FLINT, Items.STICK);
-        addItems(10, Items.GOLD_INGOT, Items.IRON_INGOT);
-        addItems(1, Items.DIAMOND);
+        addItems(20, Items.GOLD_INGOT, Items.IRON_INGOT);
+        addItems(5, Items.DIAMOND);
     }
 }
