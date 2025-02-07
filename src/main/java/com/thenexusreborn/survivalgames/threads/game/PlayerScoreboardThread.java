@@ -3,9 +3,11 @@ package com.thenexusreborn.survivalgames.threads.game;
 import com.stardevllc.starcore.utils.StarThread;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.scoreboard.ScoreboardView;
+import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
+import com.thenexusreborn.survivalgames.game.GameState;
 import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.scoreboard.game.CombatTagBoard;
 import com.thenexusreborn.survivalgames.scoreboard.game.GameBoard;
@@ -13,6 +15,8 @@ import com.thenexusreborn.survivalgames.scoreboard.game.MutationBoard;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.UUID;
 
 public class PlayerScoreboardThread extends StarThread<SurvivalGames> {
     public PlayerScoreboardThread(SurvivalGames plugin) {
@@ -22,8 +26,29 @@ public class PlayerScoreboardThread extends StarThread<SurvivalGames> {
     @Override
     public void onRun() {
         for (SGVirtualServer server : plugin.getServers()) {
+
+            Set<UUID> players = server.getPlayers();
+
+            for (UUID player : players) {
+                SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player);
+                if (sgPlayer == null) {
+                    continue;
+                }
+
+                Game game = sgPlayer.getGame();
+                if (game == null) {
+                    continue;
+                }
+
+                
+            }
+
             Game game = server.getGame();
             if (game == null) {
+                continue;
+            }
+            
+            if (game.getState() == GameState.ENDED) {
                 continue;
             }
             

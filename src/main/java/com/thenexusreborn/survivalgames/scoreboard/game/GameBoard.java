@@ -5,6 +5,7 @@ import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.scoreboard.TeamBuilder;
 import com.thenexusreborn.api.scoreboard.ValueUpdater;
 import com.thenexusreborn.nexuscore.scoreboard.SpigotScoreboardView;
+import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
@@ -91,6 +92,14 @@ public class GameBoard extends SpigotScoreboardView {
             } 
         }));
         createTeam(new TeamBuilder("blank4").entry(ChatColor.DARK_PURPLE.toString()).score(2));
-        createTeam(new TeamBuilder("serverValue").prefix("&6&lSERVER: ").entry("&f" + plugin.getPlayerRegistry().get(scoreboard.getPlayer().getUniqueId()).getGame().getServer().getName()));
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(scoreboard.getPlayer().getUniqueId());
+        if (sgPlayer == null) {
+            return;
+        }
+        
+        if (sgPlayer.getGame() == null) {
+            return;
+        }
+        createTeam(new TeamBuilder("serverValue").prefix("&6&lSERVER: ").entry("&f" + sgPlayer.getGame().getServer().getName()));
     }
 }
