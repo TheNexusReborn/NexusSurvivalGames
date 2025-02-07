@@ -72,6 +72,11 @@ public class TributeSignUpdateThread extends StarThread<SurvivalGames> {
 
                 LobbyPlayer lobbyPlayer = players.get(tributeSign.getIndex());
                 Player player = Bukkit.getPlayer(lobbyPlayer.getUniqueId());
+                
+                if (player == null) {
+                    continue;
+                }
+                
                 String name;
                 if (lobbyPlayer.getName().length() <= 14) {
                     name = StarColors.color(lobbyPlayer.getRank().getColor() + lobbyPlayer.getName());
