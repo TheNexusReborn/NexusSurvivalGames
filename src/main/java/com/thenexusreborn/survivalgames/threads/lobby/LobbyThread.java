@@ -15,6 +15,8 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
+import java.util.*;
+
 public class LobbyThread extends StarThread<SurvivalGames> {
 
     private int secondsInPrepareGame;
@@ -40,6 +42,10 @@ public class LobbyThread extends StarThread<SurvivalGames> {
             LobbyState state = lobby.getState();
             for (LobbyPlayer lobbyPlayer : lobby.getPlayers()) {
                 Player player = Bukkit.getPlayer(lobbyPlayer.getUniqueId());
+                if (player == null) {
+                    continue;
+                }
+                
                 SGUtils.updatePlayerHealthAndFood(Bukkit.getPlayer(player.getUniqueId()));
 
                 if (state != LobbyState.MAP_EDITING) {
@@ -56,8 +62,21 @@ public class LobbyThread extends StarThread<SurvivalGames> {
 
             for (LobbyPlayer player : lobby.getPlayers()) {
                 Player bukkitPlayer = Bukkit.getPlayer(player.getUniqueId());
+                
+                if (bukkitPlayer == null) {
+                    continue;
+                }
+
+                Set<UUID> invalidPlayers = new HashSet<>();
+                
                 for (LobbyPlayer other : lobby.getPlayers()) {
                     Player otherBukkitPlayer = Bukkit.getPlayer(other.getUniqueId());
+                    
+                    if (otherBukkitPlayer == null) {
+                        invalidPlayers.add(other.getUniqueId());
+                        continue;
+                    }
+                    
                     if (player.getToggleValue("vanish")) {
                         if (other.getRank().ordinal() > Rank.HELPER.ordinal()) {
                             otherBukkitPlayer.hidePlayer(bukkitPlayer);
@@ -72,6 +91,13 @@ public class LobbyThread extends StarThread<SurvivalGames> {
                         }
                     } else {
                         bukkitPlayer.showPlayer(otherBukkitPlayer);
+                    }
+                }
+                
+                if (!invalidPlayers.isEmpty()) {
+                    for (UUID invalidPlayer : invalidPlayers) {
+                        lobby.removePlayer(invalidPlayer);
+                        plugin.getLogger().warning("Removed invalid player " + invalidPlayer);
                     }
                 }
             }
