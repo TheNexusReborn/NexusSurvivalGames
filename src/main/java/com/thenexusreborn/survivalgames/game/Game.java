@@ -653,8 +653,8 @@ public class Game {
         this.gameMap.applyWorldBoarder("deathmatch", settings.getDeathmatchLength() * 60);
 
         this.timer = plugin.getClockManager().createTimer(TimeUnit.MINUTES.toMillis(settings.getDeathmatchLength()) + 50L);
-        this.timer.addRepeatingCallback(new GameMinutesCallback(this, "&6&l>> The &c&lGAME &eends &ein &b{time}&e."), TimeUnit.MINUTES, 1);
-        this.timer.addRepeatingCallback(new GameSecondsCallback(this, "&6&l>> The &c&lGAME &eends &ein &b{time}&e."), TimeUnit.SECONDS, 1);
+        this.timer.addRepeatingCallback(new GameMinutesCallback(this, "&6&l>> &eThe &c&lGAME &eends &ein &b{time}&e."), TimeUnit.MINUTES, 1);
+        this.timer.addRepeatingCallback(new GameSecondsCallback(this, "&6&l>> &eThe &c&lGAME &eends &ein &b{time}&e."), TimeUnit.SECONDS, 1);
         this.timer.setEndCondition(new DeathmatchEndCondition(this));
         this.timer.start();
     }
