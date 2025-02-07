@@ -915,7 +915,7 @@ public class SGCommand implements CommandExecutor {
                 return true;
             }
 
-            if (args[1].equalsIgnoreCase("confirm")) {
+            if (args[1].equalsIgnoreCase("confirm") || args[1].equals("c")) {
                 Runnable task = this.settingsConfirmation.get(player.getUniqueId());
                 if (task == null) {
                     sender.sendMessage(MsgType.WARN.format("You have nothing to confirm."));
@@ -956,6 +956,11 @@ public class SGCommand implements CommandExecutor {
                 case "lobby", "l" -> "lobby";
                 default -> null;
             };
+            
+            if (type == null) {
+                MsgType.WARN.send(sender, "Not enough arguments");
+                return true;
+            }
 
             Class<?> settingClass = switch (type) {
                 case "game" -> GameSettings.class;
