@@ -70,7 +70,15 @@ public class GameActionBar implements IActionBar {
 
         if (player.getTeam() == GameTeam.MUTATIONS) {
             Mutation mutation = player.getMutation();
+            if (mutation == null) {
+                return "&4&lERROR: GETTING MUTATION INFORMATION, REPORT TO FIRESTAR311";
+            }
             GamePlayer target = game.getPlayer(mutation.getTarget());
+            
+            if (target == null) {
+                return "&4&lERROR: GETTING TARGET INFORMATION, REPORT TO FIRESTAR311";
+            }
+            
             return "&c&lSEEKING REVENGE ON &a" + target.getName();
         }
 
