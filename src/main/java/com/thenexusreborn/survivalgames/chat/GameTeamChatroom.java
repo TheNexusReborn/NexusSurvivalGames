@@ -18,6 +18,7 @@ public class GameTeamChatroom extends ChatRoom {
         this.game = game;
         senderFormat.set(team.getChatFormat());
         systemFormat.set("{message}");
+        useColorPermissions.set(true);
     }
 
     @Override
