@@ -33,6 +33,11 @@ public class StatSignUpdateThread extends StarThread<SurvivalGames> {
             for (StatSign statSign : lobby.getStatSigns()) {
                 for (LobbyPlayer lobbyPlayer : lobby.getPlayers()) {
                     Player player = Bukkit.getPlayer(lobbyPlayer.getUniqueId());
+                    
+                    if (player == null) {
+                        continue;
+                    }
+                    
                     if (player.getWorld() != statSign.getLocation().getWorld()) {
                         continue;
                     }
