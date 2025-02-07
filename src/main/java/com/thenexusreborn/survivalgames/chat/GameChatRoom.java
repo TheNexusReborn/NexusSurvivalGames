@@ -13,5 +13,6 @@ public class GameChatRoom extends ChatRoom {
         
         senderFormat.set("{message}");
         systemFormat.set("{message}");
+        useColorPermissions.set(true);
     }
 }
