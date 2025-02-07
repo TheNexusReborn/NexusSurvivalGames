@@ -207,6 +207,10 @@ public class Lobby {
         generateMapOptions();
     }
 
+    public ChatRoom getLobbyChatRoom() {
+        return lobbyChatRoom;
+    }
+
     public SGVirtualServer getServer() {
         return server;
     }
@@ -520,6 +524,15 @@ public class Lobby {
         
         return gameMap;
     }
+    
+    public void addPlayer(UUID uniqueId) {
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(uniqueId);
+        if (sgPlayer == null) {
+            return;
+        }
+        
+        addPlayer(sgPlayer);
+    }
 
     public void addPlayer(SGPlayer sgPlayer) {
         NexusPlayer nexusPlayer = sgPlayer.getNexusPlayer();
@@ -627,6 +640,18 @@ public class Lobby {
         nexusPlayer.getScoreboard().setTablistHandler(new RankTablistHandler(nexusPlayer.getScoreboard()));
         nexusPlayer.setActionBar(new LobbyActionBar(plugin, plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId())));
         sendMapOptions(nexusPlayer);
+    }
+    
+    public void removePlayer(UUID uniqueId) {
+        NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(uniqueId);
+        
+        if (nexusPlayer == null || Bukkit.getPlayer(uniqueId) == null) {
+            this.players.remove(uniqueId);
+            this.lobbyChatRoom.removeMember(uniqueId);
+            return;
+        }
+        
+        removePlayer(nexusPlayer);
     }
 
     public void removePlayer(NexusPlayer nexusPlayer) {
