@@ -12,6 +12,7 @@ import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.tags.Tag;
 import com.thenexusreborn.survivalgames.chat.GameTeamChatroom;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
+import com.thenexusreborn.survivalgames.game.death.KillerInfo;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
 import com.thenexusreborn.survivalgames.scoreboard.GameTablistHandler;
 import com.thenexusreborn.survivalgames.scoreboard.game.GameBoard;
@@ -243,8 +244,10 @@ public class GamePlayer {
         if (game.getTeamCount(GameTeam.MUTATIONS) >= game.getSettings().getMaxMutationsAllowed()) {
             return new Pair<>(false, "You cannot mutate as there are too many mutations in the game already.");
         }
+        
+        boolean timesMutatedExceedsMaxAmount = getTotalTimesMutated() >= game.getSettings().getMaxMutationAmount();
 
-        if (getTotalTimesMutated() >= game.getSettings().getMaxMutationAmount()) {
+        if (timesMutatedExceedsMaxAmount) {
             return new Pair<>(false, "You cannot mutate more than " + game.getSettings().getMaxMutationAmount() + " times.");
         }
 
@@ -256,7 +259,7 @@ public class GamePlayer {
             return new Pair<>(false, "You cannot mutate because you were killed by a mutation.");
         }
 
-        if (mutated) {
+        if (mutated && timesMutatedExceedsMaxAmount) {
             return new Pair<>(false, "You have already mutated, you cannot mutate again.");
         }
 
@@ -336,7 +339,8 @@ public class GamePlayer {
         if (mostRecentDeath != null) {
             if (mostRecentDeath.getKiller() != null) {
                 if (mostRecentDeath.getKiller().getType() == EntityType.PLAYER) {
-                    return mostRecentDeath.getKiller().getKiller();
+                    KillerInfo killer = mostRecentDeath.getKiller();
+                    return killer.getKiller();
                 }
             }
         }
