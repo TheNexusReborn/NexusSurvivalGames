@@ -12,6 +12,8 @@ import com.thenexusreborn.survivalgames.mutations.Mutation;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.UUID;
+
 public class MutationEndCondition implements ClockEndCondition<TimerSnapshot> {
     
     private Mutation mutation;
@@ -52,6 +54,13 @@ public class MutationEndCondition implements ClockEndCondition<TimerSnapshot> {
 
         GamePlayer targetPlayer = game.getPlayer(mutation.getTarget());
         if (targetPlayer.getTeam() != GameTeam.TRIBUTES) {
+            if (game.getSettings().isAllowKillersKiller()) {
+                GamePlayer mutationPlayer = game.getPlayer(mutation.getPlayer());
+                UUID killer = mutationPlayer.getKiller();
+                mutation.setTarget(killer);
+                return false;
+            }
+            
             p.sendMessage(StarColors.color(MsgType.WARN + "Your target is no longer a tribute, mutation cancelled."));
             return true;
         }
