@@ -67,6 +67,11 @@ public class GameSettings implements Cloneable {
     private boolean allowTeaming = true;
     private float tntYield = 3.0F;
     private int tntFuseTicks = 20;
+    private boolean allowKillersKiller = true;
+
+    public boolean isAllowKillersKiller() {
+        return allowKillersKiller;
+    }
 
     public int getTntFuseTicks() {
         return tntFuseTicks;

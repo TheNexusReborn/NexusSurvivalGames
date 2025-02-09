@@ -268,7 +268,7 @@ public class GamePlayer {
         }
 
         if (getTeam() != GameTeam.SPECTATORS) {
-            return new Pair<>(false, "You can only mutate if you have died.");
+            return new Pair<>(false, "You must be a spectator to mutate.");
         }
         
         if (!killedByPlayer()) {
@@ -339,8 +339,23 @@ public class GamePlayer {
         if (mostRecentDeath != null) {
             if (mostRecentDeath.getKiller() != null) {
                 if (mostRecentDeath.getKiller().getType() == EntityType.PLAYER) {
-                    KillerInfo killer = mostRecentDeath.getKiller();
-                    return killer.getKiller();
+                    KillerInfo killerInfo = mostRecentDeath.getKiller();
+                    UUID killerUUID = killerInfo.getKiller();
+
+                    if (!game.getSettings().isAllowKillersKiller()) {
+                        return killerUUID;
+                    }
+                    
+                    GamePlayer killerPlayer = game.getPlayer(killerUUID);
+                    if (killerPlayer == null) {
+                        return null;
+                    }
+                    
+                    if (killerPlayer.getTeam() == GameTeam.TRIBUTES) {
+                        return killerUUID;
+                    }
+
+                    return killerPlayer.getKiller();
                 }
             }
         }
