@@ -1398,6 +1398,7 @@ public class Game {
         if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
             giveSpectatorItems(player);
         }
+        gamePlayer.setMutation(null);
     }
 
     public GamePlayer getPlayer(String name) {

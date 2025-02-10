@@ -365,7 +365,17 @@ public class GamePlayer {
                         return killerUUID;
                     }
 
-                    return killerPlayer.getKiller();
+                    UUID killersKiller = killerPlayer.getKiller();
+                    
+                    if (getUniqueId().equals(killersKiller)) {
+                        return null;
+                    }
+                    
+                    if (killerUUID.equals(killersKiller)) {
+                        return null;
+                    }
+                    
+                    return killersKiller;
                 }
             }
         }
