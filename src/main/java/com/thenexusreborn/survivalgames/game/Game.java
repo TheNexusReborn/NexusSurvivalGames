@@ -598,6 +598,7 @@ public class Game {
                     gp.sendMessage(gp.getTeam().getLeaveMessage());
                     removeMutation(gp.getMutation());
                     gp.setTeam(GameTeam.SPECTATORS);
+                    gp.giveSpectatorItems(this);
                     gp.sendMessage(gp.getTeam().getJoinMessage());
                     gp.sendMessage("&6&l>> &cYou were made a spectator because deathmatch started.");
                 }
@@ -1395,10 +1396,10 @@ public class Game {
             player.removePotionEffect(effect.getType());
         }
         GamePlayer gamePlayer = getPlayer(player.getUniqueId());
+        gamePlayer.setMutation(null);
         if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
             giveSpectatorItems(player);
         }
-        gamePlayer.setMutation(null);
     }
 
     public GamePlayer getPlayer(String name) {
