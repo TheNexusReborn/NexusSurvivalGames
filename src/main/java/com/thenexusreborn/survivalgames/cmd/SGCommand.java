@@ -1257,21 +1257,13 @@ public class SGCommand implements CommandExecutor {
                     long oldValue = timer.getTime();
 
                     if (operation.equalsIgnoreCase("subtract")) {
-                        timer.setTime(timer.getTime() - timeValue);
+                        timer.removeTime(timeValue);
                         sender.sendMessage(MsgType.INFO.format("You subtracted %v from the %v's timer.", timeFormat.format(timeValue), timerType));
                     } else if (operation.equalsIgnoreCase("add")) {
-                        long newTime = timer.getTime() + timeValue;
-                        if (newTime > timer.getLength()) {
-                            timer.setLength(newTime);
-                        }
-                        timer.setTime(newTime);
+                        timer.addTime(timeValue);
                         sender.sendMessage(MsgType.INFO.format("You added %v to the %v's timer.", timeFormat.format(timeValue), timerType));
                     } else if (operation.equalsIgnoreCase("set")) {
-                        long newTime = timer.getTime() + timeValue;
-                        if (newTime > timer.getLength()) {
-                            timer.setLength(newTime);
-                        }
-                        timer.setTime(newTime);
+                        timer.setTime(timeValue);
                         sender.sendMessage(MsgType.INFO.format("You set %v's timer to %v.", timerType, timeFormat.format(timeValue)));
                     }
 
