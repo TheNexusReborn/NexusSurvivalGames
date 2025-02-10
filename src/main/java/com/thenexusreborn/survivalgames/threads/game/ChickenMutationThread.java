@@ -16,7 +16,9 @@ import org.bukkit.inventory.ItemStack;
 
 public class ChickenMutationThread extends StarThread<SurvivalGames> {
     
-    private int eggGain = 9;
+    public static final int EGG_START_VALUE = 9;
+    
+    private int eggGain = EGG_START_VALUE;
     
     public ChickenMutationThread(SurvivalGames plugin) {
         super(plugin, 1L, 0L, false);
@@ -70,7 +72,7 @@ public class ChickenMutationThread extends StarThread<SurvivalGames> {
         }
         
         if (eggGain <= 0) {
-            eggGain = 19;
+            eggGain = EGG_START_VALUE;
         } else {
             eggGain--;
         }
