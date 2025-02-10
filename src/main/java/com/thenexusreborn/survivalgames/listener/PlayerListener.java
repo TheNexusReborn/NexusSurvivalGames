@@ -159,7 +159,7 @@ public class PlayerListener implements Listener {
                                 }
 
                                 if (team != null) {
-                                    manager.openGUI(new TeamMenu(plugin, team, game), player);
+                                    manager.openGUI(new TeamMenu(plugin, team, game, player.getUniqueId()), player);
                                 }
                             }
                         } else if (item.getType() == Material.ROTTEN_FLESH) {
