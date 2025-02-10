@@ -78,8 +78,8 @@ public abstract class Mutation {
         long seconds = (long) TimeUnit.MILLISECONDS.toSeconds(this.countdownTimer.getTime());
         p.sendMessage(StarColors.color("&6&l>> &eYou will mutate as a(n) " + getType().getDisplayName() + "!"));
         p.sendMessage(StarColors.color("&6&l>> &eYou will be mutated in &l" + seconds + " Seconds&e."));
-        Player t = Bukkit.getPlayer(this.target);
-        t.sendMessage(StarColors.color("&4&l>> &c" + p.getName() + " is &lMUTATING! &cThey spawn in &c&l" + seconds + "s..."));
+//        Player t = Bukkit.getPlayer(this.target);
+//        t.sendMessage(StarColors.color("&4&l>> &c" + p.getName() + " is &lMUTATING! &cThey spawn in &c&l" + seconds + "s..."));
         this.countdownTimer.start();
     }
     
