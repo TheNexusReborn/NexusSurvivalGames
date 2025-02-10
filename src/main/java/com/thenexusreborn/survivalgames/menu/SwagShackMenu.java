@@ -40,7 +40,7 @@ public class SwagShackMenu extends InventoryGUI {
     
     public SwagShackMenu(SurvivalGames plugin, Game game, GamePlayer player) {
         super(3, "&lSwag Shack");
-    
+
         for (ShopItem item : items) {
             ItemStack itemStack = item.getItem().getItemStack();
             itemStack.setAmount(item.getAmount());

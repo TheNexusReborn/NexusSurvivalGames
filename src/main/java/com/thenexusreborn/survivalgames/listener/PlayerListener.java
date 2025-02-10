@@ -558,8 +558,8 @@ public class PlayerListener implements Listener {
                     gamePlayer.sendMessage(MsgType.WARN + "You can only open the Swag Shack as a Tribute.");
                     return;
                 }
-
-                manager.openGUI(new SwagShackMenu(plugin, game, gamePlayer), e.getPlayer());
+                
+                Bukkit.getScheduler().runTaskLater(plugin, () -> manager.openGUI(new SwagShackMenu(plugin, game, gamePlayer), e.getPlayer()), 1L);
             }
         }
     }
