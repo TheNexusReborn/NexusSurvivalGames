@@ -15,16 +15,27 @@ public class GameSecondsCallback implements ClockCallback<TimerSnapshot> {
     
     private Game game;
     private String message;
+    private boolean announceMinute;
     
     public GameSecondsCallback(Game game, String message) {
+        this(game, message, true);
+    }
+    
+    public GameSecondsCallback(Game game, String message, boolean announceMinute) {
         this.game = game;
         this.message = message;
+        this.announceMinute = announceMinute;
     }
 
     @Override
     public void callback(TimerSnapshot timerSnapshot) {
         int remainingSeconds = (int) TimeUnit.MILLISECONDS.toSeconds(timerSnapshot.getTime());
         if (ANNOUNCE.contains(remainingSeconds)) {
+            
+            if (remainingSeconds == 60 && !announceMinute) {
+                return;
+            }
+            
             game.sendMessage(message.replace("{time}", Game.LONG_TIME_FORMAT.format(timerSnapshot.getTime())));
             if (game.getSettings().isSounds()) {
                 game.playSound(Sound.CLICK);

@@ -514,7 +514,7 @@ public class Game {
     public void startGame() {
         this.timer = plugin.getClockManager().createTimer(TimeUnit.MINUTES.toMillis(settings.getGameLength()) + 50);
         this.timer.addRepeatingCallback(new GameMinutesCallback(this, "&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b{time}&e."), TimeUnit.MINUTES, 1);
-        this.timer.addRepeatingCallback(new GameSecondsCallback(this, "&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b{time}&e."), TimeUnit.SECONDS, 1);
+        this.timer.addRepeatingCallback(new GameSecondsCallback(this, "&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b{time}&e.", false), TimeUnit.SECONDS, 1);
         this.timer.addCallback(timerSnapshot -> {
             sendMessage("");
             sendMessage("&6&l>> &9&lWHAT DO YOU THINK OF &e&l" + getGameMap().getName().toUpperCase() + "&9&l?");
