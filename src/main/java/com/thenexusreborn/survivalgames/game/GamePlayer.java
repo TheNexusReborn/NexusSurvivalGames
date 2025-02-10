@@ -117,19 +117,29 @@ public class GamePlayer {
         chatroom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES, DefaultPermissions.SEND_MESSAGES);
         Game.getPlugin().getStarChat().setPlayerFocus(Bukkit.getPlayer(getUniqueId()), chatroom);
 
+        GameTeamChatroom spectatorsRoom = game.getChatRooms().get(GameTeam.SPECTATORS);
         GameTeamChatroom mutationsRoom = game.getChatRooms().get(GameTeam.MUTATIONS);
         GameTeamChatroom zombiesRoom = game.getChatRooms().get(GameTeam.ZOMBIES);
         if (this.team == GameTeam.TRIBUTES) {
             mutationsRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
             zombiesRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+            if (game.getSettings().canTributesSeeSpectatorChat()) {
+                spectatorsRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+            }
         } else {
             GameTeamChatroom tributesRoom = game.getChatRooms().get(GameTeam.TRIBUTES);
             if (this.team == GameTeam.MUTATIONS) {
                 tributesRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
                 zombiesRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+                if (game.getSettings().canTributesSeeSpectatorChat()) {
+                    spectatorsRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+                }
             } else if (this.team == GameTeam.ZOMBIES) {
                 tributesRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
                 mutationsRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+                if (game.getSettings().canTributesSeeSpectatorChat()) {
+                    spectatorsRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+                }
             } else if (this.team == GameTeam.SPECTATORS) {
                 tributesRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
                 mutationsRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);

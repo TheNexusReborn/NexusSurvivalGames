@@ -68,6 +68,11 @@ public class GameSettings implements Cloneable {
     private float tntYield = 3.0F;
     private int tntFuseTicks = 20;
     private boolean allowKillersKiller = true;
+    private boolean tributesSeeSpectatorChat = true;
+
+    public boolean canTributesSeeSpectatorChat() {
+        return tributesSeeSpectatorChat;
+    }
 
     public boolean isAllowKillersKiller() {
         return allowKillersKiller;
