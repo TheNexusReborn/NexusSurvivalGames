@@ -429,6 +429,9 @@ public class SGCommand implements CommandExecutor {
 
                             target.sendMessage(target.getTeam().getLeaveMessage());
                             target.setTeam(GameTeam.SPECTATORS);
+                            target.clearInventory();
+                            target.clearPotionEffects();
+                            target.giveSpectatorItems(game);
                             target.sendMessage(target.getTeam().getJoinMessage());
 
                             game.teleportSpectator(Bukkit.getPlayer(target.getUniqueId()), game.getGameMap().getCenterLocation());
