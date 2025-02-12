@@ -30,6 +30,7 @@ import com.thenexusreborn.survivalgames.menu.MutateGui;
 import com.thenexusreborn.survivalgames.menu.SwagShackMenu;
 import com.thenexusreborn.survivalgames.menu.TeamMenu;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
+import com.thenexusreborn.survivalgames.mutations.MutationType;
 import com.thenexusreborn.survivalgames.mutations.impl.ChickenMutation;
 import com.thenexusreborn.survivalgames.mutations.impl.CreeperMutation;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
@@ -796,7 +797,7 @@ public class PlayerListener implements Listener {
             return;
         }
         if (sgPlayer.getGame() != null) {
-            sgPlayer.getGame().removePlayer(nexusPlayer);
+            sgPlayer.getGame().quit(nexusPlayer);
         }
 
         if (sgPlayer.getLobby() != null) {
@@ -806,5 +807,45 @@ public class PlayerListener implements Listener {
         e.setQuitMessage(null);
         NexusAPI.getApi().getPrimaryDatabase().saveSilent(sgPlayer.getStats());
         plugin.getPlayerRegistry().unregister(e.getPlayer().getUniqueId());
+    }
+    
+    @EventHandler
+    public void onPlayerMove(PlayerMoveEvent e) {
+        Player player = e.getPlayer();
+        Block fromBlock = e.getFrom().getBlock();
+        Block toBlock = e.getTo().getBlock();
+        
+        if ((fromBlock.getType() == Material.WATER || fromBlock.getType() == Material.STATIONARY_WATER) && 
+                toBlock.getType() == Material.WATER || toBlock.getType() == Material.STATIONARY_WATER) {
+            SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
+            if (sgPlayer == null) {
+                return;
+            }
+            
+            if (sgPlayer.getGame() == null) {
+                return;
+            }
+
+            GamePlayer gamePlayer = sgPlayer.getGamePlayer();
+            if (gamePlayer == null) {
+                return;
+            }
+            
+            if (gamePlayer.getTeam() != GameTeam.MUTATIONS) {
+                return;
+            }
+            
+            if (gamePlayer.getMutation() == null) {
+                return;
+            }
+            
+            if (gamePlayer.getMutation().getType() != MutationType.PIG_ZOMBIE) {
+                return;
+            }
+            
+            Vector changed = e.getTo().clone().subtract(e.getFrom()).toVector().multiply(1.4);
+            changed.setY(e.getTo().clone().subtract(e.getFrom()).toVector().getY());
+            player.setVelocity(changed);
+        }
     }
 }
