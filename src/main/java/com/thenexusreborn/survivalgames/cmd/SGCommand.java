@@ -60,7 +60,7 @@ import java.util.stream.Stream;
 public class SGCommand implements CommandExecutor {
 
     private final SurvivalGames plugin;
-    
+
     private Map<UUID, Runnable> settingsConfirmation = new HashMap<>();
 
     public SGCommand(SurvivalGames plugin) {
@@ -138,8 +138,10 @@ public class SGCommand implements CommandExecutor {
 
             GuiManager guiManager = Bukkit.getServicesManager().getRegistration(GuiManager.class).getProvider();
             switch (gameSubCommand) {
-                case "tributes", "tr" -> guiManager.openGUI(new TeamMenu(plugin, GameTeam.TRIBUTES, game, player.getUniqueId()), player);
-                case "spectators", "sp" -> guiManager.openGUI(new TeamMenu(plugin, GameTeam.SPECTATORS, game, player.getUniqueId()), player);
+                case "tributes", "tr" ->
+                        guiManager.openGUI(new TeamMenu(plugin, GameTeam.TRIBUTES, game, player.getUniqueId()), player);
+                case "spectators", "sp" ->
+                        guiManager.openGUI(new TeamMenu(plugin, GameTeam.SPECTATORS, game, player.getUniqueId()), player);
                 case "setup" -> {
                     if (game.getState() != GameState.UNDEFINED) {
                         sender.sendMessage(MsgType.WARN.format("The game has already been setup."));
@@ -866,6 +868,7 @@ public class SGCommand implements CommandExecutor {
             boolean confirm = false;
             boolean global = false;
             boolean allRunning = false;
+            boolean silent = false;
 
             StringBuilder sb = new StringBuilder();
             for (String arg : args) {
@@ -878,6 +881,8 @@ public class SGCommand implements CommandExecutor {
                 } else if (arg.equalsIgnoreCase("-gr") || arg.equalsIgnoreCase("-rg")) {
                     allRunning = true;
                     global = true;
+                } else if (arg.equalsIgnoreCase("-s")) {
+                    silent = true;
                 }
                 // TODO Add more permutations
                 else {
@@ -892,7 +897,7 @@ public class SGCommand implements CommandExecutor {
                 case "lobby", "l" -> "lobby";
                 default -> null;
             };
-            
+
             if (type == null) {
                 MsgType.WARN.send(sender, "Not enough arguments");
                 return true;
@@ -903,7 +908,7 @@ public class SGCommand implements CommandExecutor {
                 case "lobby" -> LobbySettings.class;
                 default -> null; //Can ignore this really as it will never be null
             };
-            
+
             if (!(args.length > 2)) {
                 MsgType.WARN.send(sender, "Not enough arguments");
                 return true;
@@ -953,12 +958,12 @@ public class SGCommand implements CommandExecutor {
 
                 return true;
             }
-            
+
             if (!(args.length > 3)) {
                 MsgType.WARN.send(sender, "Invalid argument count");
                 return true;
             }
-            
+
             String setting = args[2].toLowerCase();
             Field field = null;
             StringConverter<?> converter = null;
@@ -975,7 +980,7 @@ public class SGCommand implements CommandExecutor {
                 sender.sendMessage(MsgType.WARN.format("Could not find a setting named %v.", args[2]));
                 return true;
             }
-            
+
             field.setAccessible(true);
 
             Object value = converter.convertTo(args[3]);
@@ -983,7 +988,7 @@ public class SGCommand implements CommandExecutor {
                 sender.sendMessage(MsgType.WARN.format("Could not convert %v to a(n) %v", args[3], field.getType().getSimpleName()));
                 return true;
             }
-            
+
             boolean isGameType = type.equalsIgnoreCase("game");
             boolean isLobbyType = type.equalsIgnoreCase("lobby");
 
@@ -1017,7 +1022,7 @@ public class SGCommand implements CommandExecutor {
                 if (sgPlayer.getGame() != null) {
                     settingsInstances.add(sgPlayer.getGame().getSettings());
                 }
-                
+
                 if (sgPlayer.getLobby() != null) {
                     settingsInstances.add(sgPlayer.getLobby().getGameSettings());
                 }
@@ -1028,6 +1033,7 @@ public class SGCommand implements CommandExecutor {
             }
 
             Field finalField = field;
+            final boolean finalSilent = silent;
             Runnable task = () -> {
                 for (Object instance : settingsInstances) {
                     try {
@@ -1039,16 +1045,18 @@ public class SGCommand implements CommandExecutor {
                     }
                 }
 //                sender.sendMessage(MsgType.INFO.format("You set the %v setting %v to %v.", type, finalField.getName(), value));
-                plugin.getNexusCore().getStaffChannel().sendMessage(new ChatContext(sgPlayer.getNexusPlayer().getColoredName() + " &fset the " + type + " setting " + finalField.getName() + " to " + value + "."));
+                if (!finalSilent) {
+                    plugin.getNexusCore().getStaffChannel().sendMessage(new ChatContext(sgPlayer.getNexusPlayer().getColoredName() + " &fset the " + type + " setting " + finalField.getName() + " to " + value + "."));
+                }
             };
-            
+
             if (confirm) {
                 task.run();
             } else {
                 this.settingsConfirmation.put(player.getUniqueId(), task);
                 sender.sendMessage("");
                 sender.sendMessage(MsgType.IMPORTANT.format("Please confirm the following action..."));
-                sender.sendMessage(MsgType.IMPORTANT.format("Setting the %v setting %v to %v in %v %v.", type, field.getName(), value, settingsInstances.size(), type.equals("game") ? "games" : type.equals("lobby") ? "lobbies": "unknown"));
+                sender.sendMessage(MsgType.IMPORTANT.format("Setting the %v setting %v to %v in %v %v.", type, field.getName(), value, settingsInstances.size(), type.equals("game") ? "games" : type.equals("lobby") ? "lobbies" : "unknown"));
                 sender.sendMessage(MsgType.IMPORTANT.format("Please type %v to confirm.", "/survivalgames settings confirm"));
                 sender.sendMessage("");
             }
