@@ -1,17 +1,17 @@
 package com.thenexusreborn.survivalgames.cmd;
 
 import com.stardevllc.clock.clocks.Timer;
+import com.stardevllc.colors.StarColors;
 import com.stardevllc.converter.string.StringConverter;
 import com.stardevllc.converter.string.StringConverters;
 import com.stardevllc.starchat.context.ChatContext;
-import com.stardevllc.colors.StarColors;
+import com.stardevllc.starui.GuiManager;
 import com.stardevllc.time.TimeFormat;
 import com.stardevllc.time.TimeParser;
 import com.thenexusreborn.api.gamearchive.GameAction;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.gamemaps.MapManager;
 import com.thenexusreborn.gamemaps.YamlMapManager;
-import com.thenexusreborn.gamemaps.model.MapSpawn;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
@@ -23,7 +23,8 @@ import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.game.GameState;
 import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
-import com.thenexusreborn.survivalgames.gamelog.*;
+import com.thenexusreborn.survivalgames.gamelog.GameCmdAction;
+import com.thenexusreborn.survivalgames.gamelog.GameGiveAction;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
 import com.thenexusreborn.survivalgames.lobby.StatSign;
@@ -32,7 +33,7 @@ import com.thenexusreborn.survivalgames.loot.item.Items;
 import com.thenexusreborn.survivalgames.loot.item.LootItem;
 import com.thenexusreborn.survivalgames.loot.tables.SGLootTable;
 import com.thenexusreborn.survivalgames.map.SQLMapManager;
-import com.thenexusreborn.survivalgames.mutations.Mutation;
+import com.thenexusreborn.survivalgames.menu.TeamMenu;
 import com.thenexusreborn.survivalgames.mutations.MutationType;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.settings.LobbySettings;
@@ -48,7 +49,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.lang.reflect.Field;
@@ -136,7 +136,10 @@ public class SGCommand implements CommandExecutor {
                 return true;
             }
 
+            GuiManager guiManager = Bukkit.getServicesManager().getRegistration(GuiManager.class).getProvider();
             switch (gameSubCommand) {
+                case "tributes", "tr" -> guiManager.openGUI(new TeamMenu(plugin, GameTeam.TRIBUTES, game, player.getUniqueId()), player);
+                case "spectators", "sp" -> guiManager.openGUI(new TeamMenu(plugin, GameTeam.SPECTATORS, game, player.getUniqueId()), player);
                 case "setup" -> {
                     if (game.getState() != GameState.UNDEFINED) {
                         sender.sendMessage(MsgType.WARN.format("The game has already been setup."));
@@ -391,34 +394,7 @@ public class SGCommand implements CommandExecutor {
                                 }
                             }
 
-                            target.sendMessage(target.getTeam().getLeaveMessage());
-                            target.setTeam(GameTeam.TRIBUTES);
-                            target.sendMessage(target.getTeam().getJoinMessage());
-
-                            target.clearInventory();
-                            target.clearPotionEffects();
-                            target.setFood(20, game.getSettings().getStartingSaturation());
-                            target.setFlight(false, false);
-                            target.setCollisions(true);
-
-                            int index = new Random().nextInt(game.getSpawns().size());
-                            MapSpawn spawnPosition = game.getGameMap().getSpawns().get(index);
-                            Location spawn = spawnPosition.toGameLocation(game.getGameMap().getWorld(), game.getGameMap().getCenterLocation());
-                            game.teleportTribute(Bukkit.getPlayer(target.getUniqueId()), spawn);
-
-                            if (lootTable != null && amountOfItems > 1) {
-                                List<ItemStack> loot = lootTable.generateLoot(amountOfItems);
-                                for (ItemStack item : loot) {
-                                    target.addItem(item);
-                                }
-                            }
-
-                            game.sendMessage(MsgType.INFO.format("%v was added to the game by %v.", target.getColoredName(), sgPlayer.getNexusPlayer().getColoredName()));
-                            if (lootTable != null && amountOfItems > 1) {
-                                game.getGameInfo().getActions().add(new GamePlayerAddAction(player.getName(), target.getName(), lootTable.getName(), amountOfItems));
-                            } else {
-                                game.getGameInfo().getActions().add(new GamePlayerAddAction(player.getName(), target.getName()));
-                            }
+                            game.addAsTribute(sgPlayer, target, lootTable, amountOfItems);
                         }
                         case "remove", "rm" -> {
                             // /sg game player remove|rm <player>
@@ -427,16 +403,7 @@ public class SGCommand implements CommandExecutor {
                                 return true;
                             }
 
-                            target.sendMessage(target.getTeam().getLeaveMessage());
-                            target.setTeam(GameTeam.SPECTATORS);
-                            target.clearInventory();
-                            target.clearPotionEffects();
-                            target.giveSpectatorItems(game);
-                            target.sendMessage(target.getTeam().getJoinMessage());
-
-                            game.teleportSpectator(Bukkit.getPlayer(target.getUniqueId()), game.getGameMap().getCenterLocation());
-                            game.sendMessage(MsgType.INFO.format("%v was removed from the game by %v.", target.getColoredName(), sgPlayer.getNexusPlayer().getColoredName()));
-                            game.getGameInfo().getActions().add(new GamePlayerRemoveAction(player.getName(), target.getName()));
+                            game.removeFromGame(sgPlayer, target);
                         }
                         case "revive", "rv" -> {
                             // /sg game player revive|rv <player> [<loottable>:<amount>]
@@ -481,35 +448,13 @@ public class SGCommand implements CommandExecutor {
                                 }
                             }
 
-                            target.sendMessage(target.getTeam().getLeaveMessage());
-                            target.setTeam(GameTeam.TRIBUTES);
-                            target.sendMessage(target.getTeam().getJoinMessage());
-
-                            target.clearInventory();
-                            target.clearPotionEffects();
-                            target.setFood(20, game.getSettings().getStartingSaturation());
-                            target.setFlight(false, false);
-                            target.setCollisions(true);
-
-                            if (lootTable != null && amountOfItems > 1) {
-                                List<ItemStack> loot = lootTable.generateLoot(amountOfItems);
-                                for (ItemStack item : loot) {
-                                    target.addItem(item);
-                                }
-                            }
-
-                            game.sendMessage(MsgType.INFO.format("%v was revived by %v.", target.getColoredName(), sgPlayer.getNexusPlayer().getColoredName()));
-                            if (lootTable != null && amountOfItems > 1) {
-                                game.getGameInfo().getActions().add(new GamePlayerReviveAction(player.getName(), target.getName(), lootTable.getName(), amountOfItems));
-                            } else {
-                                game.getGameInfo().getActions().add(new GamePlayerReviveAction(player.getName(), target.getName()));
-                            }
+                            game.revivePlayer(sgPlayer, target, lootTable, amountOfItems);
                         }
 
                         case "mutate", "m" -> {
                             // /sg game player mutate|m <player> <type|random|select> [target|killer] [bypasstimer]
                             // The select option needs some backend reworks for mutations to work properly
-                            // The random option will bot be available yet
+                            // The random option will not be available yet
 
                             if (target.getTeam() != GameTeam.SPECTATORS) {
                                 sender.sendMessage(MsgType.WARN.format("%v is not a spectator.", target.getName()));
@@ -584,19 +529,7 @@ public class SGCommand implements CommandExecutor {
                                 bypassTimer = Boolean.parseBoolean(args[6]);
                             }
 
-                            Mutation mutation = Mutation.createInstance(game, type, target.getUniqueId(), mutationTarget.getUniqueId());
-                            target.setMutation(mutation);
-
-                            game.getGameInfo().getActions().add(new GamePlayerForceMutateAction(player.getName(), target.getName(), type, mutationTarget.getName(), bypassTimer));
-
-                            if (!bypassTimer) {
-                                mutation.startCountdown();
-                            } else {
-                                mutationTarget.sendMessage(StarColors.color("&6&l>> " + target.getColoredName().toUpperCase() + " &c&lIS AFTER YOU! RUN!"));
-
-                                game.getGameInfo().getActions().add(new GameMutateAction(target.getName(), mutationTarget.getName(), mutation.getType()));
-                                game.addMutation(mutation);
-                            }
+                            game.mutatePlayer(sgPlayer, target, type, mutationTarget, bypassTimer);
                         }
 
                         default -> {

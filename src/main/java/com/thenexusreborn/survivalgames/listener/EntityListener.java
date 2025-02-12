@@ -37,7 +37,7 @@ public class EntityListener implements Listener {
     public EntityListener(SurvivalGames plugin) {
         this.plugin = plugin;
     }
-
+    
     @EventHandler
     public void onEntityTarget(EntityTargetEvent e) {
         if (!(e.getTarget() instanceof Player target)) {
