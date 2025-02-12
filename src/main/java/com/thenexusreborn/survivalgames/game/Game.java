@@ -1,15 +1,15 @@
 package com.thenexusreborn.survivalgames.game;
 
+import com.stardevllc.clock.clocks.Timer;
+import com.stardevllc.colors.StarColors;
 import com.stardevllc.helper.StringHelper;
 import com.stardevllc.registry.StringRegistry;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
-import com.stardevllc.colors.StarColors;
 import com.stardevllc.starcore.utils.Cuboid;
 import com.stardevllc.time.TimeFormat;
 import com.stardevllc.time.TimeUnit;
-import com.stardevllc.clock.clocks.Timer;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.gamearchive.GameAction;
 import com.thenexusreborn.api.gamearchive.GameInfo;
@@ -35,14 +35,13 @@ import com.thenexusreborn.survivalgames.game.death.KillerInfo;
 import com.thenexusreborn.survivalgames.game.timer.callbacks.GameMinutesCallback;
 import com.thenexusreborn.survivalgames.game.timer.callbacks.GameSecondsCallback;
 import com.thenexusreborn.survivalgames.game.timer.endconditions.*;
+import com.thenexusreborn.survivalgames.gamelog.*;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
 import com.thenexusreborn.survivalgames.lobby.LobbyType;
 import com.thenexusreborn.survivalgames.loot.item.Items;
-import com.thenexusreborn.survivalgames.mutations.Mutation;
-import com.thenexusreborn.survivalgames.mutations.MutationEffect;
-import com.thenexusreborn.survivalgames.mutations.MutationItem;
-import com.thenexusreborn.survivalgames.mutations.MutationType;
+import com.thenexusreborn.survivalgames.loot.tables.SGLootTable;
+import com.thenexusreborn.survivalgames.mutations.*;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.sponsoring.SponsorManager;
@@ -51,6 +50,7 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -192,8 +192,136 @@ public class Game {
     public Timer getGraceperiodTimer() {
         return graceperiodTimer;
     }
+    
+    public void addAsTribute(SGPlayer actor, GamePlayer target, SGLootTable lootTable, int amountOfItems) {
+        if (target.getTeam() != GameTeam.SPECTATORS) {
+            return;
+        }
+        
+        target.sendMessage(target.getTeam().getLeaveMessage());
+        target.setTeam(GameTeam.TRIBUTES);
+        target.sendMessage(target.getTeam().getJoinMessage());
 
-    public void addPlayer(NexusPlayer nexusPlayer, SGPlayerStats stats) {
+        target.clearInventory();
+        target.clearPotionEffects();
+        target.setFood(20, getSettings().getStartingSaturation());
+        target.setFlight(false, false);
+        target.setCollisions(true);
+
+        int index = new Random().nextInt(getSpawns().size());
+        MapSpawn spawnPosition = getGameMap().getSpawns().get(index);
+        Location spawn = spawnPosition.toGameLocation(getGameMap().getWorld(), getGameMap().getCenterLocation());
+        teleportTribute(Bukkit.getPlayer(target.getUniqueId()), spawn);
+
+        if (lootTable != null && amountOfItems > 1) {
+            List<ItemStack> loot = lootTable.generateLoot(amountOfItems);
+            for (ItemStack item : loot) {
+                target.addItem(item);
+            }
+        }
+
+        sendMessage(MsgType.INFO.format("%v was added to the game by %v.", target.getColoredName(), actor.getNexusPlayer().getColoredName()));
+        if (lootTable != null && amountOfItems > 1) {
+            getGameInfo().getActions().add(new GamePlayerAddAction(actor.getName(), target.getName(), lootTable.getName(), amountOfItems));
+        } else {
+            getGameInfo().getActions().add(new GamePlayerAddAction(actor.getName(), target.getName()));
+        }
+    }
+    
+    public void removeFromGame(SGPlayer actor, GamePlayer target) {
+        if (target.getTeam() == GameTeam.SPECTATORS) {
+            return;
+        }
+        
+        target.sendMessage(target.getTeam().getLeaveMessage());
+        target.setTeam(GameTeam.SPECTATORS);
+        target.clearInventory();
+        target.clearPotionEffects();
+        target.giveSpectatorItems(this);
+        target.sendMessage(target.getTeam().getJoinMessage());
+
+        teleportSpectator(Bukkit.getPlayer(target.getUniqueId()), getGameMap().getCenterLocation());
+        sendMessage(MsgType.INFO.format("%v was removed from the game by %v.", target.getColoredName(), actor.getNexusPlayer().getColoredName()));
+        getGameInfo().getActions().add(new GamePlayerRemoveAction(actor.getName(), target.getName()));
+    }
+    
+    public void revivePlayer(SGPlayer actor, GamePlayer target, SGLootTable lootTable, int amountOfItems) {
+        if (target.getTeam() != GameTeam.SPECTATORS) {
+            return;
+        }
+
+        if (!target.isSpectatorByDeath()) {
+            return;
+        }
+
+        DeathInfo mostRecentDeath = target.getMostRecentDeath();
+
+        if (mostRecentDeath == null) {
+            return;
+        }
+
+        target.sendMessage(target.getTeam().getLeaveMessage());
+        target.setTeam(GameTeam.TRIBUTES);
+        target.sendMessage(target.getTeam().getJoinMessage());
+
+        target.clearInventory();
+        target.clearPotionEffects();
+        target.setFood(20, getSettings().getStartingSaturation());
+        target.setFlight(false, false);
+        target.setCollisions(true);
+
+        if (lootTable != null && amountOfItems > 1) {
+            List<ItemStack> loot = lootTable.generateLoot(amountOfItems);
+            for (ItemStack item : loot) {
+                target.addItem(item);
+            }
+        }
+
+        sendMessage(MsgType.INFO.format("%v was revived by %v.", target.getColoredName(), actor.getNexusPlayer().getColoredName()));
+        if (lootTable != null && amountOfItems > 1) {
+            getGameInfo().getActions().add(new GamePlayerReviveAction(actor.getName(), target.getName(), lootTable.getName(), amountOfItems));
+        } else {
+            getGameInfo().getActions().add(new GamePlayerReviveAction(actor.getName(), target.getName()));
+        }
+    }
+    
+    public void mutatePlayer(SGPlayer actor, MutationBuilder builder) {
+        mutatePlayer(actor, builder.getPlayer(), builder.getType(), builder.getTarget(), builder.isBypassTimer());
+    }
+    
+    public void mutatePlayer(SGPlayer actor, GamePlayer target, MutationType type, GamePlayer mutationTarget, boolean bypassTimer) {
+        if (target.getTeam() != GameTeam.SPECTATORS) {
+            return;
+        }
+
+        if (type == null) {
+            return;
+        }
+        
+        if (mutationTarget == null) {
+            return;
+        }
+
+        if (mutationTarget.getTeam() != GameTeam.TRIBUTES) {
+            return;
+        }
+
+        Mutation mutation = Mutation.createInstance(this, type, target.getUniqueId(), mutationTarget.getUniqueId());
+        target.setMutation(mutation);
+
+        getGameInfo().getActions().add(new GamePlayerForceMutateAction(actor.getName(), target.getName(), type, mutationTarget.getName(), bypassTimer));
+
+        if (!bypassTimer) {
+            mutation.startCountdown();
+        } else {
+            mutationTarget.sendMessage(StarColors.color("&6&l>> " + target.getColoredName().toUpperCase() + " &c&lIS AFTER YOU! RUN!"));
+
+            getGameInfo().getActions().add(new GameMutateAction(target.getName(), mutationTarget.getName(), mutation.getType()));
+            addMutation(mutation);
+        }
+    }
+
+    public void join(NexusPlayer nexusPlayer, SGPlayerStats stats) {
         GamePlayer gamePlayer = new GamePlayer(nexusPlayer, this, stats);
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId());
         sgPlayer.setGame(this, gamePlayer);
@@ -236,10 +364,10 @@ public class Game {
         gamePlayer.setStatus(GamePlayer.Status.READY);
     }
     
-    public void removePlayer(UUID uuid) {
+    public void quit(UUID uuid) {
         NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(uuid);
         if (nexusPlayer != null) {
-            removePlayer(nexusPlayer);
+            quit(nexusPlayer);
         } else {
             this.players.remove(uuid);
             for (GameTeamChatroom gtc : this.chatRooms.values()) {
@@ -249,7 +377,7 @@ public class Game {
         }
     }
 
-    public void removePlayer(NexusPlayer nexusPlayer) {
+    public void quit(NexusPlayer nexusPlayer) {
         if (!this.players.containsKey(nexusPlayer.getUniqueId())) {
             return;
         }
