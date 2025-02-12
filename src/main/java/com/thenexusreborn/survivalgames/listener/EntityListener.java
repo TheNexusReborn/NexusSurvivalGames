@@ -66,6 +66,13 @@ public class EntityListener implements Listener {
 
     @EventHandler
     public void onEntityDamage(EntityDamageEvent e) {
+        if (e.getEntity() instanceof Item) {
+            if (e.getCause() == DamageCause.ENTITY_EXPLOSION || e.getCause() == DamageCause.ENTITY_EXPLOSION) {
+                e.setCancelled(true);
+                return;
+            }
+        }
+        
         if (!(e.getEntity() instanceof Player player)) {
             return;
         }
