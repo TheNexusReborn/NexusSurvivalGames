@@ -149,7 +149,7 @@ public class Game {
 
     public void handleShutdown() {
         this.state = SHUTTING_DOWN;
-        sendMessage("&4&l>> THE SERVER IS SHUTTING DOWN!");
+//        sendMessage("&4&l>> THE SERVER IS SHUTTING DOWN!");
         if (this.timer != null) {
             this.timer.cancel();
         }

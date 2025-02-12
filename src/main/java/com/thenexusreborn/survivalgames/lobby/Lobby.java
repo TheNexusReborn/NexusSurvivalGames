@@ -285,7 +285,7 @@ public class Lobby {
 
     public void handleShutdown() {
         this.state = LobbyState.SHUTTING_DOWN;
-        sendMessage("&4&l>> THE SERVER IS SHUTTING DOWN!");
+//        sendMessage("&4&l>> THE SERVER IS SHUTTING DOWN!");
         if (timer != null) {
             timer.cancel();
         }
