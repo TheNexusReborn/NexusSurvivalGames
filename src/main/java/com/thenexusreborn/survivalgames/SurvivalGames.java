@@ -237,6 +237,8 @@ public class SurvivalGames extends NexusSpigotPlugin {
         new ToggleCmd(this, "spectatorchat", "specchat");
         new ToggleCmd(this, "allowsponsors", "sponsors");
         getCommand("ratemap").setExecutor(new RateMapCmd(this));
+        
+        new GraceperiodCmd(this);
 
         getLogger().info("Registered commands");
 
