@@ -102,13 +102,13 @@ public class SGVirtualServer extends VirtualServer {
                     @Override
                     public void run() {
                         if (game.getState() != GameState.ASSIGN_TEAMS) {
-                            game.addPlayer(nexusPlayer, stats);
+                            game.join(nexusPlayer, stats);
                             cancel();
                         }
                     }
                 }.runTaskTimer(plugin, 1L, 1L);
             } else {
-                game.addPlayer(nexusPlayer, stats);
+                game.join(nexusPlayer, stats);
             }
         } else {
             lobby.addPlayer(sgPlayer);
@@ -126,7 +126,7 @@ public class SGVirtualServer extends VirtualServer {
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId());
 
         if (sgPlayer.getGame() != null) {
-            sgPlayer.getGame().removePlayer(nexusPlayer);
+            sgPlayer.getGame().quit(nexusPlayer);
         }
 
         if (sgPlayer.getLobby() != null) {
@@ -145,7 +145,7 @@ public class SGVirtualServer extends VirtualServer {
         }
         
         if (this.game != null) {
-            this.game.removePlayer(uuid);
+            this.game.quit(uuid);
         }
     }
 
