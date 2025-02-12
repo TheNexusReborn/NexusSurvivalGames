@@ -209,6 +209,12 @@ public class EntityListener implements Listener {
                         e.setCancelled(true);
                     }
                 }
+            } else if (e.getDamager() instanceof Arrow) {
+                if (targetPlayer.getMutation() != null) {
+                    if (targetPlayer.getMutation().getType() == MutationType.ENDERMAN) {
+                        e.setCancelled(true);
+                    }
+                }
             }
         } else if (e.getDamager() instanceof TNTPrimed) {
             if (e.getEntity() instanceof Player target) {
