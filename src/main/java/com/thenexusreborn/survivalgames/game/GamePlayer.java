@@ -55,6 +55,10 @@ public class GamePlayer {
         this.stats = stats;
     }
 
+    public Game getGame() {
+        return game;
+    }
+
     public SGPlayerStats getStats() {
         return stats;
     }
