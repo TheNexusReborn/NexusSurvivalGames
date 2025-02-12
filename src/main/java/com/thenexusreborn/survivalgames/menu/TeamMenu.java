@@ -36,16 +36,16 @@ public class TeamMenu extends InventoryGUI implements UpdatingGUI {
     @Override
     public void createItems() {
         if (game != null) {
-            for (GamePlayer player : game.getPlayers().values()) {
-                if (!player.getToggleValue("vanish")) {
-                    if (player.getTeam() == team) {
+            for (GamePlayer gamePlayer : game.getPlayers().values()) {
+                if (!gamePlayer.getToggleValue("vanish")) {
+                    if (gamePlayer.getTeam() == team) {
                         Button button = new Button().iconCreator(p -> {
-                            ItemStack skull = SpigotUtils.getPlayerSkull(Bukkit.getPlayer(player.getUniqueId()));
+                            ItemStack skull = SpigotUtils.getPlayerSkull(Bukkit.getPlayer(gamePlayer.getUniqueId()));
                             ItemMeta meta = skull.getItemMeta();
-                            meta.setDisplayName(StarColors.color(player.getDisplayName()));
+                            meta.setDisplayName(StarColors.color(gamePlayer.getDisplayName()));
                             skull.setItemMeta(meta);
                             return skull;
-                        }).consumer(e -> manager.openGUI(new PlayerMenu(plugin, player), (Player) e.getWhoClicked()));
+                        }).consumer(e -> manager.openGUI(new PlayerMenu(plugin, this.playerUUID, gamePlayer), (Player) e.getWhoClicked()));
                         addElement(button);
                     }
                 }
