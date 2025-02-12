@@ -8,16 +8,19 @@ import com.stardevllc.starui.element.Element;
 import com.stardevllc.starui.element.button.Button;
 import com.stardevllc.starui.gui.InventoryGUI;
 import com.stardevllc.starui.gui.UpdatingGUI;
+import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.game.GameTeam;
+import com.thenexusreborn.survivalgames.menu.manage.PlayerManageMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class PlayerMenu extends InventoryGUI implements UpdatingGUI {
@@ -25,14 +28,15 @@ public class PlayerMenu extends InventoryGUI implements UpdatingGUI {
     private SurvivalGames plugin;
     private GamePlayer player;
 
-    public PlayerMenu(SurvivalGames plugin, GamePlayer player) {
-        super(1, "&lMenu " + player.getName(), player.getUniqueId());
+    public PlayerMenu(SurvivalGames plugin, UUID playerUUID, GamePlayer player) {
+        super(1, "&lMenu " + player.getName(), playerUUID);
         this.plugin = plugin;
         this.player = player;
     }
 
     @Override
     public void createItems() {
+        GuiManager manager = plugin.getServer().getServicesManager().getRegistration(GuiManager.class).getProvider();
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
 
         Button teleportButton = new Button().iconCreator(p -> ItemBuilder.of(XMaterial.ENDER_PEARL).displayName("&e&lTeleport").build())
@@ -55,7 +59,6 @@ public class PlayerMenu extends InventoryGUI implements UpdatingGUI {
         if (sgPlayer.getGame().getSettings().isAllowSponsoring() && player.getToggleValue("allowsponsors") && player.getTeam() == GameTeam.TRIBUTES) {
             Button sponsorButton = new Button().iconCreator(p -> ItemBuilder.of(XMaterial.CHEST).displayName("&e&lSponsor").build())
                     .consumer(e -> {
-                        GuiManager manager = plugin.getServer().getServicesManager().getRegistration(GuiManager.class).getProvider();
                         SGPlayer actor = plugin.getPlayerRegistry().get(e.getWhoClicked().getUniqueId());
                         if (actor.getGame() == null) {
                             e.getWhoClicked().sendMessage(MsgType.WARN.format("You are not in a game."));
@@ -85,5 +88,17 @@ public class PlayerMenu extends InventoryGUI implements UpdatingGUI {
 
         Element typeElement = new Element().iconCreator(p -> ItemBuilder.of(XMaterial.PLAYER_HEAD).displayName(player.getTeam().getColor() + "&l" + player.getTeam().name().substring(0, player.getTeam().name().length() - 1)).build());
         addElement(typeElement);
+
+        SGPlayer nexusPlayer = plugin.getPlayerRegistry().get(playerUUID);
+        if (nexusPlayer == null) {
+            return;
+        }
+        
+        if (nexusPlayer.getNexusPlayer().getRank().ordinal() > Rank.ADMIN.ordinal()) {
+            return;
+        }
+        
+        Button manageButton = new Button().iconCreator(p -> ItemBuilder.of(XMaterial.ENDER_CHEST).displayName("&c&lMANAGE").build()).consumer(e -> manager.openGUI(new PlayerManageMenu(plugin, nexusPlayer.getGame(), nexusPlayer, player), (Player) e.getWhoClicked()));
+        addElement(manageButton);
     }
 }
