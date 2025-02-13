@@ -82,6 +82,7 @@ public class SGVirtualServer extends VirtualServer {
 
     @Override
     public void join(NexusPlayer nexusPlayer) {
+        nexusPlayer.setServer(this);
         if (game == null) {
             if (lobby.getPlayingCount() >= lobby.getLobbySettings().getMaxPlayers()) {
                 boolean isStaff = nexusPlayer.getRank().ordinal() <= Rank.HELPER.ordinal();
