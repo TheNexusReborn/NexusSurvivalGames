@@ -12,6 +12,7 @@ import org.bukkit.ChatColor;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+@SuppressWarnings("DuplicatedCode")
 public class MutationBoard extends SpigotScoreboardView {
     private SurvivalGames plugin;
     
@@ -33,15 +34,31 @@ public class MutationBoard extends SpigotScoreboardView {
         createTeam(new TeamBuilder("targetLabel").entry("&6&lTARGET:").score(13));
         createTeam(new TeamBuilder("targetValue").entry(ChatColor.WHITE).score(12).valueUpdater((player, team) -> {
             GamePlayer gamePlayer = plugin.getPlayerRegistry().get(player.getUniqueId()).getGamePlayer();
+            
+            if (gamePlayer == null) {
+                return;
+            }
+            
             if (gamePlayer.getTeam() != GameTeam.MUTATIONS) {
                 team.setSuffix("None");
                 return; 
             }
+            
             Mutation mutation = gamePlayer.getMutation();
+            
+            if (mutation == null) {
+                return;
+            }
+            
+            if (mutation.getTarget() == null) {
+                return;
+            }
+            
             SGPlayer targetPlayer = plugin.getPlayerRegistry().get(mutation.getTarget());
             if (targetPlayer == null) {
                 return;
             }
+            
             GamePlayer target = targetPlayer.getGamePlayer();
             if (target == null) {
                 team.setSuffix("None");
@@ -55,11 +72,25 @@ public class MutationBoard extends SpigotScoreboardView {
         createTeam(new TeamBuilder("typeLabel").entry("&6&lTYPE:").score(10));
         createTeam(new TeamBuilder("typeValue").entry(ChatColor.BLACK).score(9).valueUpdater((player, team) -> {
             GamePlayer gamePlayer = plugin.getPlayerRegistry().get(player.getUniqueId()).getGamePlayer();
+            
+            if (gamePlayer == null) {
+                return;
+            }
+            
             if (gamePlayer.getTeam() != GameTeam.MUTATIONS) {
                 team.setSuffix("None");
                 return;
             }
             Mutation mutation = gamePlayer.getMutation();
+            
+            if (mutation == null) {
+                return;
+            }
+            
+            if (mutation.getType() == null) {
+                return;
+            }
+            
             team.setSuffix("&f" + mutation.getType().getDisplayName());
         }));
     }
