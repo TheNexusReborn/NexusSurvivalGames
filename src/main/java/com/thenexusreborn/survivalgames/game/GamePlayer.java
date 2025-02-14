@@ -10,6 +10,7 @@ import com.thenexusreborn.api.player.PlayerBalance;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.tags.Tag;
+import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.chat.GameTeamChatroom;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.game.death.KillerInfo;
@@ -289,7 +290,7 @@ public class GamePlayer {
             return new Pair<>(false, "You can only mutate if you died to a player.");
         }
 
-        UUID killerUUID = getKiller();
+        UUID killerUUID = getMutationTarget();
         GamePlayer killer = game.getPlayer(killerUUID);
         if (killer == null) {
             return new Pair<>(false, "Your killer left, you cannot mutate.");
@@ -348,42 +349,55 @@ public class GamePlayer {
         return false;
     }
 
-    public UUID getKiller() {
+    public UUID getMutationTarget() {
         DeathInfo mostRecentDeath = this.getMostRecentDeath();
-        if (mostRecentDeath != null) {
-            if (mostRecentDeath.getKiller() != null) {
-                if (mostRecentDeath.getKiller().getType() == EntityType.PLAYER) {
-                    KillerInfo killerInfo = mostRecentDeath.getKiller();
-                    UUID killerUUID = killerInfo.getKiller();
-
-                    if (!game.getSettings().isAllowKillersKiller()) {
-                        return killerUUID;
-                    }
-                    
-                    GamePlayer killerPlayer = game.getPlayer(killerUUID);
-                    if (killerPlayer == null) {
-                        return null;
-                    }
-                    
-                    if (killerPlayer.getTeam() == GameTeam.TRIBUTES) {
-                        return killerUUID;
-                    }
-
-                    UUID killersKiller = killerPlayer.getKiller();
-                    
-                    if (getUniqueId().equals(killersKiller)) {
-                        return null;
-                    }
-                    
-                    if (killerUUID.equals(killersKiller)) {
-                        return null;
-                    }
-                    
-                    return killersKiller;
-                }
-            }
+        if (mostRecentDeath == null) {
+            return null;
         }
-        return null;
+
+        KillerInfo killerInfo = mostRecentDeath.getKiller();
+        if (killerInfo == null) {
+            return null;
+        }
+        
+        if (killerInfo.getKiller().equals(this.getUniqueId())) {
+            return killerInfo.getKiller();
+        }
+        
+        if (!game.getSettings().isAllowKillersKiller()) {
+            return killerInfo.getKiller();
+        }
+        
+        GamePlayer killerPlayer = game.getPlayer(killerInfo.getKiller());
+        
+        if (killerPlayer == null) {
+            return killerInfo.getKiller();
+        }
+        
+        if (killerPlayer.getTeam() == GameTeam.TRIBUTES) {
+            return killerPlayer.getUniqueId();
+        }
+
+        DeathInfo killerMostRecentDeath = killerPlayer.getMostRecentDeath();
+        if (killerMostRecentDeath == null) {
+            return killerInfo.getKiller();
+        }
+
+        KillerInfo killersKiller = killerMostRecentDeath.getKiller();
+        if (killersKiller == null) {
+            return killerInfo.getKiller();
+        }
+        
+        if (killersKiller.getKiller().equals(this.getUniqueId())) {
+            return killerInfo.getKiller();
+        }
+        
+        try {
+            return killerPlayer.getMutationTarget();
+        } catch (StackOverflowError e) {
+            SurvivalGames.getInstance().getLogger().severe("StackOverFlowError when trying to get mutation target");
+            return killerInfo.getKiller();            
+        }
     }
     
     public List<String> getMenuVitals() {
@@ -453,7 +467,7 @@ public class GamePlayer {
         String mutateName;
         
         if (canMutateStatus.key()) {
-            GamePlayer killer = game.getPlayer(getKiller());
+            GamePlayer killer = game.getPlayer(getMutationTarget());
             String passes;
             if (game.getSettings().isUnlimitedPasses()) {
                 passes = "Unlimited";

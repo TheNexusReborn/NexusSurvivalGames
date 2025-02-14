@@ -477,7 +477,7 @@ public class SGCommand implements CommandExecutor {
                             GamePlayer mutationTarget;
                             if (args.length > 5) {
                                 if (args[5].equalsIgnoreCase("killer")) {
-                                    UUID killerUUID = target.getKiller();
+                                    UUID killerUUID = target.getMutationTarget();
                                     if (killerUUID == null) {
                                         player.sendMessage(MsgType.WARN.format("%v does not have a recent player killer."));
                                         return true;
@@ -502,7 +502,7 @@ public class SGCommand implements CommandExecutor {
                                     }
                                 }
                             } else {
-                                UUID killerUUID = target.getKiller();
+                                UUID killerUUID = target.getMutationTarget();
                                 if (killerUUID == null) {
                                     player.sendMessage(MsgType.WARN.format("%v does not have a recent player killer.", target.getName()));
                                     return true;

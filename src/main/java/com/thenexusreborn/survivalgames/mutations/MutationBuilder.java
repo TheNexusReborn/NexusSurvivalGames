@@ -10,7 +10,7 @@ public class MutationBuilder {
 
     public MutationBuilder(GamePlayer player) {
         this.player = player;
-        this.target = player.getGame().getPlayer(player.getKiller());
+        this.target = player.getGame().getPlayer(player.getMutationTarget());
     }
 
     public MutationBuilder setType(MutationType type) {
