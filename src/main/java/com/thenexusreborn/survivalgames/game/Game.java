@@ -1269,7 +1269,9 @@ public class Game {
             if (state == INGAME) {
                 if (totalTributes > 1) {
                     if (controlType == ControlType.AUTO) {
-                        this.startDeathmatchTimer();
+                        if (this.timer.getTime() < 1000) {
+                            this.startDeathmatchTimer();
+                        }
                     } else {
                         sendMessage("&eTribute count reached or went below the deathmatch threashold, but was not automatically started due to being in manual mode.");
                     }
