@@ -1,6 +1,7 @@
 package com.thenexusreborn.survivalgames.listener;
 
 import com.stardevllc.colors.StarColors;
+import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
@@ -28,6 +29,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+@SuppressWarnings("DuplicatedCode")
 public class EntityListener implements Listener {
 
     private final SurvivalGames plugin;
@@ -250,11 +252,35 @@ public class EntityListener implements Listener {
 
     private void checkMutationDamage(GamePlayer damagerPlayer, GamePlayer targetPlayer, EntityDamageByEntityEvent e) {
         if (damagerPlayer.getTeam() == GameTeam.MUTATIONS) {
+            if (damagerPlayer.getMutation() == null) {
+                damagerPlayer.sendMessage(MsgType.ERROR.format("&lYou are set to the Mutation GameTeam, but your mutation information is null. Please report this to Firestar311."));
+                e.setCancelled(true);
+                return;
+            }
+            
+            if (damagerPlayer.getMutation().getTarget() == null) {
+                damagerPlayer.sendMessage(MsgType.ERROR.format("&lYou are set to the Mutation GameTeam, but your target is null. Please report this to Firestar311."));
+                e.setCancelled(true);
+                return;
+            }
+            
             if (!damagerPlayer.getMutation().getTarget().equals(targetPlayer.getUniqueId())) {
                 e.setCancelled(true);
                 damagerPlayer.sendMessage("&4&l>> &cYou can only damage your target.");
             }
         } else if (targetPlayer.getTeam() == GameTeam.MUTATIONS) {
+            if (targetPlayer.getMutation() == null) {
+                targetPlayer.sendMessage(MsgType.ERROR.format("&lYou are set to the Mutation GameTeam, but your mutation information is null. Please report this to Firestar311."));
+                e.setCancelled(true);
+                return;
+            }
+            
+            if (targetPlayer.getMutation().getTarget() == null) {
+                targetPlayer.sendMessage(MsgType.ERROR.format("&lYou are set to the Mutation GameTeam, but your target is null. Please report this to Firestar311."));
+                e.setCancelled(true);
+                return;
+            }
+            
             if (!targetPlayer.getMutation().getTarget().equals(damagerPlayer.getUniqueId())) {
                 e.setCancelled(true);
                 damagerPlayer.sendMessage("&4&l>> &cYou can only damage mutations that are after you.");
