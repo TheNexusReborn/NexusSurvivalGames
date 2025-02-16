@@ -129,7 +129,7 @@ public class Game {
             player.setActionBar(new GameActionBar(plugin, gamePlayer));
             this.players.put(gamePlayer.getUniqueId(), gamePlayer);
             this.gameChatroom.addMember(player.getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
-            
+
             if (sgPlayer.getNexusPlayer().getToggleValue("spectatorchat")) {
                 this.chatRooms.get(GameTeam.SPECTATORS).addMember(player.getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
             }
@@ -192,12 +192,12 @@ public class Game {
     public Timer getGraceperiodTimer() {
         return graceperiodTimer;
     }
-    
+
     public void addAsTribute(SGPlayer actor, GamePlayer target, SGLootTable lootTable, int amountOfItems) {
         if (target.getTeam() != GameTeam.SPECTATORS) {
             return;
         }
-        
+
         target.sendMessage(target.getTeam().getLeaveMessage());
         target.setTeam(GameTeam.TRIBUTES);
         target.sendMessage(target.getTeam().getJoinMessage());
@@ -227,12 +227,12 @@ public class Game {
             getGameInfo().getActions().add(new GamePlayerAddAction(actor.getName(), target.getName()));
         }
     }
-    
+
     public void removeFromGame(SGPlayer actor, GamePlayer target) {
         if (target.getTeam() == GameTeam.SPECTATORS) {
             return;
         }
-        
+
         target.sendMessage(target.getTeam().getLeaveMessage());
         target.setTeam(GameTeam.SPECTATORS);
         target.clearInventory();
@@ -244,7 +244,7 @@ public class Game {
         sendMessage(MsgType.INFO.format("%v was removed from the game by %v.", target.getColoredName(), actor.getNexusPlayer().getColoredName()));
         getGameInfo().getActions().add(new GamePlayerRemoveAction(actor.getName(), target.getName()));
     }
-    
+
     public void revivePlayer(SGPlayer actor, GamePlayer target, SGLootTable lootTable, int amountOfItems) {
         if (target.getTeam() != GameTeam.SPECTATORS) {
             return;
@@ -284,11 +284,11 @@ public class Game {
             getGameInfo().getActions().add(new GamePlayerReviveAction(actor.getName(), target.getName()));
         }
     }
-    
+
     public void mutatePlayer(SGPlayer actor, MutationBuilder builder) {
         mutatePlayer(actor, builder.getPlayer(), builder.getType(), builder.getTarget(), builder.isBypassTimer());
     }
-    
+
     public void mutatePlayer(SGPlayer actor, GamePlayer target, MutationType type, GamePlayer mutationTarget, boolean bypassTimer) {
         if (target.getTeam() != GameTeam.SPECTATORS) {
             return;
@@ -297,7 +297,7 @@ public class Game {
         if (type == null) {
             return;
         }
-        
+
         if (mutationTarget == null) {
             return;
         }
@@ -363,7 +363,7 @@ public class Game {
         gamePlayer.applyActionBar();
         gamePlayer.setStatus(GamePlayer.Status.READY);
     }
-    
+
     public void quit(UUID uuid) {
         NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(uuid);
         if (nexusPlayer != null) {
@@ -834,7 +834,7 @@ public class Game {
 
             GamePlayer gamePlayer = this.getPlayer(player.getUniqueId());
             gamePlayer.getCombatTag().setOther(null);
-            
+
             if (gamePlayer.getMutation() != null) {
                 removeMutation(gamePlayer.getMutation());
             }
@@ -964,7 +964,8 @@ public class Game {
             NexusAPI.getApi().getPrimaryDatabase().saveSilent(gameInfo);
             try {
                 NexusAPI.getApi().getGameLogExporter().exportGameInfo(gameInfo);
-            } catch (IOException e) {}
+            } catch (IOException e) {
+            }
             if (gameInfo.getId() == 0) {
                 sendMessage("&4&l>> &cThere was a database error archiving the game. Please report with date and time.");
             } else {
@@ -1266,19 +1267,6 @@ public class Game {
                 }
             }
 
-            if (totalTributes <= settings.getDeathmatchThreshold()) {
-                if (state == INGAME) {
-                    if (totalTributes > 1) {
-                        if (controlType == ControlType.AUTO) {
-                            if (this.timer.getTime() < 1000) {
-                                this.startDeathmatchTimer();
-                            }
-                        } else {
-                            sendMessage("&eTribute count reached or went below the deathmatch threashold, but was not automatically started due to being in manual mode.");
-                        }
-                    }
-                }
-            }
 
             GamePlayer killerPlayer = null;
             if (playerKiller) {
@@ -1391,9 +1379,36 @@ public class Game {
                     cancel();
                     return;
                 }
+                checkDeathmatchThreshold();
                 checkGameEnd();
+
             }
         }.runTaskLater(plugin, 1L);
+    }
+
+    public void checkDeathmatchThreshold() {
+        if (state != INGAME) {
+            return;
+        }
+
+        int totalTributes = 0;
+        for (GamePlayer player : this.players.values()) {
+            if (player.getTeam() == GameTeam.TRIBUTES) {
+                totalTributes++;
+            }
+        }
+
+        if (totalTributes <= settings.getDeathmatchThreshold()) {
+            if (totalTributes > 1) {
+                if (controlType == ControlType.AUTO) {
+                    if (this.timer.getTime() > 60000) {
+                        this.startDeathmatchTimer();
+                    }
+                } else {
+                    sendMessage("&eTribute count reached or went below the deathmatch threashold, but was not automatically started due to being in manual mode.");
+                }
+            }
+        }
     }
 
     public void giveSpectatorItems(Player p) {
@@ -1429,7 +1444,7 @@ public class Game {
         if (uniqueId == null) {
             return null;
         }
-        
+
         for (GamePlayer player : new ArrayList<>(this.players.values())) {
             if (player.getUniqueId().toString().equalsIgnoreCase(uniqueId.toString())) {
                 return player;
