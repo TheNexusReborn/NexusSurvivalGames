@@ -458,10 +458,6 @@ public class GamePlayer {
     }
     
     public void giveSpectatorItems(Game game) {
-        ItemStack tributesBook = ItemBuilder.of(XMaterial.ENCHANTED_BOOK).displayName("&a&lTributes &7&o(Right Click)").build();
-        ItemStack mutationsBook = ItemBuilder.of(XMaterial.ENCHANTED_BOOK).displayName("&d&lMutations &7&o(Right Click)").build();
-        ItemStack spectatorsBook = ItemBuilder.of(XMaterial.ENCHANTED_BOOK).displayName("&c&lSpectators &7&o(Right Click)").build();
-
         Pair<Boolean, String> canMutateStatus = canMutate();
         
         String mutateName;
@@ -480,18 +476,15 @@ public class GamePlayer {
         }
         
         ItemStack mutateItem = ItemBuilder.of(XMaterial.ROTTEN_FLESH).displayName(mutateName).build();
-        ItemStack compass = ItemBuilder.of(XMaterial.COMPASS).displayName("&fPlayer Tracker").build();
-        ItemStack tpCenter = ItemBuilder.of(XMaterial.CLOCK).displayName("&e&lTeleport to Map Center &7&o(Right Click)").build();
-        ItemStack hubItem = ItemBuilder.of(XMaterial.OAK_DOOR).displayName("&e&lReturn to Hub &7(Right Click)").build();
         Player p = Bukkit.getPlayer(getUniqueId());
         PlayerInventory inv = p.getInventory();
-        inv.setItem(0, tributesBook);
-        inv.setItem(1, mutationsBook);
-        inv.setItem(2, spectatorsBook);
+        inv.setItem(0, SurvivalGames.tributesBook.toItemStack());
+        inv.setItem(1, SurvivalGames.mutationsBook.toItemStack());
+        inv.setItem(2, SurvivalGames.spectatorsBook.toItemStack());
         inv.setItem(5, mutateItem);
-        inv.setItem(6, compass);
-        inv.setItem(7, tpCenter);
-        inv.setItem(8, hubItem);
+        inv.setItem(6, SurvivalGames.playerTrackerItem.toItemStack());
+        inv.setItem(7, SurvivalGames.tpToMapCenterItem.toItemStack());
+        inv.setItem(8, SurvivalGames.toHubItem.toItemStack());
     }
     
     private void callPlayerMethod(Consumer<Player> consumer) {

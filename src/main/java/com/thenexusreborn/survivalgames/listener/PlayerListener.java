@@ -1,10 +1,10 @@
 package com.thenexusreborn.survivalgames.listener;
 
+import com.stardevllc.colors.StarColors;
 import com.stardevllc.helper.Pair;
 import com.stardevllc.itembuilder.ItemBuilder;
 import com.stardevllc.itembuilder.XMaterial;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
-import com.stardevllc.colors.StarColors;
 import com.stardevllc.starui.GuiManager;
 import com.stardevllc.time.TimeUnit;
 import com.thenexusreborn.api.NexusAPI;
@@ -28,7 +28,6 @@ import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.loot.tables.SGLootTable;
 import com.thenexusreborn.survivalgames.menu.MutateGui;
 import com.thenexusreborn.survivalgames.menu.SwagShackMenu;
-import com.thenexusreborn.survivalgames.menu.TeamMenu;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
 import com.thenexusreborn.survivalgames.mutations.MutationType;
 import com.thenexusreborn.survivalgames.mutations.impl.ChickenMutation;
@@ -146,36 +145,13 @@ public class PlayerListener implements Listener {
                 if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
                     if (e.getItem() != null) {
                         ItemStack item = e.getItem();
-                        if (item.getType() == Material.ENCHANTED_BOOK) {
-                            ItemMeta itemMeta = item.getItemMeta();
-                            String displayName = itemMeta.getDisplayName();
-                            if (displayName != null && !displayName.isEmpty()) {
-                                GameTeam team = null;
-                                if (displayName.toLowerCase().contains("tributes")) {
-                                    team = GameTeam.TRIBUTES;
-                                } else if (displayName.toLowerCase().contains("mutations")) {
-                                    team = GameTeam.MUTATIONS;
-                                } else if (displayName.toLowerCase().contains("spectators")) {
-                                    team = GameTeam.SPECTATORS;
-                                }
-
-                                if (team != null) {
-                                    manager.openGUI(new TeamMenu(plugin, team, game, player.getUniqueId()), player);
-                                }
-                            }
-                        } else if (item.getType() == Material.ROTTEN_FLESH) {
+                        if (item.getType() == Material.ROTTEN_FLESH) {
                             Pair<Boolean, String> canMutateResult = gamePlayer.canMutate();
                             if (canMutateResult.key()) {
                                 manager.openGUI(new MutateGui(plugin, gamePlayer), player);
                             } else {
                                 gamePlayer.sendMessage(MsgType.WARN + canMutateResult.value());
                             }
-                        } else if (item.getType() == Material.WATCH) {
-                            player.teleport(game.getGameMap().getCenter().toLocation(game.getGameMap().getWorld()));
-                            gamePlayer.sendMessage("&6&l>> &eTeleported to the Map Center.");
-                        } else if (item.getType() == Material.WOOD_DOOR) {
-                            gamePlayer.sendMessage("&6&l>> &eSending you to the hub.");
-                            SGUtils.sendToHub(player);
                         }
                     }
                 }
@@ -255,9 +231,8 @@ public class PlayerListener implements Listener {
                     lobbyPlayer.getPlayer().setToggleValue("allowsponsors", !sponsorsValue);
                     sponsorsValue = lobbyPlayer.getToggleValue("allowsponsors");
                     XMaterial sponsorsItemMaterial = sponsorsValue ? XMaterial.GLOWSTONE_DUST : XMaterial.GUNPOWDER;
-                    player.getInventory().setItem(0, ItemBuilder.of(sponsorsItemMaterial).displayName("&e&lSponsors &7&o(Right click to toggle)").build());
-                } else if (e.getItem().getItemMeta().getDisplayName().contains("Return to Hub")) {
-                    SGUtils.sendToHub(player);
+                    String statusMessage = sponsorsValue ? "&a&lENABLED" : "&c&lDISABLED";
+                    player.getInventory().setItem(0, ItemBuilder.of(sponsorsItemMaterial).displayName("&e&lSponsors " + statusMessage + " &7&o(Right Click to toggle)").build());
                 }
             }
         }
