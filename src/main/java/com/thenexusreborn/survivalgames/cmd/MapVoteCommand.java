@@ -40,6 +40,11 @@ public class MapVoteCommand implements CommandExecutor {
         Game game = sgPlayer.getGame();
         Lobby lobby = sgPlayer.getLobby();
         
+        if (lobby == null) {
+            MsgType.WARN.send(sender, "You cannot use that command at this time.");
+            return true;
+        }
+        
         if (game != null) {
             sender.sendMessage(MsgType.WARN.format("You cannot vote for a map during a game."));
             return true;
