@@ -8,6 +8,7 @@ import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 public class PlayerUpdateThread extends StarThread<SurvivalGames> {
     public PlayerUpdateThread(SurvivalGames plugin) {
@@ -27,6 +28,11 @@ public class PlayerUpdateThread extends StarThread<SurvivalGames> {
                         SGUtils.updatePlayerHealthAndFood(Bukkit.getPlayer(player.getUniqueId()));
                     } else if (player.getTeam() == GameTeam.MUTATIONS) {
                         player.setFood(20, 20F);
+                    } else if (player.getTeam() == GameTeam.TRIBUTES) {
+                        Player bukkitPlayer = Bukkit.getPlayer(player.getUniqueId());
+                        if (bukkitPlayer.getHealth() >= bukkitPlayer.getMaxHealth()) {
+                            player.getDamageInfo().clearDamagers();
+                        }
                     }
                 }
             }

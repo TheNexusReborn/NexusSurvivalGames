@@ -21,3 +21,4 @@ commands:
   allowsponsors:
     aliases: [sponsors]
   sgmap:
+  graceperiod:

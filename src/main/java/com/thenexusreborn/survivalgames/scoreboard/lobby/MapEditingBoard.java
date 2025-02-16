@@ -33,7 +33,7 @@ public class MapEditingBoard extends SpigotScoreboardView {
                     String centerText = center.getX() + "," + center.getY() + "," + center.getZ();
                     SGUtils.setTeamValueForString(centerText, team);
                 } else {
-                    team.setPrefix("&fNot Set");
+                    SGUtils.setTeamValueForString("&fNot set", team);
                 }
             }
         }));
@@ -78,7 +78,7 @@ public class MapEditingBoard extends SpigotScoreboardView {
                     String swagShackText = swagShack.getX() + "," + swagShack.getY() + "," + swagShack.getZ();
                     SGUtils.setTeamValueForString(swagShackText, team);
                 } else {
-                    team.setPrefix("&fNot Set");
+                    SGUtils.setTeamValueForString("&fNot Set", team);
                 }
             }
         }));

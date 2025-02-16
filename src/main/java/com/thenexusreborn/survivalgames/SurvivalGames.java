@@ -6,6 +6,8 @@ import com.stardevllc.registry.UUIDRegistry;
 import com.stardevllc.starchat.ChatSelector;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.rooms.ChatRoom;
+import com.stardevllc.staritems.model.CustomItem;
+import com.stardevllc.staritems.model.ItemRegistry;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.registry.ToggleRegistry;
@@ -24,8 +26,13 @@ import com.thenexusreborn.nexuscore.cmds.ToggleCmd;
 import com.thenexusreborn.survivalgames.cmd.*;
 import com.thenexusreborn.survivalgames.disguises.NexusDisguises;
 import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.hooks.NexusHubHook;
 import com.thenexusreborn.survivalgames.hooks.SGPAPIExpansion;
+import com.thenexusreborn.survivalgames.items.GameTeamBook;
+import com.thenexusreborn.survivalgames.items.PlayerTrackerItem;
+import com.thenexusreborn.survivalgames.items.TPToMapCenterItem;
+import com.thenexusreborn.survivalgames.items.ToHubItem;
 import com.thenexusreborn.survivalgames.listener.BlockListener;
 import com.thenexusreborn.survivalgames.listener.EntityListener;
 import com.thenexusreborn.survivalgames.listener.PlayerListener;
@@ -83,6 +90,13 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
     public static final GameSettings globalGameSettings = new GameSettings();
     public static final LobbySettings globalLobbySettings = new LobbySettings();
+    
+    public static CustomItem tributesBook;
+    public static CustomItem mutationsBook;
+    public static CustomItem spectatorsBook;
+    public static CustomItem playerTrackerItem;
+    public static CustomItem tpToMapCenterItem;
+    public static CustomItem toHubItem;
     
     public static SurvivalGames getInstance() {
         return INSTANCE;
@@ -237,6 +251,8 @@ public class SurvivalGames extends NexusSpigotPlugin {
         new ToggleCmd(this, "spectatorchat", "specchat");
         new ToggleCmd(this, "allowsponsors", "sponsors");
         getCommand("ratemap").setExecutor(new RateMapCmd(this));
+        
+        new GraceperiodCmd(this);
 
         getLogger().info("Registered commands");
 
@@ -279,6 +295,17 @@ public class SurvivalGames extends NexusSpigotPlugin {
 //
 //            return line1 + "\n" + line2;
 //        });
+        
+        ItemRegistry itemRegistry = Bukkit.getServicesManager().getRegistration(ItemRegistry.class).getProvider();
+        
+        tributesBook = new GameTeamBook(this, GameTeam.TRIBUTES);
+        mutationsBook = new GameTeamBook(this, GameTeam.MUTATIONS);
+        spectatorsBook = new GameTeamBook(this, GameTeam.SPECTATORS);
+        playerTrackerItem = new PlayerTrackerItem(this);
+        tpToMapCenterItem = new TPToMapCenterItem(this);
+        toHubItem = new ToHubItem(this);
+        
+        itemRegistry.registerAll(tributesBook, mutationsBook, spectatorsBook, playerTrackerItem, tpToMapCenterItem, toHubItem);
         
         new NexusDisguises().init(this);
         getLogger().info("Loaded the disguises for mutations.");

@@ -70,6 +70,14 @@ public class GameSettings implements Cloneable {
     private boolean allowKillersKiller = true;
     private boolean tributesSeeSpectatorChat = true;
 
+    public void setGracePeriod(boolean gracePeriod) {
+        this.gracePeriod = gracePeriod;
+    }
+
+    public void setGracePeriodLength(int gracePeriodLength) {
+        this.gracePeriodLength = gracePeriodLength;
+    }
+
     public boolean canTributesSeeSpectatorChat() {
         return tributesSeeSpectatorChat;
     }

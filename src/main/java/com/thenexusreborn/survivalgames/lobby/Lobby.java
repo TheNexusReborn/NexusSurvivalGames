@@ -285,7 +285,7 @@ public class Lobby {
 
     public void handleShutdown() {
         this.state = LobbyState.SHUTTING_DOWN;
-        sendMessage("&4&l>> THE SERVER IS SHUTTING DOWN!");
+//        sendMessage("&4&l>> THE SERVER IS SHUTTING DOWN!");
         if (timer != null) {
             timer.cancel();
         }
@@ -628,8 +628,9 @@ public class Lobby {
 
             boolean sponsors = nexusPlayer.getToggleValue("allowsponsors");
             XMaterial sponsorsItemMaterial = sponsors ? XMaterial.GLOWSTONE_DUST : XMaterial.GUNPOWDER;
-            player.getInventory().setItem(0, ItemBuilder.of(sponsorsItemMaterial).displayName("&e&lSponsors &7&o(Right click to toggle)").build());
-            player.getInventory().setItem(8, ItemBuilder.of(XMaterial.OAK_DOOR).displayName("&e&lReturn to Hub &7(Right Click)").build());
+            String statusMessage = sponsors ? "&a&lENABLED" : "&c&lDISABLED";
+            player.getInventory().setItem(0, ItemBuilder.of(sponsorsItemMaterial).displayName("&e&lSponsors " + statusMessage + " &7&o(Right click to toggle)").build());
+            player.getInventory().setItem(8, SurvivalGames.toHubItem.toItemStack());
         }
 
         if (nexusPlayer.getRank().ordinal() <= Rank.DIAMOND.ordinal()) {

@@ -88,7 +88,7 @@ public class MutateGui extends InventoryGUI {
 
                         player.getStats().addTimesMutated(1);
 
-                        Mutation mutation = Mutation.createInstance(game, type, player.getUniqueId(), gamePlayer.getKiller());
+                        Mutation mutation = Mutation.createInstance(game, type, player.getUniqueId(), gamePlayer.getMutationTarget());
                         gamePlayer.setMutation(mutation);
                         mutation.startCountdown();
                         e.getWhoClicked().closeInventory();

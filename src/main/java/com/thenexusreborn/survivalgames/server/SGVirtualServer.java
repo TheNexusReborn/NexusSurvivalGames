@@ -15,6 +15,8 @@ import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyType;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.UUID;
@@ -81,7 +83,24 @@ public class SGVirtualServer extends VirtualServer {
     }
 
     @Override
+    public void teleportToSpawn(UUID uuid) {
+        if (!this.players.contains(uuid)) {
+            NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(uuid);
+            join(nexusPlayer);
+        } else {
+            Player player = Bukkit.getPlayer(uuid);
+            SGPlayer sgPlayer = plugin.getPlayerRegistry().get(uuid);
+            if (sgPlayer.getLobby() == null) {
+                this.lobby.addPlayer(sgPlayer);
+            } else {
+                player.teleport(this.lobby.getSpawnpoint());
+            }
+        }
+    }
+
+    @Override
     public void join(NexusPlayer nexusPlayer) {
+        nexusPlayer.setServer(this);
         if (game == null) {
             if (lobby.getPlayingCount() >= lobby.getLobbySettings().getMaxPlayers()) {
                 boolean isStaff = nexusPlayer.getRank().ordinal() <= Rank.HELPER.ordinal();
@@ -102,13 +121,13 @@ public class SGVirtualServer extends VirtualServer {
                     @Override
                     public void run() {
                         if (game.getState() != GameState.ASSIGN_TEAMS) {
-                            game.addPlayer(nexusPlayer, stats);
+                            game.join(nexusPlayer, stats);
                             cancel();
                         }
                     }
                 }.runTaskTimer(plugin, 1L, 1L);
             } else {
-                game.addPlayer(nexusPlayer, stats);
+                game.join(nexusPlayer, stats);
             }
         } else {
             lobby.addPlayer(sgPlayer);
@@ -126,7 +145,7 @@ public class SGVirtualServer extends VirtualServer {
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId());
 
         if (sgPlayer.getGame() != null) {
-            sgPlayer.getGame().removePlayer(nexusPlayer);
+            sgPlayer.getGame().quit(nexusPlayer);
         }
 
         if (sgPlayer.getLobby() != null) {
@@ -145,7 +164,7 @@ public class SGVirtualServer extends VirtualServer {
         }
         
         if (this.game != null) {
-            this.game.removePlayer(uuid);
+            this.game.quit(uuid);
         }
     }
 

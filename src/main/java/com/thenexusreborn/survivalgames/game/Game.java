@@ -1,15 +1,15 @@
 package com.thenexusreborn.survivalgames.game;
 
+import com.stardevllc.clock.clocks.Timer;
+import com.stardevllc.colors.StarColors;
 import com.stardevllc.helper.StringHelper;
 import com.stardevllc.registry.StringRegistry;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
-import com.stardevllc.colors.StarColors;
 import com.stardevllc.starcore.utils.Cuboid;
 import com.stardevllc.time.TimeFormat;
 import com.stardevllc.time.TimeUnit;
-import com.stardevllc.clock.clocks.Timer;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.gamearchive.GameAction;
 import com.thenexusreborn.api.gamearchive.GameInfo;
@@ -35,14 +35,13 @@ import com.thenexusreborn.survivalgames.game.death.KillerInfo;
 import com.thenexusreborn.survivalgames.game.timer.callbacks.GameMinutesCallback;
 import com.thenexusreborn.survivalgames.game.timer.callbacks.GameSecondsCallback;
 import com.thenexusreborn.survivalgames.game.timer.endconditions.*;
+import com.thenexusreborn.survivalgames.gamelog.*;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
 import com.thenexusreborn.survivalgames.lobby.LobbyType;
 import com.thenexusreborn.survivalgames.loot.item.Items;
-import com.thenexusreborn.survivalgames.mutations.Mutation;
-import com.thenexusreborn.survivalgames.mutations.MutationEffect;
-import com.thenexusreborn.survivalgames.mutations.MutationItem;
-import com.thenexusreborn.survivalgames.mutations.MutationType;
+import com.thenexusreborn.survivalgames.loot.tables.SGLootTable;
+import com.thenexusreborn.survivalgames.mutations.*;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.sponsoring.SponsorManager;
@@ -51,6 +50,7 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -149,7 +149,7 @@ public class Game {
 
     public void handleShutdown() {
         this.state = SHUTTING_DOWN;
-        sendMessage("&4&l>> THE SERVER IS SHUTTING DOWN!");
+//        sendMessage("&4&l>> THE SERVER IS SHUTTING DOWN!");
         if (this.timer != null) {
             this.timer.cancel();
         }
@@ -192,8 +192,136 @@ public class Game {
     public Timer getGraceperiodTimer() {
         return graceperiodTimer;
     }
+    
+    public void addAsTribute(SGPlayer actor, GamePlayer target, SGLootTable lootTable, int amountOfItems) {
+        if (target.getTeam() != GameTeam.SPECTATORS) {
+            return;
+        }
+        
+        target.sendMessage(target.getTeam().getLeaveMessage());
+        target.setTeam(GameTeam.TRIBUTES);
+        target.sendMessage(target.getTeam().getJoinMessage());
 
-    public void addPlayer(NexusPlayer nexusPlayer, SGPlayerStats stats) {
+        target.clearInventory();
+        target.clearPotionEffects();
+        target.setFood(20, getSettings().getStartingSaturation());
+        target.setFlight(false, false);
+        target.setCollisions(true);
+
+        int index = new Random().nextInt(getSpawns().size());
+        MapSpawn spawnPosition = getGameMap().getSpawns().get(index);
+        Location spawn = spawnPosition.toGameLocation(getGameMap().getWorld(), getGameMap().getCenterLocation());
+        teleportTribute(Bukkit.getPlayer(target.getUniqueId()), spawn);
+
+        if (lootTable != null && amountOfItems > 1) {
+            List<ItemStack> loot = lootTable.generateLoot(amountOfItems);
+            for (ItemStack item : loot) {
+                target.addItem(item);
+            }
+        }
+
+        sendMessage(MsgType.INFO.format("%v was added to the game by %v.", target.getColoredName(), actor.getNexusPlayer().getColoredName()));
+        if (lootTable != null && amountOfItems > 1) {
+            getGameInfo().getActions().add(new GamePlayerAddAction(actor.getName(), target.getName(), lootTable.getName(), amountOfItems));
+        } else {
+            getGameInfo().getActions().add(new GamePlayerAddAction(actor.getName(), target.getName()));
+        }
+    }
+    
+    public void removeFromGame(SGPlayer actor, GamePlayer target) {
+        if (target.getTeam() == GameTeam.SPECTATORS) {
+            return;
+        }
+        
+        target.sendMessage(target.getTeam().getLeaveMessage());
+        target.setTeam(GameTeam.SPECTATORS);
+        target.clearInventory();
+        target.clearPotionEffects();
+        target.giveSpectatorItems(this);
+        target.sendMessage(target.getTeam().getJoinMessage());
+
+        teleportSpectator(Bukkit.getPlayer(target.getUniqueId()), getGameMap().getCenterLocation());
+        sendMessage(MsgType.INFO.format("%v was removed from the game by %v.", target.getColoredName(), actor.getNexusPlayer().getColoredName()));
+        getGameInfo().getActions().add(new GamePlayerRemoveAction(actor.getName(), target.getName()));
+    }
+    
+    public void revivePlayer(SGPlayer actor, GamePlayer target, SGLootTable lootTable, int amountOfItems) {
+        if (target.getTeam() != GameTeam.SPECTATORS) {
+            return;
+        }
+
+        if (!target.isSpectatorByDeath()) {
+            return;
+        }
+
+        DeathInfo mostRecentDeath = target.getMostRecentDeath();
+
+        if (mostRecentDeath == null) {
+            return;
+        }
+
+        target.sendMessage(target.getTeam().getLeaveMessage());
+        target.setTeam(GameTeam.TRIBUTES);
+        target.sendMessage(target.getTeam().getJoinMessage());
+
+        target.clearInventory();
+        target.clearPotionEffects();
+        target.setFood(20, getSettings().getStartingSaturation());
+        target.setFlight(false, false);
+        target.setCollisions(true);
+
+        if (lootTable != null && amountOfItems > 1) {
+            List<ItemStack> loot = lootTable.generateLoot(amountOfItems);
+            for (ItemStack item : loot) {
+                target.addItem(item);
+            }
+        }
+
+        sendMessage(MsgType.INFO.format("%v was revived by %v.", target.getColoredName(), actor.getNexusPlayer().getColoredName()));
+        if (lootTable != null && amountOfItems > 1) {
+            getGameInfo().getActions().add(new GamePlayerReviveAction(actor.getName(), target.getName(), lootTable.getName(), amountOfItems));
+        } else {
+            getGameInfo().getActions().add(new GamePlayerReviveAction(actor.getName(), target.getName()));
+        }
+    }
+    
+    public void mutatePlayer(SGPlayer actor, MutationBuilder builder) {
+        mutatePlayer(actor, builder.getPlayer(), builder.getType(), builder.getTarget(), builder.isBypassTimer());
+    }
+    
+    public void mutatePlayer(SGPlayer actor, GamePlayer target, MutationType type, GamePlayer mutationTarget, boolean bypassTimer) {
+        if (target.getTeam() != GameTeam.SPECTATORS) {
+            return;
+        }
+
+        if (type == null) {
+            return;
+        }
+        
+        if (mutationTarget == null) {
+            return;
+        }
+
+        if (mutationTarget.getTeam() != GameTeam.TRIBUTES) {
+            return;
+        }
+
+        Mutation mutation = Mutation.createInstance(this, type, target.getUniqueId(), mutationTarget.getUniqueId());
+        target.setMutation(mutation);
+
+        getGameInfo().getActions().add(new GamePlayerForceMutateAction(actor.getName(), target.getName(), type, mutationTarget.getName(), bypassTimer));
+
+        if (!bypassTimer) {
+            mutation.startCountdown();
+        } else {
+            mutationTarget.sendMessage(StarColors.color("&6&l>> " + target.getColoredName().toUpperCase() + " &c&lIS AFTER YOU! RUN!"));
+
+            getGameInfo().getActions().add(new GameMutateAction(target.getName(), mutationTarget.getName(), mutation.getType()));
+            addMutation(mutation);
+        }
+    }
+
+    public void join(NexusPlayer nexusPlayer, SGPlayerStats stats) {
         GamePlayer gamePlayer = new GamePlayer(nexusPlayer, this, stats);
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId());
         sgPlayer.setGame(this, gamePlayer);
@@ -236,10 +364,10 @@ public class Game {
         gamePlayer.setStatus(GamePlayer.Status.READY);
     }
     
-    public void removePlayer(UUID uuid) {
+    public void quit(UUID uuid) {
         NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(uuid);
         if (nexusPlayer != null) {
-            removePlayer(nexusPlayer);
+            quit(nexusPlayer);
         } else {
             this.players.remove(uuid);
             for (GameTeamChatroom gtc : this.chatRooms.values()) {
@@ -249,7 +377,7 @@ public class Game {
         }
     }
 
-    public void removePlayer(NexusPlayer nexusPlayer) {
+    public void quit(NexusPlayer nexusPlayer) {
         if (!this.players.containsKey(nexusPlayer.getUniqueId())) {
             return;
         }
@@ -922,333 +1050,340 @@ public class Game {
     }
 
     public void killPlayer(GamePlayer gamePlayer, DeathInfo deathInfo) {
-        GameTeam oldTeam = gamePlayer.getTeam();
-        gamePlayer.addDeathInfo(deathInfo);
-        gamePlayer.setTeam(GameTeam.SPECTATORS);
-        Player player = Bukkit.getPlayer(gamePlayer.getUniqueId());
-        String strippedDeathMessage = ChatColor.stripColor(deathInfo.getDeathMessage());
-        strippedDeathMessage = strippedDeathMessage.substring(3, strippedDeathMessage.length() - 1);
-        GameAction deathAction = new GameAction(deathInfo.getTime(), "death");
-        gameInfo.getActions().add(deathAction);
-        deathAction.addValueData("message", strippedDeathMessage);
-        deathAction.addValueData("type", deathInfo.getType().name());
-        deathAction.addValueData("team", deathInfo.getTeam().name());
-        boolean deathByLeave = deathInfo.getType() == DeathType.SUICIDE;
-        gamePlayer.setSpectatorByDeath(!deathByLeave);
-        KillerInfo killer = deathInfo.getKiller();
-        gamePlayer.setDeathByMutation(killer != null && killer.isMutationKill());
-        if (deathInfo.getKiller() != null) {
-            deathAction.addValueData("killerType", killer.getType().name());
-            if (killer.getDistance() > 0) {
-                deathAction.addValueData("killerDistance", killer.getDistance());
-            }
-            if (killer.getType() == EntityType.PLAYER) {
-                deathAction.addValueData("killerIsMutation", killer.isMutationKill());
-                deathAction.addValueData("killerName", killer.getName());
-                deathAction.addValueData("killerHealth", killer.getHealth());
-                if (killer.getHandItem() != null) {
-                    deathAction.addValueData("killerHand", killer.getHandItem().getType().name().toLowerCase());
+        try {
+            GameTeam oldTeam = gamePlayer.getTeam();
+            gamePlayer.addDeathInfo(deathInfo);
+            gamePlayer.setTeam(GameTeam.SPECTATORS);
+            Player player = Bukkit.getPlayer(gamePlayer.getUniqueId());
+            String strippedDeathMessage = ChatColor.stripColor(deathInfo.getDeathMessage());
+            strippedDeathMessage = strippedDeathMessage.substring(3, strippedDeathMessage.length() - 1);
+            GameAction deathAction = new GameAction(deathInfo.getTime(), "death");
+            gameInfo.getActions().add(deathAction);
+            deathAction.addValueData("message", strippedDeathMessage);
+            deathAction.addValueData("type", deathInfo.getType().name());
+            deathAction.addValueData("team", deathInfo.getTeam().name());
+            boolean deathByLeave = deathInfo.getType() == DeathType.SUICIDE;
+            gamePlayer.setSpectatorByDeath(!deathByLeave);
+            KillerInfo killer = deathInfo.getKiller();
+            gamePlayer.setDeathByMutation(killer != null && killer.isMutationKill());
+            if (deathInfo.getKiller() != null) {
+                deathAction.addValueData("killerType", killer.getType().name());
+                if (killer.getDistance() > 0) {
+                    deathAction.addValueData("killerDistance", killer.getDistance());
+                }
+                if (killer.getType() == EntityType.PLAYER) {
+                    deathAction.addValueData("killerIsMutation", killer.isMutationKill());
+                    deathAction.addValueData("killerName", killer.getName());
+                    deathAction.addValueData("killerHealth", killer.getHealth());
+                    if (killer.getHandItem() != null) {
+                        deathAction.addValueData("killerHand", killer.getHandItem().getType().name().toLowerCase());
+                    }
                 }
             }
-        }
-        if (player != null) {
-            resetPlayer(player);
-            player.setGameMode(GameTeam.SPECTATORS.getGameMode());
-            player.spigot().setCollidesWithEntities(false);
-            giveSpectatorItems(player);
-            player.setAllowFlight(true);
-            player.setFlying(true);
-        }
-       
-        boolean deathByVanish = deathInfo.getType() == DeathType.VANISH;
-        int score = gamePlayer.getStats().getScore();
-        int lost = (int) Math.ceil(score / settings.getScoreDivisor());
-        if (score - lost < 0) {
-            lost = 0;
-        }
-
-        if (!(deathByVanish || deathByLeave)) {
-            if (lost > 0) {
-                gamePlayer.getStats().addScore(-lost);
+            if (player != null) {
+                resetPlayer(player);
+                player.setGameMode(GameTeam.SPECTATORS.getGameMode());
+                player.spigot().setCollidesWithEntities(false);
+                giveSpectatorItems(player);
+                player.setAllowFlight(true);
+                player.setFlying(true);
             }
-            gamePlayer.getStats().addGames(1);
-            gamePlayer.getStats().setWinStreak(0);
-            gamePlayer.getStats().addDeaths(1);
+
+            boolean deathByVanish = deathInfo.getType() == DeathType.VANISH;
+            int score = gamePlayer.getStats().getScore();
+            int lost = (int) Math.ceil(score / settings.getScoreDivisor());
+            if (score - lost < 0) {
+                lost = 0;
+            }
+
+            if (!(deathByVanish || deathByLeave)) {
+                if (lost > 0) {
+                    gamePlayer.getStats().addScore(-lost);
+                }
+                gamePlayer.getStats().addGames(1);
+                gamePlayer.getStats().setWinStreak(0);
+                gamePlayer.getStats().addDeaths(1);
+                if (oldTeam == GameTeam.MUTATIONS) {
+                    gamePlayer.getStats().addMutationDeaths(1);
+                }
+            }
+
+            boolean playerKiller = killer != null && killer.getType() == EntityType.PLAYER;
+
+            boolean claimedFirstBlood = false;
+
+            int scoreGain = 0, currentStreak = 0, personalBest = 0, xpGain = 0, creditGain = 0, nexiteGain = 0;
+            Rank killerRank = null;
+            boolean claimedScoreBounty = false, claimedCreditBounty = false;
+            Bounty bounty = gamePlayer.getBounty();
+            double scoreBounty = bounty.getAmount(Bounty.Type.SCORE);
+            double creditBounty = bounty.getAmount(Bounty.Type.CREDIT);
+            if (playerKiller) {
+                GamePlayer killerPlayer = getPlayer(killer.getKiller());
+                killerRank = killerPlayer.getRank();
+                scoreGain = lost;
+
+                if (this.firstBlood == null) {
+                    this.firstBlood = killerPlayer;
+                    claimedFirstBlood = true;
+                }
+
+                if (claimedFirstBlood) {
+                    scoreGain = (int) (scoreGain * settings.getFirstBloodMultiplier());
+                }
+
+                if (scoreBounty > 0) {
+                    scoreGain += (int) scoreBounty;
+                    claimedScoreBounty = true;
+                    bounty.remove(Bounty.Type.SCORE);
+                }
+
+                killerPlayer.getStats().addScore(scoreGain);
+
+                killerPlayer.setKillStreak(killerPlayer.getKillStreak() + 1);
+                currentStreak = killerPlayer.getKillStreak();
+                killerPlayer.setKills(killerPlayer.getKills() + 1);
+                personalBest = killerPlayer.getStats().getHighestKillstreak();
+
+                if (currentStreak > personalBest) {
+                    killerPlayer.getStats().setHighestKillstreak(currentStreak);
+                }
+
+                if (getSettings().isGiveXp()) {
+                    xpGain = settings.getKillXPGain();
+                    if (getSettings().isMultiplier()) {
+                        xpGain *= (int) killerRank.getMultiplier();
+                    }
+                    killerPlayer.getNexusPlayer().addXp(xpGain);
+                }
+
+                if (getSettings().isGiveCredits()) {
+                    creditGain = settings.getKillCreditGain();
+                    if (getSettings().isMultiplier()) {
+                        creditGain *= (int) killerRank.getMultiplier();
+                    }
+
+                    if (creditBounty > 0) {
+                        creditGain += (int) creditBounty;
+                        bounty.remove(Bounty.Type.CREDIT);
+                        claimedCreditBounty = true;
+                    }
+                    killerPlayer.getBalance().addCredits(creditGain);
+                }
+
+                if (getSettings().isEarnNexites()) {
+                    nexiteGain = settings.getKillNexiteGain();
+                    if (getSettings().isMultiplier() && killerRank.isNexiteBoost()) {
+                        nexiteGain *= (int) killerRank.getMultiplier();
+                    }
+
+                    killerPlayer.getBalance().addNexites(nexiteGain);
+                }
+
+                killerPlayer.getStats().addKills(1);
+                if (killer.isMutationKill()) {
+                    killerPlayer.getStats().addMutationKills(1);
+                    removeMutation(killerPlayer.getMutation());
+                    killerPlayer.sendMessage(killerPlayer.getTeam().getLeaveMessage());
+                    killerPlayer.setTeam(GameTeam.TRIBUTES);
+                    Bukkit.getPlayer(killerPlayer.getUniqueId()).setGameMode(GameTeam.TRIBUTES.getGameMode());
+                    killerPlayer.sendMessage(killerPlayer.getTeam().getJoinMessage());
+                }
+            }
+
+            List<UUID> damagers = gamePlayer.getDamageInfo().getDamagers();
+            List<AssisterInfo> assistors = new ArrayList<>();
+            List<String> assistorNames = new ArrayList<>();
+            if (settings.isAllowAssists()) {
+                if (!damagers.isEmpty()) {
+                    for (UUID damager : damagers) {
+                        if (killer != null && killer.getKiller().equals(damager)) {
+                            continue;
+                        }
+
+                        GamePlayer assisterPlayer = getPlayer(damager);
+                        if (assisterPlayer != null) {
+                            assistorNames.add(assisterPlayer.getName());
+                            assisterPlayer.setAssists(assisterPlayer.getAssists() + 1);
+                            assisterPlayer.getStats().addAssists(1);
+                            assistors.add(new AssisterInfo(this, assisterPlayer));
+                        }
+                    }
+                }
+            }
+
+            if (!assistorNames.isEmpty()) {
+                StringBuilder assistorBuilder = new StringBuilder();
+                for (String assistorName : assistorNames) {
+                    assistorBuilder.append(assistorName).append(",");
+                }
+                assistorBuilder.deleteCharAt(assistorBuilder.length() - 1);
+                deathAction.addValueData("assistors", assistorBuilder.toString());
+            }
+
+            int oldTeamRemaining = 0;
+            for (GamePlayer gp : new ArrayList<>(getPlayers().values())) {
+                if (gp.getTeam() == oldTeam) {
+                    oldTeamRemaining++;
+                }
+            }
+
             if (oldTeam == GameTeam.MUTATIONS) {
-                gamePlayer.getStats().addMutationDeaths(1);
-            }
-        }
-
-        boolean playerKiller = killer != null && killer.getType() == EntityType.PLAYER;
-
-        boolean claimedFirstBlood = false;
-
-        int scoreGain = 0, currentStreak = 0, personalBest = 0, xpGain = 0, creditGain = 0, nexiteGain = 0;
-        Rank killerRank = null;
-        boolean claimedScoreBounty = false, claimedCreditBounty = false;
-        Bounty bounty = gamePlayer.getBounty();
-        double scoreBounty = bounty.getAmount(Bounty.Type.SCORE);
-        double creditBounty = bounty.getAmount(Bounty.Type.CREDIT);
-        if (playerKiller) {
-            GamePlayer killerPlayer = getPlayer(killer.getKiller());
-            killerRank = killerPlayer.getRank();
-            scoreGain = lost;
-
-            if (this.firstBlood == null) {
-                this.firstBlood = killerPlayer;
-                claimedFirstBlood = true;
+                removeMutation(gamePlayer.getMutation());
             }
 
-            if (claimedFirstBlood) {
-                scoreGain = (int) (scoreGain * settings.getFirstBloodMultiplier());
-            }
-
-            if (scoreBounty > 0) {
-                scoreGain += (int) scoreBounty;
-                claimedScoreBounty = true;
-                bounty.remove(Bounty.Type.SCORE);
-            }
-
-            killerPlayer.getStats().addScore(scoreGain);
-
-            killerPlayer.setKillStreak(killerPlayer.getKillStreak() + 1);
-            currentStreak = killerPlayer.getKillStreak();
-            killerPlayer.setKills(killerPlayer.getKills() + 1);
-            personalBest = killerPlayer.getStats().getHighestKillstreak();
-
-            if (currentStreak > personalBest) {
-                killerPlayer.getStats().setHighestKillstreak(currentStreak);
-            }
-
-            if (getSettings().isGiveXp()) {
-                xpGain = settings.getKillXPGain();
-                if (getSettings().isMultiplier()) {
-                    xpGain *= (int) killerRank.getMultiplier();
-                }
-                killerPlayer.getNexusPlayer().addXp(xpGain);
-            }
-
-            if (getSettings().isGiveCredits()) {
-                creditGain = settings.getKillCreditGain();
-                if (getSettings().isMultiplier()) {
-                    creditGain *= (int) killerRank.getMultiplier();
-                }
-
-                if (creditBounty > 0) {
-                    creditGain += (int) creditBounty;
-                    bounty.remove(Bounty.Type.CREDIT);
-                    claimedCreditBounty = true;
-                }
-                killerPlayer.getBalance().addCredits(creditGain);
-            }
-
-            if (getSettings().isEarnNexites()) {
-                nexiteGain = settings.getKillNexiteGain();
-                if (getSettings().isMultiplier() && killerRank.isNexiteBoost()) {
-                    nexiteGain *= (int) killerRank.getMultiplier();
-                }
-
-                killerPlayer.getBalance().addNexites(nexiteGain);
-            }
-
-            killerPlayer.getStats().addKills(1);
-            if (killer.isMutationKill()) {
-                killerPlayer.getStats().addMutationKills(1);
-                removeMutation(killerPlayer.getMutation());
-                killerPlayer.sendMessage(killerPlayer.getTeam().getLeaveMessage());
-                killerPlayer.setTeam(GameTeam.TRIBUTES);
-                Bukkit.getPlayer(killerPlayer.getUniqueId()).setGameMode(GameTeam.TRIBUTES.getGameMode());
-                killerPlayer.sendMessage(killerPlayer.getTeam().getJoinMessage());
-            }
-        }
-
-        List<UUID> damagers = gamePlayer.getDamageInfo().getDamagers();
-        List<AssisterInfo> assistors = new ArrayList<>();
-        List<String> assistorNames = new ArrayList<>();
-        if (settings.isAllowAssists()) {
-            if (!damagers.isEmpty()) {
-                for (UUID damager : damagers) {
-                    if (killer != null && killer.getKiller().equals(damager)) {
+            if (oldTeam == GameTeam.TRIBUTES) {
+                for (GamePlayer gp : this.players.values()) {
+                    if (gp.getTeam() != GameTeam.MUTATIONS) {
                         continue;
                     }
 
-                    GamePlayer assisterPlayer = getPlayer(damager);
-                    if (assisterPlayer != null) {
-                        assistorNames.add(assisterPlayer.getName());
-                        assisterPlayer.setAssists(assisterPlayer.getAssists() + 1);
-                        assisterPlayer.getStats().addAssists(1);
-                        assistors.add(new AssisterInfo(this, assisterPlayer));
+                    Mutation mutation = gp.getMutation();
+                    if (!mutation.getTarget().equals(gamePlayer.getUniqueId())) {
+                        continue;
                     }
-                }
-            }
-        }
-        
-        if (!assistorNames.isEmpty()) {
-            StringBuilder assistorBuilder = new StringBuilder();
-            for (String assistorName : assistorNames) {
-                assistorBuilder.append(assistorName).append(",");
-            }
-            assistorBuilder.deleteCharAt(assistorBuilder.length() - 1);
-            deathAction.addValueData("assistors", assistorBuilder.toString());
-        }
 
-        int oldTeamRemaining = 0;
-        for (GamePlayer gp : new ArrayList<>(getPlayers().values())) {
-            if (gp.getTeam() == oldTeam) {
-                oldTeamRemaining++;
-            }
-        }
-
-        if (oldTeam == GameTeam.MUTATIONS) {
-            removeMutation(gamePlayer.getMutation());
-        }
-
-        if (oldTeam == GameTeam.TRIBUTES) {
-            for (GamePlayer gp : this.players.values()) {
-                if (gp.getTeam() != GameTeam.MUTATIONS) {
-                    continue;
-                }
-
-                Mutation mutation = gp.getMutation();
-                if (!mutation.getTarget().equals(gamePlayer.getUniqueId())) {
-                    continue;
-                }
-
-                if (!playerKiller) {
-                    gp.sendMessage("&6&l>> &cYour target died without a killer, you have been set back as a spectator.");
-                    gp.setTeam(GameTeam.SPECTATORS);
-                    removeMutation(mutation);
-                    gp.sendMessage(gp.getTeam().getLeaveMessage());
-                    Player mutationPlayer = Bukkit.getPlayer(gp.getUniqueId());
-                    mutationPlayer.spigot().setCollidesWithEntities(false);
-                    mutationPlayer.setAllowFlight(true);
-                    gp.sendMessage(gp.getTeam().getJoinMessage());
-                } else {
-                    mutation.setTarget(killer.getKiller());
-                    gp.sendMessage("&6&l>> &cYour target died, your new target is &a" + getPlayer(killer.getKiller()).getName());
-                }
-            }
-        }
-
-        int totalTributes = 0;
-        for (GamePlayer gp : new ArrayList<>(this.players.values())) {
-            if (gp.getTeam() == GameTeam.TRIBUTES) {
-                totalTributes++;
-            }
-        }
-
-        if (totalTributes <= settings.getDeathmatchThreshold()) {
-            if (state == INGAME) {
-                if (totalTributes > 1) {
-                    if (controlType == ControlType.AUTO) {
-                        this.startDeathmatchTimer();
+                    if (!playerKiller) {
+                        gp.sendMessage("&6&l>> &cYour target, you have been made a spectator.");
+                        gp.setTeam(GameTeam.SPECTATORS);
+                        removeMutation(mutation);
+                        gp.sendMessage(gp.getTeam().getLeaveMessage());
+                        Player mutationPlayer = Bukkit.getPlayer(gp.getUniqueId());
+                        mutationPlayer.spigot().setCollidesWithEntities(false);
+                        mutationPlayer.setAllowFlight(true);
+                        gp.sendMessage(gp.getTeam().getJoinMessage());
                     } else {
-                        sendMessage("&eTribute count reached or went below the deathmatch threashold, but was not automatically started due to being in manual mode.");
+                        mutation.setTarget(killer.getKiller());
+                        gp.sendMessage("&6&l>> &cYour target died, your new target is &a" + getPlayer(killer.getKiller()).getName());
                     }
                 }
             }
-        }
 
-        GamePlayer killerPlayer = null;
-        if (playerKiller) {
-            killerPlayer = getPlayer(killer.getKiller());
-        }
-
-        gamePlayer.sendMessage(oldTeam.getLeaveMessage());
-
-        if (killerPlayer != null) {
-            if (killer.isMutationKill()) {
-                sendMessage("&6&l>> " + killerPlayer.getColoredName() + " &ahas taken revenge and is back in the game!");
-            }
-            if (currentStreak > personalBest) {
-                if (!killerPlayer.isNewPersonalBestNotified()) {
-                    killerPlayer.sendMessage("&6&l>> &a&lNEW PERSONAL BEST!");
-                    killerPlayer.setNewPersonalBestNotified(true);
+            int totalTributes = 0;
+            for (GamePlayer gp : new ArrayList<>(this.players.values())) {
+                if (gp.getTeam() == GameTeam.TRIBUTES) {
+                    totalTributes++;
                 }
-                personalBest = currentStreak;
             }
-            killerPlayer.sendMessage("&6&l>> &f&lCurrent Streak: &a" + currentStreak + "  &f&lPersonal Best: &a" + personalBest);
-            killerPlayer.sendMessage("&2&l>> &a+" + scoreGain + " Score!" + (claimedScoreBounty ? " &e&lClaimed Bounty" : "") + (claimedFirstBlood ? " &c&lFirst Blood" : ""));
-            double multiplier = killerRank.getMultiplier();
-            String multiplierMessage = "";
-            if (multiplier > 1) {
-                multiplierMessage = killerRank.getColor() + "&l * x" + MCUtils.formatNumber(multiplier) + " " + killerRank.getPrefix() + " Bonus";
-            }
-            if (settings.isGiveXp()) {
-                String xpMsg = "&2&l>> &a&l+" + xpGain + " &2&lXP&a&l!";
-                if (settings.isMultiplier()) {
-                    xpMsg += multiplierMessage;
+
+            if (totalTributes <= settings.getDeathmatchThreshold()) {
+                if (state == INGAME) {
+                    if (totalTributes > 1) {
+                        if (controlType == ControlType.AUTO) {
+                            if (this.timer.getTime() < 1000) {
+                                this.startDeathmatchTimer();
+                            }
+                        } else {
+                            sendMessage("&eTribute count reached or went below the deathmatch threashold, but was not automatically started due to being in manual mode.");
+                        }
+                    }
                 }
-                killerPlayer.sendMessage(xpMsg);
             }
 
-            if (settings.isGiveCredits()) {
-                String creditsMsg = "&2&l>> &a&l+" + creditGain + " &3&lCREDITS&a&l!";
-                if (settings.isMultiplier()) {
-                    creditsMsg += multiplierMessage;
+            GamePlayer killerPlayer = null;
+            if (playerKiller) {
+                killerPlayer = getPlayer(killer.getKiller());
+            }
+
+            gamePlayer.sendMessage(oldTeam.getLeaveMessage());
+
+            if (killerPlayer != null) {
+                if (killer.isMutationKill()) {
+                    sendMessage("&6&l>> " + killerPlayer.getColoredName() + " &ahas taken revenge and is back in the game!");
+                }
+                if (currentStreak > personalBest) {
+                    if (!killerPlayer.isNewPersonalBestNotified()) {
+                        killerPlayer.sendMessage("&6&l>> &a&lNEW PERSONAL BEST!");
+                        killerPlayer.setNewPersonalBestNotified(true);
+                    }
+                    personalBest = currentStreak;
+                }
+                killerPlayer.sendMessage("&6&l>> &f&lCurrent Streak: &a" + currentStreak + "  &f&lPersonal Best: &a" + personalBest);
+                killerPlayer.sendMessage("&2&l>> &a+" + scoreGain + " Score!" + (claimedScoreBounty ? " &e&lClaimed Bounty" : "") + (claimedFirstBlood ? " &c&lFirst Blood" : ""));
+                double multiplier = killerRank.getMultiplier();
+                String multiplierMessage = "";
+                if (multiplier > 1) {
+                    multiplierMessage = killerRank.getColor() + "&l * x" + MCUtils.formatNumber(multiplier) + " " + killerRank.getPrefix() + " Bonus";
+                }
+                if (settings.isGiveXp()) {
+                    String xpMsg = "&2&l>> &a&l+" + xpGain + " &2&lXP&a&l!";
+                    if (settings.isMultiplier()) {
+                        xpMsg += multiplierMessage;
+                    }
+                    killerPlayer.sendMessage(xpMsg);
                 }
 
-                if (claimedCreditBounty) {
-                    creditsMsg += " &e&lClaimed Bounty";
+                if (settings.isGiveCredits()) {
+                    String creditsMsg = "&2&l>> &a&l+" + creditGain + " &3&lCREDITS&a&l!";
+                    if (settings.isMultiplier()) {
+                        creditsMsg += multiplierMessage;
+                    }
+
+                    if (claimedCreditBounty) {
+                        creditsMsg += " &e&lClaimed Bounty";
+                    }
+
+                    killerPlayer.sendMessage(creditsMsg);
                 }
 
-                killerPlayer.sendMessage(creditsMsg);
+                if (settings.isEarnNexites()) {
+                    String nexiteMsg = "&2&l>> &a&l" + nexiteGain + " &9&lNEXITES&a&l!";
+                    if (settings.isMultiplier() && killerRank.isNexiteBoost()) {
+                        nexiteMsg += multiplierMessage;
+                    }
+
+                    killerPlayer.sendMessage(nexiteMsg);
+                }
             }
 
-            if (settings.isEarnNexites()) {
-                String nexiteMsg = "&2&l>> &a&l" + nexiteGain + " &9&lNEXITES&a&l!";
-                if (settings.isMultiplier() && killerRank.isNexiteBoost()) {
-                    nexiteMsg += multiplierMessage;
+            for (AssisterInfo assister : assistors) {
+                GamePlayer assisterPlayer = assister.getGamePlayer();
+                assisterPlayer.sendMessage("&2&l>> &a+1 &aAssist");
+                String multiplierMsg = assisterPlayer.getRank().getColor() + "&l * x" + MCUtils.formatNumber(assisterPlayer.getRank().getMultiplier()) + " " + assisterPlayer.getRank().getPrefix() + " Bonus";
+                String xpMsg = "&2&l>> &a&l+" + (int) assister.getXp() + " &2&lXP&a&l!" + (settings.isMultiplier() ? " " + multiplierMsg : "");
+                String creditsMsg = "&2&l>> &a&l+" + (int) assister.getCredits() + " &3&lCREDITS&a&l!" + (settings.isMultiplier() ? " " + multiplierMsg : "");
+                String nexitesMsg = "&2&l>> &a&l" + (int) assister.getNexites() + " &9&lNEXITES&a&l!" + (settings.isMultiplier() && assisterPlayer.getRank().isNexiteBoost() ? " " + multiplierMsg : "");
+                if (assister.getXp() > 0) {
+                    assisterPlayer.sendMessage(xpMsg);
                 }
 
-                killerPlayer.sendMessage(nexiteMsg);
-            }
-        }
+                if (assister.getCredits() > 0) {
+                    assisterPlayer.sendMessage(creditsMsg);
+                }
 
-        for (AssisterInfo assister : assistors) {
-            GamePlayer assisterPlayer = assister.getGamePlayer();
-            assisterPlayer.sendMessage("&2&l>> &a+1 &aAssist");
-            String multiplierMsg = assisterPlayer.getRank().getColor() + "&l * x" + MCUtils.formatNumber(assisterPlayer.getRank().getMultiplier()) + " " + assisterPlayer.getRank().getPrefix() + " Bonus";
-            String xpMsg = "&2&l>> &a&l+" + (int) assister.getXp() + " &2&lXP&a&l!" + (settings.isMultiplier() ? " " + multiplierMsg : "");
-            String creditsMsg = "&2&l>> &a&l+" + (int) assister.getCredits() + " &3&lCREDITS&a&l!" + (settings.isMultiplier() ? " " + multiplierMsg : "");
-            String nexitesMsg = "&2&l>> &a&l" + (int) assister.getNexites() + " &9&lNEXITES&a&l!" + (settings.isMultiplier() && assisterPlayer.getRank().isNexiteBoost() ? " " + multiplierMsg : "");
-            if (assister.getXp() > 0) {
-                assisterPlayer.sendMessage(xpMsg);
+                if (assister.getNexites() > 0) {
+                    assisterPlayer.sendMessage(nexitesMsg);
+                }
             }
 
-            if (assister.getCredits() > 0) {
-                assisterPlayer.sendMessage(creditsMsg);
+            gamePlayer.sendMessage("&4&l>> &cYou lost " + lost + " Points for dying!");
+            sendMessage("&6&l>> " + oldTeam.getRemainColor() + "&l" + oldTeamRemaining + " " + oldTeam.name().toLowerCase() + " remain.");
+            if (claimedFirstBlood) {
+                sendMessage("&6&l>> &c&l" + firstBlood.getName().toUpperCase() + " CLAIMED FIRST BLOOD!");
             }
 
-            if (assister.getNexites() > 0) {
-                assisterPlayer.sendMessage(nexitesMsg);
+            if (killerPlayer != null) {
+                String killerName = killerPlayer.getColoredName();
+                String killerHealth = MCUtils.formatNumber(killer.getHealth());
+                gamePlayer.sendMessage("&4&l>> &cYour killer &8(" + killerName + "&8) &chad &4" + killerHealth + " HP &cremaining!");
             }
+
+            sendMessage(deathInfo.getDeathMessage());
+            gamePlayer.sendMessage(GameTeam.SPECTATORS.getJoinMessage());
+
+            if (claimedScoreBounty) {
+                sendMessage("&6&l>> " + killerPlayer.getColoredName() + " &6&lhas claimed the &b&l" + scoreBounty + " Score &6&lbounty on " + gamePlayer.getColoredName());
+            }
+
+            if (claimedCreditBounty && settings.isGiveCredits()) {
+                sendMessage("&6&l>> " + killerPlayer.getColoredName() + " &6&lhas claimed the &b&l" + scoreBounty + " Credit &6&lbounty on " + gamePlayer.getColoredName());
+            }
+
+            playSound(oldTeam.getDeathSound());
+        } catch (Throwable t) {
+            sendMessage(MsgType.SEVERE.format("&lThere was an error while handling " + gamePlayer.getName() + "'s death. Please report to Firestar311"));
+            t.printStackTrace();
         }
-
-        gamePlayer.sendMessage("&4&l>> &cYou lost " + lost + " Points for dying!");
-        sendMessage("&6&l>> " + oldTeam.getRemainColor() + "&l" + oldTeamRemaining + " " + oldTeam.name().toLowerCase() + " remain.");
-        if (claimedFirstBlood) {
-            sendMessage("&6&l>> &c&l" + firstBlood.getName().toUpperCase() + " CLAIMED FIRST BLOOD!");
-        }
-
-        if (killerPlayer != null) {
-            String killerName = killerPlayer.getColoredName();
-            String killerHealth = MCUtils.formatNumber(killer.getHealth());
-            gamePlayer.sendMessage("&4&l>> &cYour killer &8(" + killerName + "&8) &chad &4" + killerHealth + " HP &cremaining!");
-        }
-
-        sendMessage(deathInfo.getDeathMessage());
-        gamePlayer.sendMessage(GameTeam.SPECTATORS.getJoinMessage());
-
-        if (claimedScoreBounty) {
-            sendMessage("&6&l>> " + killerPlayer.getColoredName() + " &6&lhas claimed the &b&l" + scoreBounty + " Score &6&lbounty on " + gamePlayer.getColoredName());
-        }
-
-        if (claimedCreditBounty && settings.isGiveCredits()) {
-            sendMessage("&6&l>> " + killerPlayer.getColoredName() + " &6&lhas claimed the &b&l" + scoreBounty + " Credit &6&lbounty on " + gamePlayer.getColoredName());
-        }
-
-        playSound(oldTeam.getDeathSound());
 
         new BukkitRunnable() {
             public void run() {

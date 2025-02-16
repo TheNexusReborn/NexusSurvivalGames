@@ -1,4 +1,4 @@
-package com.thenexusreborn.survivalgames.menu;
+package com.thenexusreborn.survivalgames.menu.manage;
 
 import com.stardevllc.colors.StarColors;
 import com.stardevllc.starui.GuiManager;
@@ -6,31 +6,31 @@ import com.stardevllc.starui.element.button.Button;
 import com.stardevllc.starui.gui.InventoryGUI;
 import com.stardevllc.starui.gui.UpdatingGUI;
 import com.thenexusreborn.nexuscore.util.SpigotUtils;
+import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.game.GameTeam;
+import com.thenexusreborn.survivalgames.mutations.MutationBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.UUID;
-
-public class TeamMenu extends InventoryGUI implements UpdatingGUI {
+public class ManageMutateTargetMenu extends InventoryGUI implements UpdatingGUI {
     
     private GuiManager manager;
     
-    private SurvivalGames plugin;
     private Game game;
-    private GameTeam team;
+    private MutationBuilder builder;
+    private ManageMutateMenu previousMenu;
     
-    public TeamMenu(SurvivalGames plugin, GameTeam team, Game game, UUID player) {
-        super(3, StarColors.color(team.getColor() + team.getName()), player);
+    public ManageMutateTargetMenu(SurvivalGames plugin, SGPlayer actor, Game game, MutationBuilder builder, ManageMutateMenu previousMenu) {
+        super(3, "&lSelect " + builder.getPlayer().getName() + "'s target", actor.getUniqueId());
         manager = plugin.getServer().getServicesManager().getRegistration(GuiManager.class).getProvider();
-        this.plugin = plugin;
         this.game = game;
-        this.team = team;
+        this.builder = builder;
+        this.previousMenu = previousMenu;
     }
 
     @Override
@@ -38,14 +38,17 @@ public class TeamMenu extends InventoryGUI implements UpdatingGUI {
         if (game != null) {
             for (GamePlayer gamePlayer : game.getPlayers().values()) {
                 if (!gamePlayer.getToggleValue("vanish")) {
-                    if (gamePlayer.getTeam() == team) {
+                    if (gamePlayer.getTeam() == GameTeam.TRIBUTES) {
                         Button button = new Button().iconCreator(p -> {
                             ItemStack skull = SpigotUtils.getPlayerSkull(Bukkit.getPlayer(gamePlayer.getUniqueId()));
                             ItemMeta meta = skull.getItemMeta();
                             meta.setDisplayName(StarColors.color(gamePlayer.getDisplayName()));
                             skull.setItemMeta(meta);
                             return skull;
-                        }).consumer(e -> manager.openGUI(new PlayerMenu(plugin, this.playerUUID, gamePlayer), (Player) e.getWhoClicked()));
+                        }).consumer(e -> {
+                            builder.setTarget(gamePlayer);
+                            manager.openGUI(previousMenu, (Player) e.getWhoClicked());
+                        });
                         addElement(button);
                     }
                 }

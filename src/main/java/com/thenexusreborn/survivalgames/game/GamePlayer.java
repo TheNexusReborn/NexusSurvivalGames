@@ -10,6 +10,7 @@ import com.thenexusreborn.api.player.PlayerBalance;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.tags.Tag;
+import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.chat.GameTeamChatroom;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.game.death.KillerInfo;
@@ -53,6 +54,10 @@ public class GamePlayer {
         this.combatTag = new CombatTag(game, nexusPlayer.getUniqueId());
         this.damageInfo = new DamageInfo(nexusPlayer.getUniqueId());
         this.stats = stats;
+    }
+
+    public Game getGame() {
+        return game;
     }
 
     public SGPlayerStats getStats() {
@@ -285,7 +290,7 @@ public class GamePlayer {
             return new Pair<>(false, "You can only mutate if you died to a player.");
         }
 
-        UUID killerUUID = getKiller();
+        UUID killerUUID = getMutationTarget();
         GamePlayer killer = game.getPlayer(killerUUID);
         if (killer == null) {
             return new Pair<>(false, "Your killer left, you cannot mutate.");
@@ -344,42 +349,55 @@ public class GamePlayer {
         return false;
     }
 
-    public UUID getKiller() {
+    public UUID getMutationTarget() {
         DeathInfo mostRecentDeath = this.getMostRecentDeath();
-        if (mostRecentDeath != null) {
-            if (mostRecentDeath.getKiller() != null) {
-                if (mostRecentDeath.getKiller().getType() == EntityType.PLAYER) {
-                    KillerInfo killerInfo = mostRecentDeath.getKiller();
-                    UUID killerUUID = killerInfo.getKiller();
-
-                    if (!game.getSettings().isAllowKillersKiller()) {
-                        return killerUUID;
-                    }
-                    
-                    GamePlayer killerPlayer = game.getPlayer(killerUUID);
-                    if (killerPlayer == null) {
-                        return null;
-                    }
-                    
-                    if (killerPlayer.getTeam() == GameTeam.TRIBUTES) {
-                        return killerUUID;
-                    }
-
-                    UUID killersKiller = killerPlayer.getKiller();
-                    
-                    if (getUniqueId().equals(killersKiller)) {
-                        return null;
-                    }
-                    
-                    if (killerUUID.equals(killersKiller)) {
-                        return null;
-                    }
-                    
-                    return killersKiller;
-                }
-            }
+        if (mostRecentDeath == null) {
+            return null;
         }
-        return null;
+
+        KillerInfo killerInfo = mostRecentDeath.getKiller();
+        if (killerInfo == null) {
+            return null;
+        }
+        
+        if (killerInfo.getKiller().equals(this.getUniqueId())) {
+            return killerInfo.getKiller();
+        }
+        
+        if (!game.getSettings().isAllowKillersKiller()) {
+            return killerInfo.getKiller();
+        }
+        
+        GamePlayer killerPlayer = game.getPlayer(killerInfo.getKiller());
+        
+        if (killerPlayer == null) {
+            return killerInfo.getKiller();
+        }
+        
+        if (killerPlayer.getTeam() == GameTeam.TRIBUTES) {
+            return killerPlayer.getUniqueId();
+        }
+
+        DeathInfo killerMostRecentDeath = killerPlayer.getMostRecentDeath();
+        if (killerMostRecentDeath == null) {
+            return killerInfo.getKiller();
+        }
+
+        KillerInfo killersKiller = killerMostRecentDeath.getKiller();
+        if (killersKiller == null) {
+            return killerInfo.getKiller();
+        }
+        
+        if (killersKiller.getKiller().equals(this.getUniqueId())) {
+            return killerInfo.getKiller();
+        }
+        
+        try {
+            return killerPlayer.getMutationTarget();
+        } catch (StackOverflowError e) {
+            SurvivalGames.getInstance().getLogger().severe("StackOverFlowError when trying to get mutation target");
+            return killerInfo.getKiller();            
+        }
     }
     
     public List<String> getMenuVitals() {
@@ -440,16 +458,12 @@ public class GamePlayer {
     }
     
     public void giveSpectatorItems(Game game) {
-        ItemStack tributesBook = ItemBuilder.of(XMaterial.ENCHANTED_BOOK).displayName("&a&lTributes &7&o(Right Click)").build();
-        ItemStack mutationsBook = ItemBuilder.of(XMaterial.ENCHANTED_BOOK).displayName("&d&lMutations &7&o(Right Click)").build();
-        ItemStack spectatorsBook = ItemBuilder.of(XMaterial.ENCHANTED_BOOK).displayName("&c&lSpectators &7&o(Right Click)").build();
-
         Pair<Boolean, String> canMutateStatus = canMutate();
         
         String mutateName;
         
         if (canMutateStatus.key()) {
-            GamePlayer killer = game.getPlayer(getKiller());
+            GamePlayer killer = game.getPlayer(getMutationTarget());
             String passes;
             if (game.getSettings().isUnlimitedPasses()) {
                 passes = "Unlimited";
@@ -462,18 +476,15 @@ public class GamePlayer {
         }
         
         ItemStack mutateItem = ItemBuilder.of(XMaterial.ROTTEN_FLESH).displayName(mutateName).build();
-        ItemStack compass = ItemBuilder.of(XMaterial.COMPASS).displayName("&fPlayer Tracker").build();
-        ItemStack tpCenter = ItemBuilder.of(XMaterial.CLOCK).displayName("&e&lTeleport to Map Center &7&o(Right Click)").build();
-        ItemStack hubItem = ItemBuilder.of(XMaterial.OAK_DOOR).displayName("&e&lReturn to Hub &7(Right Click)").build();
         Player p = Bukkit.getPlayer(getUniqueId());
         PlayerInventory inv = p.getInventory();
-        inv.setItem(0, tributesBook);
-        inv.setItem(1, mutationsBook);
-        inv.setItem(2, spectatorsBook);
+        inv.setItem(0, SurvivalGames.tributesBook.toItemStack());
+        inv.setItem(1, SurvivalGames.mutationsBook.toItemStack());
+        inv.setItem(2, SurvivalGames.spectatorsBook.toItemStack());
         inv.setItem(5, mutateItem);
-        inv.setItem(6, compass);
-        inv.setItem(7, tpCenter);
-        inv.setItem(8, hubItem);
+        inv.setItem(6, SurvivalGames.playerTrackerItem.toItemStack());
+        inv.setItem(7, SurvivalGames.tpToMapCenterItem.toItemStack());
+        inv.setItem(8, SurvivalGames.toHubItem.toItemStack());
     }
     
     private void callPlayerMethod(Consumer<Player> consumer) {

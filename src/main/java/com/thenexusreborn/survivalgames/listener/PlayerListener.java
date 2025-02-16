@@ -1,10 +1,10 @@
 package com.thenexusreborn.survivalgames.listener;
 
+import com.stardevllc.colors.StarColors;
 import com.stardevllc.helper.Pair;
 import com.stardevllc.itembuilder.ItemBuilder;
 import com.stardevllc.itembuilder.XMaterial;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
-import com.stardevllc.colors.StarColors;
 import com.stardevllc.starui.GuiManager;
 import com.stardevllc.time.TimeUnit;
 import com.thenexusreborn.api.NexusAPI;
@@ -28,8 +28,8 @@ import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.loot.tables.SGLootTable;
 import com.thenexusreborn.survivalgames.menu.MutateGui;
 import com.thenexusreborn.survivalgames.menu.SwagShackMenu;
-import com.thenexusreborn.survivalgames.menu.TeamMenu;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
+import com.thenexusreborn.survivalgames.mutations.MutationType;
 import com.thenexusreborn.survivalgames.mutations.impl.ChickenMutation;
 import com.thenexusreborn.survivalgames.mutations.impl.CreeperMutation;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
@@ -145,36 +145,13 @@ public class PlayerListener implements Listener {
                 if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
                     if (e.getItem() != null) {
                         ItemStack item = e.getItem();
-                        if (item.getType() == Material.ENCHANTED_BOOK) {
-                            ItemMeta itemMeta = item.getItemMeta();
-                            String displayName = itemMeta.getDisplayName();
-                            if (displayName != null && !displayName.isEmpty()) {
-                                GameTeam team = null;
-                                if (displayName.toLowerCase().contains("tributes")) {
-                                    team = GameTeam.TRIBUTES;
-                                } else if (displayName.toLowerCase().contains("mutations")) {
-                                    team = GameTeam.MUTATIONS;
-                                } else if (displayName.toLowerCase().contains("spectators")) {
-                                    team = GameTeam.SPECTATORS;
-                                }
-
-                                if (team != null) {
-                                    manager.openGUI(new TeamMenu(plugin, team, game, player.getUniqueId()), player);
-                                }
-                            }
-                        } else if (item.getType() == Material.ROTTEN_FLESH) {
+                        if (item.getType() == Material.ROTTEN_FLESH) {
                             Pair<Boolean, String> canMutateResult = gamePlayer.canMutate();
                             if (canMutateResult.key()) {
                                 manager.openGUI(new MutateGui(plugin, gamePlayer), player);
                             } else {
                                 gamePlayer.sendMessage(MsgType.WARN + canMutateResult.value());
                             }
-                        } else if (item.getType() == Material.WATCH) {
-                            player.teleport(game.getGameMap().getCenter().toLocation(game.getGameMap().getWorld()));
-                            gamePlayer.sendMessage("&6&l>> &eTeleported to the Map Center.");
-                        } else if (item.getType() == Material.WOOD_DOOR) {
-                            gamePlayer.sendMessage("&6&l>> &eSending you to the hub.");
-                            SGUtils.sendToHub(player);
                         }
                     }
                 }
@@ -254,9 +231,8 @@ public class PlayerListener implements Listener {
                     lobbyPlayer.getPlayer().setToggleValue("allowsponsors", !sponsorsValue);
                     sponsorsValue = lobbyPlayer.getToggleValue("allowsponsors");
                     XMaterial sponsorsItemMaterial = sponsorsValue ? XMaterial.GLOWSTONE_DUST : XMaterial.GUNPOWDER;
-                    player.getInventory().setItem(0, ItemBuilder.of(sponsorsItemMaterial).displayName("&e&lSponsors &7&o(Right click to toggle)").build());
-                } else if (e.getItem().getItemMeta().getDisplayName().contains("Return to Hub")) {
-                    SGUtils.sendToHub(player);
+                    String statusMessage = sponsorsValue ? "&a&lENABLED" : "&c&lDISABLED";
+                    player.getInventory().setItem(0, ItemBuilder.of(sponsorsItemMaterial).displayName("&e&lSponsors " + statusMessage + " &7&o(Right Click to toggle)").build());
                 }
             }
         }
@@ -796,7 +772,7 @@ public class PlayerListener implements Listener {
             return;
         }
         if (sgPlayer.getGame() != null) {
-            sgPlayer.getGame().removePlayer(nexusPlayer);
+            sgPlayer.getGame().quit(nexusPlayer);
         }
 
         if (sgPlayer.getLobby() != null) {
@@ -806,5 +782,45 @@ public class PlayerListener implements Listener {
         e.setQuitMessage(null);
         NexusAPI.getApi().getPrimaryDatabase().saveSilent(sgPlayer.getStats());
         plugin.getPlayerRegistry().unregister(e.getPlayer().getUniqueId());
+    }
+    
+    @EventHandler
+    public void onPlayerMove(PlayerMoveEvent e) {
+        Player player = e.getPlayer();
+        Block fromBlock = e.getFrom().getBlock();
+        Block toBlock = e.getTo().getBlock();
+        
+        if ((fromBlock.getType() == Material.WATER || fromBlock.getType() == Material.STATIONARY_WATER) && 
+                toBlock.getType() == Material.WATER || toBlock.getType() == Material.STATIONARY_WATER) {
+            SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
+            if (sgPlayer == null) {
+                return;
+            }
+            
+            if (sgPlayer.getGame() == null) {
+                return;
+            }
+
+            GamePlayer gamePlayer = sgPlayer.getGamePlayer();
+            if (gamePlayer == null) {
+                return;
+            }
+            
+            if (gamePlayer.getTeam() != GameTeam.MUTATIONS) {
+                return;
+            }
+            
+            if (gamePlayer.getMutation() == null) {
+                return;
+            }
+            
+            if (gamePlayer.getMutation().getType() != MutationType.PIG_ZOMBIE) {
+                return;
+            }
+            
+            Vector changed = e.getTo().clone().subtract(e.getFrom()).toVector().multiply(1.4);
+            changed.setY(e.getTo().clone().subtract(e.getFrom()).toVector().getY());
+            player.setVelocity(changed);
+        }
     }
 }
