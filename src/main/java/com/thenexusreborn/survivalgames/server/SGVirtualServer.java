@@ -15,6 +15,8 @@ import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyType;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.UUID;
@@ -77,6 +79,22 @@ public class SGVirtualServer extends VirtualServer {
             } else if (playerIsSpectator && !otherPlayerIsSpectator) {
                 return true;
             } else return playerIsSpectator || !otherPlayerIsSpectator;
+        }
+    }
+
+    @Override
+    public void teleportToSpawn(UUID uuid) {
+        if (!this.players.contains(uuid)) {
+            NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(uuid);
+            join(nexusPlayer);
+        } else {
+            Player player = Bukkit.getPlayer(uuid);
+            SGPlayer sgPlayer = plugin.getPlayerRegistry().get(uuid);
+            if (sgPlayer.getLobby() == null) {
+                this.lobby.addPlayer(sgPlayer);
+            } else {
+                player.teleport(this.lobby.getSpawnpoint());
+            }
         }
     }
 
