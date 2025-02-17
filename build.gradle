@@ -45,7 +45,7 @@ dependencies {
 }
 
 group = 'com.thenexusreborn'
-version = '1.18.5-ALPHA'
+version = '1.18.6-ALPHA'
 description = 'NexusSurvivalGames'
 
 jar {

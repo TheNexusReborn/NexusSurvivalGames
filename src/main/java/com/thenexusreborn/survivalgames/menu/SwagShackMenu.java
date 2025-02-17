@@ -86,7 +86,7 @@ public class SwagShackMenu extends InventoryGUI {
                 } else {
                     player.getStats().addScore(-cost);
                 }
-                e.getWhoClicked().getInventory().addItem(item.getItem().getItemStack());
+                e.getWhoClicked().getInventory().addItem(item.getItemStack());
             });
             
             setElement(item.getPosition(), button);
@@ -126,6 +126,15 @@ public class SwagShackMenu extends InventoryGUI {
     
         public int getCreditsCost() {
             return creditsCost;
+        }
+        
+        public ItemStack getItemStack() {
+            ItemStack itemStack = item.getItemStack();
+            if (amount > 1) {
+                itemStack.setAmount(this.amount);
+            }
+            
+            return itemStack;
         }
     }
 }
