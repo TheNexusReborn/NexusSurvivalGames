@@ -55,8 +55,13 @@ public class LobbyThread extends StarThread<SurvivalGames> {
                 }
             }
 
-            world.setThundering(false);
-            world.setStorm(false);
+            if (world.isThundering()) {
+                world.setThundering(false);
+            }
+            
+            if (world.hasStorm()) {
+                world.setStorm(false);
+            }
 
             world.setGameRuleValue("doFireSpread", "false");
 
