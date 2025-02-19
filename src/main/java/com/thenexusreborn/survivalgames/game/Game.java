@@ -1510,6 +1510,7 @@ public class Game {
         gamePlayer.sendMessage(gamePlayer.getTeam().getJoinMessage());
         DisguiseAPI.disguiseEntity(player, new MobDisguise(mutation.getType().getDisguiseType()));
         gamePlayer.sendMessage("&6&l>> &dYou have &b" + gamePlayer.getStats().getMutationPasses() + " Passes &dremaining.");
+        gamePlayer.sendMessage("&d&l>> &7You're now disguised.");
 
         gamePlayer.setMutated(true);
         teleportMutation(player, location);
