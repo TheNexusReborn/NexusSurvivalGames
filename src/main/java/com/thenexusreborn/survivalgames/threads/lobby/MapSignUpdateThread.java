@@ -62,7 +62,7 @@ public class MapSignUpdateThread extends StarThread<SurvivalGames> {
                     if (bukkitPlayer != null) {
                         World world = bukkitPlayer.getWorld();
                         if (world != null) {
-                            if (!world.getName().equalsIgnoreCase(lobby.getSpawnpoint().getWorld().getName())) {
+                            if (!world.getName().equalsIgnoreCase(sign.getWorld().getName())) {
                                 continue;
                             }
                             if (player.getMapVote() == entry.getKey()) {

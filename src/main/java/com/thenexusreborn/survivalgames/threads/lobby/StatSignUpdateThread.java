@@ -38,10 +38,10 @@ public class StatSignUpdateThread extends StarThread<SurvivalGames> {
                         continue;
                     }
                     
-                    if (player.getWorld() != statSign.getLocation().getWorld()) {
+                    if (!player.getWorld().getName().equalsIgnoreCase(statSign.getLocation().getWorld().getName())) {
                         continue;
                     }
-
+                    
                     String[] lines = {StarColors.color("&n" + statSign.getDisplayName()), "", lobbyPlayer.getStats().getValue(statSign.getStat()) + "", ""};
                     player.sendSignChange(statSign.getLocation(), lines);
                 }

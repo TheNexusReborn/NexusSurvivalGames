@@ -92,7 +92,7 @@ public class TributeSignUpdateThread extends StarThread<SurvivalGames> {
                 String[] lines = {name, "Score: " + score, "Kills: " + kills, "Wins: " + wins};
 
                 for (Player op : Bukkit.getOnlinePlayers()) {
-                    if (op.getWorld() == tributeSign.getSignLocation().getWorld()) {
+                    if (op.getWorld().getName().equalsIgnoreCase(tributeSign.getSignLocation().getWorld().getName())) {
                         op.sendSignChange(tributeSign.getSignLocation(), lines);
                     }
                 }
