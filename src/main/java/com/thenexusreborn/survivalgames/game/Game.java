@@ -1549,6 +1549,7 @@ public class Game {
         }
         GamePlayer gamePlayer = getPlayer(player.getUniqueId());
         gamePlayer.setMutation(null);
+        gamePlayer.sendMessage("&&d&l>> &7You're no longer disguised.");
         if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
             giveSpectatorItems(player);
         }
