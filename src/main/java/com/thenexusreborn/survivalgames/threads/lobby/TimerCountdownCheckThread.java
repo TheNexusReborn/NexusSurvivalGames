@@ -36,7 +36,7 @@ public class TimerCountdownCheckThread extends StarThread<SurvivalGames> {
 
             if (playerCount >= lobby.getLobbySettings().getMinPlayers()) {
                 lobby.startTimer();
-                lobby.sendMessage("&eMinimum player count has been met, starting countdown to game start.");
+                lobby.sendMessage("&6&l>> &aMinimum player requirement met! Game starting shortly...");
             }
         }
     }
