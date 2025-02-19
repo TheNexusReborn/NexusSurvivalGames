@@ -46,6 +46,7 @@ public class GamePlayer {
     private TreeMap<Long, DeathInfo> deaths = new TreeMap<>();
     private Status status;
     private SGPlayerStats stats;
+    private int timesMutated;
     
     public GamePlayer(NexusPlayer nexusPlayer, Game game, SGPlayerStats stats) {
         this.nexusPlayer = nexusPlayer;
@@ -230,13 +231,11 @@ public class GamePlayer {
     }
     
     public int getTotalTimesMutated() {
-        int totalMutations = 0;
-        for (DeathInfo deathInfo : new ArrayList<>(deaths.values())) {
-            if (deathInfo.getTeam() == GameTeam.MUTATIONS) {
-                totalMutations++;
-            }
-        }
-        return totalMutations;
+        return timesMutated;
+    }
+    
+    public void incrementTimesMutated() {
+        this.timesMutated++;
     }
     
     public Pair<Boolean, String> canMutate() {
