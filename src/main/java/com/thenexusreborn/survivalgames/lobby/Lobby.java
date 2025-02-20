@@ -355,7 +355,7 @@ public class Lobby {
         }
         
         plugin.getMapManager().setEditMode(true);
-
+        
         sendMessage("&eThe lobby has been set to editing maps. Automatic actions are temporarily suspended");
     }
 
@@ -364,6 +364,7 @@ public class Lobby {
 
         for (LobbyPlayer player : this.getPlayers()) {
             player.getPlayer().getScoreboard().setView(new LobbyBoard(player.getPlayer().getScoreboard(), this));
+            player.getPlayer().setActionBar(new LobbyActionBar(plugin, plugin.getPlayerRegistry().get(player.getUniqueId())));
         }
         
         plugin.getMapManager().setEditMode(false);
