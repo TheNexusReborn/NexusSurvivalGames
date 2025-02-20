@@ -54,13 +54,17 @@ public class LobbyThread extends StarThread<SurvivalGames> {
                     }
                 }
             }
-
+            
             if (world.isThundering()) {
+                plugin.getLogger().info("Lobby world has thunder, clearing");
                 world.setThundering(false);
+                world.setWeatherDuration(Integer.MAX_VALUE);
             }
             
             if (world.hasStorm()) {
+                plugin.getLogger().info("Lobby world has storm, clearing");
                 world.setStorm(false);
+                world.setWeatherDuration(Integer.MAX_VALUE);
             }
 
             world.setGameRuleValue("doFireSpread", "false");
