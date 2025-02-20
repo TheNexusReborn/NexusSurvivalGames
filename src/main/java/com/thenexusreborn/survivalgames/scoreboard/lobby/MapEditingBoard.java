@@ -26,7 +26,7 @@ public class MapEditingBoard extends SpigotScoreboardView {
         createTeam(new TeamBuilder("centerLabel").entry("&6&lCENTER:").score(12));
         createTeam(new TeamBuilder("centerValue").entry(ChatColor.AQUA).score(11).valueUpdater((player, team) -> {
             if (plugin.getPlayerRegistry().get(player.getUniqueId()).getLobby().getGameMap() == null) {
-                team.setPrefix("&fNo Map Set");
+                SGUtils.setTeamValueForString("&fNo Map Set", team);
             } else {
                 Position center = plugin.getPlayerRegistry().get(player.getUniqueId()).getLobby().getGameMap().getCenter();
                 if (center != null) {
@@ -71,7 +71,7 @@ public class MapEditingBoard extends SpigotScoreboardView {
         createTeam(new TeamBuilder("swagShackLabel").entry("&6&lSWAG SHACK:").score(3));
         createTeam(new TeamBuilder("swagShackValue").entry(ChatColor.DARK_AQUA).score(2).valueUpdater((player, team) -> {
             if (plugin.getPlayerRegistry().get(player.getUniqueId()).getLobby().getGameMap() == null) {
-                team.setPrefix("&fNo Map Set");
+                SGUtils.setTeamValueForString("&fNo Map Set", team);
             } else {
                 Position swagShack = plugin.getPlayerRegistry().get(player.getUniqueId()).getLobby().getGameMap().getSwagShack();
                 if (swagShack != null) {
