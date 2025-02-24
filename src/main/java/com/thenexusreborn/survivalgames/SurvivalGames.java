@@ -221,6 +221,17 @@ public class SurvivalGames extends NexusSpigotPlugin {
 
         getLogger().info("Loaded " + mapManager.getMaps().size() + " Maps");
 
+        for (SGMap sgMap : mapManager.getMaps()) {
+            Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+                getLogger().info("Downloading map " + sgMap.getName());
+                if (sgMap.download(this)) {
+                    getLogger().info("Downloaded map " + sgMap.getName());
+                } else {
+                    getLogger().warning("Failed to download map " + sgMap.getName());
+                }
+            });
+        }
+
         getLogger().info("Loading all unlocked mutations");
         SQLDatabase database = NexusAPI.getApi().getPrimaryDatabase();
         try {
