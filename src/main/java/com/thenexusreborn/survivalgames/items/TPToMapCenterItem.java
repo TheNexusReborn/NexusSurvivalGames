@@ -39,7 +39,8 @@ public class TPToMapCenterItem extends CustomItem {
                 return;
             }
 
-            player.teleport(game.getGameMap().getCenter().toLocation(game.getGameMap().getWorld()));
+            player.teleport(game.getGameMap().getSpawnCenter().toLocation(game.getGameMap().getWorld()));
+            gamePlayer.setPosition(player.getLocation());
             gamePlayer.sendMessage("&6&l>> &eTeleported to the Map Center.");
         });
     }

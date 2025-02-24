@@ -66,6 +66,7 @@ public class WarmupSpawnThread extends StarThread<SurvivalGames> {
                         spawnLocation.setYaw(playerLocation.getYaw());
                         spawnLocation.setPitch(playerLocation.getPitch());
                         player.teleport(spawnLocation);
+                        gamePlayer.setPosition(spawnLocation);
                     }
                 }
             } catch (Exception e) {

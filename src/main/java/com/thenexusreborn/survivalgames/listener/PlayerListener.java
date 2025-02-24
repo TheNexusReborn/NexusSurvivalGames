@@ -726,6 +726,7 @@ public class PlayerListener implements Listener {
                 } else {
                     player.teleport(deathLocation);
                 }
+                gamePlayer.setPosition(player.getLocation());
                 game.killPlayer(gamePlayer, deathInfo);
             }
         }.runTaskLater(plugin, 2L);

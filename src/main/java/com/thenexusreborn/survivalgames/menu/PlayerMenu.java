@@ -42,6 +42,8 @@ public class PlayerMenu extends InventoryGUI implements UpdatingGUI {
         Button teleportButton = new Button().iconCreator(p -> ItemBuilder.of(XMaterial.ENDER_PEARL).displayName("&e&lTeleport").build())
                 .consumer(e -> {
                     e.getWhoClicked().teleport(Bukkit.getPlayer(player.getUniqueId()).getLocation());
+                    SGPlayer actor = plugin.getPlayerRegistry().get(e.getWhoClicked().getUniqueId());
+                    actor.getGamePlayer().setPosition(e.getWhoClicked().getLocation());
                     e.getWhoClicked().sendMessage(StarColors.color(MsgType.INFO + "Teleported to " + player.getColoredName() + "&e."));
                 });
         addElement(teleportButton);

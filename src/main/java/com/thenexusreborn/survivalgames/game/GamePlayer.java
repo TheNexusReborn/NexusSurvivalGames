@@ -5,6 +5,7 @@ import com.stardevllc.itembuilder.ItemBuilder;
 import com.stardevllc.itembuilder.XMaterial;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.starcore.utils.ArmorSet;
+import com.stardevllc.starcore.utils.Position;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.PlayerBalance;
 import com.thenexusreborn.api.player.Rank;
@@ -19,6 +20,7 @@ import com.thenexusreborn.survivalgames.scoreboard.GameTablistHandler;
 import com.thenexusreborn.survivalgames.scoreboard.game.GameBoard;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -47,6 +49,7 @@ public class GamePlayer {
     private Status status;
     private SGPlayerStats stats;
     private int timesMutated;
+    private Position position = new Position();
     
     public GamePlayer(NexusPlayer nexusPlayer, Game game, SGPlayerStats stats) {
         this.nexusPlayer = nexusPlayer;
@@ -55,6 +58,22 @@ public class GamePlayer {
         this.combatTag = new CombatTag(game, nexusPlayer.getUniqueId());
         this.damageInfo = new DamageInfo(nexusPlayer.getUniqueId());
         this.stats = stats;
+    }
+    
+    public void setPosition(Location location) {
+        this.position.setX(location.getBlockX());
+        this.position.setY(location.getBlockY());
+        this.position.setZ(location.getBlockZ());
+    }
+    
+    public void setPosition(Position position) {
+        this.position.setX(position.getX());
+        this.position.setY(position.getY());
+        this.position.setZ(position.getZ());
+    }
+
+    public Position getPosition() {
+        return position;
     }
 
     public Game getGame() {

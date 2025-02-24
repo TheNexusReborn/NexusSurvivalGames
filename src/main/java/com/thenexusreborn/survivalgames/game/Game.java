@@ -447,6 +447,8 @@ public class Game {
 
     private void teleportToGameSpawn(Player player, Location spawn, GameTeam gameTeam) {
         player.teleport(spawn);
+        GamePlayer gamePlayer = this.players.get(player.getUniqueId());
+        gamePlayer.setPosition(player.getLocation());
         Bukkit.getScheduler().runTaskLater(plugin, () -> player.setGameMode(gameTeam.getGameMode()), 1L);
     }
 
@@ -461,6 +463,7 @@ public class Game {
     public void teleportSpectator(Player spectator, Location mapSpawn) {
         try {
             spectator.teleport(mapSpawn);
+            this.players.get(spectator.getUniqueId()).setPosition(mapSpawn);
             spectator.setGameMode(GameTeam.SPECTATORS.getGameMode());
             spectator.setFoodLevel(20);
             spectator.setSaturation(20);
