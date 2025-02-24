@@ -3,7 +3,6 @@ package com.thenexusreborn.survivalgames.threads.lobby;
 import com.stardevllc.starcore.utils.StarThread;
 import com.stardevllc.time.TimeUnit;
 import com.thenexusreborn.api.player.Rank;
-import com.thenexusreborn.nexuscore.util.ServerProperties;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
@@ -15,7 +14,9 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 public class LobbyThread extends StarThread<SurvivalGames> {
 
@@ -32,7 +33,8 @@ public class LobbyThread extends StarThread<SurvivalGames> {
             if (lobby == null) {
                 continue;
             }
-            World world = Bukkit.getWorld(ServerProperties.getLevelName());
+            
+            World world = lobby.getWorld();
             for (Entity entity : world.getEntities()) {
                 if (!(entity instanceof Player)) {
                     entity.remove();
@@ -56,13 +58,11 @@ public class LobbyThread extends StarThread<SurvivalGames> {
             }
             
             if (world.isThundering()) {
-                plugin.getLogger().info("Lobby world has thunder, clearing");
                 world.setThundering(false);
                 world.setWeatherDuration(Integer.MAX_VALUE);
             }
             
             if (world.hasStorm()) {
-                plugin.getLogger().info("Lobby world has storm, clearing");
                 world.setStorm(false);
                 world.setWeatherDuration(Integer.MAX_VALUE);
             }
