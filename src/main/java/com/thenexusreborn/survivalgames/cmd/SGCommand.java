@@ -1103,25 +1103,21 @@ public class SGCommand implements CommandExecutor {
                     return true;
                 }
 
-                int newMaps = 0, duplicateMaps = 1;
+                int newMaps = 0, duplicateMaps = 0;
                 for (SGMap map : importManager.getMaps()) {
                     SGMap existingMap = plugin.getMapManager().getMap(map.getName());
                     if (existingMap == null) {
                         plugin.getMapManager().addMap(map);
                         sender.sendMessage(MsgType.INFO.format("Added %v as a new map.", map.getName()));
+                        newMaps++;
                     } else {
-                        existingMap.setCreators(map.getCreators());
-                        existingMap.setCenter(map.getCenter());
-                        existingMap.setBorderDistance(map.getBorderDistance());
-                        existingMap.setDeathmatchBorderDistance(map.getDeathmatchBorderDistance());
-                        existingMap.setSpawns(map.getSpawns());
-                        existingMap.setRatings(new ArrayList<>(map.getRatings().values()));
-                        existingMap.setActive(map.isActive());
+                        existingMap.copyFrom(map);
                         sender.sendMessage(MsgType.INFO.format("Replaced %v's settings with the values from the imported data.", map.getName()));
+                        duplicateMaps++;
                     }
                 }
 
-                sender.sendMessage(MsgType.INFO.format("Added %v new map(s) and updated %v duplicate map(s).", newMaps, duplicateMaps));
+                sender.sendMessage(MsgType.INFO.format("Added %v new map(s) and updated %v map(s).", newMaps, duplicateMaps));
             } else if (args[1].equalsIgnoreCase("setsource")) {
                 if (option.equalsIgnoreCase("sql")) {
                     if (plugin.getMapManager() instanceof SQLMapManager) {
