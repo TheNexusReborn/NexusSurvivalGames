@@ -558,7 +558,7 @@ public class Lobby {
             return;
         }
 
-        LobbyPlayer lobbyPlayer = new LobbyPlayer(nexusPlayer, stats);
+        LobbyPlayer lobbyPlayer = this.players.getOrDefault(nexusPlayer.getUniqueId(), new LobbyPlayer(nexusPlayer, stats));
         this.players.put(nexusPlayer.getUniqueId(), lobbyPlayer);
         sgPlayer.setLobby(this, lobbyPlayer);
         this.lobbyChatRoom.addMember(nexusPlayer.getUniqueId(), DefaultPermissions.VIEW_MESSAGES, DefaultPermissions.SEND_MESSAGES);

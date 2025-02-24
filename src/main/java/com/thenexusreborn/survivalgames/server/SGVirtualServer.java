@@ -15,8 +15,6 @@ import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyType;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.UUID;
@@ -42,11 +40,11 @@ public class SGVirtualServer extends VirtualServer {
     public boolean recalculateVisibility(UUID playerUUID, UUID otherPlayerUUID) {
         NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(playerUUID);
         NexusPlayer otherNexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(otherPlayerUUID);
-        
+
         if (nexusPlayer == null) {
             return false;
         }
-        
+
         if (otherNexusPlayer == null) {
             return false;
         }
@@ -88,13 +86,8 @@ public class SGVirtualServer extends VirtualServer {
             NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(uuid);
             join(nexusPlayer);
         } else {
-            Player player = Bukkit.getPlayer(uuid);
             SGPlayer sgPlayer = plugin.getPlayerRegistry().get(uuid);
-            if (sgPlayer.getLobby() == null) {
-                this.lobby.addPlayer(sgPlayer);
-            } else {
-                player.teleport(this.lobby.getSpawnpoint());
-            }
+            this.lobby.addPlayer(sgPlayer);
         }
     }
 
@@ -154,15 +147,15 @@ public class SGVirtualServer extends VirtualServer {
 
         this.players.remove(nexusPlayer.getUniqueId());
     }
-    
+
     @Override
     public void quit(UUID uuid) {
         this.players.remove(uuid);
-        
+
         if (this.lobby != null) {
             this.lobby.removePlayer(uuid);
         }
-        
+
         if (this.game != null) {
             this.game.quit(uuid);
         }
