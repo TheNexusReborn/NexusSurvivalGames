@@ -28,7 +28,7 @@ public class MapEditingBoard extends SpigotScoreboardView {
             if (plugin.getPlayerRegistry().get(player.getUniqueId()).getLobby().getGameMap() == null) {
                 SGUtils.setTeamValueForString("&fNo Map Set", team);
             } else {
-                Position center = plugin.getPlayerRegistry().get(player.getUniqueId()).getLobby().getGameMap().getCenter();
+                Position center = plugin.getPlayerRegistry().get(player.getUniqueId()).getLobby().getGameMap().getSpawnCenter();
                 if (center != null) {
                     String centerText = center.getX() + "," + center.getY() + "," + center.getZ();
                     SGUtils.setTeamValueForString(centerText, team);
@@ -46,18 +46,18 @@ public class MapEditingBoard extends SpigotScoreboardView {
                 team.setSuffix("" + plugin.getPlayerRegistry().get(player.getUniqueId()).getLobby().getGameMap().getSpawns().size());
             }
         }));
-        createTeam(new TeamBuilder("borderDistance").entry("&eBorder Distance: &b").score(7).valueUpdater((player, team) -> {
+        createTeam(new TeamBuilder("borderDistance").entry("&eArena Border Length: &b").score(7).valueUpdater((player, team) -> {
             if (plugin.getPlayerRegistry().get(player.getUniqueId()).getLobby().getGameMap() == null) {
                 team.setSuffix("0");
             } else {
-                team.setSuffix("" + plugin.getPlayerRegistry().get(player.getUniqueId()).getLobby().getGameMap().getBorderDistance());
+                team.setSuffix("" + plugin.getPlayerRegistry().get(player.getUniqueId()).getLobby().getGameMap().getArenaBorderLength());
             }
         }));
-        createTeam(new TeamBuilder("dmBorderDistance").entry("&eDM Border Distance: &b").score(6).valueUpdater((player, team) -> {
+        createTeam(new TeamBuilder("dmBorderDistance").entry("&eDM Border Length: &b").score(6).valueUpdater((player, team) -> {
             if (plugin.getPlayerRegistry().get(player.getUniqueId()).getLobby().getGameMap() == null) {
                 team.setSuffix("0");
             } else {
-                team.setSuffix("" + plugin.getPlayerRegistry().get(player.getUniqueId()).getLobby().getGameMap().getDeathmatchBorderDistance());
+                team.setSuffix("" + plugin.getPlayerRegistry().get(player.getUniqueId()).getLobby().getGameMap().getDeathmatchBorderLength());
             }
         }));
         createTeam(new TeamBuilder("creatorCount").entry("&eTotal Creators: &b").score(5).valueUpdater((player, team) -> {

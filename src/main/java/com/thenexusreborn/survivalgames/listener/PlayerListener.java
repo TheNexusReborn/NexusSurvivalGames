@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames.listener;
 
+import com.sk89q.worldedit.bukkit.BukkitUtil;
 import com.stardevllc.colors.StarColors;
 import com.stardevllc.helper.Pair;
 import com.stardevllc.itembuilder.ItemBuilder;
@@ -312,7 +313,7 @@ public class PlayerListener implements Listener {
                             if (game.getState() == GameState.DEATHMATCH) {
                                 lootTable = lootManager.getLootTable("tierFour");
                             } else {
-                                boolean withinCenter = game.getGameMap().getDeathmatchArea().contains(player);
+                                boolean withinCenter = game.getGameMap().getDeathmatchRegion().contains(BukkitUtil.toVector(player.getLocation()));
                                 if (game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_DEATHMATCH) {
                                     boolean afterRestock = game.getTimedRestockCount() > 0;
                                     if (withinCenter) {
@@ -722,7 +723,7 @@ public class PlayerListener implements Listener {
             public void run() {
                 player.spigot().respawn();
                 if (e.getEntity().getLastDamageCause().getCause() == DamageCause.VOID) {
-                    player.teleport(game.getGameMap().getCenter().toLocation(game.getGameMap().getWorld()));
+                    player.teleport(game.getGameMap().getSpawnCenter().toLocation(game.getGameMap().getWorld()));
                 } else {
                     player.teleport(deathLocation);
                 }

@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames.game;
 
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.stardevllc.clock.clocks.Timer;
 import com.stardevllc.colors.StarColors;
 import com.stardevllc.helper.StringHelper;
@@ -7,7 +8,6 @@ import com.stardevllc.registry.StringRegistry;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
-import com.stardevllc.starcore.utils.Cuboid;
 import com.stardevllc.time.TimeFormat;
 import com.stardevllc.time.TimeUnit;
 import com.thenexusreborn.api.NexusAPI;
@@ -338,7 +338,7 @@ public class Game {
         giveSpectatorItems(player);
         player.spigot().setCollidesWithEntities(false);
         gamePlayer.setStatus(GamePlayer.Status.TELEPORTING_TO_CENTER);
-        teleportSpectator(player, this.gameMap.getCenter().toLocation(this.gameMap.getWorld()));
+        teleportSpectator(player, this.gameMap.getSpawnCenter().toLocation(this.gameMap.getWorld()));
 
         gamePlayer.setStatus(GamePlayer.Status.CALCULATING_VISIBILITY);
         if (nexusPlayer.getToggleValue("vanish")) {
@@ -501,7 +501,7 @@ public class Game {
             }
         }
 
-        Location mapSpawn = getGameMap().getCenter().toLocation(getGameMap().getWorld());
+        Location mapSpawn = getGameMap().getSpawnCenter().toLocation(getGameMap().getWorld());
         teleportTributes(tributes, mapSpawn);
         teleportSpectators(spectators, mapSpawn);
         for (Entity entity : getGameMap().getWorld().getEntities()) {
@@ -560,13 +560,17 @@ public class Game {
             return;
         }
 
-        int radius = gameMap.getDeathmatchBorderDistance();
-        Location center = gameMap.getCenter().toLocation(gameMap.getWorld());
-        Location corner1 = center.clone();
-        corner1.add(radius, radius, radius);
-        Location corner2 = center.clone();
-        corner2.subtract(radius, radius, radius);
-        gameMap.setDeathmatchArea(new Cuboid(corner1, corner2));
+        CuboidRegion arenaRegion = getGameMap().getArenaRegion();
+        if (arenaRegion == null) {
+            handleError("Could not define the region for the arena");
+            return;
+        }
+
+        CuboidRegion deathmatchArea = getGameMap().getDeathmatchRegion();
+        if (deathmatchArea == null) {
+            handleError("Could not define the region for the deathmatch");
+            return;
+        }
 
         try {
             for (int i = 0; i < getGameMap().getSpawns().size(); i++) {
@@ -746,7 +750,7 @@ public class Game {
                 }
             }
             resetSpawns();
-            Location mapSpawn = gameMap.getCenter().toLocation(gameMap.getWorld());
+            Location mapSpawn = gameMap.getSpawnCenter().toLocation(gameMap.getWorld());
             teleportTributes(tributes, mapSpawn);
             teleportSpectators(spectators, mapSpawn);
 
@@ -1505,7 +1509,7 @@ public class Game {
         sendMessage("&6&l>> " + gamePlayer.getColoredName() + " &6has &lMUTATED &6as a(n) &l" + mutation.getType().getDisplayName() + " &6and seeks revenge on &a" + Bukkit.getPlayer(mutation.getTarget()).getName() + "&6!");
 
         MapSpawn spawn = gameMap.getSpawns().get(new Random().nextInt(gameMap.getSpawns().size()));
-        Location location = spawn.toGameLocation(this.gameMap.getWorld(), gameMap.getCenter().toLocation(gameMap.getWorld()));
+        Location location = spawn.toGameLocation(this.gameMap.getWorld(), gameMap.getSpawnCenter().toLocation(gameMap.getWorld()));
         Player player = Bukkit.getPlayer(gamePlayer.getUniqueId());
 
         gamePlayer.sendMessage(gamePlayer.getTeam().getLeaveMessage());
