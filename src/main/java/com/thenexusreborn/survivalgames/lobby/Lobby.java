@@ -309,22 +309,26 @@ public class Lobby {
         this.mapOptions.clear();
 
         getPlayers().forEach(player -> player.setMapVote(-1));
+        
+        plugin.getLogger().info("Cleared existing data");
+        
+        List<SGMap> maps = new ArrayList<>(plugin.getMapManager().getMaps());
+        maps.removeIf(map -> !map.isActive());
 
-        if (plugin.getMapManager().getMaps().size() == 1 && !this.mapSigns.isEmpty()) {
-            this.mapOptions.put(1, plugin.getMapManager().getMaps().getFirst());
-        } else if (plugin.getMapManager().getMaps().size() >= this.mapSigns.size()) {
-            List<SGMap> maps = new ArrayList<>(plugin.getMapManager().getMaps());
-            for (Integer position : new HashSet<>(this.mapSigns.keySet())) {
-                SGMap map;
-                int index;
-                do {
-                    index = new Random().nextInt(maps.size());
-                    map = maps.get(index);
-                } while (!map.isActive());
-                this.mapOptions.put(position, map);
-                maps.remove(index);
+        plugin.getLogger().info("Found " + maps.size() + " valid maps");
+
+        Collections.shuffle(maps);
+
+        for (int i = 0; i < maps.size(); i++) {
+            if (!this.mapSigns.containsKey(i + 1)) {
+                plugin.getLogger().warning("Map Signs does not contain " + i);
+                break;
             }
+
+            this.mapOptions.put(i + 1, maps.get(i));
         }
+        
+        plugin.getLogger().info("Generated the map options");
     }
 
     public boolean checkMapEditing(Player player) {
@@ -368,6 +372,8 @@ public class Lobby {
         }
         
         plugin.getMapManager().setEditMode(false);
+        
+        generateMapOptions();
 
         sendMessage("&eThe lobby has been set to no longer editing maps. Automatic actions resumed.");
     }
@@ -863,11 +869,17 @@ public class Lobby {
                     return;
                 }
 
-                if (player.getMapVote() > -1) {
-                    player.sendMessage("&6&l>> &eYou changed your vote to &b" + this.mapOptions.get(entry.getKey()).getName());
+                SGMap sgMap = this.mapOptions.get(entry.getKey());
+                
+                if (sgMap == null) {
+                    MsgType.WARN.send(Bukkit.getPlayer(nexusPlayer.getUniqueId()), "Invalid Vote Option");
+                    return;
+                } else if (player.getMapVote() > -1) {
+                    player.sendMessage("&6&l>> &eYou changed your vote to &b" + sgMap.getName());
                 } else {
-                    player.sendMessage("&6&l>> &eYou voted for the map &b" + this.mapOptions.get(entry.getKey()).getName());
+                    player.sendMessage("&6&l>> &eYou voted for the map &b" + sgMap.getName());
                 }
+                
                 player.setMapVote(entry.getKey());
                 return;
             }
