@@ -24,6 +24,8 @@ repositories {
     maven {
         url = uri('https://repo.maven.apache.org/maven2/')
     }
+
+    maven { url = uri('https://maven.enginehub.org/repo/') }
 }
 
 processResources {
@@ -34,7 +36,7 @@ processResources {
 
 dependencies {
     compileOnly 'com.thenexusreborn:NexusCore:1.14.5-ALPHA'
-    compileOnly 'com.thenexusreborn:NexusMaps:1.1.1-ALPHA'
+    compileOnly 'com.thenexusreborn:NexusMaps:1.2-ALPHA'
     compileOnly 'com.thenexusreborn:NexusHub:1.7.1-ALPHA'
     compileOnly 'com.github.StarDevelopmentLLC:converter:0.1.0'
     compileOnly 'com.github.StarDevelopmentLLC:StarCore:0.1.11'
@@ -42,6 +44,8 @@ dependencies {
     compileOnly 'me.clip:placeholderapi:2.11.5'
     compileOnly 'org.spigotmc:spigot:1.8.8-R0.1-SNAPSHOT'
     compileOnly 'com.comphenix.protocol:ProtocolLib:5.0.0'
+    compileOnly 'com.sk89q.worldedit:worldedit-core:6.1'
+    compileOnly 'com.sk89q.worldedit:worldedit-bukkit:6.1.5'
 }
 
 group = 'com.thenexusreborn'
