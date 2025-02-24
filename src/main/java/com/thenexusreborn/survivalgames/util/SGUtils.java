@@ -26,7 +26,7 @@ public final class SGUtils {
         if (map != null) {
             setTeamValueForString(map.getName(), team);
         } else {
-            team.setPrefix("&fNot Set");
+            setTeamValueForString("Not Set", team);
         }
     }
     
