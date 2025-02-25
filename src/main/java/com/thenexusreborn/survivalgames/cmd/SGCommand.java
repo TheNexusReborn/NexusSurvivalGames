@@ -604,10 +604,10 @@ public class SGCommand implements CommandExecutor {
                     }
                     if (lobby.getState() == LobbyState.MAP_EDITING) {
                         lobby.stopEditingMaps();
-                        sender.sendMessage(MsgType.WARN.format("You stopped editing maps."));
+                        sender.sendMessage(MsgType.INFO.format("You stopped editing maps."));
                     } else {
                         lobby.editMaps();
-                        sender.sendMessage(MsgType.WARN.format("You started editing maps."));
+                        sender.sendMessage(MsgType.INFO.format("You started editing maps."));
                     }
                 }
                 case "mapsigns", "ms" -> {
