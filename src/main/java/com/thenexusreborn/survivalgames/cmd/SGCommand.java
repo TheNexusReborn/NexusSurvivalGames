@@ -1061,6 +1061,19 @@ public class SGCommand implements CommandExecutor {
                 sender.sendMessage("");
             }
         } else if (subCommand.equals("maps") || subCommand.equals("m")) {
+            if (!(args.length > 1)) {
+                MsgType.WARN.send(sender, "Usage: /" + label + " " + subCommand + " <list|export|import|setsource> [args]");
+                return true;
+            }
+            
+            if (args[1].equalsIgnoreCase("list")) {
+                StarColors.coloredMessage(sender, "&6&l>> &eList of &bSG Maps");
+                for (SGMap map : plugin.getMapManager().getMaps()) {
+                    StarColors.coloredMessage(sender, " &6&l> &d" + map.getName() + "  " + (map.isActive() ? "&a&lACTIVE" : "&c&lINACTIVE") + "  " + (map.isValid() ? "&a&lVALID" : "&c&lINVALID"));
+                }
+                return true;
+            }
+            
             if (!(args.length > 2)) {
                 sender.sendMessage(MsgType.WARN.format("Usage: /" + label + " " + subCommand + " <export|import|setsource> <sql|yml>"));
                 return true;
