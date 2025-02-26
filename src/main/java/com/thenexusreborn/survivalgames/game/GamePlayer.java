@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames.game;
 
+import com.stardevllc.colors.StarColors;
 import com.stardevllc.helper.Pair;
 import com.stardevllc.itembuilder.ItemBuilder;
 import com.stardevllc.itembuilder.XMaterial;
@@ -25,6 +26,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 
 import java.text.DecimalFormat;
@@ -475,10 +477,8 @@ public class GamePlayer {
         player.getInventory().setArmorContents(null);
     }
     
-    public void giveSpectatorItems(Game game) {
+    public String getMutateItemNameFromStatus() {
         Pair<Boolean, String> canMutateStatus = canMutate();
-        
-        String mutateName;
         
         if (canMutateStatus.key()) {
             GamePlayer killer = game.getPlayer(getMutationTarget());
@@ -488,10 +488,29 @@ public class GamePlayer {
             } else {
                 passes = getStats().getMutationPasses() + "";
             }
-            mutateName = "&c&lTAKE REVENGE   &eTarget: " + killer.getColoredName() + "   &ePasses: &b" + passes;
+            return "&c&lTAKE REVENGE   &eTarget: " + killer.getColoredName() + "   &ePasses: &b" + passes;
         } else {
-            mutateName = "&c" + canMutateStatus.value();
+            return "&c" + canMutateStatus.value();
         }
+    }
+
+    public void updateMutationItem() {
+        Player player = Bukkit.getPlayer(getUniqueId());
+        PlayerInventory inv = player.getInventory();
+
+        ItemStack mutateItem = inv.getItem(5);
+        ItemMeta itemMeta = mutateItem.getItemMeta();
+        
+        String mutateName = StarColors.color(getMutateItemNameFromStatus());
+        
+        if (itemMeta.getDisplayName() == null || !itemMeta.getDisplayName().equals(mutateName)) {
+            itemMeta.setDisplayName(mutateName);
+            mutateItem.setItemMeta(itemMeta);
+        }
+    }
+    
+    public void giveSpectatorItems(Game game) {
+        String mutateName = getMutateItemNameFromStatus();
         
         ItemStack mutateItem = ItemBuilder.of(XMaterial.ROTTEN_FLESH).displayName(mutateName).build();
         Player p = Bukkit.getPlayer(getUniqueId());
@@ -580,6 +599,7 @@ public class GamePlayer {
         Map.Entry<Long, DeathInfo> mostRecentDeath = this.deaths.lastEntry();
         return mostRecentDeath != null ? mostRecentDeath.getValue() : null;
     }
+
 
     public enum Status {
         SETTING_UP_PLAYER, TELEPORTING_TO_CENTER, CALCULATING_VISIBILITY, SETTING_UP_SCOREBOARD, READY, SETTING_UP_ACTIONBAR, ADDING_TO_GAME
