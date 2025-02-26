@@ -548,6 +548,10 @@ public class SGCommand implements CommandExecutor {
 
             String lobbySubCommand = args[1].toLowerCase();
             switch (lobbySubCommand) {
+                case "regeneratemapoptions", "rmo" -> {
+                    lobby.generateMapOptions();
+                    MsgType.INFO.send(sender, "You regenerated the map options");
+                }
                 case "forcestart", "fs" -> {
                     if (game != null) {
                         sender.sendMessage(MsgType.WARN.format("The server has a game in progress."));
@@ -1065,7 +1069,7 @@ public class SGCommand implements CommandExecutor {
                 MsgType.WARN.send(sender, "Usage: /" + label + " " + subCommand + " <list|export|import|setsource> [args]");
                 return true;
             }
-            
+
             if (args[1].equalsIgnoreCase("list")) {
                 StarColors.coloredMessage(sender, "&6&l>> &eList of &bSG Maps");
                 for (SGMap map : plugin.getMapManager().getMaps()) {
@@ -1073,7 +1077,7 @@ public class SGCommand implements CommandExecutor {
                 }
                 return true;
             }
-            
+
             if (!(args.length > 2)) {
                 sender.sendMessage(MsgType.WARN.format("Usage: /" + label + " " + subCommand + " <export|import|setsource> <sql|yml>"));
                 return true;
