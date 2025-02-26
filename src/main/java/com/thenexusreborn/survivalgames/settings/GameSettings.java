@@ -69,6 +69,11 @@ public class GameSettings implements Cloneable {
     private int tntFuseTicks = 20;
     private boolean allowKillersKiller = true;
     private boolean tributesSeeSpectatorChat = true;
+    private boolean allowBounties = true;
+    
+    public boolean isAllowBounties() {
+        return allowBounties;
+    }
 
     public void setGracePeriod(boolean gracePeriod) {
         this.gracePeriod = gracePeriod;

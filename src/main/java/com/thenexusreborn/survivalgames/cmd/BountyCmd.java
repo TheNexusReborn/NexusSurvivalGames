@@ -37,6 +37,11 @@ public class BountyCmd implements CommandExecutor {
             player.sendMessage(MsgType.WARN.format("You can only bounty a player during a game."));
             return true;
         }
+        
+        if (!game.getSettings().isAllowBounties()) {
+            MsgType.WARN.send(player, "Bounties are disabled for this game.");
+            return true;
+        }
 
         if (!(args.length > 1)) {
             player.sendMessage(MsgType.WARN.format("Usage: /" + label + " <player> <amount> [type: default score]"));
