@@ -912,12 +912,6 @@ public class SGCommand implements CommandExecutor {
                 return true;
             }
 
-            Class<?> settingClass = switch (type) {
-                case "game" -> GameSettings.class;
-                case "lobby" -> LobbySettings.class;
-                default -> null; //Can ignore this really as it will never be null
-            };
-
             if (!(args.length > 2)) {
                 MsgType.WARN.send(sender, "Not enough arguments");
                 return true;
@@ -935,13 +929,6 @@ public class SGCommand implements CommandExecutor {
                 }
             }
 
-                if (Modifier.isFinal(declaredField.getModifiers())) {
-                    continue;
-                }
-
-                StringConverter<?> converter = StringConverters.getConverter(declaredField.getType());
-                if (converter != null) {
-                    fields.put(declaredField, converter);
             if (allRunning) {
                 if (isGameType) {
                     plugin.getServers().forEach(server -> {
@@ -973,7 +960,11 @@ public class SGCommand implements CommandExecutor {
             if (args[2].equalsIgnoreCase("list")) {
                 List<String> lines = new LinkedList<>();
                 for (Field field : fields.keySet()) {
-                    lines.add("  &8 - &a" + field.getName().toLowerCase());
+                    try {
+                        lines.add("  &8 - &a" + field.getName().toLowerCase() + " &7= &e" + fields.get(field).convertFrom(field.get(settingsInstances)));
+                    } catch (IllegalAccessException e) {
+                        MsgType.WARN.send(sender, "Could not parse the value of %v.", field.getName());
+                    }
                 }
 
                 if (lines.isEmpty()) {
