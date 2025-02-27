@@ -200,13 +200,8 @@ public class Game {
 
         target.sendMessage(target.getTeam().getLeaveMessage());
         target.setTeam(GameTeam.TRIBUTES);
+        GameTeam.TRIBUTES.getPlayerState().apply(target);
         target.sendMessage(target.getTeam().getJoinMessage());
-
-        target.clearInventory();
-        target.clearPotionEffects();
-        target.setFood(20, getSettings().getStartingSaturation());
-        target.setFlight(false, false);
-        target.setCollisions(true);
 
         int index = new Random().nextInt(getSpawns().size());
         MapSpawn spawnPosition = getGameMap().getSpawns().get(index);
@@ -235,8 +230,7 @@ public class Game {
 
         target.sendMessage(target.getTeam().getLeaveMessage());
         target.setTeam(GameTeam.SPECTATORS);
-        target.clearInventory();
-        target.clearPotionEffects();
+        GameTeam.SPECTATORS.getPlayerState().apply(target);
         target.giveSpectatorItems(this);
         target.sendMessage(target.getTeam().getJoinMessage());
 
@@ -262,13 +256,8 @@ public class Game {
 
         target.sendMessage(target.getTeam().getLeaveMessage());
         target.setTeam(GameTeam.TRIBUTES);
+        GameTeam.TRIBUTES.getPlayerState().apply(target);
         target.sendMessage(target.getTeam().getJoinMessage());
-
-        target.clearInventory();
-        target.clearPotionEffects();
-        target.setFood(20, getSettings().getStartingSaturation());
-        target.setFlight(false, false);
-        target.setCollisions(true);
 
         if (lootTable != null && amountOfItems > 1) {
             List<ItemStack> loot = lootTable.generateLoot(amountOfItems);
@@ -332,11 +321,8 @@ public class Game {
         gamePlayer.setStatus(GamePlayer.Status.SETTING_UP_PLAYER);
         Player player = Bukkit.getPlayer(nexusPlayer.getUniqueId());
         this.gameChatroom.addMember(player.getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
-        player.getInventory().clear();
-        player.getInventory().setArmorContents(null);
-        player.setAllowFlight(false);
+        GameTeam.SPECTATORS.getPlayerState().apply(player);
         giveSpectatorItems(player);
-        player.spigot().setCollidesWithEntities(false);
         gamePlayer.setStatus(GamePlayer.Status.TELEPORTING_TO_CENTER);
         teleportSpectator(player, this.gameMap.getSpawnCenter().toLocation(this.gameMap.getWorld()));
 
@@ -449,7 +435,6 @@ public class Game {
         player.teleport(spawn);
         GamePlayer gamePlayer = this.players.get(player.getUniqueId());
         gamePlayer.setPosition(player.getLocation());
-        Bukkit.getScheduler().runTaskLater(plugin, () -> player.setGameMode(gameTeam.getGameMode()), 1L);
     }
 
     public void teleportTribute(Player tribute, Location spawn) {
@@ -464,11 +449,6 @@ public class Game {
         try {
             spectator.teleport(mapSpawn);
             this.players.get(spectator.getUniqueId()).setPosition(mapSpawn);
-            spectator.setGameMode(GameTeam.SPECTATORS.getGameMode());
-            spectator.setFoodLevel(20);
-            spectator.setSaturation(20);
-            spectator.setAllowFlight(true);
-            spectator.setFlying(true);
         } catch (NullPointerException e) {
             if (spectator != null) {
                 throw e;
@@ -488,15 +468,11 @@ public class Game {
         resetSpawns();
         List<UUID> tributes = new ArrayList<>(), spectators = new ArrayList<>();
         for (GamePlayer player : getPlayers().values()) {
-            player.clearInventory();
-            player.clearPotionEffects();
-            player.setFood(20, getSettings().getStartingSaturation());
+            player.getTeam().getPlayerState().apply(player);
             if (player.getTeam() == GameTeam.TRIBUTES) {
                 tributes.add(player.getUniqueId());
-                player.setFlight(false, false);
             } else if (player.getTeam() == GameTeam.SPECTATORS) {
                 spectators.add(player.getUniqueId());
-                player.setFlight(true, true);
                 player.giveSpectatorItems(this);
             }
         }
@@ -1088,14 +1064,8 @@ public class Game {
                     }
                 }
             }
-            if (player != null) {
-                resetPlayer(player);
-                player.setGameMode(GameTeam.SPECTATORS.getGameMode());
-                player.spigot().setCollidesWithEntities(false);
-                giveSpectatorItems(player);
-                player.setAllowFlight(true);
-                player.setFlying(true);
-            }
+
+            GameTeam.SPECTATORS.getPlayerState().apply(player);
 
             boolean deathByVanish = deathInfo.getType() == DeathType.VANISH;
             int score = gamePlayer.getStats().getScore();
@@ -1194,7 +1164,6 @@ public class Game {
                     removeMutation(killerPlayer.getMutation());
                     killerPlayer.sendMessage(killerPlayer.getTeam().getLeaveMessage());
                     killerPlayer.setTeam(GameTeam.TRIBUTES);
-                    Bukkit.getPlayer(killerPlayer.getUniqueId()).setGameMode(GameTeam.TRIBUTES.getGameMode());
                     killerPlayer.sendMessage(killerPlayer.getTeam().getJoinMessage());
                 }
             }
@@ -1257,8 +1226,6 @@ public class Game {
                         removeMutation(mutation);
                         gp.sendMessage(gp.getTeam().getLeaveMessage());
                         Player mutationPlayer = Bukkit.getPlayer(gp.getUniqueId());
-                        mutationPlayer.spigot().setCollidesWithEntities(false);
-                        mutationPlayer.setAllowFlight(true);
                         gp.sendMessage(gp.getTeam().getJoinMessage());
                     } else {
                         mutation.setTarget(killer.getKiller());
@@ -1522,14 +1489,10 @@ public class Game {
 
         gamePlayer.setMutated(true);
         teleportMutation(player, location);
-        gamePlayer.clearInventory();
-        gamePlayer.setFlight(false, false);
-        gamePlayer.setCollisions(true);
-        gamePlayer.setFood(20, 20F);
+        GameTeam.MUTATIONS.getPlayerState().apply(player);
         mutation.cancelTimer();
 
         MutationType type = mutation.getType();
-        gamePlayer.setHealth(20, type.getHealth());
         PlayerInventory inv = player.getInventory();
         inv.setItem(0, type.getWeapon());
         inv.setItem(1, Items.PLAYER_TRACKER.getItemStack());
@@ -1545,16 +1508,7 @@ public class Game {
     public void removeMutation(Mutation mutation) {
         Player player = Bukkit.getPlayer(mutation.getPlayer());
         DisguiseAPI.undisguiseToAll(player);
-        player.getInventory().clear();
-        player.getInventory().setArmorContents(null);
-        player.setMaxHealth(settings.getMaxHealth());
-        player.setHealth(settings.getMaxHealth());
-        player.setExp(0);
-        player.setLevel(0);
-        player.spigot().setCollidesWithEntities(true);
-        for (PotionEffect effect : player.getActivePotionEffects()) {
-            player.removePotionEffect(effect.getType());
-        }
+        GameTeam.TRIBUTES.getPlayerState().apply(player);
         GamePlayer gamePlayer = getPlayer(player.getUniqueId());
         gamePlayer.setMutation(null);
         gamePlayer.sendMessage("&&d&l>> &7You're no longer disguised.");
