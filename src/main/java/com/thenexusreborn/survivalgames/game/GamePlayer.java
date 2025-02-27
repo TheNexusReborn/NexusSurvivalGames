@@ -344,6 +344,10 @@ public class GamePlayer {
         if (getTeam() == GameTeam.SPECTATORS) {
             return;
         }
+        
+        if (!getGame().getSettings().isAllowCombatTag()) {
+            return;
+        }
 
         if (!getCombatTag().isInCombatWith(other.getUniqueId())) {
             sendMessage("&6&l>> &cYou are now in combat with " + other.getNexusPlayer().getColoredName() + "&c!");

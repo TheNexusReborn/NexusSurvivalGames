@@ -24,6 +24,7 @@ public class GameSettings implements Cloneable {
     
     //Combat Tag
     private int combatTagLength = 10;
+    private boolean allowCombatTag = true;
     
     //Bounty
     private int maxScoreBounty = 10000;
@@ -101,6 +102,10 @@ public class GameSettings implements Cloneable {
     private int deathmatchLength = 5;
     private int deathmatchWarmupLength = 10;
     private int deathmatchCountdownLength = 60;
+
+    public boolean isAllowCombatTag() {
+        return allowCombatTag;
+    }
 
     public int getMaxSponsorships() {
         return maxSponsorships;
