@@ -28,6 +28,7 @@ import com.thenexusreborn.survivalgames.scoreboard.lobby.MapEditingBoard;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.settings.LobbySettings;
+import com.thenexusreborn.survivalgames.util.PlayerState;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -40,7 +41,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -55,6 +55,14 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class Lobby {
+    public static final PlayerState PLAYER_STATE = new PlayerState()
+            .totalExperience(0).level(0).exp(0)
+            .allowFlight(false).flying(false)
+            .clearInventory(true).clearEffects(true)
+            .maxHealth(20).health(20)
+            .collisions(true)
+            .gameMode(GameMode.SURVIVAL);
+    
     private final SurvivalGames plugin;
     private final SGVirtualServer server;
     private ControlType controlType = ControlType.AUTO;
@@ -547,6 +555,8 @@ public class Lobby {
         if (player == null) {
             return;
         }
+        
+        PLAYER_STATE.apply(player);
 
         NexusPlayer nexusPlayer = sgPlayer.getNexusPlayer();
         SGPlayerStats stats = sgPlayer.getStats();
@@ -580,8 +590,6 @@ public class Lobby {
         Location spawn = getSpawnpoint().clone();
         spawn.setY(spawn.getY() + 2);
         player.teleport(spawn);
-        player.setMaxHealth(20);
-        player.setLevel(0);
 
         for (Player online : Bukkit.getOnlinePlayers()) {
             if (!this.players.containsKey(online.getUniqueId())) {
@@ -622,14 +630,6 @@ public class Lobby {
                     Bukkit.getPlayer(nexusPlayer.getUniqueId()).hidePlayer(p);
                 }
             }
-        }
-
-        player.setHealth(player.getMaxHealth());
-        player.setGameMode(GameMode.SURVIVAL);
-        player.getInventory().clear();
-        player.getInventory().setArmorContents(null);
-        for (PotionEffect pe : player.getActivePotionEffects()) {
-            player.removePotionEffect(pe.getType());
         }
 
         boolean sponsors = nexusPlayer.getToggleValue("allowsponsors");

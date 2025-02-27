@@ -1025,7 +1025,7 @@ public class Game {
     public void nextGame() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (this.players.containsKey(player.getUniqueId())) {
-                resetPlayer(player);
+                Lobby.PLAYER_STATE.apply(player);
             }
         }
 
