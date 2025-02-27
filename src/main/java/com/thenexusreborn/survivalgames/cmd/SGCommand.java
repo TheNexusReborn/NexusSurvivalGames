@@ -973,8 +973,25 @@ public class SGCommand implements CommandExecutor {
                 }
 
                 sender.sendMessage(MsgType.INFO.format("List of &b" + type + " settings."));
-                lines.forEach(line -> StarColors.coloredMessage(sender, line));
+                
+                int page = 1;
+                
+                if (args.length > 3) {
+                    try {
+                        page = Integer.parseInt(args[3]);
+                    } catch (Exception e) {
+                        MsgType.WARN.send(sender, "Invalid number %v", args[3]);
+                        return true;
+                    }
+                }
+                
+                int offset = (page - 1) * 7; // 7 is the amount per page
 
+                for (int i = 0; i < 7; i++) {
+                    StarColors.coloredMessage(sender, lines.get(offset + i));
+                }
+                
+//                lines.forEach(line -> StarColors.coloredMessage(sender, line));
                 return true;
             }
 
