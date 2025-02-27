@@ -62,9 +62,14 @@ public class SGCommand implements CommandExecutor {
     private final SurvivalGames plugin;
 
     private Map<UUID, Runnable> settingsConfirmation = new HashMap<>();
+    
+    private Map<String, Map<Field, StringConverter<?>>> settingsFields = new HashMap<>();
 
     public SGCommand(SurvivalGames plugin) {
         this.plugin = plugin;
+        
+        this.settingsFields.put("game", getFieldsFromSettingsClass(GameSettings.class));
+        this.settingsFields.put("lobby", getFieldsFromSettingsClass(LobbySettings.class));
     }
 
     @SuppressWarnings("DuplicatedCode")
@@ -918,13 +923,17 @@ public class SGCommand implements CommandExecutor {
                 return true;
             }
 
-            Field[] declaredFields = settingClass.getDeclaredFields();
+            boolean isGameType = type.equalsIgnoreCase("game");
+            boolean isLobbyType = type.equalsIgnoreCase("lobby");
 
-            Map<Field, StringConverter<?>> fields = new HashMap<>();
-            for (Field declaredField : declaredFields) {
-                if (Modifier.isStatic(declaredField.getModifiers())) {
-                    continue;
+            Set<Object> settingsInstances = new HashSet<>();
+            if (global) {
+                if (isGameType) {
+                    settingsInstances.add(SurvivalGames.globalGameSettings);
+                } else if (isLobbyType) {
+                    settingsInstances.add(SurvivalGames.globalLobbySettings);
                 }
+            }
 
                 if (Modifier.isFinal(declaredField.getModifiers())) {
                     continue;
@@ -933,8 +942,23 @@ public class SGCommand implements CommandExecutor {
                 StringConverter<?> converter = StringConverters.getConverter(declaredField.getType());
                 if (converter != null) {
                     fields.put(declaredField, converter);
+            if (allRunning) {
+                if (isGameType) {
+                    plugin.getServers().forEach(server -> {
+                        if (server.getGame() != null) {
+                            settingsInstances.add(server.getGame().getSettings());
+                        }
+                    });
+                } else if (isLobbyType) {
+                    plugin.getServers().forEach(server -> {
+                        if (server.getLobby() != null) {
+                            settingsInstances.add(server.getGame().getSettings());
+                        }
+                    });
                 }
             }
+
+            Map<Field, StringConverter<?>> fields = this.settingsFields.get(type);
 
             if (type == null) {
                 sender.sendMessage(MsgType.WARN.format("Invalid setting type. Can only be game (g) or lobby (l)"));
@@ -985,40 +1009,10 @@ public class SGCommand implements CommandExecutor {
                 return true;
             }
 
-            field.setAccessible(true);
-
             Object value = converter.convertTo(args[3]);
             if (value == null) {
                 sender.sendMessage(MsgType.WARN.format("Could not convert %v to a(n) %v", args[3], field.getType().getSimpleName()));
                 return true;
-            }
-
-            boolean isGameType = type.equalsIgnoreCase("game");
-            boolean isLobbyType = type.equalsIgnoreCase("lobby");
-
-            Set<Object> settingsInstances = new HashSet<>();
-            if (global) {
-                if (isGameType) {
-                    settingsInstances.add(SurvivalGames.globalGameSettings);
-                } else if (isLobbyType) {
-                    settingsInstances.add(SurvivalGames.globalLobbySettings);
-                }
-            }
-
-            if (allRunning) {
-                if (isGameType) {
-                    plugin.getServers().forEach(server -> {
-                        if (server.getGame() != null) {
-                            settingsInstances.add(server.getGame().getSettings());
-                        }
-                    });
-                } else if (isLobbyType) {
-                    plugin.getServers().forEach(server -> {
-                        if (server.getLobby() != null) {
-                            settingsInstances.add(server.getGame().getSettings());
-                        }
-                    });
-                }
             }
 
             //TODO Add instanceof check here when sender limit fixed
@@ -1292,5 +1286,29 @@ public class SGCommand implements CommandExecutor {
         }
 
         return true;
+    }
+
+
+    private Map<Field, StringConverter<?>> getFieldsFromSettingsClass(Class<?> settingsClass) {
+        Field[] declaredFields = settingsClass.getDeclaredFields();
+
+        Map<Field, StringConverter<?>> fields = new TreeMap<>(Comparator.comparing(Field::getName));
+        for (Field declaredField : declaredFields) {
+            if (Modifier.isStatic(declaredField.getModifiers())) {
+                continue;
+            }
+
+            if (Modifier.isFinal(declaredField.getModifiers())) {
+                continue;
+            }
+
+            StringConverter<?> converter = StringConverters.getConverter(declaredField.getType());
+            if (converter != null) {
+                declaredField.setAccessible(true);
+                fields.put(declaredField, converter);
+            }
+        }
+
+        return fields;
     }
 }
