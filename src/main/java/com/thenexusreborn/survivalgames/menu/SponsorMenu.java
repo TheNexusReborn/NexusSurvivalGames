@@ -60,8 +60,8 @@ public class SponsorMenu extends InventoryGUI {
                     return;
                 }
                 
-                if (actor.hasSponsored()) {
-                    actor.sendMessage(MsgType.WARN + "You cannot sponsor any more.");
+                if (!actor.canSponsor()) {
+                    actor.sendMessage(MsgType.WARN + "You can only sponsor " + game.getSettings().getMaxSponsorships() + " time(s).");
                     return;
                 }
 
