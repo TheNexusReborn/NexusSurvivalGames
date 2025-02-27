@@ -666,6 +666,10 @@ public class Game {
         } else {
             sendMessage("&6&l>> &d&lTEAMING IS NOT ALLOWED IN THIS GAME.");
         }
+        
+        if (this.settings.isShowBorders()) {
+            this.gameMap.applyWorldBoarder("game");
+        }
 
         if (gameMap.getSwagShack() != null) {
             Villager entity = (Villager) gameMap.getWorld().spawnEntity(gameMap.getSwagShack().toLocation(gameMap.getWorld()), EntityType.VILLAGER);
@@ -775,7 +779,9 @@ public class Game {
         sendMessage("&6&l>> &d&lTHERE IS NO TEAMING ALLOWED IN DEATHMATCH.");
         restockChests();
 
-        this.gameMap.applyWorldBoarder("deathmatch", settings.getDeathmatchLength() * 60);
+        if (this.settings.isShowBorders()) {
+            this.gameMap.applyWorldBoarder("deathmatch", settings.getDeathmatchLength() * 60);
+        }
 
         this.timer = plugin.getClockManager().createTimer(TimeUnit.MINUTES.toMillis(settings.getDeathmatchLength()) + 50L);
         this.timer.addRepeatingCallback(new GameMinutesCallback(this, "&6&l>> &eThe &c&lGAME &eends &ein &b{time}&e."), TimeUnit.MINUTES, 1);

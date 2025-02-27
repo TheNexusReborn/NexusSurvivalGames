@@ -70,7 +70,12 @@ public class GameSettings implements Cloneable {
     private boolean allowKillersKiller = true;
     private boolean tributesSeeSpectatorChat = true;
     private boolean allowBounties = true;
-    
+    private boolean showBorders = true;
+
+    public boolean isShowBorders() {
+        return showBorders;
+    }
+
     public boolean isAllowBounties() {
         return allowBounties;
     }
