@@ -61,7 +61,7 @@ public class SponsorMenu extends InventoryGUI {
                 }
                 
                 if (actor.hasSponsored()) {
-                    actor.sendMessage(MsgType.WARN + "You can only sponsor once per game.");
+                    actor.sendMessage(MsgType.WARN + "You cannot sponsor any more.");
                     return;
                 }
 
@@ -87,6 +87,7 @@ public class SponsorMenu extends InventoryGUI {
                     actor.getStats().addScore(-cost);
                 }
                 actor.setSponsored(true);
+                actor.incrementSponsors();
 
                 Object chosen = category.getEntries().get(new Random().nextInt(category.getEntries().size()));
                 category.apply(Bukkit.getPlayer(target.getUniqueId()), chosen);

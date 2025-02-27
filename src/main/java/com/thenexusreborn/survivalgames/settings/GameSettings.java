@@ -20,6 +20,7 @@ public class GameSettings implements Cloneable {
     private int sponsorScoreCost = 100;
     private int sponsorCreditCost = 200;
     private boolean allowSponsoring = true;
+    private int maxSponsorships = 1;
     
     //Combat Tag
     private int combatTagLength = 10;
@@ -100,6 +101,10 @@ public class GameSettings implements Cloneable {
     private int deathmatchLength = 5;
     private int deathmatchWarmupLength = 10;
     private int deathmatchCountdownLength = 60;
+
+    public int getMaxSponsorships() {
+        return maxSponsorships;
+    }
 
     public boolean isShowBorders() {
         return showBorders;

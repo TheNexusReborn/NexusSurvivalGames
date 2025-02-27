@@ -44,6 +44,7 @@ public class GamePlayer {
     private Mutation mutation;
     private boolean deathByMutation;
     private boolean sponsored;
+    private int timesSponsored;
     private Bounty bounty;
     private CombatTag combatTag;
     private DamageInfo damageInfo;
@@ -61,7 +62,15 @@ public class GamePlayer {
         this.damageInfo = new DamageInfo(nexusPlayer.getUniqueId());
         this.stats = stats;
     }
-    
+
+    public int getTimesSponsored() {
+        return timesSponsored;
+    }
+
+    public int getTimesMutated() {
+        return timesMutated;
+    }
+
     public void setPosition(Location location) {
         this.position.setX(location.getBlockX());
         this.position.setY(location.getBlockY());
@@ -367,6 +376,14 @@ public class GamePlayer {
             }
         }
         return false;
+    }
+    
+    public boolean canSponsor() {
+        return this.timesSponsored < this.getGame().getSettings().getMaxSponsorships();
+    }
+    
+    public void incrementSponsors() {
+        this.timesSponsored++;
     }
 
     public UUID getMutationTarget() {

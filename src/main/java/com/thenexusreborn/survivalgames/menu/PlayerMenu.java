@@ -57,8 +57,10 @@ public class PlayerMenu extends InventoryGUI implements UpdatingGUI {
                     .consumer(e -> e.getWhoClicked().sendMessage(StarColors.color(MsgType.WARN + "This feature is not yet implemented.")));
             addElement(viewInventoryButton);
         }
+        
+        boolean sponsoringAllowed = sgPlayer.getGame().getSettings().isAllowSponsoring();
 
-        if (sgPlayer.getGame().getSettings().isAllowSponsoring() && player.getToggleValue("allowsponsors") && player.getTeam() == GameTeam.TRIBUTES) {
+        if (sponsoringAllowed && player.getToggleValue("allowsponsors") && player.getTeam() == GameTeam.TRIBUTES) {
             Button sponsorButton = new Button().iconCreator(p -> ItemBuilder.of(XMaterial.CHEST).displayName("&e&lSponsor").build())
                     .consumer(e -> {
                         SGPlayer actor = plugin.getPlayerRegistry().get(e.getWhoClicked().getUniqueId());
@@ -78,7 +80,7 @@ public class PlayerMenu extends InventoryGUI implements UpdatingGUI {
                             return;
                         }
 
-                        manager.openGUI(new SponsorMenu(plugin, gp, player), (Player) e.getWhoClicked());
+                        manager.openGUI(new SponsorMenu(plugin, gp, player), e.getWhoClicked());
                     });
 
             addElement(sponsorButton);
