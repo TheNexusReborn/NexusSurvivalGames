@@ -14,9 +14,9 @@ import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.game.GameTeam;
+import com.thenexusreborn.survivalgames.game.PlayerManageBuilder;
 import com.thenexusreborn.survivalgames.menu.manage.PlayerManageMenu;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -102,7 +102,7 @@ public class PlayerMenu extends InventoryGUI implements UpdatingGUI {
             return;
         }
         
-        Button manageButton = new Button().iconCreator(p -> ItemBuilder.of(XMaterial.ENDER_CHEST).displayName("&c&lMANAGE").build()).consumer(e -> manager.openGUI(new PlayerManageMenu(plugin, nexusPlayer.getGame(), nexusPlayer, player), (Player) e.getWhoClicked()));
+        Button manageButton = new Button().iconCreator(p -> ItemBuilder.of(XMaterial.ENDER_CHEST).displayName("&c&lMANAGE").build()).consumer(e -> manager.openGUI(new PlayerManageMenu(plugin, nexusPlayer.getGame(), new PlayerManageBuilder(nexusPlayer, player)), e.getWhoClicked()));
         addElement(manageButton);
     }
 }

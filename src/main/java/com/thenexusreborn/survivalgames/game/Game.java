@@ -259,7 +259,7 @@ public class Game {
         GameTeam.TRIBUTES.getPlayerState().apply(target);
         target.sendMessage(target.getTeam().getJoinMessage());
 
-        if (lootTable != null && amountOfItems > 1) {
+        if (lootTable != null && amountOfItems > 0) {
             List<ItemStack> loot = lootTable.generateLoot(amountOfItems);
             for (ItemStack item : loot) {
                 target.addItem(item);
