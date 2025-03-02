@@ -322,7 +322,7 @@ public class Game {
         Player player = Bukkit.getPlayer(nexusPlayer.getUniqueId());
         this.gameChatroom.addMember(player.getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
         GameTeam.SPECTATORS.getPlayerState().apply(player);
-        giveSpectatorItems(player);
+        gamePlayer.giveSpectatorItems(this);
         gamePlayer.setStatus(GamePlayer.Status.TELEPORTING_TO_CENTER);
         teleportSpectator(player, this.gameMap.getSpawnCenter().toLocation(this.gameMap.getWorld()));
 
@@ -1010,18 +1010,6 @@ public class Game {
         }
     }
 
-    public void resetPlayer(Player player) {
-        player.setTotalExperience(0);
-        player.setLevel(0);
-        player.setExp(0);
-        player.getInventory().clear();
-        player.getInventory().setArmorContents(null);
-        player.setAllowFlight(false);
-        player.setMaxHealth(20);
-        player.setHealth(20);
-        player.spigot().setCollidesWithEntities(true);
-    }
-
     public void nextGame() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (this.players.containsKey(player.getUniqueId())) {
@@ -1072,6 +1060,7 @@ public class Game {
             }
 
             GameTeam.SPECTATORS.getPlayerState().apply(player);
+            gamePlayer.giveSpectatorItems(this);
 
             boolean deathByVanish = deathInfo.getType() == DeathType.VANISH;
             int score = gamePlayer.getStats().getScore();
@@ -1391,11 +1380,6 @@ public class Game {
         }
     }
 
-    public void giveSpectatorItems(Player p) {
-        GamePlayer gamePlayer = getPlayer(p.getUniqueId());
-        gamePlayer.giveSpectatorItems(this);
-    }
-
     public void checkGameEnd() {
         //Count total tributes
         int totalTributes = 0;
@@ -1519,7 +1503,7 @@ public class Game {
         gamePlayer.setMutation(null);
         gamePlayer.sendMessage("&&d&l>> &7You're no longer disguised.");
         if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
-            giveSpectatorItems(player);
+            gamePlayer.giveSpectatorItems(this);
         }
     }
 
