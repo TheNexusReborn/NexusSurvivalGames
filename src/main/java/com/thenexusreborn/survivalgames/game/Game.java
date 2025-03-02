@@ -1570,18 +1570,6 @@ public class Game {
         return chatRooms;
     }
 
-    public boolean willRestockChests() {
-        if (this.getState() != INGAME) {
-            return false;
-        }
-
-        if (this.restockCallbackId == null) {
-            return false;
-        }
-
-        return this.timer.shouldCallback(this.restockCallbackId);
-    }
-
     public long getNextRestock() {
         if (this.getState() != INGAME) {
             return 0;
