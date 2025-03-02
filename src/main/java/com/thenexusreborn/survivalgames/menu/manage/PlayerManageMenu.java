@@ -28,7 +28,7 @@ public class PlayerManageMenu extends InventoryGUI implements UpdatingGUI {
     private PlayerManageBuilder manageBuilder;
     
     public PlayerManageMenu(SurvivalGames plugin, Game game, PlayerManageBuilder manageBuilder) {
-        super(1, "&e&lManage " + manageBuilder.getTarget(), manageBuilder.getActor().getUniqueId());
+        super(1, "&e&lManage " + manageBuilder.getTarget().getName(), manageBuilder.getActor().getUniqueId());
         this.plugin = plugin;
         this.game = game;
         this.manageBuilder = manageBuilder;
@@ -47,20 +47,23 @@ public class PlayerManageMenu extends InventoryGUI implements UpdatingGUI {
                         if (this.manageBuilder.getLootTable() == null) {
                             ib.addLoreLine("&7&oThis will add " + target.getName() + " to the game with no items");
                         } else {
-                            ib.addLoreLine("&7&oThis will add " + target.getName() + " to the game with " + this.manageBuilder.getNumberOfItems() + " item(s) from the " + this.manageBuilder.getLootTable().getName() + " loot table");
+                            ib.addLoreLine("&7&oThis will add " + target.getName() + " to the game");
+                            ib.addLoreLine("&7&o    LootTable: " + this.manageBuilder.getLootTable().getName());
+                            ib.addLoreLine("&7&o    Items: " + this.manageBuilder.getNumberOfItems());
                         }
                         
                         ib.addLoreLine("");
-                        ib.addLoreLine("&6&lLeft Click &fto add " + target.getName() + " with current settings");
-                        ib.addLoreLine("&6&lRight Click &fto configure the loot table and number of items");
+                        ib.addLoreLine("&6&lLeft Click &fto add " + target.getName());
+                        ib.addLoreLine("&6&lRight Click &fto configure");
                         return ib.build();
                     })
                     .consumer(e -> {
                         if (e.getClick() == ClickType.LEFT) {
                             game.addAsTribute(actor, target, manageBuilder.getLootTable(), manageBuilder.getNumberOfItems());
+                            e.getWhoClicked().closeInventory();
                         } else if (e.getClick() == ClickType.RIGHT) {
                             e.getWhoClicked().closeInventory();
-                            Bukkit.getScheduler().runTaskLater(plugin, () -> new ConversationFactory(plugin).withFirstPrompt(new SelectLootTablePrompt(plugin, this, manageBuilder)).buildConversation((Player) e).begin(), 1L);
+                            Bukkit.getScheduler().runTaskLater(plugin, () -> new ConversationFactory(plugin).withLocalEcho(false).withFirstPrompt(new SelectLootTablePrompt(plugin, this, manageBuilder)).buildConversation((Player) e.getWhoClicked()).begin(), 1L);
                         }
                     });
             addElement(addButton);
@@ -72,7 +75,10 @@ public class PlayerManageMenu extends InventoryGUI implements UpdatingGUI {
                                     .displayName("&c&lREMOVE")
                                     .addLoreLine("&7&oRemoves the player from the game")
                                     .build())
-                    .consumer(e -> game.removeFromGame(actor, target));
+                    .consumer(e -> {
+                        game.removeFromGame(actor, target);
+                        e.getWhoClicked().closeInventory();
+                    });
             addElement(removeButton);
         }
 
@@ -84,17 +90,20 @@ public class PlayerManageMenu extends InventoryGUI implements UpdatingGUI {
                         if (this.manageBuilder.getLootTable() == null) {
                             ib.addLoreLine("&7&oThis will revive " + target.getName() + " with no items");
                         } else {
-                            ib.addLoreLine("&7&oThis will revive " + target.getName() + " with " + this.manageBuilder.getNumberOfItems() + " item(s) from the " + this.manageBuilder.getLootTable().getName() + " loot table");
+                            ib.addLoreLine("&7&oThis will revive " + target.getName() + " to the game");
+                            ib.addLoreLine("&7&o    LootTable: " + this.manageBuilder.getLootTable().getName());
+                            ib.addLoreLine("&7&o    Items: " + this.manageBuilder.getNumberOfItems());
                         }
 
                         ib.addLoreLine("");
-                        ib.addLoreLine("&6&lLeft Click &fto revive " + target.getName() + " with current settings");
-                        ib.addLoreLine("&6&lRight Click &fto configure the loot table and number of items");
+                        ib.addLoreLine("&6&lLeft Click &fto revive " + target.getName());
+                        ib.addLoreLine("&6&lRight Click &fto configure");
                         return ib.build();
                     })
                     .consumer(e -> {
                         if (e.getClick() == ClickType.LEFT) {
                             game.revivePlayer(actor, target, manageBuilder.getLootTable(), manageBuilder.getNumberOfItems());
+                            e.getWhoClicked().closeInventory();
                         } else if (e.getClick() == ClickType.RIGHT) {
                             e.getWhoClicked().closeInventory();
                             Bukkit.getScheduler().runTaskLater(plugin, () -> new ConversationFactory(plugin).withFirstPrompt(new SelectLootTablePrompt(plugin, this, manageBuilder)).buildConversation((Player) e).begin(), 1L);

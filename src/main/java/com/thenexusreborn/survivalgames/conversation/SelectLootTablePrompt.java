@@ -67,6 +67,7 @@ public class SelectLootTablePrompt extends StringPrompt {
         
         builder.lootTable(lootTable);
         builder.numberOfItems(amountOfItems);
+        guiManager.openGUI(this.menu, player);
         return Prompt.END_OF_CONVERSATION;
     }
 }
