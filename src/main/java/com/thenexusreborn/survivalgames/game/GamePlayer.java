@@ -22,6 +22,7 @@ import com.thenexusreborn.survivalgames.scoreboard.game.GameBoard;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -520,7 +521,15 @@ public class GamePlayer {
         PlayerInventory inv = player.getInventory();
 
         ItemStack mutateItem = inv.getItem(5);
+        if (mutateItem == null || mutateItem.getType() == Material.AIR) {
+            return;
+        }
+        
         ItemMeta itemMeta = mutateItem.getItemMeta();
+        
+        if (itemMeta == null) {
+            return;
+        }
         
         String mutateName = StarColors.color(getMutateItemNameFromStatus());
         
@@ -631,7 +640,6 @@ public class GamePlayer {
     public String toString() {
         return "GamePlayer{" +
                 "nexusPlayer=" + nexusPlayer +
-                ", game=" + game +
                 ", team=" + team +
                 ", spectatorByDeath=" + spectatorByDeath +
                 ", newPersonalBestNotified=" + newPersonalBestNotified +
