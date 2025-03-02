@@ -920,31 +920,6 @@ public class SGCommand implements CommandExecutor {
             boolean isGameType = type.equalsIgnoreCase("game");
             boolean isLobbyType = type.equalsIgnoreCase("lobby");
 
-            Set<Object> settingsInstances = new HashSet<>();
-            if (global) {
-                if (isGameType) {
-                    settingsInstances.add(SurvivalGames.globalGameSettings);
-                } else if (isLobbyType) {
-                    settingsInstances.add(SurvivalGames.globalLobbySettings);
-                }
-            }
-
-            if (allRunning) {
-                if (isGameType) {
-                    plugin.getServers().forEach(server -> {
-                        if (server.getGame() != null) {
-                            settingsInstances.add(server.getGame().getSettings());
-                        }
-                    });
-                } else if (isLobbyType) {
-                    plugin.getServers().forEach(server -> {
-                        if (server.getLobby() != null) {
-                            settingsInstances.add(server.getGame().getSettings());
-                        }
-                    });
-                }
-            }
-
             Map<Field, StringConverter<?>> fields = this.settingsFields.get(type);
 
             if (type == null) {
@@ -958,10 +933,28 @@ public class SGCommand implements CommandExecutor {
             }
 
             if (args[2].equalsIgnoreCase("list")) {
+                Object settingsInstance = null;
+                
+                if (isLobbyType) {
+                    if (sgPlayer.getLobby() != null) {
+                        settingsInstance = sgPlayer.getLobby().getLobbySettings();
+                    }
+                } else if (isGameType) {
+                    if (sgPlayer.getGame() != null) {
+                        settingsInstance = sgPlayer.getGame().getSettings();
+                    } else if (sgPlayer.getLobby() != null) {
+                        settingsInstance = sgPlayer.getLobby().getGameSettings();
+                    }
+                }
+                
                 List<String> lines = new LinkedList<>();
                 for (Field field : fields.keySet()) {
                     try {
-                        lines.add("  &8 - &a" + field.getName().toLowerCase() + " &7= &e" + fields.get(field).convertFrom(field.get(settingsInstances)));
+                        String line = "  &8 - &a" + field.getName().toLowerCase();
+                        if (settingsInstance != null) {
+                            line += " &7= &e" + fields.get(field).convertFrom(field.get(settingsInstance));
+                        }
+                        lines.add(line);
                     } catch (IllegalAccessException e) {
                         MsgType.WARN.send(sender, "Could not parse the value of %v.", field.getName());
                     }
@@ -986,12 +979,15 @@ public class SGCommand implements CommandExecutor {
                 }
                 
                 int offset = (page - 1) * 7; // 7 is the amount per page
+                
+                int remaining = lines.size() - offset;
+                
+                int offsetEnd = offset + Math.min(7, remaining);
 
-                for (int i = 0; i < 7; i++) {
+                for (int i = 0; i < offsetEnd; i++) {
                     StarColors.coloredMessage(sender, lines.get(offset + i));
                 }
                 
-//                lines.forEach(line -> StarColors.coloredMessage(sender, line));
                 return true;
             }
 
@@ -1021,6 +1017,31 @@ public class SGCommand implements CommandExecutor {
             if (value == null) {
                 sender.sendMessage(MsgType.WARN.format("Could not convert %v to a(n) %v", args[3], field.getType().getSimpleName()));
                 return true;
+            }
+
+            Set<Object> settingsInstances = new HashSet<>();
+            if (global) {
+                if (isGameType) {
+                    settingsInstances.add(SurvivalGames.globalGameSettings);
+                } else if (isLobbyType) {
+                    settingsInstances.add(SurvivalGames.globalLobbySettings);
+                }
+            }
+
+            if (allRunning) {
+                if (isGameType) {
+                    plugin.getServers().forEach(server -> {
+                        if (server.getGame() != null) {
+                            settingsInstances.add(server.getGame().getSettings());
+                        }
+                    });
+                } else if (isLobbyType) {
+                    plugin.getServers().forEach(server -> {
+                        if (server.getLobby() != null) {
+                            settingsInstances.add(server.getGame().getSettings());
+                        }
+                    });
+                }
             }
 
             //TODO Add instanceof check here when sender limit fixed
