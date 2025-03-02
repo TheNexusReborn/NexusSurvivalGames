@@ -59,6 +59,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static com.thenexusreborn.survivalgames.game.GameState.*;
@@ -603,7 +604,9 @@ public class Game {
             sendMessage("&6&lSurvival Games &7&oFree-for-all Deathmatch &8- &3Classic Mode");
             sendMessage("&8- &7Loot chests scattered around the map for gear.");
             sendMessage("&8- &7Outlast the other tributes and be the last one standing!");
-            sendMessage("&8- &7Arena deathmatch begins after &e" + getSettings().getGameLength() + " minutes&7.");
+            if (settings.isAllowDeathmatch()) {
+                sendMessage("&8- &7Arena deathmatch begins after &e" + getSettings().getGameLength() + " minutes&7.");
+            }
             sendMessage("");
             StringBuilder creatorBuilder = new StringBuilder();
             for (String creator : getGameMap().getCreators()) {
@@ -624,8 +627,20 @@ public class Game {
 
     public void startGame() {
         this.timer = plugin.getClockManager().createTimer(TimeUnit.MINUTES.toMillis(settings.getGameLength()) + 50);
-        this.timer.addRepeatingCallback(new GameMinutesCallback(this, "&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b{time}&e."), TimeUnit.MINUTES, 1);
-        this.timer.addRepeatingCallback(new GameSecondsCallback(this, "&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b{time}&e.", false), TimeUnit.SECONDS, 1);
+
+        Supplier<String> msg = () -> {
+            String type;
+            if (this.settings.isAllowDeathmatch()) {
+                type = "DEATHMATCH";
+            } else {
+                type = "GAME";
+            }
+
+            return "&6&l>> &eThe &c&l" + type + " &ebegins in &b{time}&e.";
+        };
+        
+        this.timer.addRepeatingCallback(new GameMinutesCallback(this, msg), TimeUnit.MINUTES, 1);
+        this.timer.addRepeatingCallback(new GameSecondsCallback(this, msg, false), TimeUnit.SECONDS, 1);
         this.timer.addCallback(timerSnapshot -> {
             sendMessage("");
             sendMessage("&6&l>> &9&lWHAT DO YOU THINK OF &e&l" + getGameMap().getName().toUpperCase() + "&9&l?");
@@ -1357,6 +1372,10 @@ public class Game {
 
     public void checkDeathmatchThreshold() {
         if (state != INGAME) {
+            return;
+        }
+        
+        if (!settings.isAllowDeathmatch()) {
             return;
         }
 

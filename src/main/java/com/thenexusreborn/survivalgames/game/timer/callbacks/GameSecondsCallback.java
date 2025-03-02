@@ -9,24 +9,34 @@ import org.bukkit.Sound;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Supplier;
 
 public class GameSecondsCallback implements ClockCallback<TimerSnapshot> {
     private static final Set<Integer> ANNOUNCE = new HashSet<>(Arrays.asList(60, 45, 30, 15, 10, 5, 4, 3, 2, 1, 0));
     
     private Game game;
-    private String message;
+    private Supplier<String> msgSupplier;
     private boolean announceMinute;
-    
+
     public GameSecondsCallback(Game game, String message) {
-        this(game, message, true);
-    }
-    
-    public GameSecondsCallback(Game game, String message, boolean announceMinute) {
-        this.game = game;
-        this.message = message;
-        this.announceMinute = announceMinute;
+        this(game, () -> message);
     }
 
+    public GameSecondsCallback(Game game, String message, boolean announceMinute) {
+        this(game, () -> message, announceMinute);
+    }
+
+    public GameSecondsCallback(Game game, Supplier<String> msgSupplier) {
+        this.game = game;
+        this.msgSupplier = msgSupplier;
+    }
+
+    public GameSecondsCallback(Game game, Supplier<String> msgSupplier, boolean announceMinute) {
+        this.game = game;
+        this.msgSupplier = msgSupplier;
+        this.announceMinute = announceMinute;
+    }
+    
     @Override
     public void callback(TimerSnapshot timerSnapshot) {
         int remainingSeconds = (int) TimeUnit.MILLISECONDS.toSeconds(timerSnapshot.getTime());
@@ -36,7 +46,7 @@ public class GameSecondsCallback implements ClockCallback<TimerSnapshot> {
                 return;
             }
             
-            game.sendMessage(message.replace("{time}", Game.LONG_TIME_FORMAT.format(timerSnapshot.getTime())));
+            game.sendMessage(msgSupplier.get().replace("{time}", Game.LONG_TIME_FORMAT.format(timerSnapshot.getTime())));
             if (game.getSettings().isSounds()) {
                 game.playSound(Sound.CLICK);
             }

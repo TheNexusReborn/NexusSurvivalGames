@@ -9,99 +9,104 @@ import com.thenexusreborn.survivalgames.settings.enums.Weather;
 public class GameSettings implements Cloneable {
 
     //Chest Restock
-    private int chestRestockInterval = 5;
-    private int chestRestockDenomination = 2;
-    private boolean chestRestockRelative = true;
+    protected int chestRestockInterval = 5;
+    protected int chestRestockDenomination = 2;
+    protected boolean chestRestockRelative = true;
     
     //Swag Shack
-    private boolean allowSwagShack = true;
+    protected boolean allowSwagShack = true;
     
     //Sponsoring
-    private int sponsorScoreCost = 100;
-    private int sponsorCreditCost = 200;
-    private boolean allowSponsoring = true;
-    private int maxSponsorships = 1;
+    protected int sponsorScoreCost = 100;
+    protected int sponsorCreditCost = 200;
+    protected boolean allowSponsoring = true;
+    protected int maxSponsorships = 1;
     
     //Combat Tag
-    private int combatTagLength = 10;
-    private boolean allowCombatTag = true;
+    protected int combatTagLength = 10;
+    protected boolean allowCombatTag = true;
     
     //Bounty
-    private int maxScoreBounty = 10000;
-    private int maxCreditBounty = 10000;
-    private boolean allowBounties = true;
+    protected int maxScoreBounty = 10000;
+    protected int maxCreditBounty = 10000;
+    protected boolean allowBounties = true;
     
     //Assister Stat
-    private int assistNexiteGain = 1;
-    private int assistXpGain = 1;
-    private int assistCreditGain = 1;
-    private boolean allowAssists = true;
+    protected int assistNexiteGain = 1;
+    protected int assistXpGain = 1;
+    protected int assistCreditGain = 1;
+    protected boolean allowAssists = true;
     
     //Killer Stat
-    private int killNexiteGain = 2;
-    private int killXpGain = 2;
-    private int killCreditGain = 2;
+    protected int killNexiteGain = 2;
+    protected int killXpGain = 2;
+    protected int killCreditGain = 2;
     
     //Win Stat
-    private int winNexiteBaseGain = 10;
-    private int winXpBaseGain = 10;
-    private int winCreditsBaseGain = 10;
-    private int winScoreBaseGain = 50;
+    protected int winNexiteBaseGain = 10;
+    protected int winXpBaseGain = 10;
+    protected int winCreditsBaseGain = 10;
+    protected int winScoreBaseGain = 50;
     
     //Mutations
-    private int maxMutationsAllowed = 10;
-    private boolean useAllMutationTypes = true;
-    private double passUseChance = 0.99;
-    private double passAwardChance = 0.75;
-    private int mutationSpawnDelay = 10; //Default: 15
-    private boolean unlimitedMutationPasses = true; //Default: false
-    private boolean allowKillersKiller = true;
-    private int maxMutationAmount = 1;
-    private boolean mutationsEnabled = true;
+    protected int maxMutationsAllowed = 10;
+    protected boolean useAllMutationTypes = true;
+    protected double passUseChance = 0.99;
+    protected double passAwardChance = 0.75;
+    protected int mutationSpawnDelay = 10; //Default: 15
+    protected boolean unlimitedMutationPasses = true; //Default: false
+    protected boolean allowKillersKiller = true;
+    protected int maxMutationAmount = 1;
+    protected boolean mutationsEnabled = true;
     
     //Player
-    private boolean earnNexites = false;
-    private double firstBloodMultiplier = 1.25;
-    private double scoreDivisor = 10;
-    private float startingSaturation = 5;
-    private boolean earnNetworkXp = true;
-    private boolean earnCredits = true;
-    private boolean applyMultipliers = true;
-    private boolean regeneration = true;
-    private int maxHealth = 20;
-    private int maxTeamAmount = 2;
-    private boolean allowTeaming = true;
-    private boolean tributesSeeSpectatorChat = true;
+    protected boolean earnNexites = false;
+    protected double firstBloodMultiplier = 1.25;
+    protected double scoreDivisor = 10;
+    protected float startingSaturation = 5;
+    protected boolean earnNetworkXp = true;
+    protected boolean earnCredits = true;
+    protected boolean applyMultipliers = true;
+    protected boolean regeneration = true;
+    protected int maxHealth = 20;
+    protected int maxTeamAmount = 2;
+    protected boolean allowTeaming = true;
+    protected boolean tributesSeeSpectatorChat = true;
     
     //Loot
-    private boolean enderchestsEnabled = true;
-    private boolean useTieredLoot = true;
+    protected boolean enderchestsEnabled = true;
+    protected boolean useTieredLoot = true;
     
     //Cosmetic
-    private ColorMode colorMode = ColorMode.RANK;
-    private boolean sounds = true;
+    protected ColorMode colorMode = ColorMode.RANK;
+    protected boolean sounds = true;
     
     //World
-    private Weather worldWeather = Weather.CLEAR;
-    private Time worldTime = Time.NOON;
-    private boolean weatherProgression = false;
-    private boolean timeProgression = false;
-    private boolean showBorders = true;
-    private float tntYield = 3.0F;
-    private int tntFuseTicks = 20;
+    protected Weather worldWeather = Weather.CLEAR;
+    protected Time worldTime = Time.NOON;
+    protected boolean weatherProgression = false;
+    protected boolean timeProgression = false;
+    protected boolean showBorders = true;
+    protected float tntYield = 3.0F;
+    protected int tntFuseTicks = 20;
     
     //Game
-    private boolean gracePeriod = false;
-    private int warmupLength = 10; // Default: 30
-    private int gracePeriodLength = 60;
-    private int gameLength = 10; //Default: 20
-    private int nextGameTimerLength = 10;
+    protected boolean gracePeriod = false;
+    protected int warmupLength = 10; // Default: 30
+    protected int gracePeriodLength = 60;
+    protected int gameLength = 10; //Default: 20
+    protected int nextGameTimerLength = 10;
     
     //Deathmatch
-    private int deathmatchThreshold = 2; //Default: 4
-    private int deathmatchLength = 5;
-    private int deathmatchWarmupLength = 10;
-    private int deathmatchCountdownLength = 60;
+    protected int deathmatchThreshold = 2; //Default: 4
+    protected int deathmatchLength = 5;
+    protected int deathmatchWarmupLength = 10;
+    protected int deathmatchCountdownLength = 60;
+    protected boolean allowDeathmatch = true;
+
+    public boolean isAllowDeathmatch() {
+        return allowDeathmatch;
+    }
 
     public boolean isAllowCombatTag() {
         return allowCombatTag;

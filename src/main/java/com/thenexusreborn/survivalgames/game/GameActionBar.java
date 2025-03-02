@@ -90,7 +90,11 @@ public class GameActionBar implements IActionBar {
             if (game.getNextRestock() > 0) {
                 return "&f&lChests restock in &e" + Game.LONG_TIME_FORMAT.format(game.getNextRestock());
             } else {
-                return "&f&lDeathmatch in &e" + Game.LONG_TIME_FORMAT.format(game.getTimer().getTime() + 1000);
+                if (game.getSettings().isAllowDeathmatch()) {
+                    return "&f&lDeathmatch in &e" + Game.LONG_TIME_FORMAT.format(game.getTimer().getTime() + 1000);
+                } else {
+                    return "&f&lGame ends in &e" + Game.LONG_TIME_FORMAT.format(game.getTimer().getTime() + 1000);
+                }
             }
         }
 
@@ -107,7 +111,7 @@ public class GameActionBar implements IActionBar {
         }
 
         if (game.getState() == GameState.DEATHMATCH_WARMUP) {
-            return "&f&lYou have &e" + Game.LONG_TIME_FORMAT.format(game.getTimer().getTime() + 1000);
+            return "&f&lDeathmatch starts in &e" + Game.LONG_TIME_FORMAT.format(game.getTimer().getTime() + 1000);
         }
 
         if (game.getState() == GameState.DEATHMATCH_WARMUP_DONE) {
@@ -115,7 +119,7 @@ public class GameActionBar implements IActionBar {
         }
 
         if (game.getState() == GameState.DEATHMATCH) {
-            return "&f&lYou have &e" + Game.LONG_TIME_FORMAT.format(game.getTimer().getTime() + 1000);
+            return "&f&lGame ends in &e" + Game.LONG_TIME_FORMAT.format(game.getTimer().getTime() + 1000);
         }
 
         if (game.getState() == GameState.ENDING) {

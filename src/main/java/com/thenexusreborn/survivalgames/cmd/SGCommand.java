@@ -227,6 +227,11 @@ public class SGCommand implements CommandExecutor {
                     }
                 }
                 case "startdeathmatchcountdown", "sdmcd" -> {
+                    if (!game.getSettings().isAllowDeathmatch()) {
+                        MsgType.WARN.send(sender, "Deathmatch is disabled for this game.");
+                        return true;
+                    }
+                    
                     if (game.getState() == GameState.INGAME) {
                         game.getGameInfo().getActions().add(new GameCmdAction(sender.getName(), "startdeathmatchcountdown"));
                         game.startDeathmatchTimer();
@@ -240,6 +245,11 @@ public class SGCommand implements CommandExecutor {
                     }
                 }
                 case "teleportdeathmatch", "tpdm" -> {
+                    if (!game.getSettings().isAllowDeathmatch()) {
+                        MsgType.WARN.send(sender, "Deathmatch is disabled for this game.");
+                        return true;
+                    }
+                    
                     if (game.getState().ordinal() >= GameState.INGAME.ordinal() && game.getState().ordinal() <= GameState.INGAME_DEATHMATCH.ordinal()) {
                         game.getGameInfo().getActions().add(new GameCmdAction(sender.getName(), "teleportdeathmatch"));
                         game.teleportDeathmatch();
@@ -253,6 +263,11 @@ public class SGCommand implements CommandExecutor {
                     }
                 }
                 case "startdeathmatchwarmup", "sdmw" -> {
+                    if (!game.getSettings().isAllowDeathmatch()) {
+                        MsgType.WARN.send(sender, "Deathmatch is disabled for this game.");
+                        return true;
+                    }
+                    
                     if (game.getState() == GameState.TELEPORT_DEATHMATCH_DONE) {
                         game.getGameInfo().getActions().add(new GameCmdAction(sender.getName(), "startdeathmatchwarmup"));
                         game.startDeathmatchWarmup();
@@ -262,6 +277,11 @@ public class SGCommand implements CommandExecutor {
                     }
                 }
                 case "startdeathmatch", "sdm" -> {
+                    if (!game.getSettings().isAllowDeathmatch()) {
+                        MsgType.WARN.send(sender, "Deathmatch is disabled for this game.");
+                        return true;
+                    }
+                    
                     if (Stream.of(GameState.TELEPORT_DEATHMATCH_DONE, GameState.DEATHMATCH_WARMUP, GameState.DEATHMATCH_WARMUP_DONE).anyMatch(gameState -> game.getState() == gameState)) {
                         game.getGameInfo().getActions().add(new GameCmdAction(sender.getName(), "startdeathmatch"));
                         game.startDeathmatch();
