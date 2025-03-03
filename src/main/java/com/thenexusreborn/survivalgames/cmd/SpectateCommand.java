@@ -1,6 +1,8 @@
 package com.thenexusreborn.survivalgames.cmd;
 
+import com.stardevllc.cmdflags.FlagResult;
 import com.thenexusreborn.api.player.Rank;
+import com.thenexusreborn.nexuscore.api.command.NexusCommand;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
@@ -14,7 +16,6 @@ import com.thenexusreborn.survivalgames.game.death.DeathType;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -23,40 +24,31 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public class SpectateCommand implements CommandExecutor {
-    
-    private final SurvivalGames plugin;
-    
+public class SpectateCommand extends NexusCommand<SurvivalGames> {
     private static final Set<GameState> INVALID_GAME_STATES = new HashSet<>(Arrays.asList(GameState.ASSIGN_TEAMS, GameState.ENDED, GameState.ENDING, 
             GameState.ERROR, GameState.TELEPORT_START, GameState.SETTING_UP, GameState.SETUP_COMPLETE, GameState.UNDEFINED));
-    
-    public SpectateCommand(SurvivalGames plugin) {
-        this.plugin = plugin;
-    }
-    
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        Rank senderRank = MCUtils.getSenderRank(sender);
-        if (senderRank.ordinal() > Rank.MEDIA.ordinal()) {
-            sender.sendMessage(MsgType.WARN.format("You do not have permission to use that command."));
-            return true;
-        }
-        
-        if (!(sender instanceof Player player)) {
-            sender.sendMessage(MsgType.WARN.format("Only players can use that command."));
-            return true;
-        }
 
+
+    public SpectateCommand(SurvivalGames plugin) {
+        super(plugin, "spectate", "", Rank.MEDIA);
+        this.playerOnly = true;
+    }
+
+    @Override
+    public boolean execute(CommandSender sender, Rank senderRank, String label, String[] args, FlagResult flagResults) {
+        Player player = (Player) sender; 
+        
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
-    
+
         Game game = sgPlayer.getGame();
         if (game != null) {
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
-        
+
             if (INVALID_GAME_STATES.contains(game.getState())) {
                 player.sendMessage(MsgType.WARN.format("Invalid game state to use that command. Please wait to try again."));
                 return true;
             }
-        
+
             if (gamePlayer.getTeam() == GameTeam.TRIBUTES || gamePlayer.getTeam() == GameTeam.MUTATIONS) {
                 game.killPlayer(gamePlayer, new DeathInfo(game, System.currentTimeMillis(), gamePlayer, DeathType.SPECTATE, player.getLocation()));
             } else {
@@ -71,7 +63,7 @@ public class SpectateCommand implements CommandExecutor {
                         spectating = true;
                     }
                 }
-            
+
                 if (spectating) {
                     lobby.removeSpectatingPlayer(player.getUniqueId());
                     sender.sendMessage(MsgType.INFO.format("You will no longer be spectating the game"));

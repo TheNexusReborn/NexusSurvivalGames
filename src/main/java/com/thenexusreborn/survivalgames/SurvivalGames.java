@@ -253,16 +253,15 @@ public class SurvivalGames extends NexusSpigotPlugin {
         this.lootManager = new LootManager(this);
         this.lootManager.loadData();
 
-        getCommand("votestart").setExecutor(new VoteStartCommand(this));
-        getCommand("stats").setExecutor(new StatsCommand(this));
+        new VoteStartCommand(this);
+        new StatsCommand(this);
         getCommand("survivalgames").setExecutor(new SGCommand(this));
-        getCommand("spectate").setExecutor(new SpectateCommand(this));
-        getCommand("mapvote").setExecutor(new MapVoteCommand(this));
-        getCommand("bounty").setExecutor(new BountyCmd(this));
+        new SpectateCommand(this);
+        new MapVoteCommand(this);
+        new BountyCmd(this);
         new ToggleCmd(this, "spectatorchat", "specchat");
         new ToggleCmd(this, "allowsponsors", "sponsors");
-        getCommand("ratemap").setExecutor(new RateMapCmd(this));
-        
+        new RateMapCmd(this);
         new GraceperiodCmd(this);
 
         getLogger().info("Registered commands");

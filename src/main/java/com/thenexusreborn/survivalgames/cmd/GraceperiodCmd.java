@@ -10,6 +10,8 @@ import com.thenexusreborn.survivalgames.settings.GameSettings;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.List;
+
 public class GraceperiodCmd extends NexusCommand<SurvivalGames> {
     public GraceperiodCmd(SurvivalGames plugin) {
         super(plugin, "graceperiod", "", Rank.VIP);
@@ -70,5 +72,10 @@ public class GraceperiodCmd extends NexusCommand<SurvivalGames> {
         }
         
         return true;
+    }
+
+    @Override
+    public List<String> getCompletions(CommandSender sender, Rank senderRank, String label, String[] args, FlagResult flagResult) {
+        return List.of("on", "off");
     }
 }

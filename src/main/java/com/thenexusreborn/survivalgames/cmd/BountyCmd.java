@@ -1,6 +1,8 @@
 package com.thenexusreborn.survivalgames.cmd;
 
-import com.stardevllc.colors.StarColors;
+import com.stardevllc.cmdflags.FlagResult;
+import com.thenexusreborn.api.player.Rank;
+import com.thenexusreborn.nexuscore.api.command.NexusCommand;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
@@ -10,34 +12,30 @@ import com.thenexusreborn.survivalgames.game.Bounty.Type;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.game.GameTeam;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class BountyCmd implements CommandExecutor {
+import java.util.ArrayList;
+import java.util.List;
 
-    private final SurvivalGames plugin;
+public class BountyCmd extends NexusCommand<SurvivalGames> {
 
     public BountyCmd(SurvivalGames plugin) {
-        this.plugin = plugin;
+        super(plugin, "bounty", "", Rank.MEMBER);
+        this.playerOnly = true;
     }
 
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!(sender instanceof Player player)) {
-            sender.sendMessage(StarColors.color(MsgType.WARN + "Only players can use that command."));
-            return true;
-        }
-
+    @Override
+    public boolean execute(CommandSender sender, Rank senderRank, String label, String[] args, FlagResult flagResults) {
+        Player player = (Player) sender; 
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
-
         Game game = sgPlayer.getGame();
 
         if (game == null) {
             player.sendMessage(MsgType.WARN.format("You can only bounty a player during a game."));
             return true;
         }
-        
+
         if (!game.getSettings().isAllowBounties()) {
             MsgType.WARN.send(player, "Bounties are disabled for this game.");
             return true;
@@ -67,7 +65,7 @@ public class BountyCmd implements CommandExecutor {
             player.sendMessage(MsgType.WARN.format("You provided an invalid number value."));
             return true;
         }
-        
+
         if (amount < 1) {
             senderPlayer.sendMessage(MsgType.WARN.format("Invalid Bount Amount. Must be greater than 1"));
             return true;
@@ -117,5 +115,25 @@ public class BountyCmd implements CommandExecutor {
         game.sendMessage("&6&l>> &dThe bounty on " + coloredName + " &dwas increased by &b" + formattedAmount + " " + type.name().toLowerCase() + "&d!");
         game.sendMessage("&6&l>> &dThe current value is &b" + totalFormattedAmount + " " + type.name().toLowerCase() + "&d.");
         return true;
+    }
+
+    @Override
+    public List<String> getCompletions(CommandSender sender, Rank senderRank, String label, String[] args, FlagResult flagResult) {
+        List<String> completions = new ArrayList<>();
+        
+        Player player = (Player) sender;
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
+        
+        if (sgPlayer.getGame() == null) {
+            return null;
+        }
+
+        for (GamePlayer gp : sgPlayer.getGame().getPlayers().values()) {
+            if (gp.getTeam() == GameTeam.TRIBUTES) {
+                completions.add(gp.getName());
+            }
+        }
+        
+        return completions;
     }
 }
