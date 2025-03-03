@@ -63,7 +63,7 @@ public class GraceperiodCmd extends NexusCommand<SurvivalGames> {
                 }
 
                 settings.setGracePeriod(true);
-                settings.setGracePeriodLength(30);
+                settings.setGracePeriodLength(seconds);
                 MsgType.INFO.send(player, "You turned the graceperiod &aon %bwith a time of %v seconds", seconds);
                 MsgType.DETAIL.send(player, "Note: It will apply on the next game");
             }
