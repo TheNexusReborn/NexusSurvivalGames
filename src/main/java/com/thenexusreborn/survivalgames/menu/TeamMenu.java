@@ -49,6 +49,7 @@ public class TeamMenu extends InventoryGUI implements UpdatingGUI {
                         addElement(button);
                     }
                 }
+                    meta.setDisplayName(StarColors.color(gamePlayer.getColoredName()));
             }
         }
     }
