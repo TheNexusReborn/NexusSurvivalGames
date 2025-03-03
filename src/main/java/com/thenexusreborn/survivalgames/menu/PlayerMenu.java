@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("DuplicatedCode")
 public class PlayerMenu extends InventoryGUI implements UpdatingGUI {
 
     private SurvivalGames plugin;
