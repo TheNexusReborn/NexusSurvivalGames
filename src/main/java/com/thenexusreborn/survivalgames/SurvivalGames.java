@@ -263,6 +263,10 @@ public class SurvivalGames extends NexusSpigotPlugin {
         new ToggleCmd(this, "allowsponsors", "sponsors");
         new RateMapCmd(this);
         new GraceperiodCmd(this);
+        
+        new GameTeamCmd(this, GameTeam.TRIBUTES);
+        new GameTeamCmd(this, GameTeam.SPECTATORS);
+        new GameTeamCmd(this, GameTeam.MUTATIONS);
 
         getLogger().info("Registered commands");
 
