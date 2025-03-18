@@ -3,7 +3,7 @@ package com.thenexusreborn.survivalgames.game.timer.endconditions;
 import com.stardevllc.clock.condition.ClockEndCondition;
 import com.stardevllc.clock.snapshot.TimerSnapshot;
 import com.thenexusreborn.nexuscore.util.MsgType;
-import com.thenexusreborn.survivalgames.ControlType;
+import com.thenexusreborn.survivalgames.control.ControlType;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GameState;
 

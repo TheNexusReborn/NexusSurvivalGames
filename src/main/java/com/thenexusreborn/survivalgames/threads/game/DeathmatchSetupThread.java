@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.threads.game;
 
 import com.stardevllc.starcore.utils.StarThread;
-import com.thenexusreborn.survivalgames.ControlType;
+import com.thenexusreborn.survivalgames.control.ControlType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GameState;

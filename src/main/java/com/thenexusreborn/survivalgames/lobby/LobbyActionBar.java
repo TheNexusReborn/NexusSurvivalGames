@@ -3,7 +3,7 @@ package com.thenexusreborn.survivalgames.lobby;
 import com.stardevllc.clock.clocks.Timer;
 import com.stardevllc.time.TimeUnit;
 import com.thenexusreborn.api.player.IActionBar;
-import com.thenexusreborn.survivalgames.ControlType;
+import com.thenexusreborn.survivalgames.control.ControlType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 
