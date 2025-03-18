@@ -5,18 +5,11 @@ import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.scoreboard.ScoreboardView;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.Game;
-import com.thenexusreborn.survivalgames.game.GamePlayer;
-import com.thenexusreborn.survivalgames.game.GameState;
-import com.thenexusreborn.survivalgames.game.GameTeam;
-import com.thenexusreborn.survivalgames.scoreboard.game.CombatTagBoard;
-import com.thenexusreborn.survivalgames.scoreboard.game.GameBoard;
-import com.thenexusreborn.survivalgames.scoreboard.game.MutationBoard;
+import com.thenexusreborn.survivalgames.game.*;
+import com.thenexusreborn.survivalgames.scoreboard.game.*;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 
-import java.util.ArrayList;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class PlayerScoreboardThread extends StarThread<SurvivalGames> {
     public PlayerScoreboardThread(SurvivalGames plugin) {

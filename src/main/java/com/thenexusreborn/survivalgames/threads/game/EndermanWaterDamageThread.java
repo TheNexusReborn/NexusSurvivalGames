@@ -2,14 +2,9 @@ package com.thenexusreborn.survivalgames.threads.game;
 
 import com.stardevllc.starcore.utils.StarThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.Game;
-import com.thenexusreborn.survivalgames.game.GamePlayer;
-import com.thenexusreborn.survivalgames.game.GameState;
-import com.thenexusreborn.survivalgames.game.GameTeam;
+import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 

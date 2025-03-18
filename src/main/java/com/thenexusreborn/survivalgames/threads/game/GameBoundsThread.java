@@ -8,13 +8,8 @@ import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.Game;
-import com.thenexusreborn.survivalgames.game.GamePlayer;
-import com.thenexusreborn.survivalgames.game.GameState;
-import com.thenexusreborn.survivalgames.game.GameTeam;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
+import com.thenexusreborn.survivalgames.game.*;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 
 public class GameBoundsThread extends StarThread<SurvivalGames> {
