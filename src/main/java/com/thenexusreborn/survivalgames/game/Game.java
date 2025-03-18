@@ -139,6 +139,10 @@ public class Game {
         gameInfo.setPlayers(playerNames.toArray(new String[0]));
     }
 
+    public GamePlayer getFirstBlood() {
+        return firstBlood;
+    }
+    
     public long getStart() {
         return start;
     }
