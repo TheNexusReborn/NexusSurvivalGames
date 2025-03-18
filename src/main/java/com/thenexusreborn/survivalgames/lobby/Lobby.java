@@ -367,8 +367,6 @@ public class Lobby {
         }
 
         plugin.getMapManager().setEditMode(true);
-
-        sendMessage("&eThe lobby has been set to editing maps. Automatic actions are temporarily suspended");
     }
 
     public void stopEditingMaps() {
@@ -382,8 +380,6 @@ public class Lobby {
         plugin.getMapManager().setEditMode(false);
 
         generateMapOptions();
-
-        sendMessage("&eThe lobby has been set to no longer editing maps. Automatic actions resumed.");
     }
 
     public void automatic() {
