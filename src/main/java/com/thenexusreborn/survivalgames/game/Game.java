@@ -56,7 +56,7 @@ import java.util.Map.Entry;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static com.thenexusreborn.survivalgames.game.GameState.*;
+import static com.thenexusreborn.survivalgames.game.Game.State.*;
 
 @SuppressWarnings({"unused"})
 public class Game implements Controllable, IHasState {
@@ -65,6 +65,45 @@ public class Game implements Controllable, IHasState {
     public static final TimeFormat TIME_FORMAT = new TimeFormat("%*00h%%#0m%%00s%");
     public static final TimeFormat LONG_TIME_FORMAT = new TimeFormat("%*00h%%00m%%00s%");
 
+    public enum State implements IState {
+        UNDEFINED, ERROR, SHUTTING_DOWN,
+        SETTING_UP, SETUP_COMPLETE,
+        ASSIGN_TEAMS, TEAMS_ASSIGNED,
+        TELEPORT_START, TELEPORT_START_DONE,
+        WARMUP, WARMUP_DONE,
+        INGAME, INGAME_DEATHMATCH,
+        TELEPORT_DEATHMATCH, TELEPORT_DEATHMATCH_DONE,
+        DEATHMATCH_WARMUP, DEATHMATCH_WARMUP_DONE,
+        DEATHMATCH,
+        GAME_COMPLETE, NEXT_GAME_READY,
+        ENDING, ENDED
+    }
+    
+    public enum SubState implements ISubState {
+        UNDEFINED, 
+        
+        //setup
+        DOWNLOADING_MAP, UNZIPPING_MAP, COPYING_MAP, LOADING_MAP, DEFINING_ARENA, DEFINING_DEATHMATCH, CLEARING_SPAWNS, DEFINING_GAMERULES,
+        
+        //teleport
+        TELEPORT_TRIBUTES, TELEPORT_SPECTATORS, 
+        
+        //warmup/game start
+        TIMER_INIT, CALCULATE_RESTOCK, SETUP_GRACE_PERIOD, SETUP_BORDER, SETUP_SWAG_SHACK, 
+        
+        //During game
+        RESTOCKING_CHESTS, PLAYER_DEATH, ADD_MUTATION, 
+        
+        //Admin actions
+        ADD_AS_TRIBUTE, REMOVE_FROM_GAME, REVIVE_PLAYER, MUTATE_PLAYER, PLAYER_JOIN, PLAYER_QUIT, 
+        
+        //Deathmatch
+        REMOVING_MUTATIONS, 
+        
+        //Ending
+        TIMER_SHUTDOWN, DETERMINE_WINNER, SET_GAME_STATS
+    }
+    
     private final SGMap gameMap;
     private final SGVirtualServer server;
     private ControlType controlType = ControlType.AUTO;
@@ -73,7 +112,8 @@ public class Game implements Controllable, IHasState {
     private final Map<Integer, UUID> spawns = new HashMap<>();
     private final ChatRoom gameChatroom;
     private final Map<GameTeam, GameTeamChatroom> chatRooms = new HashMap<>();
-    private GameState state = UNDEFINED;
+    private State state = UNDEFINED;
+    private SubState subState = SubState.UNDEFINED;
     private Timer timer, graceperiodTimer;
     private final List<Location> lootedChests = new ArrayList<>();
     private final GameInfo gameInfo;
@@ -93,7 +133,7 @@ public class Game implements Controllable, IHasState {
         this.server = server;
         this.settings = settings;
         this.gameInfo = new GameInfo();
-
+        
         this.gameChatroom = new GameChatRoom(this);
         plugin.getStarChat().getRoomRegistry().register(gameChatroom.getName(), gameChatroom);
 
@@ -149,11 +189,16 @@ public class Game implements Controllable, IHasState {
         return server;
     }
 
-    public void setState(GameState state) {
+    public void setState(State state) {
         this.gameInfo.getActions().add(new GameAction(System.currentTimeMillis(), "statechange").addValueData("oldvalue", this.state.name()).addValueData("newvalue", state.name()));
         this.state = state;
+        this.subState = SubState.UNDEFINED;
     }
-
+    
+    public SubState getSubState() {
+        return subState;
+    }
+    
     public void handleShutdown() {
         this.state = SHUTTING_DOWN;
 //        sendMessage("&4&l>> THE SERVER IS SHUTTING DOWN!");
@@ -204,6 +249,8 @@ public class Game implements Controllable, IHasState {
         if (target.getTeam() != GameTeam.SPECTATORS) {
             return;
         }
+        
+        setSubState(SubState.ADD_AS_TRIBUTE);
 
         target.sendMessage(target.getTeam().getLeaveMessage());
         target.setTeam(GameTeam.TRIBUTES);
@@ -228,6 +275,8 @@ public class Game implements Controllable, IHasState {
         } else {
             getGameInfo().getActions().add(new GamePlayerAddAction(actor.getName(), target.getName()));
         }
+        
+        setSubState(SubState.UNDEFINED);
     }
 
     public void removeFromGame(SGPlayer actor, GamePlayer target) {
@@ -235,6 +284,7 @@ public class Game implements Controllable, IHasState {
             return;
         }
 
+        setSubState(SubState.REMOVE_FROM_GAME);
         target.sendMessage(target.getTeam().getLeaveMessage());
         target.setTeam(GameTeam.SPECTATORS);
         GameTeam.SPECTATORS.getPlayerState().apply(target);
@@ -244,6 +294,7 @@ public class Game implements Controllable, IHasState {
         teleportSpectator(Bukkit.getPlayer(target.getUniqueId()), getGameMap().getCenterLocation());
         sendMessage(MsgType.INFO.format("%v was removed from the game by %v.", target.getColoredName(), actor.getNexusPlayer().getColoredName()));
         getGameInfo().getActions().add(new GamePlayerRemoveAction(actor.getName(), target.getName()));
+        setSubState(SubState.UNDEFINED);
     }
 
     public void revivePlayer(SGPlayer actor, GamePlayer target, SGLootTable lootTable, int amountOfItems) {
@@ -261,6 +312,7 @@ public class Game implements Controllable, IHasState {
             return;
         }
 
+        setSubState(SubState.REVIVE_PLAYER);
         target.sendMessage(target.getTeam().getLeaveMessage());
         target.setTeam(GameTeam.TRIBUTES);
         GameTeam.TRIBUTES.getPlayerState().apply(target);
@@ -279,6 +331,8 @@ public class Game implements Controllable, IHasState {
         } else {
             getGameInfo().getActions().add(new GamePlayerReviveAction(actor.getName(), target.getName()));
         }
+        
+        setSubState(SubState.UNDEFINED);
     }
 
     public void mutatePlayer(SGPlayer actor, MutationBuilder builder) {
@@ -301,6 +355,8 @@ public class Game implements Controllable, IHasState {
         if (mutationTarget.getTeam() != GameTeam.TRIBUTES) {
             return;
         }
+        
+        setSubState(SubState.MUTATE_PLAYER);
 
         Mutation mutation = Mutation.createInstance(this, type, target.getUniqueId(), mutationTarget.getUniqueId());
         target.setMutation(mutation);
@@ -315,9 +371,12 @@ public class Game implements Controllable, IHasState {
             getGameInfo().getActions().add(new GameMutateAction(target.getName(), mutationTarget.getName(), mutation.getType()));
             addMutation(mutation);
         }
+        
+        setSubState(SubState.UNDEFINED);
     }
 
     public void join(NexusPlayer nexusPlayer, SGPlayerStats stats) {
+        setSubState(SubState.PLAYER_JOIN);
         GamePlayer gamePlayer = new GamePlayer(nexusPlayer, this, stats);
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId());
         sgPlayer.setGame(this, gamePlayer);
@@ -355,6 +414,7 @@ public class Game implements Controllable, IHasState {
         gamePlayer.setStatus(GamePlayer.Status.SETTING_UP_ACTIONBAR);
         gamePlayer.applyActionBar();
         gamePlayer.setStatus(GamePlayer.Status.READY);
+        setSubState(SubState.UNDEFINED);
     }
 
     public void quit(UUID uuid) {
@@ -374,10 +434,11 @@ public class Game implements Controllable, IHasState {
         if (!this.players.containsKey(nexusPlayer.getUniqueId())) {
             return;
         }
+        setSubState(SubState.PLAYER_QUIT);
         GamePlayer gamePlayer = this.players.get(nexusPlayer.getUniqueId());
         this.chatRooms.get(gamePlayer.getTeam()).removeMember(gamePlayer.getUniqueId());
         this.gameChatroom.removeMember(gamePlayer.getUniqueId());
-        EnumSet<GameState> ignoreStates = EnumSet.of(UNDEFINED, SETTING_UP, SETUP_COMPLETE, ASSIGN_TEAMS, TEAMS_ASSIGNED, TELEPORT_START, TELEPORT_START_DONE, ERROR, ENDING, ENDED);
+        Set<IState> ignoreStates = Set.of(UNDEFINED, SETTING_UP, SETUP_COMPLETE, ASSIGN_TEAMS, TEAMS_ASSIGNED, TELEPORT_START, TELEPORT_START_DONE, ERROR, ENDING, ENDED);
         if (!ignoreStates.contains(this.state)) {
             if (gamePlayer.getTeam() == GameTeam.TRIBUTES || gamePlayer.getTeam() == GameTeam.MUTATIONS) {
                 killPlayer(gamePlayer, new DeathInfo(this, System.currentTimeMillis(), gamePlayer, DeathType.SUICIDE, null));
@@ -411,6 +472,7 @@ public class Game implements Controllable, IHasState {
         } else {
             sendMessage("&c&l<< &b" + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft.");
         }
+        setSubState(SubState.UNDEFINED);
     }
 
     public Map<UUID, GamePlayer> getPlayers() {
@@ -418,7 +480,9 @@ public class Game implements Controllable, IHasState {
     }
 
     public void resetSpawns() {
+        setSubState(SubState.CLEARING_SPAWNS);
         this.spawns.entrySet().forEach(entry -> entry.setValue(null));
+        setSubState(SubState.UNDEFINED);
     }
 
     public void teleportTributes(List<UUID> tributes, Location mapSpawn) {
@@ -485,7 +549,9 @@ public class Game implements Controllable, IHasState {
         }
 
         Location mapSpawn = getGameMap().getSpawnCenter().toLocation(getGameMap().getWorld());
+        setSubState(SubState.TELEPORT_TRIBUTES);
         teleportTributes(tributes, mapSpawn);
+        setSubState(SubState.TELEPORT_SPECTATORS);
         teleportSpectators(spectators, mapSpawn);
         for (Entity entity : getGameMap().getWorld().getEntities()) {
             if (entity instanceof Monster) {
@@ -520,41 +586,53 @@ public class Game implements Controllable, IHasState {
         }
         setState(TEAMS_ASSIGNED);
     }
+    
+    public void setSubState(SubState subState) {
+        this.subState = subState;
+    }
 
     public void setup() {
         setState(SETTING_UP);
+        
+        setSubState(SubState.DOWNLOADING_MAP);
         if (!getGameMap().download(Game.getPlugin())) {
             handleError("Could not download map");
             return;
         }
 
+        setSubState(SubState.UNZIPPING_MAP);
         if (!getGameMap().unzip(Game.getPlugin())) {
             handleError("Could not unzip map");
             return;
         }
 
+        setSubState(SubState.COPYING_MAP);
         if (!getGameMap().copyFolder(Game.getPlugin(), getServer().getName() + "-", false)) {
             handleError("Could not copy map folder");
             return;
         }
 
+        setSubState(SubState.LOADING_MAP);
         if (!getGameMap().load(Game.getPlugin())) {
             handleError("Could not load map");
             return;
         }
 
+        setSubState(SubState.DEFINING_ARENA);
         CuboidRegion arenaRegion = getGameMap().getArenaRegion();
         if (arenaRegion == null) {
             handleError("Could not define the region for the arena");
             return;
         }
 
+        setSubState(SubState.DEFINING_DEATHMATCH);
         CuboidRegion deathmatchArea = getGameMap().getDeathmatchRegion();
         if (deathmatchArea == null) {
             handleError("Could not define the region for the deathmatch");
             return;
         }
 
+        setSubState(SubState.CLEARING_SPAWNS);
         try {
             for (int i = 0; i < getGameMap().getSpawns().size(); i++) {
                 setSpawn(i, null);
@@ -565,6 +643,7 @@ public class Game implements Controllable, IHasState {
             return;
         }
 
+        setSubState(SubState.DEFINING_GAMERULES);
         try {
             gameMap.getWorld().setGameRuleValue("naturalRegeneration", "" + settings.isRegeneration());
             gameMap.getWorld().setGameRuleValue("doDaylightCycle", "" + settings.isTimeProgression());
@@ -593,12 +672,13 @@ public class Game implements Controllable, IHasState {
         this.gameChatroom.sendMessage(new ChatContext(message));
     }
 
-    public GameState getState() {
+    public State getState() {
         return state;
     }
 
     public void startWarmup() {
         setState(WARMUP);
+        setSubState(SubState.TIMER_INIT);
         this.timer = Game.getPlugin().getClockManager().createTimer(TimeUnit.SECONDS.toMillis(getSettings().getWarmupLength()) + 50L);
         this.timer.setEndCondition(new WarmupEndCondition(this));
         this.timer.addRepeatingCallback(new GameSecondsCallback(this, "&6&l>> &eThe game begins in &b{time}&e."), TimeUnit.SECONDS, 1);
@@ -629,9 +709,11 @@ public class Game implements Controllable, IHasState {
             }
         }, TimeUnit.SECONDS.toMillis(getSettings().getWarmupLength()) / 2);
         this.timer.start();
+        setSubState(SubState.UNDEFINED);
     }
 
     public void startGame() {
+        setSubState(SubState.TIMER_INIT);
         this.timer = plugin.getClockManager().createTimer(TimeUnit.MINUTES.toMillis(settings.getGameLength()) + 50);
 
         Supplier<String> msg = () -> {
@@ -653,7 +735,8 @@ public class Game implements Controllable, IHasState {
             sendMessage("&6&l>> &7Type &8[&6/ratemap &4&l1 &c&l2 &6&l3 &e&l4 &a&l5&8] &7to submit a rating!");
             sendMessage("");
         }, TimeUnit.MINUTES.toMillis(settings.getGameLength()) / 4);
-
+        
+        setSubState(SubState.CALCULATE_RESTOCK);
         long restockLength;
         if (settings.isChestRestockRelative()) {
             restockLength = settings.getGameLength() / settings.getChestRestockDenomination();
@@ -673,6 +756,7 @@ public class Game implements Controllable, IHasState {
         this.timer.start();
 
         this.start = System.currentTimeMillis();
+        setSubState(SubState.SETUP_GRACE_PERIOD);
         if (this.settings.isGracePeriod()) {
             this.graceperiodTimer = plugin.getClockManager().createTimer(TimeUnit.SECONDS.toMillis(settings.getGracePeriodLength()) + 50L);
             this.graceperiodTimer.addRepeatingCallback(new GameSecondsCallback(this, "&6&l>> &eThe &c&lGRACE PERIOD &eends in &b{time}&e."), TimeUnit.SECONDS, 1);
@@ -689,19 +773,26 @@ public class Game implements Controllable, IHasState {
         }
         
         if (this.settings.isShowBorders()) {
+            setSubState(SubState.SETUP_BORDER);
             this.gameMap.applyWorldBoarder("game");
+            setSubState(SubState.UNDEFINED);
         }
 
         if (gameMap.getSwagShack() != null) {
+            setSubState(SubState.SETUP_SWAG_SHACK);
             Villager entity = (Villager) gameMap.getWorld().spawnEntity(gameMap.getSwagShack().toLocation(gameMap.getWorld()), EntityType.VILLAGER);
             entity.setCustomNameVisible(true);
             entity.setCustomName(StarColors.color("&e&lSwag Shack"));
             entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 255, false, false));
         }
+        
+        setSubState(SubState.UNDEFINED);
     }
 
     public void restockChests() {
+        setSubState(SubState.RESTOCKING_CHESTS);
         this.lootedChests.clear();
+        setSubState(SubState.UNDEFINED);
     }
 
     public void warmupComplete() {
@@ -757,7 +848,9 @@ public class Game implements Controllable, IHasState {
             }
             resetSpawns();
             Location mapSpawn = gameMap.getSpawnCenter().toLocation(gameMap.getWorld());
+            setSubState(SubState.TELEPORT_TRIBUTES);
             teleportTributes(tributes, mapSpawn);
+            setSubState(SubState.TELEPORT_SPECTATORS);
             teleportSpectators(spectators, mapSpawn);
 
             setState(TELEPORT_DEATHMATCH_DONE);
@@ -776,6 +869,8 @@ public class Game implements Controllable, IHasState {
                 Bukkit.getPlayer(player.getUniqueId()).addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 0));
             }
         }
+        
+        setSubState(SubState.TIMER_INIT);
         if (this.timer != null) {
             timer.cancel();
         }
@@ -784,6 +879,7 @@ public class Game implements Controllable, IHasState {
         this.timer.addRepeatingCallback(new GameSecondsCallback(this, "&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b{time}&e."), TimeUnit.SECONDS, 1);
         this.timer.setEndCondition(new DMWarmupEndCondition(this));
         this.timer.start();
+        setSubState(SubState.UNDEFINED);
     }
 
     public void startDeathmatch() {
@@ -805,14 +901,17 @@ public class Game implements Controllable, IHasState {
         restockChests();
 
         if (this.settings.isShowBorders()) {
+            setSubState(SubState.SETUP_BORDER);
             this.gameMap.applyWorldBoarder("deathmatch", settings.getDeathmatchLength() * 60);
         }
 
+        setSubState(SubState.TIMER_INIT);
         this.timer = plugin.getClockManager().createTimer(TimeUnit.MINUTES.toMillis(settings.getDeathmatchLength()) + 50L);
         this.timer.addRepeatingCallback(new GameMinutesCallback(this, "&6&l>> &eThe &c&lGAME &eends &ein &b{time}&e."), TimeUnit.MINUTES, 1);
         this.timer.addRepeatingCallback(new GameSecondsCallback(this, "&6&l>> &eThe &c&lGAME &eends &ein &b{time}&e."), TimeUnit.SECONDS, 1);
         this.timer.setEndCondition(new DeathmatchEndCondition(this));
         this.timer.start();
+        setSubState(SubState.UNDEFINED);
     }
 
     public void deathmatchWarmupDone() {
@@ -823,6 +922,7 @@ public class Game implements Controllable, IHasState {
         setState(ENDING);
         this.end = System.currentTimeMillis();
         plugin.incrementGamesPlayed();
+        setSubState(SubState.TIMER_SHUTDOWN);
         if (this.timer != null) {
             timer.cancel();
             this.timer = null;
@@ -833,6 +933,7 @@ public class Game implements Controllable, IHasState {
             this.graceperiodTimer = null;
         }
 
+        setSubState(SubState.DETERMINE_WINNER);
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (!this.players.containsKey(player.getUniqueId())) {
                 continue;
@@ -958,6 +1059,7 @@ public class Game implements Controllable, IHasState {
             }
         }
 
+        setSubState(SubState.SET_GAME_STATS);
         gameInfo.setGameStart(this.start);
         gameInfo.setGameEnd(this.end);
         if (winner != null) {
@@ -1033,6 +1135,8 @@ public class Game implements Controllable, IHasState {
         } else {
             this.nextGame();
         }
+        
+        setSubState(SubState.UNDEFINED);
     }
 
     public void nextGame() {
@@ -1053,6 +1157,7 @@ public class Game implements Controllable, IHasState {
     }
 
     public void killPlayer(GamePlayer gamePlayer, DeathInfo deathInfo) {
+        setSubState(SubState.PLAYER_DEATH);
         try {
             GameTeam oldTeam = gamePlayer.getTeam();
             gamePlayer.addDeathInfo(deathInfo);
@@ -1378,6 +1483,8 @@ public class Game implements Controllable, IHasState {
 
             }
         }.runTaskLater(plugin, 1L);
+        
+        setSubState(SubState.UNDEFINED);
     }
 
     public void checkDeathmatchThreshold() {
@@ -1491,6 +1598,7 @@ public class Game implements Controllable, IHasState {
     }
 
     public void addMutation(Mutation mutation) {
+        setSubState(SubState.ADD_MUTATION);
         GamePlayer gamePlayer = getPlayer(mutation.getPlayer());
         sendMessage("&6&l>> " + gamePlayer.getColoredName() + " &6has &lMUTATED &6as a(n) &l" + mutation.getType().getDisplayName() + " &6and seeks revenge on &a" + Bukkit.getPlayer(mutation.getTarget()).getName() + "&6!");
         
@@ -1527,6 +1635,7 @@ public class Game implements Controllable, IHasState {
         }
         
         getGameInfo().getActions().add(new GameMutateAction(gamePlayer.getName(), target.getName(), mutation.getType()));
+        setSubState(SubState.UNDEFINED);
     }
 
     public void removeMutation(Mutation mutation) {
@@ -1585,11 +1694,11 @@ public class Game implements Controllable, IHasState {
     }
 
     public void gameComplete() {
-        setState(GameState.GAME_COMPLETE);
+        setState(GAME_COMPLETE);
     }
 
     public void nextGameReady() {
-        setState(GameState.NEXT_GAME_READY);
+        setState(NEXT_GAME_READY);
     }
 
     public static SurvivalGames getPlugin() {

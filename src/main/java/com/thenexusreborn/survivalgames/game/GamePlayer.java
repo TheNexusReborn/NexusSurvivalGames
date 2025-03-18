@@ -63,7 +63,11 @@ public class GamePlayer {
         this.damageInfo = new DamageInfo(nexusPlayer.getUniqueId());
         this.stats = stats;
     }
-
+    
+    public Status getStatus() {
+        return status;
+    }
+    
     public int getTimesSponsored() {
         return timesSponsored;
     }
@@ -274,7 +278,7 @@ public class GamePlayer {
             return new Pair<>(false, "You cannot mutate because there is not game running.");
         }
 
-        if (!(game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_DEATHMATCH)) {
+        if (!(game.getState() == Game.State.INGAME || game.getState() == Game.State.INGAME_DEATHMATCH)) {
             return new Pair<>(false, "You cannot mutate in the current game state.");
         }
 

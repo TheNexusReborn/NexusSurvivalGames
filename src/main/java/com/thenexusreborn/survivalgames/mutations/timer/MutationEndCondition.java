@@ -44,7 +44,7 @@ public class MutationEndCondition implements ClockEndCondition<TimerSnapshot> {
             return true;
         }
 
-        if (!(game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_DEATHMATCH)) {
+        if (!(game.getState() == Game.State.INGAME || game.getState() == Game.State.INGAME_DEATHMATCH)) {
             p.sendMessage(StarColors.color(MsgType.WARN + "You are no longer allowed to mutate due to the game's current progress."));
             return true;
         }

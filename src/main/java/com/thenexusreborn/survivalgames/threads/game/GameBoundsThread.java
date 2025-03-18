@@ -33,9 +33,9 @@ public class GameBoundsThread extends StarThread<SurvivalGames> {
             SGMap map = game.getGameMap();
 
             Region region;
-            if (game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_DEATHMATCH) {
+            if (game.getState() == Game.State.INGAME || game.getState() == Game.State.INGAME_DEATHMATCH) {
                 region = map.getArenaRegion();
-            } else if (game.getState() == GameState.DEATHMATCH) {
+            } else if (game.getState() == Game.State.DEATHMATCH) {
                 region = map.getDeathmatchRegion();
             } else {
                 continue;

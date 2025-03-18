@@ -23,7 +23,7 @@ public class EndermanWaterDamageThread extends StarThread<SurvivalGames> {
                 continue;
             }
             
-            if (!(game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_DEATHMATCH)) {
+            if (!(game.getState() == Game.State.INGAME || game.getState() == Game.State.INGAME_DEATHMATCH)) {
                 continue;
             }
 

@@ -311,11 +311,11 @@ public class PlayerListener implements Listener {
                         if (!useTieredLoot) {
                             lootTable = lootManager.getLootTable("tierOne");
                         } else {
-                            if (game.getState() == GameState.DEATHMATCH) {
+                            if (game.getState() == Game.State.DEATHMATCH) {
                                 lootTable = lootManager.getLootTable("tierFour");
                             } else {
                                 boolean withinCenter = game.getGameMap().getDeathmatchRegion().contains(BukkitUtil.toVector(player.getLocation()));
-                                if (game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_DEATHMATCH) {
+                                if (game.getState() == Game.State.INGAME || game.getState() == Game.State.INGAME_DEATHMATCH) {
                                     boolean afterRestock = game.getTimedRestockCount() > 0;
                                     if (withinCenter) {
                                         if (afterRestock) {

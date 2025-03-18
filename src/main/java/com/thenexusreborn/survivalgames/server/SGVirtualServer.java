@@ -11,6 +11,7 @@ import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyType;
+import com.thenexusreborn.survivalgames.state.IState;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -59,7 +60,7 @@ public class SGVirtualServer extends VirtualServer {
                 return true;
             } else return !otherPlayerIsVanished || playerIsVanished;
         } else {
-            if (game.getState() == GameState.ENDING) {
+            if (game.getState() == Game.State.ENDING) {
                 return true;
             }
 
@@ -105,12 +106,12 @@ public class SGVirtualServer extends VirtualServer {
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId());
         SGPlayerStats stats = sgPlayer.getStats();
         if (game != null) {
-            GameState state = game.getState();
-            if (state == GameState.ASSIGN_TEAMS) {
+            IState state = game.getState();
+            if (state == Game.State.ASSIGN_TEAMS) {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        if (game.getState() != GameState.ASSIGN_TEAMS) {
+                        if (game.getState() != Game.State.ASSIGN_TEAMS) {
                             game.join(nexusPlayer, stats);
                             cancel();
                         }

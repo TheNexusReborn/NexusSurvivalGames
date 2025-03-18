@@ -41,7 +41,7 @@ public class PlayerScoreboardThread extends StarThread<SurvivalGames> {
                 continue;
             }
             
-            if (game.getState() == GameState.ENDED) {
+            if (game.getState() == Game.State.ENDED) {
                 continue;
             }
             

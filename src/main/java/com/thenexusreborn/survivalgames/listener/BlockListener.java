@@ -57,7 +57,7 @@ public class BlockListener implements Listener {
                 e.setCancelled(true);
                 return;
             }
-            if (Stream.of(GameState.INGAME, GameState.INGAME_DEATHMATCH, GameState.DEATHMATCH).anyMatch(gameState -> game.getState() == gameState)) {
+            if (Stream.of(Game.State.INGAME, Game.State.INGAME_DEATHMATCH, Game.State.DEATHMATCH).anyMatch(gameState -> game.getState() == gameState)) {
                 if (e.getBlock().getType() == Material.TNT) {
                     SGUtils.spawnTNTWithSource(e.getBlock().getLocation(), e.getPlayer(), game.getSettings().getTntFuseTicks(), game.getSettings().getTntYield());
                     new BukkitRunnable() {
@@ -89,7 +89,7 @@ public class BlockListener implements Listener {
         }
         
         if (game != null) {
-            if (Stream.of(GameState.INGAME, GameState.INGAME_DEATHMATCH, GameState.DEATHMATCH).anyMatch(gameState -> game.getState() == gameState)) {
+            if (Stream.of(Game.State.INGAME, Game.State.INGAME_DEATHMATCH, Game.State.DEATHMATCH).anyMatch(gameState -> game.getState() == gameState)) {
                 if (game.getPlayer(e.getPlayer().getUniqueId()).getTeam() != GameTeam.TRIBUTES) {
                     e.setCancelled(true);
                     return;
