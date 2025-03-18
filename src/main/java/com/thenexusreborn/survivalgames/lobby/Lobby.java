@@ -17,8 +17,8 @@ import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.scoreboard.impl.RankTablistHandler;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.*;
-import com.thenexusreborn.survivalgames.control.ControlType;
 import com.thenexusreborn.survivalgames.chat.LobbyChatRoom;
+import com.thenexusreborn.survivalgames.control.ControlType;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.lobby.timer.LobbyTimerCallback;
 import com.thenexusreborn.survivalgames.scoreboard.lobby.DebugLobbyBoard;
@@ -53,7 +53,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class Lobby {
+public class Lobby implements Controllable {
     public static final PlayerState PLAYER_STATE = new PlayerState()
             .totalExperience(0).level(0).exp(0)
             .allowFlight(false).flying(false)
