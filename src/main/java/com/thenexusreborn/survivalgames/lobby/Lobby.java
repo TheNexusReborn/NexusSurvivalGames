@@ -27,6 +27,7 @@ import com.thenexusreborn.survivalgames.scoreboard.lobby.MapEditingBoard;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.settings.LobbySettings;
+import com.thenexusreborn.survivalgames.state.IHasState;
 import com.thenexusreborn.survivalgames.util.PlayerState;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
 import net.md_5.bungee.api.ChatColor;
@@ -53,7 +54,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class Lobby implements Controllable {
+public class Lobby implements Controllable, IHasState {
     public static final PlayerState PLAYER_STATE = new PlayerState()
             .totalExperience(0).level(0).exp(0)
             .allowFlight(false).flying(false)
