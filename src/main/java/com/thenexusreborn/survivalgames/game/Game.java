@@ -739,6 +739,7 @@ public class Game {
                 timer.cancel();
             }
 
+            setSubState(SubState.REMOVING_MUTATIONS);
             for (GamePlayer gp : this.players.values()) {
                 if (gp.getTeam() == GameTeam.MUTATIONS) {
                     gp.sendMessage(gp.getTeam().getLeaveMessage());
@@ -774,16 +775,15 @@ public class Game {
 
     public void startDeathmatchWarmup() {
         setState(DEATHMATCH_WARMUP);
-
-        if (this.timer != null) {
-            timer.cancel();
-        }
-
+        
         playSound(Sound.ENDERDRAGON_GROWL);
         for (GamePlayer player : this.players.values()) {
             if (player.getTeam() == GameTeam.TRIBUTES) {
                 Bukkit.getPlayer(player.getUniqueId()).addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 0));
             }
+        }
+        if (this.timer != null) {
+            timer.cancel();
         }
 
         this.timer = plugin.getClockManager().createTimer(TimeUnit.SECONDS.toMillis(settings.getDeathmatchWarmupLength()) + 50L);
