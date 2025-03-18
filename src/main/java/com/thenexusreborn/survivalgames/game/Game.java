@@ -735,6 +735,10 @@ public class Game {
         try {
             setState(TELEPORT_DEATHMATCH);
 
+            if (this.timer != null) {
+                timer.cancel();
+            }
+
             for (GamePlayer gp : this.players.values()) {
                 if (gp.getTeam() == GameTeam.MUTATIONS) {
                     gp.sendMessage(gp.getTeam().getLeaveMessage());
