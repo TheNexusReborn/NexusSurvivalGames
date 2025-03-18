@@ -138,7 +138,11 @@ public class Game {
         gameInfo.setPlayerCount(tributeCount);
         gameInfo.setPlayers(playerNames.toArray(new String[0]));
     }
-
+    
+    public Graceperiod getGraceperiod() {
+        return graceperiod;
+    }
+    
     public GamePlayer getFirstBlood() {
         return firstBlood;
     }
