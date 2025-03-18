@@ -139,6 +139,10 @@ public class Game {
         gameInfo.setPlayers(playerNames.toArray(new String[0]));
     }
 
+    public long getStart() {
+        return start;
+    }
+    
     public SGVirtualServer getServer() {
         return server;
     }
