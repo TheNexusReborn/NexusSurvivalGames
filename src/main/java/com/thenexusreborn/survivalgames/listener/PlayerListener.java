@@ -149,7 +149,9 @@ public class PlayerListener implements Listener {
                         if (item.getType() == Material.ROTTEN_FLESH) {
                             Pair<Boolean, String> canMutateResult = gamePlayer.canMutate();
                             if (canMutateResult.key()) {
-                                manager.openGUI(new MutateGui(plugin, gamePlayer), player);
+                                MutationBuilder mutationBuilder = new MutationBuilder(gamePlayer);
+                                mutationBuilder.setUsePass(true);
+                                manager.openGUI(new MutateGui(plugin, mutationBuilder), player);
                             } else {
                                 gamePlayer.sendMessage(MsgType.WARN + canMutateResult.value());
                             }

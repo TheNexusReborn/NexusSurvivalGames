@@ -1499,7 +1499,10 @@ public class Game {
     public void addMutation(Mutation mutation) {
         GamePlayer gamePlayer = getPlayer(mutation.getPlayer());
         sendMessage("&6&l>> " + gamePlayer.getColoredName() + " &6has &lMUTATED &6as a(n) &l" + mutation.getType().getDisplayName() + " &6and seeks revenge on &a" + Bukkit.getPlayer(mutation.getTarget()).getName() + "&6!");
-
+        
+        GamePlayer target = getPlayer(mutation.getTarget());
+        target.sendMessage(StarColors.color("&6&l>> " + gamePlayer.getColoredName().toUpperCase() + " &c&lIS AFTER YOU! RUN!"));
+        
         MapSpawn spawn = gameMap.getSpawns().get(new Random().nextInt(gameMap.getSpawns().size()));
         Location location = spawn.toGameLocation(this.gameMap.getWorld(), gameMap.getSpawnCenter().toLocation(gameMap.getWorld()));
         Player player = Bukkit.getPlayer(gamePlayer.getUniqueId());
@@ -1528,6 +1531,8 @@ public class Game {
         for (MutationEffect effect : type.getEffects()) {
             player.addPotionEffect(new PotionEffect(effect.getPotionType(), Integer.MAX_VALUE, effect.getAmplifier(), false, false));
         }
+        
+        getGameInfo().getActions().add(new GameMutateAction(gamePlayer.getName(), target.getName(), mutation.getType()));
     }
 
     public void removeMutation(Mutation mutation) {
