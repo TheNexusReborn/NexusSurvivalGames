@@ -25,6 +25,19 @@ public final class Bounty {
     public void remove(Type type) {
         this.amounts.remove(type);
     }
+    
+    public boolean has() {
+        if (amounts.isEmpty()) {
+            return false;
+        }
+        
+        int total = 0;
+        for (Integer amount : amounts.values()) {
+            total += amount;
+        }
+        
+        return total != 0;
+    }
 
     public enum Type {
         CREDIT, SCORE
