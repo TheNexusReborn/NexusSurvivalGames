@@ -15,8 +15,6 @@ import java.util.UUID;
 
 public class SGPlayer {
     
-    private static final SurvivalGames plugin = SurvivalGames.getInstance();
-    
     //Player based fields
     private NexusPlayer nexusPlayer;
     private Player spigotPlayer;
@@ -109,5 +107,9 @@ public class SGPlayer {
 
     public UUID getUniqueId() {
         return nexusPlayer.getUniqueId();
+    }
+
+    public String getColoredName() {
+        return getNexusPlayer().getColoredName();
     }
 }
