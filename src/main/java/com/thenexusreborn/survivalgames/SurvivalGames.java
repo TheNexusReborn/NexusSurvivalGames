@@ -8,6 +8,7 @@ import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.staritems.model.CustomItem;
 import com.stardevllc.staritems.model.ItemRegistry;
+import com.stardevllc.starui.GuiManager;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.registry.ToggleRegistry;
@@ -428,5 +429,9 @@ public class SurvivalGames extends NexusSpigotPlugin {
         }
         
         return instanceServer;
+    }
+    
+    public GuiManager getGuiManager() {
+        return Bukkit.getServicesManager().getRegistration(GuiManager.class).getProvider();
     }
 }
