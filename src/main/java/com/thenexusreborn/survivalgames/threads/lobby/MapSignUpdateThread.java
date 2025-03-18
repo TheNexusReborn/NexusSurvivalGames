@@ -29,7 +29,7 @@ public class MapSignUpdateThread extends StarThread<SurvivalGames> {
             if (lobby == null) {
                 continue;
             }
-            if (lobby.getState() == LobbyState.MAP_EDITING) {
+            if (lobby.getState() == LobbyState.MAP_CONFIGURATING) {
                 continue;
             }
 

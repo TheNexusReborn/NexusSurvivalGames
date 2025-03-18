@@ -50,7 +50,7 @@ public class LobbyThread extends StarThread<SurvivalGames> {
                 
                 SGUtils.updatePlayerHealthAndFood(Bukkit.getPlayer(player.getUniqueId()));
 
-                if (state != LobbyState.MAP_EDITING) {
+                if (state != LobbyState.MAP_CONFIGURATING) {
                     if (player.getLocation().getBlockY() < lobby.getSpawnpoint().getBlockY() - 20) {
                         player.teleport(lobby.getSpawnpoint());
                     }
@@ -112,7 +112,7 @@ public class LobbyThread extends StarThread<SurvivalGames> {
             }
 
             boolean resetLobby = false;
-            if (!(state == LobbyState.WAITING || state == LobbyState.MAP_EDITING)) {
+            if (!(state == LobbyState.WAITING || state == LobbyState.MAP_CONFIGURATING)) {
                 if (lobby.getTimer() == null) {
                     resetLobby = true;
                 } else if (TimeUnit.SECONDS.fromMillis(lobby.getTimer().getTime()) <= 0) {

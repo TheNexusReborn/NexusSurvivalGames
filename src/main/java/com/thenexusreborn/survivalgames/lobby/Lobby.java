@@ -333,7 +333,7 @@ public class Lobby implements Controllable, IHasState {
     }
 
     public boolean checkMapEditing(Player player) {
-        if (this.state == LobbyState.MAP_EDITING) {
+        if (this.state == LobbyState.MAP_CONFIGURATING) {
             return !player.getWorld().getName().equalsIgnoreCase(this.spawnpoint.getWorld().getName());
         }
 
@@ -348,8 +348,8 @@ public class Lobby implements Controllable, IHasState {
         this.lobbyChatRoom.sendMessage(new ChatContext(message));
     }
 
-    public void editMaps() {
-        this.state = LobbyState.MAP_EDITING;
+    public void startConfiguringMaps() {
+        this.state = LobbyState.MAP_CONFIGURATING;
         if (timer != null) {
             this.timer.cancel();
             this.timer = null;
@@ -362,7 +362,7 @@ public class Lobby implements Controllable, IHasState {
         plugin.getMapManager().setEditMode(true);
     }
 
-    public void stopEditingMaps() {
+    public void stopConfiguringMaps() {
         this.state = LobbyState.WAITING;
 
         for (LobbyPlayer player : this.getPlayers()) {
@@ -522,7 +522,7 @@ public class Lobby implements Controllable, IHasState {
     }
 
     public SGMap getGameMap() {
-        if (this.state == LobbyState.MAP_EDITING) {
+        if (this.state == LobbyState.MAP_CONFIGURATING) {
             return plugin.getMapManager().getMapBeingEdited();
         }
 
@@ -633,7 +633,7 @@ public class Lobby implements Controllable, IHasState {
 
         if (this.debugMode) {
             nexusPlayer.getScoreboard().setView(new DebugLobbyBoard(nexusPlayer.getScoreboard(), this));
-        } else if (this.state == LobbyState.MAP_EDITING) {
+        } else if (this.state == LobbyState.MAP_CONFIGURATING) {
             nexusPlayer.getScoreboard().setView(new MapEditingBoard(nexusPlayer.getScoreboard(), plugin));
         } else {
             nexusPlayer.getScoreboard().setView(new LobbyBoard(nexusPlayer.getScoreboard(), this));
