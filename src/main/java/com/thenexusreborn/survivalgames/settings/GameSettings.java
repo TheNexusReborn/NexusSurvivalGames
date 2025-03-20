@@ -6,7 +6,7 @@ import com.thenexusreborn.survivalgames.settings.enums.Time;
 import com.thenexusreborn.survivalgames.settings.enums.Weather;
 
 @TableName("sggamesettings")
-public class GameSettings implements Cloneable {
+public class GameSettings implements Cloneable, ISettings {
 
     //Chest Restock
     protected int chestRestockInterval = 5;
