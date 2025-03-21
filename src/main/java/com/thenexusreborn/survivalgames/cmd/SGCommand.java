@@ -1,30 +1,16 @@
 package com.thenexusreborn.survivalgames.cmd;
 
-import com.stardevllc.clock.clocks.Timer;
-import com.stardevllc.colors.StarColors;
-import com.stardevllc.time.TimeFormat;
-import com.stardevllc.time.TimeParser;
-import com.thenexusreborn.api.gamearchive.GameAction;
 import com.thenexusreborn.api.player.Rank;
-import com.thenexusreborn.gamemaps.MapManager;
-import com.thenexusreborn.gamemaps.YamlMapManager;
-import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
-import com.thenexusreborn.survivalgames.loot.tables.SGLootTable;
-import com.thenexusreborn.survivalgames.map.SQLMapManager;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.Skull;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 
 import java.util.List;
-import java.util.Set;
 
 public class SGCommand implements CommandExecutor {
 
@@ -1057,7 +1043,7 @@ public class SGCommand implements CommandExecutor {
 //                        return;
 //                    }
 //                }
-////                sender.sendMessage(MsgType.INFO.format("You set the %v setting %v to %v.", type, finalField.getName(), value));
+//                sender.sendMessage(MsgType.INFO.format("You set the %v setting %v to %v.", type, finalField.getName(), value));
 //                if (!finalSilent) {
 //                    plugin.getNexusCore().getStaffChannel().sendMessage(new ChatContext(sgPlayer.getNexusPlayer().getColoredName() + " &fset the " + type + " setting " + finalField.getName() + " to " + value + "."));
 //                }
@@ -1074,230 +1060,226 @@ public class SGCommand implements CommandExecutor {
 //                sender.sendMessage("");
 //            }
         } else if (subCommand.equals("maps") || subCommand.equals("m")) {
-            if (!(args.length > 1)) {
-                MsgType.WARN.send(sender, "Usage: /" + label + " " + subCommand + " <list|export|import|setsource> [args]");
-                return true;
-            }
+//            if (!(args.length > 1)) {
+//                MsgType.WARN.send(sender, "Usage: /" + label + " " + subCommand + " <list|export|import|setsource> [args]");
+//                return true;
+//            }
 
-            if (args[1].equalsIgnoreCase("list")) {
-                StarColors.coloredMessage(sender, "&6&l>> &eList of &bSG Maps");
-                for (SGMap map : plugin.getMapManager().getMaps()) {
-                    StarColors.coloredMessage(sender, " &6&l> &d" + map.getName() + "  " + (map.isActive() ? "&a&lACTIVE" : "&c&lINACTIVE") + "  " + (map.isValid() ? "&a&lVALID" : "&c&lINVALID"));
-                }
-                return true;
-            }
+//            if (args[1].equalsIgnoreCase("list")) {
+//                StarColors.coloredMessage(sender, "&6&l>> &eList of &bSG Maps");
+//                for (SGMap map : plugin.getMapManager().getMaps()) {
+//                    StarColors.coloredMessage(sender, " &6&l> &d" + map.getName() + "  " + (map.isActive() ? "&a&lACTIVE" : "&c&lINACTIVE") + "  " + (map.isValid() ? "&a&lVALID" : "&c&lINVALID"));
+//                }
+//                return true;
+//            }
 
-            if (!(args.length > 2)) {
-                sender.sendMessage(MsgType.WARN.format("Usage: /" + label + " " + subCommand + " <export|import|setsource> <sql|yml>"));
-                return true;
-            }
+//            if (!(args.length > 2)) {
+//                sender.sendMessage(MsgType.WARN.format("Usage: /" + label + " " + subCommand + " <export|import|setsource> <sql|yml>"));
+//                return true;
+//            }
+//
+//            String option = args[2];
+//            if (!(option.equalsIgnoreCase("sql") || option.equalsIgnoreCase("yml"))) {
+//                sender.sendMessage(MsgType.WARN.format("Invalid option, only valid options are sql and yml."));
+//                return true;
+//            }
 
-            String option = args[2];
-            if (!(option.equalsIgnoreCase("sql") || option.equalsIgnoreCase("yml"))) {
-                sender.sendMessage(MsgType.WARN.format("Invalid option, only valid options are sql and yml."));
-                return true;
-            }
-
-            if (args[1].equalsIgnoreCase("export")) {
-                if (option.equalsIgnoreCase("sql")) {
-                    SQLMapManager sqlMapManager = new SQLMapManager(plugin);
-                    for (SGMap map : plugin.getMapManager().getMaps()) {
-                        sqlMapManager.addMap(map);
-                    }
-                    sqlMapManager.saveMaps();
-                    sender.sendMessage(MsgType.INFO.format("Exported %v maps to SQL.", sqlMapManager.getMaps().size()));
-                } else {
-                    YamlMapManager yamlMapManager = new YamlMapManager(plugin);
-                    for (SGMap map : plugin.getMapManager().getMaps()) {
-                        yamlMapManager.addMap(map);
-                    }
-                    yamlMapManager.saveMaps();
-                    sender.sendMessage(MsgType.INFO.format("Exported %v maps to YML.", yamlMapManager.getMaps().size()));
-                }
-            } else if (args[1].equalsIgnoreCase("import")) {
-                MapManager importManager;
-
-                if (option.equalsIgnoreCase("sql")) {
-                    importManager = new SQLMapManager(plugin);
-                } else {
-                    importManager = new YamlMapManager(plugin);
-                }
-
-                importManager.loadMaps();
-                if (importManager.getMaps().isEmpty()) {
-                    sender.sendMessage(MsgType.WARN.format("No maps could be loaded from %v.", option.toUpperCase()));
-                    return true;
-                }
-
-                int newMaps = 0, duplicateMaps = 0;
-                for (SGMap map : importManager.getMaps()) {
-                    SGMap existingMap = plugin.getMapManager().getMap(map.getName());
-                    if (existingMap == null) {
-                        plugin.getMapManager().addMap(map);
-                        sender.sendMessage(MsgType.INFO.format("Added %v as a new map.", map.getName()));
-                        newMaps++;
-                    } else {
-                        existingMap.copyFrom(map);
-                        sender.sendMessage(MsgType.INFO.format("Replaced %v's settings with the values from the imported data.", map.getName()));
-                        duplicateMaps++;
-                    }
-                }
-
-                sender.sendMessage(MsgType.INFO.format("Added %v new map(s) and updated %v map(s).", newMaps, duplicateMaps));
-            } else if (args[1].equalsIgnoreCase("setsource")) {
-                if (option.equalsIgnoreCase("sql")) {
-                    if (plugin.getMapManager() instanceof SQLMapManager) {
-                        sender.sendMessage(MsgType.WARN.format("The map souce is already set to SQL."));
-                        return true;
-                    }
-
-                    plugin.setMapManager(new SQLMapManager(plugin));
-                    sender.sendMessage(MsgType.INFO.format("You set the map source to SQL."));
-                } else {
-                    if (plugin.getMapManager() instanceof YamlMapManager) {
-                        sender.sendMessage(MsgType.WARN.format("The map souce is already set to YML."));
-                        return true;
-                    }
-
-                    plugin.setMapManager(new YamlMapManager(plugin));
-                    sender.sendMessage(MsgType.INFO.format("You set the map source to YML."));
-                }
-            }
+//            if (args[1].equalsIgnoreCase("export")) {
+//                if (option.equalsIgnoreCase("sql")) {
+//                    SQLMapManager sqlMapManager = new SQLMapManager(plugin);
+//                    for (SGMap map : plugin.getMapManager().getMaps()) {
+//                        sqlMapManager.addMap(map);
+//                    }
+//                    sqlMapManager.saveMaps();
+//                    sender.sendMessage(MsgType.INFO.format("Exported %v maps to SQL.", sqlMapManager.getMaps().size()));
+//                } else {
+//                    YamlMapManager yamlMapManager = new YamlMapManager(plugin);
+//                    for (SGMap map : plugin.getMapManager().getMaps()) {
+//                        yamlMapManager.addMap(map);
+//                    }
+//                    yamlMapManager.saveMaps();
+//                    sender.sendMessage(MsgType.INFO.format("Exported %v maps to YML.", yamlMapManager.getMaps().size()));
+//                }
+//            } else if (args[1].equalsIgnoreCase("import")) {
+//                MapManager importManager;
+//
+//                if (option.equalsIgnoreCase("sql")) {
+//                    importManager = new SQLMapManager(plugin);
+//                } else {
+//                    importManager = new YamlMapManager(plugin);
+//                }
+//
+//                importManager.loadMaps();
+//                if (importManager.getMaps().isEmpty()) {
+//                    sender.sendMessage(MsgType.WARN.format("No maps could be loaded from %v.", option.toUpperCase()));
+//                    return true;
+//                }
+//
+//                int newMaps = 0, duplicateMaps = 0;
+//                for (SGMap map : importManager.getMaps()) {
+//                    SGMap existingMap = plugin.getMapManager().getMap(map.getName());
+//                    if (existingMap == null) {
+//                        plugin.getMapManager().addMap(map);
+//                        sender.sendMessage(MsgType.INFO.format("Added %v as a new map.", map.getName()));
+//                        newMaps++;
+//                    } else {
+//                        existingMap.copyFrom(map);
+//                        sender.sendMessage(MsgType.INFO.format("Replaced %v's settings with the values from the imported data.", map.getName()));
+//                        duplicateMaps++;
+//                    }
+//                }
+//
+//                sender.sendMessage(MsgType.INFO.format("Added %v new map(s) and updated %v map(s).", newMaps, duplicateMaps));
+//            } else if (args[1].equalsIgnoreCase("setsource")) {
+//                if (option.equalsIgnoreCase("sql")) {
+//                    if (plugin.getMapManager() instanceof SQLMapManager) {
+//                        sender.sendMessage(MsgType.WARN.format("The map souce is already set to SQL."));
+//                        return true;
+//                    }
+//
+//                    plugin.setMapManager(new SQLMapManager(plugin));
+//                    sender.sendMessage(MsgType.INFO.format("You set the map source to SQL."));
+//                } else {
+//                    if (plugin.getMapManager() instanceof YamlMapManager) {
+//                        sender.sendMessage(MsgType.WARN.format("The map souce is already set to YML."));
+//                        return true;
+//                    }
+//
+//                    plugin.setMapManager(new YamlMapManager(plugin));
+//                    sender.sendMessage(MsgType.INFO.format("You set the map source to YML."));
+//                }
+//            }
         } else if (subCommand.equals("timer") || subCommand.equals("t")) {
-            if (!(args.length > 1)) {
-                sender.sendMessage(MsgType.WARN.format("You must provide a sub command."));
-                return true;
-            }
-
-            Timer timer;
-            String timerType;
-            if (game != null) {
-                timer = game.getTimer();
-                timerType = "game";
-            } else {
-                timer = lobby.getTimer();
-                timerType = "lobby";
-            }
-
-            if (timer == null) {
-                sender.sendMessage(MsgType.WARN.format("The %v does not have an active timer. Nothing to control.", timerType));
-                return true;
-            }
-
-            String timerSubCommand = args[1].toLowerCase();
-            switch (timerSubCommand) {
-                case "pause" -> {
-                    if (timer.isPaused()) {
-                        sender.sendMessage(MsgType.WARN.format("The timer is already paused."));
-                        return true;
-                    }
-                    timer.pause();
-                    sender.sendMessage(MsgType.INFO.format("You paused the timer."));
-                }
-                case "resume" -> {
-                    if (!timer.isPaused()) {
-                        sender.sendMessage(MsgType.WARN.format("The timer is not paused."));
-                        return true;
-                    }
-                    timer.unpause();
-                    sender.sendMessage(MsgType.INFO.format("You resumed the timer."));
-                }
-                case "reset" -> {
-                    timer.reset();
-                    sender.sendMessage(MsgType.INFO.format("You reset the timer."));
-                }
-                case "modify" -> {
-                    if (!(args.length > 3)) {
-                        sender.sendMessage(MsgType.WARN.format("Usage: /survivalgames timer modify set|add|subtract <value>"));
-                        return true;
-                    }
-
-                    // /sg timer modify set|add|substract <value>
-                    String operation = args[2];
-                    String rawValue = args[3];
-
-                    TimeFormat timeFormat = new TimeFormat("%*#0h%%*#0m%%*#0s%");
-                    TimeParser timeParser = new TimeParser();
-                    long timeValue = timeParser.parseTime(rawValue);
-
-                    long oldValue = timer.getTime();
-
-                    if (operation.equalsIgnoreCase("subtract")) {
-                        timer.removeTime(timeValue);
-                        sender.sendMessage(MsgType.INFO.format("You subtracted %v from the %v's timer.", timeFormat.format(timeValue), timerType));
-                    } else if (operation.equalsIgnoreCase("add")) {
-                        timer.addTime(timeValue);
-                        sender.sendMessage(MsgType.INFO.format("You added %v to the %v's timer.", timeFormat.format(timeValue), timerType));
-                    } else if (operation.equalsIgnoreCase("set")) {
-                        timer.setTime(timeValue);
-                        sender.sendMessage(MsgType.INFO.format("You set %v's timer to %v.", timerType, timeFormat.format(timeValue)));
-                    }
-
-                    long newValue = timer.getTime();
-
-                    if (timerType.equalsIgnoreCase("game")) {
-                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "timermodification").addValueData("actor", sender.getName()).addValueData("oldvalue", oldValue).addValueData("newvalue", newValue));
-                    }
-                }
-            }
-        } else if (args[0].equalsIgnoreCase("skull")) {
-            Block targetBlock = player.getTargetBlock((Set<Material>) null, 10);
-            Skull skull = (Skull) targetBlock.getState();
-            player.sendMessage(skull.getOwner());
+//            if (!(args.length > 1)) {
+//                sender.sendMessage(MsgType.WARN.format("You must provide a sub command."));
+//                return true;
+//            }
+//
+//            Timer timer;
+//            String timerType;
+//            if (game != null) {
+//                timer = game.getTimer();
+//                timerType = "game";
+//            } else {
+//                timer = lobby.getTimer();
+//                timerType = "lobby";
+//            }
+//
+//            if (timer == null) {
+//                sender.sendMessage(MsgType.WARN.format("The %v does not have an active timer. Nothing to control.", timerType));
+//                return true;
+//            }
+//
+//            String timerSubCommand = args[1].toLowerCase();
+//            switch (timerSubCommand) {
+//                case "pause" -> {
+//                    if (timer.isPaused()) {
+//                        sender.sendMessage(MsgType.WARN.format("The timer is already paused."));
+//                        return true;
+//                    }
+//                    timer.pause();
+//                    sender.sendMessage(MsgType.INFO.format("You paused the timer."));
+//                }
+//                case "resume" -> {
+//                    if (!timer.isPaused()) {
+//                        sender.sendMessage(MsgType.WARN.format("The timer is not paused."));
+//                        return true;
+//                    }
+//                    timer.unpause();
+//                    sender.sendMessage(MsgType.INFO.format("You resumed the timer."));
+//                }
+//                case "reset" -> {
+//                    timer.reset();
+//                    sender.sendMessage(MsgType.INFO.format("You reset the timer."));
+//                }
+//                case "modify" -> {
+//                    if (!(args.length > 3)) {
+//                        sender.sendMessage(MsgType.WARN.format("Usage: /survivalgames timer modify set|add|subtract <value>"));
+//                        return true;
+//                    }
+//
+//                    // /sg timer modify set|add|substract <value>
+//                    String operation = args[2];
+//                    String rawValue = args[3];
+//
+//                    TimeFormat timeFormat = new TimeFormat("%*#0h%%*#0m%%*#0s%");
+//                    TimeParser timeParser = new TimeParser();
+//                    long timeValue = timeParser.parseTime(rawValue);
+//
+//                    long oldValue = timer.getTime();
+//
+//                    if (operation.equalsIgnoreCase("subtract")) {
+//                        timer.removeTime(timeValue);
+//                        sender.sendMessage(MsgType.INFO.format("You subtracted %v from the %v's timer.", timeFormat.format(timeValue), timerType));
+//                    } else if (operation.equalsIgnoreCase("add")) {
+//                        timer.addTime(timeValue);
+//                        sender.sendMessage(MsgType.INFO.format("You added %v to the %v's timer.", timeFormat.format(timeValue), timerType));
+//                    } else if (operation.equalsIgnoreCase("set")) {
+//                        timer.setTime(timeValue);
+//                        sender.sendMessage(MsgType.INFO.format("You set %v's timer to %v.", timerType, timeFormat.format(timeValue)));
+//                    }
+//
+//                    long newValue = timer.getTime();
+//
+//                    if (timerType.equalsIgnoreCase("game")) {
+//                        game.getGameInfo().getActions().add(new GameAction(System.currentTimeMillis(), "timermodification").addValueData("actor", sender.getName()).addValueData("oldvalue", oldValue).addValueData("newvalue", newValue));
+//                    }
+//                }
+//            }
         } else if (args[0].equalsIgnoreCase("loottable")) {
-            if (!(args.length > 1)) {
-                sender.sendMessage(MsgType.WARN.format("You must provide a Loot Table name."));
-                return true;
-            }
-
-            SGLootTable lootTable = plugin.getLootManager().getLootTable(args[1]);
-            if (lootTable == null) {
-                sender.sendMessage(MsgType.WARN.format("The value %v is not a valid loot table", args[1]));
-                return true;
-            }
-
-            if (!(args.length > 2)) {
-                sender.sendMessage(MsgType.WARN.format("You must provide a sub command."));
-                return true;
-            }
-
-            if (args[2].equalsIgnoreCase("reload")) {
-                lootTable.setReloading(true);
-                try {
-                    lootTable.saveData();
-                    lootTable.loadData();
-                    if (lootTable.getItemWeights().isEmpty()) {
-                        lootTable.loadDefaultData();
-                    }
-                    sender.sendMessage(MsgType.INFO.format("Reload of loot table %v was successful.", lootTable.getName()));
-                } catch (Throwable throwable) {
-                    sender.sendMessage(MsgType.ERROR.format("There was an error reloading that loot table: " + throwable.getMessage()));
-                }
-                lootTable.setReloading(false);
-            } else if (args[2].equalsIgnoreCase("setitemweight") || args[2].equalsIgnoreCase("siw")) {
-                if (!(args.length > 4)) {
-                    sender.sendMessage(MsgType.WARN.format(String.format("Usage: /%s %s %s %s <item> <weight>", label, args[0], args[1], args[2])));
-                    return true;
-                }
-
-                String itemName = args[3].toLowerCase().replace("'", "");
-                if (!lootTable.getItemWeights().containsKey(itemName)) {
-                    sender.sendMessage(MsgType.WARN.format("The loot table %v does not contain an item entry with the id of %v", lootTable.getName(), itemName));
-                    return true;
-                }
-
-                int weight;
-                try {
-                    weight = Integer.parseInt(args[4]);
-                } catch (NumberFormatException e) {
-                    sender.sendMessage(MsgType.WARN.format("The input value %v is not a valid whole number.", args[4]));
-                    return true;
-                }
-
-                lootTable.getItemWeights().put(itemName, weight);
-                sender.sendMessage(MsgType.INFO.format("You set the item %v's weight to %v in loot table %v", itemName, weight, lootTable.getName()));
-                sender.sendMessage(MsgType.INFO.format(String.format("You must use /%s %s %s reload", label, args[0], args[1]) + " to apply your changes."));
-            }
+//            if (!(args.length > 1)) {
+//                sender.sendMessage(MsgType.WARN.format("You must provide a Loot Table name."));
+//                return true;
+//            }
+//
+//            SGLootTable lootTable = plugin.getLootManager().getLootTable(args[1]);
+//            if (lootTable == null) {
+//                sender.sendMessage(MsgType.WARN.format("The value %v is not a valid loot table", args[1]));
+//                return true;
+//            }
+//
+//            if (!(args.length > 2)) {
+//                sender.sendMessage(MsgType.WARN.format("You must provide a sub command."));
+//                return true;
+//            }
+//
+//            if (args[2].equalsIgnoreCase("reload")) {
+//                lootTable.setReloading(true);
+//                try {
+//                    lootTable.saveData();
+//                    lootTable.loadData();
+//                    if (lootTable.getItemWeights().isEmpty()) {
+//                        lootTable.loadDefaultData();
+//                    }
+//                    sender.sendMessage(MsgType.INFO.format("Reload of loot table %v was successful.", lootTable.getName()));
+//                } catch (Throwable throwable) {
+//                    sender.sendMessage(MsgType.ERROR.format("There was an error reloading that loot table: " + throwable.getMessage()));
+//                }
+//                lootTable.setReloading(false);
+//            } else if (args[2].equalsIgnoreCase("setitemweight") || args[2].equalsIgnoreCase("siw")) {
+//                if (!(args.length > 4)) {
+//                    sender.sendMessage(MsgType.WARN.format(String.format("Usage: /%s %s %s %s <item> <weight>", label, args[0], args[1], args[2])));
+//                    return true;
+//                }
+//
+//                String itemName = args[3].toLowerCase().replace("'", "");
+//                if (!lootTable.getItemWeights().containsKey(itemName)) {
+//                    sender.sendMessage(MsgType.WARN.format("The loot table %v does not contain an item entry with the id of %v", lootTable.getName(), itemName));
+//                    return true;
+//                }
+//
+//                int weight;
+//                try {
+//                    weight = Integer.parseInt(args[4]);
+//                } catch (NumberFormatException e) {
+//                    sender.sendMessage(MsgType.WARN.format("The input value %v is not a valid whole number.", args[4]));
+//                    return true;
+//                }
+//
+//                lootTable.getItemWeights().put(itemName, weight);
+//                sender.sendMessage(MsgType.INFO.format("You set the item %v's weight to %v in loot table %v", itemName, weight, lootTable.getName()));
+//                sender.sendMessage(MsgType.INFO.format(String.format("You must use /%s %s %s reload", label, args[0], args[1]) + " to apply your changes."));
+//            }
         }
 
         return true;
