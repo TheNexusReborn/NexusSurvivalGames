@@ -1,6 +1,4 @@
-package com.thenexusreborn.survivalgames;
-
-import com.thenexusreborn.survivalgames.control.ControlType;
+package com.thenexusreborn.survivalgames.control;
 
 public interface Controllable {
     ControlType getControlType();

@@ -25,6 +25,7 @@ import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.chat.GameChatRoom;
 import com.thenexusreborn.survivalgames.chat.GameTeamChatroom;
 import com.thenexusreborn.survivalgames.control.ControlType;
+import com.thenexusreborn.survivalgames.control.Controllable;
 import com.thenexusreborn.survivalgames.disguises.DisguiseAPI;
 import com.thenexusreborn.survivalgames.disguises.disguisetypes.MobDisguise;
 import com.thenexusreborn.survivalgames.game.Bounty.Type;

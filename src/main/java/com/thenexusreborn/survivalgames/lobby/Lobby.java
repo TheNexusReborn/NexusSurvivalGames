@@ -19,6 +19,7 @@ import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.*;
 import com.thenexusreborn.survivalgames.chat.LobbyChatRoom;
 import com.thenexusreborn.survivalgames.control.ControlType;
+import com.thenexusreborn.survivalgames.control.Controllable;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.lobby.timer.LobbyTimerCallback;
 import com.thenexusreborn.survivalgames.scoreboard.lobby.*;
