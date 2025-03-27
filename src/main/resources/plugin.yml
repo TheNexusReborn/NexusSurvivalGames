@@ -26,3 +26,4 @@ commands:
   spectators:
   mutations:
   sgadmin:
+    aliases: [sga]

@@ -25,6 +25,7 @@ import com.thenexusreborn.nexuscore.NexusCore;
 import com.thenexusreborn.nexuscore.api.NexusSpigotPlugin;
 import com.thenexusreborn.nexuscore.cmds.ToggleCmd;
 import com.thenexusreborn.survivalgames.cmd.*;
+import com.thenexusreborn.survivalgames.cmd.sgadmin.SGAdminCmd;
 import com.thenexusreborn.survivalgames.disguises.NexusDisguises;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GameTeam;
@@ -256,6 +257,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
 
         new VoteStartCommand(this);
         new StatsCommand(this);
+        new SGAdminCmd(this);
         getCommand("survivalgames").setExecutor(new SGCommand(this));
         new SpectateCommand(this);
         new MapVoteCommand(this);
