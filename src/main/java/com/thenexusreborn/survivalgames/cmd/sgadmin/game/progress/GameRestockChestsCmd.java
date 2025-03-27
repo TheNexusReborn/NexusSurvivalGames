@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 
 public class GameRestockChestsCmd extends GameProgressSubCmd {
     public GameRestockChestsCmd(SurvivalGames plugin, ICommand<SurvivalGames> parent) {
-        super(plugin, parent, "setup", "");
+        super(plugin, parent, "restockchests", "rc");
     }
 
     @Override

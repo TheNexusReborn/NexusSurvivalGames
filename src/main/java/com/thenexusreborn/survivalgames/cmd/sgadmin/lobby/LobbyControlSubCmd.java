@@ -16,7 +16,7 @@ public class LobbyControlSubCmd extends SubCommand<SurvivalGames> {
     private ControlType controlType;
     
     public LobbyControlSubCmd(SurvivalGames plugin, ICommand<SurvivalGames> parent, ControlType controlType) {
-        super(plugin, parent, 1, "", "", Rank.ADMIN, controlType.getAliases());
+        super(plugin, parent, 1, controlType.name().toLowerCase(), "", Rank.ADMIN, controlType.getAliases());
         this.controlType = controlType;
     }
 

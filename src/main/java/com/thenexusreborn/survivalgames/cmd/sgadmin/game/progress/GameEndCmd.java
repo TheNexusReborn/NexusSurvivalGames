@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 
 public class GameEndCmd extends GameProgressSubCmd {
     public GameEndCmd(SurvivalGames plugin, ICommand<SurvivalGames> parent) {
-        super(plugin, parent, "setup", "");
+        super(plugin, parent, "end", "");
     }
 
     @Override

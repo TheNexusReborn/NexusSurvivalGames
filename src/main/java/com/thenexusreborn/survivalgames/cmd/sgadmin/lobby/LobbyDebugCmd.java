@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 
 public class LobbyDebugCmd extends LobbySubCommand {
     public LobbyDebugCmd(SurvivalGames plugin, ICommand<SurvivalGames> parent) {
-        super(plugin, parent, "debug", "", "");
+        super(plugin, parent, "debug", "");
     }
     
     @Override

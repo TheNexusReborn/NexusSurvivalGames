@@ -17,7 +17,7 @@ public class GameControlSubCmd extends SubCommand<SurvivalGames> {
     private ControlType controlType;
     
     public GameControlSubCmd(SurvivalGames plugin, ICommand<SurvivalGames> parent, ControlType controlType) {
-        super(plugin, parent, 1, "", "", Rank.ADMIN, controlType.getAliases());
+        super(plugin, parent, 1, controlType.name(), "", Rank.ADMIN, controlType.getAliases());
         this.controlType = controlType;
     }
 

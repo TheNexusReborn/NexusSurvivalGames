@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 
 public class MapSignsSetSubCmd extends MapSignsSubCmd {
     public MapSignsSetSubCmd(SurvivalGames plugin, ICommand<SurvivalGames> parent) {
-        super(plugin, parent, "remove", "", "r");
+        super(plugin, parent, "set", "", "s");
     }
     
     @Override

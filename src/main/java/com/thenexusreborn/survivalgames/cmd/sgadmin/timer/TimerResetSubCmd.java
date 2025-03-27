@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 
 public class TimerResetSubCmd extends TimerSubCommand {
     public TimerResetSubCmd(SurvivalGames plugin, ICommand<SurvivalGames> parent) {
-        super(plugin, parent, 1, "resume", "");
+        super(plugin, parent, 1, "reset", "");
     }
     
     @Override
