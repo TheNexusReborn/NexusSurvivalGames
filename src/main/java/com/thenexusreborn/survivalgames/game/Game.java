@@ -82,26 +82,12 @@ public class Game implements Controllable, IHasState {
     
     public enum SubState implements ISubState {
         UNDEFINED, 
-        
-        //setup
         DOWNLOADING_MAP, UNZIPPING_MAP, COPYING_MAP, LOADING_MAP, DEFINING_ARENA, DEFINING_DEATHMATCH, CLEARING_SPAWNS, DEFINING_GAMERULES,
-        
-        //teleport
         TELEPORT_TRIBUTES, TELEPORT_SPECTATORS, 
-        
-        //warmup/game start
         TIMER_INIT, CALCULATE_RESTOCK, SETUP_GRACE_PERIOD, SETUP_BORDER, SETUP_SWAG_SHACK, 
-        
-        //During game
         RESTOCKING_CHESTS, PLAYER_DEATH, ADD_MUTATION, 
-        
-        //Admin actions
         ADD_AS_TRIBUTE, REMOVE_FROM_GAME, REVIVE_PLAYER, MUTATE_PLAYER, PLAYER_JOIN, PLAYER_QUIT, 
-        
-        //Deathmatch
         REMOVING_MUTATIONS, 
-        
-        //Ending
         TIMER_SHUTDOWN, DETERMINE_WINNER, SET_GAME_STATS
     }
     
