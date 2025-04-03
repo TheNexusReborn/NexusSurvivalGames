@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.loot.tables;
 
-import com.stardevllc.colors.StarColors;
+import com.stardevllc.starcore.StarColors;
 import com.thenexusreborn.survivalgames.loot.item.LootItem;
 import org.bukkit.inventory.ItemStack;
 

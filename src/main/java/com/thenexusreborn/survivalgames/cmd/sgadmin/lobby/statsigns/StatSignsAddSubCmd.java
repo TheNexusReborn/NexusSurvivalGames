@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.cmd.sgadmin.lobby.statsigns;
 
-import com.stardevllc.cmdflags.FlagResult;
-import com.stardevllc.colors.StarColors;
+import com.stardevllc.starcore.cmdflags.FlagResult;
+import com.stardevllc.starcore.StarColors;
 import com.thenexusreborn.nexuscore.api.command.ICommand;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;

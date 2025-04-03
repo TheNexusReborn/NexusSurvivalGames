@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.menu.manage;
 
-import com.stardevllc.itembuilder.ItemBuilder;
-import com.stardevllc.itembuilder.XMaterial;
+import com.stardevllc.starcore.base.XMaterial;
+import com.stardevllc.starcore.base.itembuilder.ItemBuilder;
 import com.stardevllc.starui.GuiManager;
 import com.stardevllc.starui.element.button.Button;
 import com.stardevllc.starui.gui.InventoryGUI;
@@ -9,10 +9,7 @@ import com.stardevllc.starui.gui.UpdatingGUI;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.conversation.SelectLootTablePrompt;
-import com.thenexusreborn.survivalgames.game.Game;
-import com.thenexusreborn.survivalgames.game.GamePlayer;
-import com.thenexusreborn.survivalgames.game.GameTeam;
-import com.thenexusreborn.survivalgames.game.PlayerManageBuilder;
+import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.mutations.MutationBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.conversations.ConversationFactory;

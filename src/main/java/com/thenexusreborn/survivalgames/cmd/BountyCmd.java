@@ -1,17 +1,14 @@
 package com.thenexusreborn.survivalgames.cmd;
 
-import com.stardevllc.cmdflags.FlagResult;
+import com.stardevllc.starcore.cmdflags.FlagResult;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.nexuscore.api.command.NexusCommand;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.Bounty;
+import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.game.Bounty.Type;
-import com.thenexusreborn.survivalgames.game.Game;
-import com.thenexusreborn.survivalgames.game.GamePlayer;
-import com.thenexusreborn.survivalgames.game.GameTeam;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 

@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames;
 
-import com.stardevllc.colors.StarColors;
+import com.stardevllc.starcore.StarColors;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.survivalgames.game.Game;

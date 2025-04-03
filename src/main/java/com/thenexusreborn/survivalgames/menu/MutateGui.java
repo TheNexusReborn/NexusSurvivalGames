@@ -1,8 +1,8 @@
 package com.thenexusreborn.survivalgames.menu;
 
 import com.stardevllc.helper.Pair;
-import com.stardevllc.itembuilder.ItemBuilder;
-import com.stardevllc.itembuilder.XMaterial;
+import com.stardevllc.starcore.base.XMaterial;
+import com.stardevllc.starcore.base.itembuilder.ItemBuilder;
 import com.stardevllc.starui.element.Element;
 import com.stardevllc.starui.element.button.Button;
 import com.stardevllc.starui.gui.InventoryGUI;
@@ -15,9 +15,7 @@ import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.mutations.*;
 import org.bukkit.Bukkit;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class MutateGui extends InventoryGUI {
     public MutateGui(SurvivalGames plugin, MutationBuilder mutationBuilder) {

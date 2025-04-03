@@ -1,8 +1,8 @@
 package com.thenexusreborn.survivalgames.menu;
 
-import com.stardevllc.colors.StarColors;
-import com.stardevllc.itembuilder.ItemBuilder;
-import com.stardevllc.itembuilder.XMaterial;
+import com.stardevllc.starcore.StarColors;
+import com.stardevllc.starcore.base.XMaterial;
+import com.stardevllc.starcore.base.itembuilder.ItemBuilder;
 import com.stardevllc.starui.GuiManager;
 import com.stardevllc.starui.element.Element;
 import com.stardevllc.starui.element.button.Button;
@@ -12,16 +12,11 @@ import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.Game;
-import com.thenexusreborn.survivalgames.game.GamePlayer;
-import com.thenexusreborn.survivalgames.game.GameTeam;
-import com.thenexusreborn.survivalgames.game.PlayerManageBuilder;
+import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.menu.manage.PlayerManageMenu;
 import org.bukkit.Bukkit;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("DuplicatedCode")

@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.menu;
 
-import com.stardevllc.itembuilder.ItemBuilder;
+import com.stardevllc.starcore.base.itembuilder.ItemBuilder;
 import com.stardevllc.starui.element.button.Button;
 import com.stardevllc.starui.gui.InventoryGUI;
 import com.thenexusreborn.nexuscore.util.MsgType;
@@ -13,9 +13,7 @@ import com.thenexusreborn.survivalgames.sponsoring.SponsorManager;
 import org.bukkit.Bukkit;
 import org.bukkit.event.inventory.ClickType;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class SponsorMenu extends InventoryGUI {
     public SponsorMenu(SurvivalGames plugin, GamePlayer actor, GamePlayer target) {

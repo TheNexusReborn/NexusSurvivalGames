@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.scoreboard.lobby;
 
 import com.stardevllc.clock.clocks.Timer;
-import com.stardevllc.colors.StarColors;
+import com.stardevllc.starcore.StarColors;
 import com.stardevllc.time.TimeFormat;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;

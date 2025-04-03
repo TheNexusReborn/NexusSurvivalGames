@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.cmd;
 
-import com.stardevllc.cmdflags.FlagResult;
+import com.stardevllc.starcore.cmdflags.FlagResult;
 import com.stardevllc.time.TimeUnit;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.Rank;

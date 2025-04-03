@@ -1,22 +1,24 @@
 package com.thenexusreborn.survivalgames.mutations;
 
 import com.stardevllc.helper.StringHelper;
-import com.stardevllc.itembuilder.ItemBuilder;
-import com.stardevllc.itembuilder.XMaterial;
+import com.stardevllc.starcore.base.XMaterial;
+import com.stardevllc.starcore.base.itembuilder.ItemBuilder;
 import com.stardevllc.starcore.utils.ArmorSet;
 import com.thenexusreborn.survivalgames.disguises.disguisetypes.DisguiseType;
 import com.thenexusreborn.survivalgames.mutations.impl.*;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.inventory.*;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 
 import static com.stardevllc.starcore.utils.ArmorSet.*;
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.*;
-import static org.bukkit.potion.PotionEffectType.*;
+import static org.bukkit.potion.PotionEffectType.SLOW;
+import static org.bukkit.potion.PotionEffectType.SPEED;
 
 public class MutationType {
     private static final ItemBuilder UNBREAKABLE_GOLD_SWORD = ItemBuilder.of(XMaterial.GOLDEN_SWORD).unbreakable(true);
