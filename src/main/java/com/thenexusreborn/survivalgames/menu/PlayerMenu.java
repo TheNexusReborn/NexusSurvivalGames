@@ -41,7 +41,7 @@ public class PlayerMenu extends InventoryGUI implements UpdatingGUI {
             return;
         }
         
-        if (actorGamePlayer != null) {
+        if (actorGamePlayer == null) {
             return;
         }
         
