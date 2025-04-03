@@ -32,7 +32,7 @@ public class PlayerTrackerThread extends StarThread<SurvivalGames> {
                 continue;
             }
 
-            if (!(game.getState().ordinal() >= GameState.INGAME.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal())) {
+            if (!(game.getState().ordinal() >= Game.State.INGAME.ordinal() && game.getState().ordinal() <= Game.State.DEATHMATCH.ordinal())) {
                 continue;
             }
 

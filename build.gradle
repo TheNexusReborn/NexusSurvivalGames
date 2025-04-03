@@ -41,6 +41,7 @@ dependencies {
 //    compileOnly 'com.github.StarDevelopmentLLC:converter:0.1.1'
     compileOnly 'com.github.StarDevelopmentLLC:StarCore:0.2.0'
     compileOnly 'com.github.StarDevelopmentLLC:StarChat:0.2.0'
+    compileOnly 'com.github.StarDevelopmentLLC:StarItems:0.1.4'
     compileOnly 'me.clip:placeholderapi:2.11.5'
     compileOnly 'org.spigotmc:spigot:1.8.8-R0.1-SNAPSHOT'
     compileOnly 'com.comphenix.protocol:ProtocolLib:5.0.0'

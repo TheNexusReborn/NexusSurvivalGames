@@ -57,7 +57,7 @@ public class GameActionBar implements IActionBar {
             return "&aWarmup done, waiting for game to start...";
         }
 
-        if (game.getState().ordinal() >= GameState.INGAME.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal()) {
+        if (game.getState().ordinal() >= Game.State.INGAME.ordinal() && game.getState().ordinal() <= Game.State.DEATHMATCH.ordinal()) {
             TrackerInfo trackerInfo = player.getTrackerInfo();
             if (trackerInfo != null) {
                 String target = trackerInfo.target();

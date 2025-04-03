@@ -15,12 +15,8 @@ import com.thenexusreborn.api.registry.ToggleRegistry;
 import com.thenexusreborn.api.server.InstanceServer;
 import com.thenexusreborn.api.sql.DatabaseRegistry;
 import com.thenexusreborn.api.sql.objects.SQLDatabase;
-import com.thenexusreborn.gamemaps.MapManager;
-import com.thenexusreborn.gamemaps.SGMapCommand;
-import com.thenexusreborn.gamemaps.YamlMapManager;
-import com.thenexusreborn.gamemaps.model.MapRating;
-import com.thenexusreborn.gamemaps.model.MapSpawn;
-import com.thenexusreborn.gamemaps.model.SGMap;
+import com.thenexusreborn.gamemaps.*;
+import com.thenexusreborn.gamemaps.model.*;
 import com.thenexusreborn.nexuscore.NexusCore;
 import com.thenexusreborn.nexuscore.api.NexusSpigotPlugin;
 import com.thenexusreborn.nexuscore.cmds.ToggleCmd;
@@ -31,14 +27,8 @@ import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.hooks.NexusHubHook;
 import com.thenexusreborn.survivalgames.hooks.SGPAPIExpansion;
-import com.thenexusreborn.survivalgames.items.GameTeamBook;
-import com.thenexusreborn.survivalgames.items.PlayerTrackerItem;
-import com.thenexusreborn.survivalgames.items.TPToMapCenterItem;
-import com.thenexusreborn.survivalgames.items.ToHubItem;
-import com.thenexusreborn.survivalgames.listener.BlockListener;
-import com.thenexusreborn.survivalgames.listener.EntityListener;
-import com.thenexusreborn.survivalgames.listener.PlayerListener;
-import com.thenexusreborn.survivalgames.listener.ServerListener;
+import com.thenexusreborn.survivalgames.items.*;
+import com.thenexusreborn.survivalgames.listener.*;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.map.SQLMapManager;
@@ -60,10 +50,7 @@ import org.bukkit.plugin.PluginManager;
 
 import java.io.File;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class SurvivalGames extends NexusSpigotPlugin {
     
