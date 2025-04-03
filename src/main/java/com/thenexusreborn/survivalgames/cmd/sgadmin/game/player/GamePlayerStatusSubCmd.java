@@ -28,7 +28,7 @@ public class GamePlayerStatusSubCmd extends GamePlayerSubCmd {
         
         sender.sendMessage(StarColors.color("&6&l>> &eGame Player Information for &b" + target.getName()));
         sendLine(sender, "Team", target.getTeam().name());
-        sendLine(sender, "Status", target.getStatus().name());
+        sendLine(sender, "Status", target.getStatus() != null ? target.getStatus().name() : "UNDEFINED");
         sendLine(sender, "Kills", target.getKills());
         sendLine(sender, "Kill Streak", target.getKillStreak());
         sendLine(sender, "Assists", target.getAssists());
