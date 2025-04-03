@@ -1632,7 +1632,7 @@ public class Game implements Controllable, IHasState {
         GameTeam.TRIBUTES.getPlayerState().apply(player);
         GamePlayer gamePlayer = getPlayer(player.getUniqueId());
         gamePlayer.setMutation(null);
-        gamePlayer.sendMessage("&&d&l>> &7You're no longer disguised.");
+        gamePlayer.sendMessage("&d&l>> &7You're no longer disguised.");
         if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
             gamePlayer.giveSpectatorItems(this);
         }
