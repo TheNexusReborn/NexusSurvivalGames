@@ -73,7 +73,7 @@ public class BountyCmd extends NexusCommand<SurvivalGames> {
             try {
                 type = Bounty.Type.valueOf(args[2].toUpperCase());
             } catch (Exception e) {
-                player.sendMessage(MsgType.WARN.format("Invalid Bounty Type. Valid Options: CREDIT, SCORE"));
+                player.sendMessage(MsgType.WARN.format("Invalid Bounty Type. Valid Options: CREDITS, SCORE"));
                 return true;
             }
         }
@@ -87,7 +87,7 @@ public class BountyCmd extends NexusCommand<SurvivalGames> {
                 senderPlayer.getStats().addScore(-amount);
             }
             max = game.getSettings().getMaxScoreBounty();
-        } else if (type == Type.CREDIT) {
+        } else if (type == Type.CREDITS) {
             if (senderPlayer.getBalance().getCredits() < amount) {
                 senderPlayer.sendMessage(MsgType.WARN.format("You do not have enough credits to set a bounty of %v.", amount));
                 return true;

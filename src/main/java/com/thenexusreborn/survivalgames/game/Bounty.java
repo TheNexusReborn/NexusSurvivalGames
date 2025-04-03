@@ -40,7 +40,7 @@ public final class Bounty {
     }
 
     public enum Type {
-        CREDIT, SCORE
+        CREDITS, SCORE
     }
 
     @Override

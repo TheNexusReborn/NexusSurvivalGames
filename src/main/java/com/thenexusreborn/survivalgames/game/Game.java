@@ -1038,7 +1038,7 @@ public class Game implements Controllable, IHasState {
                 double amount = bounty.getAmount(type);
                 if (amount > 0) {
                     sendMessage("&6&l>> For winning the game, " + winner.getColoredName() + " &6&l has kept their &b&l" + MCUtils.formatNumber(amount) + " " + StringHelper.titlize(type.name()) + " &6&lbounty!");
-                    if (type == Type.CREDIT) {
+                    if (type == Type.CREDITS) {
                         winner.getBalance().addCredits(amount);
                     } else if (type == Type.SCORE) {
                         winner.getStats().addScore((int) amount);
@@ -1208,7 +1208,7 @@ public class Game implements Controllable, IHasState {
             boolean claimedScoreBounty = false, claimedCreditBounty = false;
             Bounty bounty = gamePlayer.getBounty();
             double scoreBounty = bounty.getAmount(Bounty.Type.SCORE);
-            double creditBounty = bounty.getAmount(Bounty.Type.CREDIT);
+            double creditBounty = bounty.getAmount(Bounty.Type.CREDITS);
             if (playerKiller) {
                 GamePlayer killerPlayer = getPlayer(killer.getKiller());
                 killerRank = killerPlayer.getRank();
@@ -1256,7 +1256,7 @@ public class Game implements Controllable, IHasState {
 
                     if (creditBounty > 0) {
                         creditGain += (int) creditBounty;
-                        bounty.remove(Bounty.Type.CREDIT);
+                        bounty.remove(Bounty.Type.CREDITS);
                         claimedCreditBounty = true;
                     }
                     killerPlayer.getBalance().addCredits(creditGain);
