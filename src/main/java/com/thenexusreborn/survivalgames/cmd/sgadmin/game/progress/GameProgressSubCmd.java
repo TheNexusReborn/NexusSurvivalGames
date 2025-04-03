@@ -14,7 +14,7 @@ import org.bukkit.entity.Player;
 
 public abstract class GameProgressSubCmd extends SubCommand<SurvivalGames> {
     
-    protected static final PresenceFlag PREVIOUS = new PresenceFlag("previous", "p");
+    protected static final PresenceFlag PREVIOUS = new PresenceFlag("p", "Previous");
     
     public GameProgressSubCmd(SurvivalGames plugin, ICommand<SurvivalGames> parent, String name, String description, String... aliases) {
         super(plugin, parent, 1, name, description, Rank.ADMIN, aliases);
