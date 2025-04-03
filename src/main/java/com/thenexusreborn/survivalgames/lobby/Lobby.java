@@ -712,6 +712,15 @@ public class Lobby implements Controllable, IHasState {
 
     public void setControlType(ControlType controlType) {
         this.controlType = controlType;
+        
+        if (this.controlType == ControlType.MANUAL) {
+            if (this.timer != null) {
+                this.timer.cancel();
+                this.timer = null;
+            }
+            
+            this.state = LobbyState.WAITING;
+        }
     }
 
     public LobbyState getState() {
