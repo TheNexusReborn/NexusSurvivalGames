@@ -629,8 +629,16 @@ public class GamePlayer {
         Map.Entry<Long, DeathInfo> mostRecentDeath = this.deaths.lastEntry();
         return mostRecentDeath != null ? mostRecentDeath.getValue() : null;
     }
-
-
+    
+    public Rank getEffectiveRank() {
+        return nexusPlayer.getEffectiveRank();
+    }
+    
+    public String getTrueName() {
+        return this.nexusPlayer.getTrueName();
+    }
+    
+    
     public enum Status {
         SETTING_UP_PLAYER, TELEPORTING_TO_CENTER, CALCULATING_VISIBILITY, SETTING_UP_SCOREBOARD, READY, SETTING_UP_ACTIONBAR, ADDING_TO_GAME
 

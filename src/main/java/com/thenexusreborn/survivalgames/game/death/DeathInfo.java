@@ -96,7 +96,7 @@ public class DeathInfo {
         if (game.getSettings().getColorMode() == ColorMode.GAME_TEAM) {
             playerName = teamColor;
         } else {
-            playerName = gamePlayer.getRank().getColor();
+            playerName = gamePlayer.getEffectiveRank().getColor();
         }
         
         playerName += gamePlayer.getName() + "&7";
@@ -110,7 +110,7 @@ public class DeathInfo {
                     if (game.getSettings().getColorMode() == ColorMode.GAME_TEAM) {
                         killerName = killer.getTeamColor() + killerPlayer.getName();
                     } else {
-                        killerName = killerPlayer.getRank().getColor() + killerPlayer.getName();
+                        killerName = killerPlayer.getEffectiveRank().getColor() + killerPlayer.getName();
                     }
                 } else { //TODO Maybe just reset the dead player?
                     killerName = "&r" + killer.getName();

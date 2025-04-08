@@ -79,7 +79,7 @@ public class TributeSignUpdateThread extends StarThread<SurvivalGames> {
                 
                 String name;
                 if (lobbyPlayer.getName().length() <= 14) {
-                    name = StarColors.color(lobbyPlayer.getRank().getColor() + lobbyPlayer.getName());
+                    name = StarColors.color(lobbyPlayer.getEffectiveRank().getColor() + lobbyPlayer.getName());
                 } else {
                     name = lobbyPlayer.getName();
                 }

@@ -87,13 +87,13 @@ public class SGPAPIExpansion extends PlaceholderExpansion {
             }
 
             String prefix = "";
-            if (gamePlayer.getRank() != Rank.MEMBER) {
-                prefix = gamePlayer.getRank().getPrefix() + " ";
+            if (gamePlayer.getEffectiveRank() != Rank.MEMBER) {
+                prefix = gamePlayer.getEffectiveRank().getPrefix() + " ";
             }
 
             String nameColor;
             if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
-                nameColor = gamePlayer.getRank().getColor();
+                nameColor = gamePlayer.getEffectiveRank().getColor();
             } else {
                 nameColor = gamePlayer.getTeam().getColor();
             }

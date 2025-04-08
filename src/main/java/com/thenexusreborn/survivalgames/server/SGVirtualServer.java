@@ -125,7 +125,7 @@ public class SGVirtualServer extends VirtualServer {
         }
 
         if (nexusPlayer.getRank().ordinal() <= Rank.MEDIA.ordinal()) {
-            plugin.getNexusCore().getStaffChannel().sendMessage(new ChatContext(nexusPlayer.getDisplayName() + " &7&l-> &6" + name.get()));
+            plugin.getNexusCore().getStaffChannel().sendMessage(new ChatContext(nexusPlayer.getTrueDisplayName() + " &7&l-> &6" + name.get()));
         }
 
         this.players.add(nexusPlayer.getUniqueId());

@@ -37,7 +37,7 @@ public class LobbyControlSubCmd extends SubCommand<SurvivalGames> {
         }
         
         lobby.setControlType(controlType);
-        lobby.sendMessage(MsgType.INFO.format("The lobby has been set to %v by %v", controlType.name().toLowerCase(), sgPlayer.getColoredName()));
+        lobby.sendMessage(MsgType.INFO.format("The lobby has been set to %v by %v", controlType.name().toLowerCase(), sgPlayer.getTrueColoredName()));
         return true;
     }
 }

@@ -405,7 +405,7 @@ public class Lobby implements Controllable, IHasState {
         }
 
         if (lobbySettings.isVoteWeight()) {
-            return (int) nexusPlayer.getRank().getMultiplier();
+            return (int) nexusPlayer.getEffectiveRank().getMultiplier();
         } else {
             return 1;
         }
@@ -416,7 +416,7 @@ public class Lobby implements Controllable, IHasState {
         for (LobbyPlayer player : getPlayers()) {
             if (player.getMapVote() == position) {
                 if (getLobbySettings().isVoteWeight()) {
-                    votes += (int) player.getRank().getMultiplier();
+                    votes += (int) player.getEffectiveRank().getMultiplier();
                 } else {
                     votes += 1;
                 }
@@ -590,18 +590,18 @@ public class Lobby implements Controllable, IHasState {
             player.showPlayer(online);
         }
 
-        if (nexusPlayer.getToggleValue("vanish")) {
+        if (nexusPlayer.getToggleValue("vanish") && nexusPlayer.getNickname() != null) {
             for (Player p : Bukkit.getOnlinePlayers()) {
                 LobbyPlayer psp = this.players.get(p.getUniqueId());
                 if (psp != null) {
                     if (psp.getRank().ordinal() > Rank.HELPER.ordinal()) {
                         p.hidePlayer(player);
                     } else {
-                        psp.sendMessage("&a&l>> " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined &e&overy silently&e.");
+                        psp.sendMessage("&a&l>> " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined &e&ovanished&e.");
                     }
                 }
             }
-        } else if (nexusPlayer.getToggleValue("incognito")) {
+        } else if (nexusPlayer.getToggleValue("incognito") && nexusPlayer.getNickname() != null) {
             for (LobbyPlayer np : getPlayers()) {
                 if (np != null) {
                     if (np.getRank().ordinal() <= Rank.HELPER.ordinal()) {
@@ -610,7 +610,7 @@ public class Lobby implements Controllable, IHasState {
                 }
             }
         } else {
-            sendMessage("&a&l>> " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined.");
+            sendMessage("&a&l>> " + nexusPlayer.getEffectiveRank().getColor() + nexusPlayer.getName() + " &ejoined.");
         }
 
         boolean joiningPlayerStaff = nexusPlayer.getRank().ordinal() <= Rank.HELPER.ordinal();
@@ -675,13 +675,13 @@ public class Lobby implements Controllable, IHasState {
             totalPlayers++;
         }
 
-        if (nexusPlayer.getToggleValue("vanish")) {
+        if (nexusPlayer.getToggleValue("vanish") && nexusPlayer.getNickname() != null) {
             for (LobbyPlayer snp : getPlayers()) {
                 if (snp.getRank().ordinal() <= Rank.HELPER.ordinal()) {
                     snp.sendMessage("&c&l<< " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft &e&ovanished&e.");
                 }
             }
-        } else if (nexusPlayer.getToggleValue("incognito")) {
+        } else if (nexusPlayer.getToggleValue("incognito") && nexusPlayer.getNickname() != null) {
             for (LobbyPlayer snp : getPlayers()) {
                 if (snp.getRank().ordinal() <= Rank.HELPER.ordinal()) {
                     snp.sendMessage("&c&l<< " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft &e&osilently&e.");

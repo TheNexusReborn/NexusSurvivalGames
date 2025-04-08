@@ -112,4 +112,12 @@ public class SGPlayer {
     public String getColoredName() {
         return getNexusPlayer().getColoredName();
     }
+    
+    public String getTrueName() {
+        return getNexusPlayer().getTrueName();
+    }
+    
+    public String getTrueColoredName() {
+        return getNexusPlayer().getTrueColoredName();
+    }
 }

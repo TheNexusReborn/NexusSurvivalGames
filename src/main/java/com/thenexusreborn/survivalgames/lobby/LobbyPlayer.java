@@ -87,4 +87,12 @@ public class LobbyPlayer {
                 ", mapVote=" + mapVote +
                 '}';
     }
+    
+    public Rank getEffectiveRank() {
+        return this.player.getEffectiveRank();
+    }
+    
+    public String getTrueName() {
+        return this.player.getTrueName();
+    }
 }
