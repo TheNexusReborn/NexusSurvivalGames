@@ -40,6 +40,7 @@ import com.thenexusreborn.survivalgames.settings.LobbySettings;
 import com.thenexusreborn.survivalgames.threads.ServerStatusThread;
 import com.thenexusreborn.survivalgames.threads.game.*;
 import com.thenexusreborn.survivalgames.threads.lobby.*;
+import com.thenexusreborn.survivalgames.util.NickSGPlayerStats;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -364,6 +365,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         for (SQLDatabase database : registry.getObjects().values()) {
             if (database.getName().toLowerCase().contains("nexus")) {
                 database.registerClass(SGPlayerStats.class);
+                database.registerClass(NickSGPlayerStats.class);
                 database.registerClass(UnlockedMutation.class);
                 database.registerClass(MapRating.class);
                 database.registerClass(SGMap.class);

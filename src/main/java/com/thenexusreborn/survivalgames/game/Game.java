@@ -140,7 +140,7 @@ public class Game implements Controllable, IHasState {
         int tributeCount = 0;
         for (LobbyPlayer player : players) {
             SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
-            GamePlayer gamePlayer = new GamePlayer(player.getPlayer(), this, player.getStats());
+            GamePlayer gamePlayer = new GamePlayer(sgPlayer, this, player.getStats());
             sgPlayer.setGame(this, gamePlayer);
             if (player.isSpectating()) {
                 gamePlayer.setTeam(GameTeam.SPECTATORS);
@@ -365,8 +365,8 @@ public class Game implements Controllable, IHasState {
 
     public void join(NexusPlayer nexusPlayer, SGPlayerStats stats) {
         setSubState(SubState.PLAYER_JOIN);
-        GamePlayer gamePlayer = new GamePlayer(nexusPlayer, this, stats);
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId());
+        GamePlayer gamePlayer = new GamePlayer(sgPlayer, this, stats);
         sgPlayer.setGame(this, gamePlayer);
         gamePlayer.setStatus(GamePlayer.Status.ADDING_TO_GAME);
         gamePlayer.setTeam(GameTeam.SPECTATORS);
@@ -439,6 +439,7 @@ public class Game implements Controllable, IHasState {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             SQLDatabase database = NexusAPI.getApi().getPrimaryDatabase();
             database.saveSilent(sgPlayer.getStats());
+            database.saveSilent(gamePlayer.getTrueStats());
             database.saveSilent(sgPlayer.getNexusPlayer().getBalance());
             database.saveSilent(sgPlayer.getNexusPlayer().getExperience());
         });
@@ -1094,6 +1095,7 @@ public class Game implements Controllable, IHasState {
 
                 for (GamePlayer gamePlayer : players.values()) {
                     NexusAPI.getApi().getPrimaryDatabase().queue(gamePlayer.getStats());
+                    NexusAPI.getApi().getPrimaryDatabase().queue(gamePlayer.getTrueStats());
                     NexusAPI.getApi().getPrimaryDatabase().queue(gamePlayer.getBalance());
                     NexusAPI.getApi().getPrimaryDatabase().queue(gamePlayer.getNexusPlayer().getExperience());
                 }

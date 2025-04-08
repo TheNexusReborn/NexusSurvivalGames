@@ -26,8 +26,7 @@ import com.thenexusreborn.survivalgames.menu.SwagShackMenu;
 import com.thenexusreborn.survivalgames.mutations.*;
 import com.thenexusreborn.survivalgames.mutations.impl.ChickenMutation;
 import com.thenexusreborn.survivalgames.mutations.impl.CreeperMutation;
-import com.thenexusreborn.survivalgames.util.SGPlayerStats;
-import com.thenexusreborn.survivalgames.util.SGUtils;
+import com.thenexusreborn.survivalgames.util.*;
 import org.bukkit.*;
 import org.bukkit.block.*;
 import org.bukkit.entity.*;
@@ -731,8 +730,16 @@ public class PlayerListener implements Listener {
         } catch (Throwable ex) {
             stats = new SGPlayerStats(e.getNexusPlayer().getUniqueId());
         }
+        
+        NickSGPlayerStats fakeStats;
+        try {
+            fakeStats = NexusAPI.getApi().getPrimaryDatabase().get(NickSGPlayerStats.class, "uniqueid", e.getNexusPlayer().getUniqueId()).getFirst();
+        } catch (Throwable ex) {
+            fakeStats = null;
+        }
 
         sgPlayer.setStats(stats);
+        sgPlayer.setNickSGPlayerStats(fakeStats);
 
         plugin.getPlayerRegistry().register(sgPlayer);
         e.setJoinMessage(null);

@@ -10,6 +10,7 @@ import com.stardevllc.starcore.utils.Position;
 import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.tags.Tag;
+import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.chat.GameTeamChatroom;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
@@ -31,7 +32,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 public class GamePlayer {
-    private final NexusPlayer nexusPlayer;
+    private final SGPlayer sgPlayer;
     private Game game;
     private GameTeam team;
     private boolean spectatorByDeath, newPersonalBestNotified;
@@ -47,17 +48,15 @@ public class GamePlayer {
     private DamageInfo damageInfo;
     private TreeMap<Long, DeathInfo> deaths = new TreeMap<>();
     private Status status;
-    private SGPlayerStats stats;
     private int timesMutated;
     private Position position = new Position();
     
-    public GamePlayer(NexusPlayer nexusPlayer, Game game, SGPlayerStats stats) {
-        this.nexusPlayer = nexusPlayer;
+    public GamePlayer(SGPlayer sgPlayer, Game game, SGPlayerStats stats) {
+        this.sgPlayer = sgPlayer;
         this.game = game;
-        this.bounty = new Bounty(nexusPlayer.getUniqueId());
-        this.combatTag = new CombatTag(game, nexusPlayer.getUniqueId());
-        this.damageInfo = new DamageInfo(nexusPlayer.getUniqueId());
-        this.stats = stats;
+        this.bounty = new Bounty(sgPlayer.getUniqueId());
+        this.combatTag = new CombatTag(game, sgPlayer.getUniqueId());
+        this.damageInfo = new DamageInfo(sgPlayer.getUniqueId());
     }
     
     public Status getStatus() {
@@ -93,11 +92,15 @@ public class GamePlayer {
     }
 
     public SGPlayerStats getStats() {
-        return stats;
+        return sgPlayer.getStats();
+    }
+    
+    public SGPlayerStats getTrueStats() {
+        return sgPlayer.getTrueStats();
     }
 
     public PlayerBalance getBalance() {
-        return this.nexusPlayer.getBalance();
+        return this.sgPlayer.getNexusPlayer().getBalance();
     }
     
     public String getColoredName() {
@@ -129,11 +132,11 @@ public class GamePlayer {
     }
     
     public NexusPlayer getNexusPlayer() {
-        return nexusPlayer;
+        return sgPlayer.getNexusPlayer();
     }
     
     public void sendMessage(String message) {
-        nexusPlayer.sendMessage(message);
+        sgPlayer.sendMessage(message);
     }
     
     public TrackerInfo getTrackerInfo() {
@@ -190,7 +193,7 @@ public class GamePlayer {
     }
     
     public UUID getUniqueId() {
-        return nexusPlayer.getUniqueId();
+        return sgPlayer.getUniqueId();
     }
     
     public void setSpectatorByDeath(boolean value) {
@@ -485,12 +488,12 @@ public class GamePlayer {
     }
 
     public void applyScoreboard() {
-        nexusPlayer.getScoreboard().setView(new GameBoard(nexusPlayer.getScoreboard(), Game.getPlugin()));
-        nexusPlayer.getScoreboard().setTablistHandler(new GameTablistHandler(nexusPlayer.getScoreboard(), Game.getPlugin()));
+        sgPlayer.getNexusPlayer().getScoreboard().setView(new GameBoard(sgPlayer.getNexusPlayer().getScoreboard(), Game.getPlugin()));
+        sgPlayer.getNexusPlayer().getScoreboard().setTablistHandler(new GameTablistHandler(sgPlayer.getNexusPlayer().getScoreboard(), Game.getPlugin()));
     }
 
     public void applyActionBar() {
-        nexusPlayer.setActionBar(new GameActionBar(Game.getPlugin(), this));
+        sgPlayer.getNexusPlayer().setActionBar(new GameActionBar(Game.getPlugin(), this));
     }
 
     public void clearInventory() {
@@ -609,11 +612,11 @@ public class GamePlayer {
     }
 
     public boolean hasActiveTag() {
-        return this.nexusPlayer.hasActiveTag();
+        return this.sgPlayer.getNexusPlayer().hasActiveTag();
     }
 
     public Tag getActiveTag() {
-        return this.nexusPlayer.getActiveTag();
+        return this.sgPlayer.getNexusPlayer().getActiveTag();
     }
 
     public void addItem(ItemStack itemStack) {
@@ -631,11 +634,11 @@ public class GamePlayer {
     }
     
     public Rank getEffectiveRank() {
-        return nexusPlayer.getEffectiveRank();
+        return sgPlayer.getNexusPlayer().getEffectiveRank();
     }
     
     public String getTrueName() {
-        return this.nexusPlayer.getTrueName();
+        return this.sgPlayer.getNexusPlayer().getTrueName();
     }
     
     
@@ -647,7 +650,7 @@ public class GamePlayer {
     @Override
     public String toString() {
         return "GamePlayer{" +
-                "nexusPlayer=" + nexusPlayer +
+                "nexusPlayer=" + sgPlayer.getNexusPlayer() +
                 ", team=" + team +
                 ", spectatorByDeath=" + spectatorByDeath +
                 ", newPersonalBestNotified=" + newPersonalBestNotified +
@@ -664,7 +667,7 @@ public class GamePlayer {
                 ", damageInfo=" + damageInfo +
                 ", deaths=" + deaths +
                 ", status=" + status +
-                ", stats=" + stats +
+                ", stats=" + getTrueStats() +
                 '}';
     }
 }

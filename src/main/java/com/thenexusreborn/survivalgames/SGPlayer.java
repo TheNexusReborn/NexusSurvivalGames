@@ -7,6 +7,7 @@ import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
+import com.thenexusreborn.survivalgames.util.NickSGPlayerStats;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -21,6 +22,7 @@ public class SGPlayer {
     
     //Stats
     private SGPlayerStats stats;
+    private NickSGPlayerStats nickSGPlayerStats;
     
     //Accessor fields for where a player is, these are mutally exclusive
     private Lobby lobby;
@@ -62,8 +64,20 @@ public class SGPlayer {
     public Player getSpigotPlayer() {
         return spigotPlayer;
     }
+    
+    public SGPlayerStats getTrueStats() {
+        return this.stats;
+    }
 
     public SGPlayerStats getStats() {
+        if (getNexusPlayer().getNickname() != null) {
+            if (this.nickSGPlayerStats == null) {
+                this.nickSGPlayerStats = new NickSGPlayerStats(getUniqueId(), this.stats);
+            }
+            
+            return this.nickSGPlayerStats;
+        }
+        
         return stats;
     }
 
@@ -86,7 +100,11 @@ public class SGPlayer {
     public void setStats(SGPlayerStats stats) {
         this.stats = stats;
     }
-
+    
+    public void setNickSGPlayerStats(NickSGPlayerStats nickSGPlayerStats) {
+        this.nickSGPlayerStats = nickSGPlayerStats;
+    }
+    
     public void setLobby(Lobby lobby, LobbyPlayer lobbyPlayer) {
         this.lobby = lobby;
         this.lobbyPlayer = lobbyPlayer;
