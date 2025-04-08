@@ -688,7 +688,7 @@ public class Lobby implements Controllable, IHasState {
                 }
             }
         } else {
-            sendMessage("&c&l<< " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft.");
+            sendMessage("&c&l<< " + nexusPlayer.getEffectiveRank().getColor() + nexusPlayer.getName() + " &eleft.");
         }
 
         if (this.state == LobbyState.COUNTDOWN) {
