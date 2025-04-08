@@ -10,7 +10,7 @@ import com.thenexusreborn.survivalgames.cmd.sgadmin.settings.SGASettingsCmd;
 
 public class SGAdminCmd extends NexusCommand<SurvivalGames> {
     public SGAdminCmd(SurvivalGames plugin) {
-        super(plugin, "sgadmin", "", Rank.ADMIN, "sga");
+        super(plugin, "survivalgamesadmin", "", Rank.ADMIN, "sgadmin", "sga");
         this.subCommands.add(new SGAGameCmd(plugin, this));
         this.subCommands.add(new SGALobbyCmd(plugin, this));
         this.subCommands.add(new SGASettingsCmd(plugin, this));

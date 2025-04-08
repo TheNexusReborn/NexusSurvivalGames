@@ -25,5 +25,5 @@ commands:
   tributes:
   spectators:
   mutations:
-  sgadmin:
-    aliases: [sga]
+  survivalgamesadmin:
+    aliases: [sga, sgadmin]
