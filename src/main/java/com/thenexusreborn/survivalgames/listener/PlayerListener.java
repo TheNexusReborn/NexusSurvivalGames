@@ -9,9 +9,9 @@ import com.stardevllc.starcore.base.itembuilder.ItemBuilder;
 import com.stardevllc.starui.GuiManager;
 import com.stardevllc.time.TimeUnit;
 import com.thenexusreborn.api.NexusAPI;
+import com.thenexusreborn.api.nickname.NickTime;
 import com.thenexusreborn.api.player.*;
-import com.thenexusreborn.nexuscore.api.events.NexusPlayerLoadEvent;
-import com.thenexusreborn.nexuscore.api.events.ToggleChangeEvent;
+import com.thenexusreborn.nexuscore.api.events.*;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -734,6 +734,11 @@ public class PlayerListener implements Listener {
         NickSGPlayerStats fakeStats;
         try {
             fakeStats = NexusAPI.getApi().getPrimaryDatabase().get(NickSGPlayerStats.class, "uniqueid", e.getNexusPlayer().getUniqueId()).getFirst();
+            
+            if (nexusPlayer.getNickname() != null) {
+                fakeStats.setPersist(nexusPlayer.getNickname().isPersist());
+            }
+            
         } catch (Throwable ex) {
             fakeStats = null;
         }
@@ -766,6 +771,7 @@ public class PlayerListener implements Listener {
 
         e.setQuitMessage(null);
         NexusAPI.getApi().getPrimaryDatabase().saveSilent(sgPlayer.getStats());
+        NexusAPI.getApi().getPrimaryDatabase().saveSilent(sgPlayer.getTrueStats());
         plugin.getPlayerRegistry().unregister(e.getPlayer().getUniqueId());
     }
     
@@ -807,5 +813,10 @@ public class PlayerListener implements Listener {
             changed.setY(e.getTo().clone().subtract(e.getFrom()).toVector().getY());
             player.setVelocity(changed);
         }
+    }
+    
+    @EventHandler
+    public void onNickRemove(NicknameRemoveEvent e) {
+        NexusAPI.getApi().getPrimaryDatabase().deleteSilent(NickTime.class, e.getNexusPlayer().getUniqueId().toString(), new Object[]{"persist"}, new Object[]{false});
     }
 }

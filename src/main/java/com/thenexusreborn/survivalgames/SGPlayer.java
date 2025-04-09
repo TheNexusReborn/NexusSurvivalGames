@@ -72,7 +72,7 @@ public class SGPlayer {
     public SGPlayerStats getStats() {
         if (getNexusPlayer().getNickname() != null) {
             if (this.nickSGPlayerStats == null) {
-                this.nickSGPlayerStats = new NickSGPlayerStats(getUniqueId(), this.stats);
+                this.nickSGPlayerStats = new NickSGPlayerStats(getUniqueId(), this.stats, getNexusPlayer().getNickname().isPersist());
             }
             
             return this.nickSGPlayerStats;

@@ -8,18 +8,29 @@ import java.util.UUID;
 @TableName("nicksgplayerstats")
 public class NickSGPlayerStats extends SGPlayerStats {
     
+    private boolean persist;
+    
     @ColumnIgnored
     private SGPlayerStats trueStats;
     
-    public NickSGPlayerStats(UUID uniqueId, SGPlayerStats trueStats) {
+    public NickSGPlayerStats(UUID uniqueId, SGPlayerStats trueStats, boolean persist) {
         super(uniqueId);
         this.trueStats = trueStats;
+        this.persist = persist;
     }
     
     protected NickSGPlayerStats() {}
     
     public SGPlayerStats getTrueStats() {
         return trueStats;
+    }
+    
+    public boolean isPersist() {
+        return persist;
+    }
+    
+    public void setPersist(boolean persist) {
+        this.persist = persist;
     }
     
     public void setTrueStats(SGPlayerStats trueStats) {
