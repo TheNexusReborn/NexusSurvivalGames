@@ -816,6 +816,21 @@ public class PlayerListener implements Listener {
     }
     
     @EventHandler
+    public void onNickSet(NicknameSetEvent e) {
+        NexusPlayer nexusPlayer = e.getNexusPlayer();
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId());
+        if (sgPlayer == null) {
+            return;
+        }
+        
+        if (sgPlayer.getNickSGPlayerStats() != null) {
+            sgPlayer.getNickSGPlayerStats().setPersist(e.getNickname().isPersist());
+        } else {
+            sgPlayer.setNickSGPlayerStats(new NickSGPlayerStats(nexusPlayer.getUniqueId(), sgPlayer.getTrueStats(), e.getNickname().isPersist()));
+        }
+    }
+    
+    @EventHandler
     public void onNickRemove(NicknameRemoveEvent e) {
         NexusAPI.getApi().getPrimaryDatabase().deleteSilent(NickTime.class, e.getNexusPlayer().getUniqueId().toString(), new Object[]{"persist"}, new Object[]{false});
     }

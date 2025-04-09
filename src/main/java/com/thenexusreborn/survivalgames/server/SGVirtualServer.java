@@ -125,7 +125,7 @@ public class SGVirtualServer extends VirtualServer {
         }
 
         if (nexusPlayer.getRank().ordinal() <= Rank.MEDIA.ordinal()) {
-            if (nexusPlayer.getNickname() == null) { //TODO Need a change from StarChat to filter receivers
+            if (!nexusPlayer.isNicked()) { //TODO Need a change from StarChat to filter receivers
                 plugin.getNexusCore().getStaffChannel().sendMessage(new ChatContext(nexusPlayer.getTrueDisplayName() + " &7&l-> &6" + name.get()));
             }
         }

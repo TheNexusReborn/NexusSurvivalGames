@@ -590,7 +590,7 @@ public class Lobby implements Controllable, IHasState {
             player.showPlayer(online);
         }
 
-        if (nexusPlayer.getToggleValue("vanish") && nexusPlayer.getNickname() != null) {
+        if (nexusPlayer.getToggleValue("vanish") && !nexusPlayer.isNicked()) {
             for (Player p : Bukkit.getOnlinePlayers()) {
                 LobbyPlayer psp = this.players.get(p.getUniqueId());
                 if (psp != null) {
@@ -601,7 +601,7 @@ public class Lobby implements Controllable, IHasState {
                     }
                 }
             }
-        } else if (nexusPlayer.getToggleValue("incognito") && nexusPlayer.getNickname() != null) {
+        } else if (nexusPlayer.getToggleValue("incognito") && !nexusPlayer.isNicked()) {
             for (LobbyPlayer np : getPlayers()) {
                 if (np != null) {
                     if (np.getRank().ordinal() <= Rank.HELPER.ordinal()) {
@@ -675,13 +675,13 @@ public class Lobby implements Controllable, IHasState {
             totalPlayers++;
         }
 
-        if (nexusPlayer.getToggleValue("vanish") && nexusPlayer.getNickname() != null) {
+        if (nexusPlayer.getToggleValue("vanish") && !nexusPlayer.isNicked()) {
             for (LobbyPlayer snp : getPlayers()) {
                 if (snp.getRank().ordinal() <= Rank.HELPER.ordinal()) {
                     snp.sendMessage("&c&l<< " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft &e&ovanished&e.");
                 }
             }
-        } else if (nexusPlayer.getToggleValue("incognito") && nexusPlayer.getNickname() != null) {
+        } else if (nexusPlayer.getToggleValue("incognito") && !nexusPlayer.isNicked()) {
             for (LobbyPlayer snp : getPlayers()) {
                 if (snp.getRank().ordinal() <= Rank.HELPER.ordinal()) {
                     snp.sendMessage("&c&l<< " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft &e&osilently&e.");

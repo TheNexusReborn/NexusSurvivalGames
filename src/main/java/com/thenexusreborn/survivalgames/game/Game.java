@@ -381,13 +381,13 @@ public class Game implements Controllable, IHasState {
         teleportSpectator(player, this.gameMap.getSpawnCenter().toLocation(this.gameMap.getWorld()));
 
         gamePlayer.setStatus(GamePlayer.Status.CALCULATING_VISIBILITY);
-        if (nexusPlayer.getToggleValue("vanish") && nexusPlayer.getNickname() != null) {
+        if (nexusPlayer.getToggleValue("vanish") && !nexusPlayer.isNicked()) {
             for (GamePlayer gp : this.players.values()) {
                 if (gp.getRank().ordinal() <= Rank.HELPER.ordinal() || gp.getUniqueId().equals(nexusPlayer.getUniqueId())) {
                     gp.sendMessage("&a&l>> " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined &e&ovanished&e.");
                 }
             }
-        } else if (nexusPlayer.getToggleValue("incognito") && nexusPlayer.getNickname() != null) {
+        } else if (nexusPlayer.getToggleValue("incognito") && !nexusPlayer.isNicked()) {
             for (GamePlayer gp : this.players.values()) {
                 if (gp.getRank().ordinal() <= Rank.HELPER.ordinal() || gp.getUniqueId().equals(nexusPlayer.getUniqueId())) {
                     gp.sendMessage("&a&l>> " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined &e&osilently&e.");
@@ -446,13 +446,13 @@ public class Game implements Controllable, IHasState {
 
         this.players.remove(nexusPlayer.getUniqueId());
 
-        if (nexusPlayer.getToggleValue("vanish") && nexusPlayer.getNickname() != null) {
+        if (nexusPlayer.getToggleValue("vanish") && !nexusPlayer.isNicked()) {
             for (GamePlayer gp : this.players.values()) {
                 if (gp.getRank().ordinal() <= Rank.HELPER.ordinal()) {
                     gp.sendMessage("&c&l<< " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft &e&ovanished&e.");
                 }
             }
-        } else if (nexusPlayer.getToggleValue("incognito") && nexusPlayer.getNickname() != null) {
+        } else if (nexusPlayer.getToggleValue("incognito") && !nexusPlayer.isNicked()) {
             for (GamePlayer gp : this.players.values()) {
                 if (gp.getRank().ordinal() <= Rank.HELPER.ordinal()) {
                     gp.sendMessage("&c&l<< " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &eleft &e&osilently&e.");
