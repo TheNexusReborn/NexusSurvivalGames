@@ -38,6 +38,12 @@ public class NickSGPlayerStats extends SGPlayerStats {
     }
     
     @Override
+    public void setWinStreak(int winStreak) {
+        this.trueStats.setWinStreak(winStreak);
+        super.setWinStreak(winStreak);
+    }
+    
+    @Override
     public void addScore(int i) {
         this.trueStats.addScore(i);
         super.addScore(i);
