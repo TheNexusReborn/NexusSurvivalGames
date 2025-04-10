@@ -38,99 +38,93 @@ public class NickSGPlayerStats extends SGPlayerStats {
     }
     
     @Override
-    public void setTimesMutated(int timesMutated) {
-        trueStats.setTimesMutated(timesMutated);
-        super.setTimesMutated(timesMutated);
+    public void addScore(int i) {
+        this.trueStats.addScore(i);
+        super.addScore(i);
     }
     
     @Override
-    public void setDeathmatchesReached(int deathmatchesReached) {
-        trueStats.setDeathmatchesReached(deathmatchesReached);
-        super.setDeathmatchesReached(deathmatchesReached);
+    public void addDeathmatchesReached(int i) {
+        this.trueStats.addDeathmatchesReached(i);
+        super.addDeathmatchesReached(i);
     }
     
     @Override
-    public void setScore(int score) {
-        trueStats.setScore(score);
-        super.setScore(score);
+    public void addGames(int i) {
+        this.trueStats.addGames(i);
+        super.addGames(i);
     }
     
     @Override
-    public void setKills(int kills) {
-        trueStats.setKills(kills);
-        super.setKills(kills);
+    public void addWins(int i) {
+        this.trueStats.addWins(i);
+        super.addWins(i);
     }
     
     @Override
-    public void setHighestKillstreak(int highestKillstreak) {
-        trueStats.setHighestKillstreak(highestKillstreak);
-        super.setHighestKillstreak(highestKillstreak);
+    public void addWinStreak(int i) {
+        this.trueStats.addWinStreak(i);
+        super.addWinStreak(i);
     }
     
     @Override
-    public void setGames(int games) {
-        trueStats.setGames(games);
-        super.setGames(games);
+    public void addMutationPasses(int i) {
+        this.trueStats.addMutationPasses(i);
+        super.addMutationPasses(i);
     }
     
     @Override
-    public void setWins(int wins) {
-        trueStats.setWins(wins);
-        super.setWins(wins);
+    public void addDeaths(int i) {
+        this.trueStats.addDeaths(i);
+        super.addDeaths(i);
     }
     
     @Override
-    public void setWinStreak(int winStreak) {
-        trueStats.setWinStreak(winStreak);
-        super.setWinStreak(winStreak);
+    public void addMutationDeaths(int i) {
+        this.trueStats.addMutationDeaths(i);
+        super.addMutationDeaths(i);
     }
     
     @Override
-    public void setDeaths(int deaths) {
-        trueStats.setDeaths(deaths);
-        super.setDeaths(deaths);
+    public void addKills(int i) {
+        this.trueStats.addKills(i);
+        super.addKills(i);
     }
     
     @Override
-    public void setChestsLooted(int chestsLooted) {
-        trueStats.setChestsLooted(chestsLooted);
-        super.setChestsLooted(chestsLooted);
+    public void addMutationKills(int i) {
+        this.trueStats.addMutationKills(i);
+        super.addMutationKills(i);
     }
     
     @Override
-    public void setAssists(int assists) {
-        trueStats.setAssists(assists);
-        super.setAssists(assists);
+    public void addAssists(int i) {
+        this.trueStats.addAssists(i);
+        super.addAssists(i);
     }
     
     @Override
-    public void setMutationKills(int mutationKills) {
-        trueStats.setMutationKills(mutationKills);
-        super.setMutationKills(mutationKills);
+    public void addChestsLooted(int i) {
+        this.trueStats.addChestsLooted(i);
+        super.addChestsLooted(i);
     }
     
     @Override
-    public void setMutationDeaths(int mutationDeaths) {
-        trueStats.setMutationDeaths(mutationDeaths);
-        super.setMutationDeaths(mutationDeaths);
+    public void addTimesMutated(int i) {
+        this.trueStats.addTimesMutated(i);
+        super.addTimesMutated(i);
     }
     
     @Override
-    public void setMutationPasses(int mutationPasses) {
-        trueStats.setMutationPasses(mutationPasses);
-        super.setMutationPasses(mutationPasses);
+    public void addSponsoredOthers(int i) {
+        this.trueStats.addSponsoredOthers(i);
+        super.addSponsoredOthers(i);
     }
     
     @Override
-    public void setSponsoredOthers(int sponsoredOthers) {
-        trueStats.setSponsoredOthers(sponsoredOthers);
-        super.setSponsoredOthers(sponsoredOthers);
-    }
-    
-    @Override
-    public void setSponsorsReceived(int sponsorsReceived) {
-        trueStats.setSponsorsReceived(sponsorsReceived);
-        super.setSponsorsReceived(sponsorsReceived);
+    public void addSponsorsReceived(int i) {
+        this.trueStats.addSponsorsReceived(i);
+        super.addSponsorsReceived(i);
     }
     
     @Override
