@@ -20,6 +20,7 @@ import com.thenexusreborn.gamemaps.model.*;
 import com.thenexusreborn.nexuscore.NexusCore;
 import com.thenexusreborn.nexuscore.api.NexusSpigotPlugin;
 import com.thenexusreborn.nexuscore.cmds.ToggleCmd;
+import com.thenexusreborn.nexuscore.discord.NexusBot;
 import com.thenexusreborn.survivalgames.cmd.*;
 import com.thenexusreborn.survivalgames.cmd.sgadmin.SGAdminCmd;
 import com.thenexusreborn.survivalgames.disguises.NexusDisguises;
@@ -316,7 +317,16 @@ public class SurvivalGames extends NexusSpigotPlugin {
         new NexusDisguises().init(this);
         getLogger().info("Loaded the disguises for mutations.");
     }
-
+    
+    @Override
+    public void registerChannels(NexusBot nexusBot) {
+//        Bukkit.getScheduler().runTaskLater(this, () -> {
+//            for (SGVirtualServer server : this.servers) {
+//                nexusBot.addServerChannel(server.getName());
+//            }
+//        }, 1L);
+    }
+    
     @Override
     public void registerToggles(ToggleRegistry registry) {
         registry.register("spectatorchat", Rank.HELPER, "View Spectator Chat", "Allows you to see the spectator chat", false);
