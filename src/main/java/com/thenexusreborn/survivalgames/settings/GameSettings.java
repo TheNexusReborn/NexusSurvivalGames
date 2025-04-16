@@ -66,7 +66,6 @@ public class GameSettings implements Cloneable, ISettings {
     protected float startingSaturation = 5;
     protected boolean earnNetworkXp = true;
     protected boolean earnCredits = true;
-    protected boolean applyMultipliers = true;
     protected boolean regeneration = true;
     protected int maxHealth = 20;
     protected int maxTeamAmount = 2;
@@ -214,10 +213,6 @@ public class GameSettings implements Cloneable, ISettings {
     
     public boolean isWeatherProgression() {
         return weatherProgression;
-    }
-    
-    public boolean isMultiplier() {
-        return applyMultipliers;
     }
     
     public Time getTime() {

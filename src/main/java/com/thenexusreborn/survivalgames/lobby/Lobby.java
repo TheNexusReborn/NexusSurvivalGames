@@ -2,6 +2,7 @@ package com.thenexusreborn.survivalgames.lobby;
 
 import com.stardevllc.clock.clocks.Timer;
 import com.stardevllc.helper.FileHelper;
+import com.stardevllc.helper.MapHelper;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
@@ -397,6 +398,24 @@ public class Lobby implements Controllable, IHasState {
         this.timer.addRepeatingCallback(new LobbyTimerCallback(this), TimeUnit.SECONDS.toMillis(1));
         this.timer.start();
     }
+    
+    private static final Map<Rank, Integer> VOTE_WEIGHTS = MapHelper.of(
+            Rank.NEXUS, 10, 
+            Rank.ADMIN, 10, 
+            Rank.HEAD_MOD, 9, 
+            Rank.SR_MOD, 9, 
+            Rank.MOD, 8, 
+            Rank.HELPER, 7, 
+            Rank.MVP, 10, 
+            Rank.VIP, 6, 
+            Rank.ARCHITECT, 5, 
+            Rank.PLATINUM, 4, 
+            Rank.DIAMOND, 3, 
+            Rank.BRASS, 3, 
+            Rank.GOLD, 2, 
+            Rank.INVAR, 2, 
+            Rank.IRON, 1, 
+            Rank.MEMBER, 1);
 
     private int getVoteCount(int position, UUID uuid) {
         NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(uuid);
@@ -405,7 +424,7 @@ public class Lobby implements Controllable, IHasState {
         }
 
         if (lobbySettings.isVoteWeight()) {
-            return (int) nexusPlayer.getEffectiveRank().getMultiplier();
+            return VOTE_WEIGHTS.get(nexusPlayer.getEffectiveRank());
         } else {
             return 1;
         }
@@ -416,7 +435,7 @@ public class Lobby implements Controllable, IHasState {
         for (LobbyPlayer player : getPlayers()) {
             if (player.getMapVote() == position) {
                 if (getLobbySettings().isVoteWeight()) {
-                    votes += (int) player.getEffectiveRank().getMultiplier();
+                    votes += VOTE_WEIGHTS.get(player.getEffectiveRank());
                 } else {
                     votes += 1;
                 }
@@ -470,7 +489,7 @@ public class Lobby implements Controllable, IHasState {
             double ratingRatio = rating * 1.0 / totalRatings;
             int ratingPercent = (int) (ratingRatio * 100);
 
-            ratingMsg = "&7Rating: " + ProgressBar.of(ratingPercent, 100, 5, "* ", "&a", "&7") + " &7&o(rating: " + rating / totalRatings + " star(s), based on: " + totalRatings + " vote(s))";
+            ratingMsg = "&7Rating: " + ProgressBar.of(ratingPercent, 100, 5, "* ", "&a", "&7") + " &7&o(Rating: " + (rating / totalRatings) + " star(s), based on: " + totalRatings + " vote(s))";
         }
 
         sendMessage("&6&l> " + ratingMsg);

@@ -17,14 +17,6 @@ public class AssisterInfo {
         if (game.getSettings().isEarnNexites()) {
             nexites = game.getSettings().getAssistNexiteGain();
         }
-        
-        if (game.getSettings().isMultiplier()) {
-            credits *= gamePlayer.getRank().getMultiplier();
-            xp *= gamePlayer.getRank().getMultiplier();
-            if (gamePlayer.getRank().isNexiteBoost()) {
-                nexites += gamePlayer.getRank().getMultiplier();
-            }
-        }
     }
     
     public GamePlayer getGamePlayer() {
