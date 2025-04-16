@@ -1056,7 +1056,7 @@ public class Game implements Controllable, IHasState {
             } else {
                 sendMessage("&6&l>> &aThis game has been archived!");
 //                sendMessage("&6&l>> &aCustom Website Coming Soon!");
-                sendMessage("&6&l>> &aGame Log: &bhttp://thenexusreborn.com:8051/game?id=" + gameInfo.getId());
+                sendMessage("&6&l>> &aGame Log: &bhttps://api.thenexusreborn.com/game/" + gameInfo.getId());
                 
                 if (gameInfo.getId() % 1000 == 0) {
                     for (PlayerInfo p : gameInfo.getPlayers()) {
