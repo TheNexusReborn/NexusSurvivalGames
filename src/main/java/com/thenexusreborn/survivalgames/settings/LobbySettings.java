@@ -3,7 +3,7 @@ package com.thenexusreborn.survivalgames.settings;
 import com.thenexusreborn.api.sql.annotations.table.TableName;
 
 @TableName("sglobbysettings")
-public class LobbySettings implements Cloneable {
+public class LobbySettings implements Cloneable, ISettings {
     private int voteStartAvailableThreshold = 4;
     private boolean allowVoteStart = true;
     private int voteStartThreshold = 2;

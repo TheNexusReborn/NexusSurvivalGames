@@ -8,35 +8,27 @@ import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.staritems.model.CustomItem;
 import com.stardevllc.staritems.model.ItemRegistry;
+import com.stardevllc.starui.GuiManager;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.registry.ToggleRegistry;
 import com.thenexusreborn.api.server.InstanceServer;
 import com.thenexusreborn.api.sql.DatabaseRegistry;
 import com.thenexusreborn.api.sql.objects.SQLDatabase;
-import com.thenexusreborn.gamemaps.MapManager;
-import com.thenexusreborn.gamemaps.SGMapCommand;
-import com.thenexusreborn.gamemaps.YamlMapManager;
-import com.thenexusreborn.gamemaps.model.MapRating;
-import com.thenexusreborn.gamemaps.model.MapSpawn;
-import com.thenexusreborn.gamemaps.model.SGMap;
+import com.thenexusreborn.gamemaps.*;
+import com.thenexusreborn.gamemaps.model.*;
 import com.thenexusreborn.nexuscore.NexusCore;
 import com.thenexusreborn.nexuscore.api.NexusSpigotPlugin;
 import com.thenexusreborn.nexuscore.cmds.ToggleCmd;
 import com.thenexusreborn.survivalgames.cmd.*;
+import com.thenexusreborn.survivalgames.cmd.sgadmin.SGAdminCmd;
 import com.thenexusreborn.survivalgames.disguises.NexusDisguises;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.hooks.NexusHubHook;
 import com.thenexusreborn.survivalgames.hooks.SGPAPIExpansion;
-import com.thenexusreborn.survivalgames.items.GameTeamBook;
-import com.thenexusreborn.survivalgames.items.PlayerTrackerItem;
-import com.thenexusreborn.survivalgames.items.TPToMapCenterItem;
-import com.thenexusreborn.survivalgames.items.ToHubItem;
-import com.thenexusreborn.survivalgames.listener.BlockListener;
-import com.thenexusreborn.survivalgames.listener.EntityListener;
-import com.thenexusreborn.survivalgames.listener.PlayerListener;
-import com.thenexusreborn.survivalgames.listener.ServerListener;
+import com.thenexusreborn.survivalgames.items.*;
+import com.thenexusreborn.survivalgames.listener.*;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.map.SQLMapManager;
@@ -48,6 +40,7 @@ import com.thenexusreborn.survivalgames.settings.LobbySettings;
 import com.thenexusreborn.survivalgames.threads.ServerStatusThread;
 import com.thenexusreborn.survivalgames.threads.game.*;
 import com.thenexusreborn.survivalgames.threads.lobby.*;
+import com.thenexusreborn.survivalgames.util.NickSGPlayerStats;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -58,10 +51,7 @@ import org.bukkit.plugin.PluginManager;
 
 import java.io.File;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class SurvivalGames extends NexusSpigotPlugin {
     
@@ -221,6 +211,17 @@ public class SurvivalGames extends NexusSpigotPlugin {
 
         getLogger().info("Loaded " + mapManager.getMaps().size() + " Maps");
 
+        for (SGMap sgMap : mapManager.getMaps()) {
+            Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+                getLogger().info("Downloading map " + sgMap.getName());
+                if (sgMap.download(this)) {
+                    getLogger().info("Downloaded map " + sgMap.getName());
+                } else {
+                    getLogger().warning("Failed to download map " + sgMap.getName());
+                }
+            });
+        }
+
         getLogger().info("Loading all unlocked mutations");
         SQLDatabase database = NexusAPI.getApi().getPrimaryDatabase();
         try {
@@ -242,17 +243,21 @@ public class SurvivalGames extends NexusSpigotPlugin {
         this.lootManager = new LootManager(this);
         this.lootManager.loadData();
 
-        getCommand("votestart").setExecutor(new VoteStartCommand(this));
-        getCommand("stats").setExecutor(new StatsCommand(this));
+        new VoteStartCommand(this);
+        new StatsCommand(this);
+        new SGAdminCmd(this);
         getCommand("survivalgames").setExecutor(new SGCommand(this));
-        getCommand("spectate").setExecutor(new SpectateCommand(this));
-        getCommand("mapvote").setExecutor(new MapVoteCommand(this));
-        getCommand("bounty").setExecutor(new BountyCmd(this));
+        new SpectateCommand(this);
+        new MapVoteCommand(this);
+        new BountyCmd(this);
         new ToggleCmd(this, "spectatorchat", "specchat");
         new ToggleCmd(this, "allowsponsors", "sponsors");
-        getCommand("ratemap").setExecutor(new RateMapCmd(this));
-        
+        new RateMapCmd(this);
         new GraceperiodCmd(this);
+        
+        new GameTeamCmd(this, GameTeam.TRIBUTES);
+        new GameTeamCmd(this, GameTeam.SPECTATORS);
+        new GameTeamCmd(this, GameTeam.MUTATIONS);
 
         getLogger().info("Registered commands");
 
@@ -273,6 +278,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         new ServerStatusThread(this).start();
         new PlayerScoreboardThread(this).start();
         new WarmupSpawnThread(this).start();
+        new GameBoundsThread(this).start();
 
         getLogger().info("Registered Tasks");
 
@@ -359,6 +365,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         for (SQLDatabase database : registry.getObjects().values()) {
             if (database.getName().toLowerCase().contains("nexus")) {
                 database.registerClass(SGPlayerStats.class);
+                database.registerClass(NickSGPlayerStats.class);
                 database.registerClass(UnlockedMutation.class);
                 database.registerClass(MapRating.class);
                 database.registerClass(SGMap.class);
@@ -413,5 +420,9 @@ public class SurvivalGames extends NexusSpigotPlugin {
         }
         
         return instanceServer;
+    }
+    
+    public GuiManager getGuiManager() {
+        return Bukkit.getServicesManager().getRegistration(GuiManager.class).getProvider();
     }
 }

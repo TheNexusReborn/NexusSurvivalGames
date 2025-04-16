@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.threads.lobby;
 
-import com.stardevllc.colors.StarColors;
+import com.stardevllc.starcore.StarColors;
 import com.stardevllc.starcore.utils.StarThread;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -29,7 +29,7 @@ public class MapSignUpdateThread extends StarThread<SurvivalGames> {
             if (lobby == null) {
                 continue;
             }
-            if (lobby.getState() == LobbyState.MAP_EDITING) {
+            if (lobby.getState() == LobbyState.MAP_CONFIGURATING) {
                 continue;
             }
 
@@ -62,7 +62,7 @@ public class MapSignUpdateThread extends StarThread<SurvivalGames> {
                     if (bukkitPlayer != null) {
                         World world = bukkitPlayer.getWorld();
                         if (world != null) {
-                            if (!world.getName().equalsIgnoreCase(lobby.getSpawnpoint().getWorld().getName())) {
+                            if (!world.getName().equalsIgnoreCase(sign.getWorld().getName())) {
                                 continue;
                             }
                             if (player.getMapVote() == entry.getKey()) {

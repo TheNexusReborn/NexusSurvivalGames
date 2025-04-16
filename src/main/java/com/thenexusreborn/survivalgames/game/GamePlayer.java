@@ -1,15 +1,16 @@
 package com.thenexusreborn.survivalgames.game;
 
 import com.stardevllc.helper.Pair;
-import com.stardevllc.itembuilder.ItemBuilder;
-import com.stardevllc.itembuilder.XMaterial;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
+import com.stardevllc.starcore.StarColors;
+import com.stardevllc.starcore.base.XMaterial;
+import com.stardevllc.starcore.base.itembuilder.ItemBuilder;
 import com.stardevllc.starcore.utils.ArmorSet;
-import com.thenexusreborn.api.player.NexusPlayer;
-import com.thenexusreborn.api.player.PlayerBalance;
-import com.thenexusreborn.api.player.Rank;
+import com.stardevllc.starcore.utils.Position;
+import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.tags.Tag;
+import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.chat.GameTeamChatroom;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
@@ -18,11 +19,12 @@ import com.thenexusreborn.survivalgames.mutations.Mutation;
 import com.thenexusreborn.survivalgames.scoreboard.GameTablistHandler;
 import com.thenexusreborn.survivalgames.scoreboard.game.GameBoard;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
-import org.bukkit.Bukkit;
+import org.bukkit.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 
 import java.text.DecimalFormat;
@@ -30,7 +32,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 public class GamePlayer {
-    private final NexusPlayer nexusPlayer;
+    private final SGPlayer sgPlayer;
     private Game game;
     private GameTeam team;
     private boolean spectatorByDeath, newPersonalBestNotified;
@@ -40,20 +42,49 @@ public class GamePlayer {
     private Mutation mutation;
     private boolean deathByMutation;
     private boolean sponsored;
+    private int timesSponsored;
     private Bounty bounty;
     private CombatTag combatTag;
     private DamageInfo damageInfo;
     private TreeMap<Long, DeathInfo> deaths = new TreeMap<>();
     private Status status;
-    private SGPlayerStats stats;
+    private int timesMutated;
+    private Position position = new Position();
     
-    public GamePlayer(NexusPlayer nexusPlayer, Game game, SGPlayerStats stats) {
-        this.nexusPlayer = nexusPlayer;
+    public GamePlayer(SGPlayer sgPlayer, Game game, SGPlayerStats stats) {
+        this.sgPlayer = sgPlayer;
         this.game = game;
-        this.bounty = new Bounty(nexusPlayer.getUniqueId());
-        this.combatTag = new CombatTag(game, nexusPlayer.getUniqueId());
-        this.damageInfo = new DamageInfo(nexusPlayer.getUniqueId());
-        this.stats = stats;
+        this.bounty = new Bounty(sgPlayer.getUniqueId());
+        this.combatTag = new CombatTag(game, sgPlayer.getUniqueId());
+        this.damageInfo = new DamageInfo(sgPlayer.getUniqueId());
+    }
+    
+    public Status getStatus() {
+        return status;
+    }
+    
+    public int getTimesSponsored() {
+        return timesSponsored;
+    }
+
+    public int getTimesMutated() {
+        return timesMutated;
+    }
+
+    public void setPosition(Location location) {
+        this.position.setX(location.getBlockX());
+        this.position.setY(location.getBlockY());
+        this.position.setZ(location.getBlockZ());
+    }
+    
+    public void setPosition(Position position) {
+        this.position.setX(position.getX());
+        this.position.setY(position.getY());
+        this.position.setZ(position.getZ());
+    }
+
+    public Position getPosition() {
+        return position;
     }
 
     public Game getGame() {
@@ -61,11 +92,15 @@ public class GamePlayer {
     }
 
     public SGPlayerStats getStats() {
-        return stats;
+        return sgPlayer.getStats();
+    }
+    
+    public SGPlayerStats getTrueStats() {
+        return sgPlayer.getTrueStats();
     }
 
     public PlayerBalance getBalance() {
-        return this.nexusPlayer.getBalance();
+        return this.sgPlayer.getNexusPlayer().getBalance();
     }
     
     public String getColoredName() {
@@ -97,11 +132,11 @@ public class GamePlayer {
     }
     
     public NexusPlayer getNexusPlayer() {
-        return nexusPlayer;
+        return sgPlayer.getNexusPlayer();
     }
     
     public void sendMessage(String message) {
-        nexusPlayer.sendMessage(message);
+        sgPlayer.sendMessage(message);
     }
     
     public TrackerInfo getTrackerInfo() {
@@ -158,7 +193,7 @@ public class GamePlayer {
     }
     
     public UUID getUniqueId() {
-        return nexusPlayer.getUniqueId();
+        return sgPlayer.getUniqueId();
     }
     
     public void setSpectatorByDeath(boolean value) {
@@ -230,13 +265,11 @@ public class GamePlayer {
     }
     
     public int getTotalTimesMutated() {
-        int totalMutations = 0;
-        for (DeathInfo deathInfo : new ArrayList<>(deaths.values())) {
-            if (deathInfo.getTeam() == GameTeam.MUTATIONS) {
-                totalMutations++;
-            }
-        }
-        return totalMutations;
+        return timesMutated;
+    }
+    
+    public void incrementTimesMutated() {
+        this.timesMutated++;
     }
     
     public Pair<Boolean, String> canMutate() {
@@ -244,7 +277,7 @@ public class GamePlayer {
             return new Pair<>(false, "You cannot mutate because there is not game running.");
         }
 
-        if (!(game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_DEATHMATCH)) {
+        if (!(game.getState() == Game.State.INGAME || game.getState() == Game.State.INGAME_DEATHMATCH)) {
             return new Pair<>(false, "You cannot mutate in the current game state.");
         }
 
@@ -315,6 +348,10 @@ public class GamePlayer {
         if (getTeam() == GameTeam.SPECTATORS) {
             return;
         }
+        
+        if (!getGame().getSettings().isAllowCombatTag()) {
+            return;
+        }
 
         if (!getCombatTag().isInCombatWith(other.getUniqueId())) {
             sendMessage("&6&l>> &cYou are now in combat with " + other.getNexusPlayer().getColoredName() + "&c!");
@@ -347,6 +384,14 @@ public class GamePlayer {
             }
         }
         return false;
+    }
+    
+    public boolean canSponsor() {
+        return this.timesSponsored < this.getGame().getSettings().getMaxSponsorships();
+    }
+    
+    public void incrementSponsors() {
+        this.timesSponsored++;
     }
 
     public UUID getMutationTarget() {
@@ -443,12 +488,12 @@ public class GamePlayer {
     }
 
     public void applyScoreboard() {
-        nexusPlayer.getScoreboard().setView(new GameBoard(nexusPlayer.getScoreboard(), Game.getPlugin()));
-        nexusPlayer.getScoreboard().setTablistHandler(new GameTablistHandler(nexusPlayer.getScoreboard(), Game.getPlugin()));
+        sgPlayer.getNexusPlayer().getScoreboard().setView(new GameBoard(sgPlayer.getNexusPlayer().getScoreboard(), Game.getPlugin()));
+        sgPlayer.getNexusPlayer().getScoreboard().setTablistHandler(new GameTablistHandler(sgPlayer.getNexusPlayer().getScoreboard(), Game.getPlugin()));
     }
 
     public void applyActionBar() {
-        nexusPlayer.setActionBar(new GameActionBar(Game.getPlugin(), this));
+        sgPlayer.getNexusPlayer().setActionBar(new GameActionBar(Game.getPlugin(), this));
     }
 
     public void clearInventory() {
@@ -457,10 +502,8 @@ public class GamePlayer {
         player.getInventory().setArmorContents(null);
     }
     
-    public void giveSpectatorItems(Game game) {
+    public String getMutateItemNameFromStatus() {
         Pair<Boolean, String> canMutateStatus = canMutate();
-        
-        String mutateName;
         
         if (canMutateStatus.key()) {
             GamePlayer killer = game.getPlayer(getMutationTarget());
@@ -470,10 +513,37 @@ public class GamePlayer {
             } else {
                 passes = getStats().getMutationPasses() + "";
             }
-            mutateName = "&c&lTAKE REVENGE   &eTarget: " + killer.getColoredName() + "   &ePasses: &b" + passes;
+            return "&c&lTAKE REVENGE   &eTarget: " + killer.getColoredName() + "   &ePasses: &b" + passes;
         } else {
-            mutateName = "&c" + canMutateStatus.value();
+            return "&c" + canMutateStatus.value();
         }
+    }
+
+    public void updateMutationItem() {
+        Player player = Bukkit.getPlayer(getUniqueId());
+        PlayerInventory inv = player.getInventory();
+
+        ItemStack mutateItem = inv.getItem(5);
+        if (mutateItem == null || mutateItem.getType() == Material.AIR) {
+            return;
+        }
+        
+        ItemMeta itemMeta = mutateItem.getItemMeta();
+        
+        if (itemMeta == null) {
+            return;
+        }
+        
+        String mutateName = StarColors.color(getMutateItemNameFromStatus());
+        
+        if (itemMeta.getDisplayName() == null || !itemMeta.getDisplayName().equals(mutateName)) {
+            itemMeta.setDisplayName(mutateName);
+            mutateItem.setItemMeta(itemMeta);
+        }
+    }
+    
+    public void giveSpectatorItems(Game game) {
+        String mutateName = getMutateItemNameFromStatus();
         
         ItemStack mutateItem = ItemBuilder.of(XMaterial.ROTTEN_FLESH).displayName(mutateName).build();
         Player p = Bukkit.getPlayer(getUniqueId());
@@ -542,11 +612,11 @@ public class GamePlayer {
     }
 
     public boolean hasActiveTag() {
-        return this.nexusPlayer.hasActiveTag();
+        return this.sgPlayer.getNexusPlayer().hasActiveTag();
     }
 
     public Tag getActiveTag() {
-        return this.nexusPlayer.getActiveTag();
+        return this.sgPlayer.getNexusPlayer().getActiveTag();
     }
 
     public void addItem(ItemStack itemStack) {
@@ -562,7 +632,16 @@ public class GamePlayer {
         Map.Entry<Long, DeathInfo> mostRecentDeath = this.deaths.lastEntry();
         return mostRecentDeath != null ? mostRecentDeath.getValue() : null;
     }
-
+    
+    public Rank getEffectiveRank() {
+        return sgPlayer.getNexusPlayer().getEffectiveRank();
+    }
+    
+    public String getTrueName() {
+        return this.sgPlayer.getNexusPlayer().getTrueName();
+    }
+    
+    
     public enum Status {
         SETTING_UP_PLAYER, TELEPORTING_TO_CENTER, CALCULATING_VISIBILITY, SETTING_UP_SCOREBOARD, READY, SETTING_UP_ACTIONBAR, ADDING_TO_GAME
 
@@ -571,8 +650,7 @@ public class GamePlayer {
     @Override
     public String toString() {
         return "GamePlayer{" +
-                "nexusPlayer=" + nexusPlayer +
-                ", game=" + game +
+                "nexusPlayer=" + sgPlayer.getNexusPlayer() +
                 ", team=" + team +
                 ", spectatorByDeath=" + spectatorByDeath +
                 ", newPersonalBestNotified=" + newPersonalBestNotified +
@@ -589,7 +667,7 @@ public class GamePlayer {
                 ", damageInfo=" + damageInfo +
                 ", deaths=" + deaths +
                 ", status=" + status +
-                ", stats=" + stats +
+                ", stats=" + getTrueStats() +
                 '}';
     }
 }

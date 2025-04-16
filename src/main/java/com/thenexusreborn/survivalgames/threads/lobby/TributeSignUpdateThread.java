@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.threads.lobby;
 
 import com.mojang.authlib.GameProfile;
-import com.stardevllc.colors.StarColors;
+import com.stardevllc.starcore.StarColors;
 import com.stardevllc.starcore.utils.StarThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
@@ -33,7 +33,7 @@ public class TributeSignUpdateThread extends StarThread<SurvivalGames> {
             if (lobby == null) {
                 continue;
             }
-            if (lobby.getState() == LobbyState.MAP_EDITING) {
+            if (lobby.getState() == LobbyState.MAP_CONFIGURATING) {
                 continue;
             }
 
@@ -79,7 +79,7 @@ public class TributeSignUpdateThread extends StarThread<SurvivalGames> {
                 
                 String name;
                 if (lobbyPlayer.getName().length() <= 14) {
-                    name = StarColors.color(lobbyPlayer.getRank().getColor() + lobbyPlayer.getName());
+                    name = StarColors.color(lobbyPlayer.getEffectiveRank().getColor() + lobbyPlayer.getName());
                 } else {
                     name = lobbyPlayer.getName();
                 }
@@ -92,7 +92,7 @@ public class TributeSignUpdateThread extends StarThread<SurvivalGames> {
                 String[] lines = {name, "Score: " + score, "Kills: " + kills, "Wins: " + wins};
 
                 for (Player op : Bukkit.getOnlinePlayers()) {
-                    if (op.getWorld() == tributeSign.getSignLocation().getWorld()) {
+                    if (op.getWorld().getName().equalsIgnoreCase(tributeSign.getSignLocation().getWorld().getName())) {
                         op.sendSignChange(tributeSign.getSignLocation(), lines);
                     }
                 }

@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.scoreboard.lobby;
 
-import com.stardevllc.colors.StarColors;
+import com.stardevllc.starcore.StarColors;
 import com.stardevllc.starcore.utils.Position;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.scoreboard.TeamBuilder;
@@ -26,9 +26,9 @@ public class MapEditingBoard extends SpigotScoreboardView {
         createTeam(new TeamBuilder("centerLabel").entry("&6&lCENTER:").score(12));
         createTeam(new TeamBuilder("centerValue").entry(ChatColor.AQUA).score(11).valueUpdater((player, team) -> {
             if (plugin.getPlayerRegistry().get(player.getUniqueId()).getLobby().getGameMap() == null) {
-                team.setPrefix("&fNo Map Set");
+                SGUtils.setTeamValueForString("&fNo Map Set", team);
             } else {
-                Position center = plugin.getPlayerRegistry().get(player.getUniqueId()).getLobby().getGameMap().getCenter();
+                Position center = plugin.getPlayerRegistry().get(player.getUniqueId()).getLobby().getGameMap().getSpawnCenter();
                 if (center != null) {
                     String centerText = center.getX() + "," + center.getY() + "," + center.getZ();
                     SGUtils.setTeamValueForString(centerText, team);
@@ -46,18 +46,18 @@ public class MapEditingBoard extends SpigotScoreboardView {
                 team.setSuffix("" + plugin.getPlayerRegistry().get(player.getUniqueId()).getLobby().getGameMap().getSpawns().size());
             }
         }));
-        createTeam(new TeamBuilder("borderDistance").entry("&eBorder Distance: &b").score(7).valueUpdater((player, team) -> {
+        createTeam(new TeamBuilder("borderDistance").entry("&eArena Border Length: &b").score(7).valueUpdater((player, team) -> {
             if (plugin.getPlayerRegistry().get(player.getUniqueId()).getLobby().getGameMap() == null) {
                 team.setSuffix("0");
             } else {
-                team.setSuffix("" + plugin.getPlayerRegistry().get(player.getUniqueId()).getLobby().getGameMap().getBorderDistance());
+                team.setSuffix("" + plugin.getPlayerRegistry().get(player.getUniqueId()).getLobby().getGameMap().getArenaBorderLength());
             }
         }));
-        createTeam(new TeamBuilder("dmBorderDistance").entry("&eDM Border Distance: &b").score(6).valueUpdater((player, team) -> {
+        createTeam(new TeamBuilder("dmBorderDistance").entry("&eDM Border Length: &b").score(6).valueUpdater((player, team) -> {
             if (plugin.getPlayerRegistry().get(player.getUniqueId()).getLobby().getGameMap() == null) {
                 team.setSuffix("0");
             } else {
-                team.setSuffix("" + plugin.getPlayerRegistry().get(player.getUniqueId()).getLobby().getGameMap().getDeathmatchBorderDistance());
+                team.setSuffix("" + plugin.getPlayerRegistry().get(player.getUniqueId()).getLobby().getGameMap().getDeathmatchBorderLength());
             }
         }));
         createTeam(new TeamBuilder("creatorCount").entry("&eTotal Creators: &b").score(5).valueUpdater((player, team) -> {
@@ -71,7 +71,7 @@ public class MapEditingBoard extends SpigotScoreboardView {
         createTeam(new TeamBuilder("swagShackLabel").entry("&6&lSWAG SHACK:").score(3));
         createTeam(new TeamBuilder("swagShackValue").entry(ChatColor.DARK_AQUA).score(2).valueUpdater((player, team) -> {
             if (plugin.getPlayerRegistry().get(player.getUniqueId()).getLobby().getGameMap() == null) {
-                team.setPrefix("&fNo Map Set");
+                SGUtils.setTeamValueForString("&fNo Map Set", team);
             } else {
                 Position swagShack = plugin.getPlayerRegistry().get(player.getUniqueId()).getLobby().getGameMap().getSwagShack();
                 if (swagShack != null) {

@@ -4,23 +4,20 @@ import com.stardevllc.starcore.utils.StarThread;
 import com.thenexusreborn.gamemaps.model.MapSpawn;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.Game;
-import com.thenexusreborn.survivalgames.game.GamePlayer;
-import com.thenexusreborn.survivalgames.game.GameState;
-import com.thenexusreborn.survivalgames.game.GameTeam;
+import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
+
+import static com.thenexusreborn.survivalgames.game.Game.State.*;
 
 public class WarmupSpawnThread extends StarThread<SurvivalGames> {
     
-    public static final GameState[] states = new GameState[] {GameState.WARMUP, GameState.WARMUP_DONE, GameState.DEATHMATCH_WARMUP, GameState.DEATHMATCH_WARMUP_DONE, GameState.TELEPORT_START, GameState.TELEPORT_DEATHMATCH, GameState.TELEPORT_START_DONE, GameState.TELEPORT_DEATHMATCH_DONE};
+    public static final Game.State[] states = new Game.State[] {WARMUP, WARMUP_DONE, DEATHMATCH_WARMUP, DEATHMATCH_WARMUP_DONE, TELEPORT_START, TELEPORT_DEATHMATCH, TELEPORT_START_DONE, TELEPORT_DEATHMATCH_DONE};
     
     public WarmupSpawnThread(SurvivalGames plugin) {
         super(plugin, 1L, 1L, false);
@@ -66,6 +63,7 @@ public class WarmupSpawnThread extends StarThread<SurvivalGames> {
                         spawnLocation.setYaw(playerLocation.getYaw());
                         spawnLocation.setPitch(playerLocation.getPitch());
                         player.teleport(spawnLocation);
+                        gamePlayer.setPosition(spawnLocation);
                     }
                 }
             } catch (Exception e) {

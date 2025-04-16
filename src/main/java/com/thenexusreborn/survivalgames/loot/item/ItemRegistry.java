@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.loot.item;
 
 import com.stardevllc.registry.StringRegistry;
-import com.stardevllc.colors.StarColors;
+import com.stardevllc.starcore.StarColors;
 
 public class ItemRegistry extends StringRegistry<LootItem> {
 

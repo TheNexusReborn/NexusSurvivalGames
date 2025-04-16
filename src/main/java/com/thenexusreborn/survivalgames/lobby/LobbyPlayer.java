@@ -3,23 +3,26 @@ package com.thenexusreborn.survivalgames.lobby;
 import com.thenexusreborn.api.player.IActionBar;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
+import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
 
 import java.util.UUID;
 
 public class LobbyPlayer {
-    private final NexusPlayer player;
-    private SGPlayerStats stats;
+    private final SGPlayer player;
     private boolean spectating, voteStart;
     private int mapVote = -1;
     
-    public LobbyPlayer(NexusPlayer player, SGPlayerStats stats) {
+    public LobbyPlayer(SGPlayer player, SGPlayerStats stats) {
         this.player = player;
-        this.stats = stats;
     }
 
     public SGPlayerStats getStats() {
-        return stats;
+        return player.getStats();
+    }
+    
+    public SGPlayerStats getTrueStats() {
+        return player.getTrueStats();
     }
 
     public void setSpectating(boolean spectating) {
@@ -35,7 +38,7 @@ public class LobbyPlayer {
     }
     
     public NexusPlayer getPlayer() {
-        return player;
+        return player.getNexusPlayer();
     }
     
     public boolean isSpectating() {
@@ -75,7 +78,7 @@ public class LobbyPlayer {
     }
     
     public void setActionBar(IActionBar actionBar) {
-        this.player.setActionBar(actionBar);
+        this.player.getNexusPlayer().setActionBar(actionBar);
     }
     
     @Override
@@ -86,5 +89,17 @@ public class LobbyPlayer {
                 ", voteStart=" + voteStart +
                 ", mapVote=" + mapVote +
                 '}';
+    }
+    
+    public Rank getEffectiveRank() {
+        return this.player.getNexusPlayer().getEffectiveRank();
+    }
+    
+    public String getTrueName() {
+        return this.player.getTrueName();
+    }
+    
+    public boolean isNicked() {
+        return this.player.getNexusPlayer().isNicked();
     }
 }

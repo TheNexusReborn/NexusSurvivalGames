@@ -1,12 +1,13 @@
 package com.thenexusreborn.survivalgames;
 
-import com.stardevllc.colors.StarColors;
+import com.stardevllc.starcore.StarColors;
 import com.thenexusreborn.api.NexusAPI;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
+import com.thenexusreborn.survivalgames.util.NickSGPlayerStats;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -15,14 +16,13 @@ import java.util.UUID;
 
 public class SGPlayer {
     
-    private static final SurvivalGames plugin = SurvivalGames.getInstance();
-    
     //Player based fields
     private NexusPlayer nexusPlayer;
     private Player spigotPlayer;
     
     //Stats
     private SGPlayerStats stats;
+    private NickSGPlayerStats nickSGPlayerStats;
     
     //Accessor fields for where a player is, these are mutally exclusive
     private Lobby lobby;
@@ -64,8 +64,24 @@ public class SGPlayer {
     public Player getSpigotPlayer() {
         return spigotPlayer;
     }
-
+    
+    public SGPlayerStats getTrueStats() {
+        return this.stats;
+    }
+    
+    public NickSGPlayerStats getNickSGPlayerStats() {
+        return nickSGPlayerStats;
+    }
+    
     public SGPlayerStats getStats() {
+        if (getNexusPlayer().isNicked()) {
+            if (this.nickSGPlayerStats == null) {
+                this.nickSGPlayerStats = new NickSGPlayerStats(getUniqueId(), this.stats, getNexusPlayer().getNickname().isPersist());
+            }
+            
+            return this.nickSGPlayerStats;
+        }
+        
         return stats;
     }
 
@@ -88,7 +104,11 @@ public class SGPlayer {
     public void setStats(SGPlayerStats stats) {
         this.stats = stats;
     }
-
+    
+    public void setNickSGPlayerStats(NickSGPlayerStats nickSGPlayerStats) {
+        this.nickSGPlayerStats = nickSGPlayerStats;
+    }
+    
     public void setLobby(Lobby lobby, LobbyPlayer lobbyPlayer) {
         this.lobby = lobby;
         this.lobbyPlayer = lobbyPlayer;
@@ -109,5 +129,17 @@ public class SGPlayer {
 
     public UUID getUniqueId() {
         return nexusPlayer.getUniqueId();
+    }
+
+    public String getColoredName() {
+        return getNexusPlayer().getColoredName();
+    }
+    
+    public String getTrueName() {
+        return getNexusPlayer().getTrueName();
+    }
+    
+    public String getTrueColoredName() {
+        return getNexusPlayer().getTrueColoredName();
     }
 }

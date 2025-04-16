@@ -8,15 +8,11 @@ import com.thenexusreborn.api.server.InstanceServer;
 import com.thenexusreborn.api.server.VirtualServer;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.Game;
-import com.thenexusreborn.survivalgames.game.GamePlayer;
-import com.thenexusreborn.survivalgames.game.GameState;
-import com.thenexusreborn.survivalgames.game.GameTeam;
+import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyType;
+import com.thenexusreborn.survivalgames.state.IState;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.UUID;
@@ -42,11 +38,11 @@ public class SGVirtualServer extends VirtualServer {
     public boolean recalculateVisibility(UUID playerUUID, UUID otherPlayerUUID) {
         NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(playerUUID);
         NexusPlayer otherNexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(otherPlayerUUID);
-        
+
         if (nexusPlayer == null) {
             return false;
         }
-        
+
         if (otherNexusPlayer == null) {
             return false;
         }
@@ -64,7 +60,7 @@ public class SGVirtualServer extends VirtualServer {
                 return true;
             } else return !otherPlayerIsVanished || playerIsVanished;
         } else {
-            if (game.getState() == GameState.ENDING) {
+            if (game.getState() == Game.State.ENDING) {
                 return true;
             }
 
@@ -88,13 +84,8 @@ public class SGVirtualServer extends VirtualServer {
             NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(uuid);
             join(nexusPlayer);
         } else {
-            Player player = Bukkit.getPlayer(uuid);
             SGPlayer sgPlayer = plugin.getPlayerRegistry().get(uuid);
-            if (sgPlayer.getLobby() == null) {
-                this.lobby.addPlayer(sgPlayer);
-            } else {
-                player.teleport(this.lobby.getSpawnpoint());
-            }
+            this.lobby.addPlayer(sgPlayer);
         }
     }
 
@@ -115,12 +106,12 @@ public class SGVirtualServer extends VirtualServer {
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId());
         SGPlayerStats stats = sgPlayer.getStats();
         if (game != null) {
-            GameState state = game.getState();
-            if (state == GameState.ASSIGN_TEAMS) {
+            IState state = game.getState();
+            if (state == Game.State.ASSIGN_TEAMS) {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        if (game.getState() != GameState.ASSIGN_TEAMS) {
+                        if (game.getState() != Game.State.ASSIGN_TEAMS) {
                             game.join(nexusPlayer, stats);
                             cancel();
                         }
@@ -134,7 +125,9 @@ public class SGVirtualServer extends VirtualServer {
         }
 
         if (nexusPlayer.getRank().ordinal() <= Rank.MEDIA.ordinal()) {
-            plugin.getNexusCore().getStaffChannel().sendMessage(new ChatContext(nexusPlayer.getDisplayName() + " &7&l-> &6" + name.get()));
+            if (!nexusPlayer.isNicked()) { //TODO Need a change from StarChat to filter receivers
+                plugin.getNexusCore().getStaffChannel().sendMessage(new ChatContext(nexusPlayer.getTrueDisplayName() + " &7&l-> &6" + name.get()));
+            }
         }
 
         this.players.add(nexusPlayer.getUniqueId());
@@ -154,15 +147,15 @@ public class SGVirtualServer extends VirtualServer {
 
         this.players.remove(nexusPlayer.getUniqueId());
     }
-    
+
     @Override
     public void quit(UUID uuid) {
         this.players.remove(uuid);
-        
+
         if (this.lobby != null) {
             this.lobby.removePlayer(uuid);
         }
-        
+
         if (this.game != null) {
             this.game.quit(uuid);
         }

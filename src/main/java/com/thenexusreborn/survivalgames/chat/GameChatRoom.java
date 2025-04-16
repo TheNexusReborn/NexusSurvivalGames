@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.chat;
 
-import com.stardevllc.actors.Actor;
 import com.stardevllc.starchat.rooms.ChatRoom;
+import com.stardevllc.starcore.actors.Actor;
 import com.thenexusreborn.survivalgames.game.Game;
 
 public class GameChatRoom extends ChatRoom {

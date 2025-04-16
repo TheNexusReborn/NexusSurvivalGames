@@ -6,69 +6,122 @@ import com.thenexusreborn.survivalgames.settings.enums.Time;
 import com.thenexusreborn.survivalgames.settings.enums.Weather;
 
 @TableName("sggamesettings")
-public class GameSettings implements Cloneable {
+public class GameSettings implements Cloneable, ISettings {
 
-    private int chestRestockInterval = 5;
-    private int chestRestockDenomination = 2;
-    private boolean chestRestockRelative = true;
-    private boolean allowSwagShack = true;
-    private int sponsorScoreCost = 100;
-    private int sponsorCreditCost = 200;
-    private boolean allowSponsoring = true;
-    private int combatTagLength = 10;
-    private int maxScoreBounty = 10000;
-    private int maxCreditBounty = 10000;
-    private int assistNexiteGain = 1;
-    private int assistXpGain = 1;
-    private int assistCreditGain = 1;
-    private int killNexiteGain = 2;
-    private int killXpGain = 2;
-    private int killCreditGain = 2;
-    private int winNexiteBaseGain = 10;
-    private int winXpBaseGain = 10;
-    private int winCreditsBaseGain = 10;
-    private int winScoreBaseGain = 50;
-    private int maxMutationsAllowed = 10;
-    private boolean allowAssists = true;
-    private boolean earnNexites = false;
-    private int maxMutationAmount = 1;
-    private double firstBloodMultiplier = 1.25;
-    private double scoreDivisor = 10;
-    private float startingSaturation = 5;
-    private boolean useAllMutationTypes = true;
-    private double passUseChance = 0.99;
-    private double passAwardChance = 0.75;
-    private int mutationSpawnDelay = 10; //Default: 15
-    private boolean enderchestsEnabled = true;
-    private boolean useTieredLoot = true;
-    private boolean earnNetworkXp = true;
-    private boolean earnCredits = true;
-    private ColorMode colorMode = ColorMode.RANK;
-    private boolean sounds = true;
-    private Weather worldWeather = Weather.CLEAR;
-    private Time worldTime = Time.NOON;
-    private boolean applyMultipliers = true;
-    private boolean weatherProgression = false;
-    private boolean timeProgression = false;
-    private boolean unlimitedMutationPasses = true; //Default: false
-    private boolean gracePeriod = false;
-    private boolean regeneration = true;
-    private boolean mutationsEnabled = true;
-    private int nextGameTimerLength = 10;
-    private int deathmatchThreshold = 2; //Default: 4
-    private int warmupLength = 10; // Default: 30
-    private int deathmatchLength = 5;
-    private int gameLength = 10; //Default: 20
-    private int gracePeriodLength = 60;
-    private int maxHealth = 20;
-    private int deathmatchWarmupLength = 10;
-    private int deathmatchCountdownLength = 60;
-    private int maxTeamAmount = 2;
-    private boolean allowTeaming = true;
-    private float tntYield = 3.0F;
-    private int tntFuseTicks = 20;
-    private boolean allowKillersKiller = true;
-    private boolean tributesSeeSpectatorChat = true;
+    //Chest Restock
+    protected int chestRestockInterval = 5;
+    protected int chestRestockDenomination = 2;
+    protected boolean chestRestockRelative = true;
+    
+    //Swag Shack
+    protected boolean allowSwagShack = true;
+    
+    //Sponsoring
+    protected int sponsorScoreCost = 100;
+    protected int sponsorCreditCost = 200;
+    protected boolean allowSponsoring = true;
+    protected int maxSponsorships = 1;
+    
+    //Combat Tag
+    protected int combatTagLength = 10;
+    protected boolean allowCombatTag = true;
+    
+    //Bounty
+    protected int maxScoreBounty = 10000;
+    protected int maxCreditBounty = 10000;
+    protected boolean allowBounties = true;
+    
+    //Assister Stat
+    protected int assistNexiteGain = 1;
+    protected int assistXpGain = 1;
+    protected int assistCreditGain = 1;
+    protected boolean allowAssists = true;
+    
+    //Killer Stat
+    protected int killNexiteGain = 2;
+    protected int killXpGain = 2;
+    protected int killCreditGain = 2;
+    
+    //Win Stat
+    protected int winNexiteBaseGain = 10;
+    protected int winXpBaseGain = 10;
+    protected int winCreditsBaseGain = 10;
+    protected int winScoreBaseGain = 50;
+    
+    //Mutations
+    protected int maxMutationsAllowed = 10;
+    protected boolean useAllMutationTypes = true;
+    protected double passUseChance = 0.99;
+    protected double passAwardChance = 0.75;
+    protected int mutationSpawnDelay = 10; //Default: 15
+    protected boolean unlimitedMutationPasses = true; //Default: false
+    protected boolean allowKillersKiller = true;
+    protected int maxMutationAmount = 1;
+    protected boolean mutationsEnabled = true;
+    
+    //Player
+    protected boolean earnNexites = false;
+    protected double firstBloodMultiplier = 1.25;
+    protected double scoreDivisor = 10;
+    protected float startingSaturation = 5;
+    protected boolean earnNetworkXp = true;
+    protected boolean earnCredits = true;
+    protected boolean regeneration = true;
+    protected int maxHealth = 20;
+    protected int maxTeamAmount = 2;
+    protected boolean allowTeaming = true;
+    protected boolean tributesSeeSpectatorChat = true;
+    
+    //Loot
+    protected boolean enderchestsEnabled = true;
+    protected boolean useTieredLoot = true;
+    
+    //Cosmetic
+    protected ColorMode colorMode = ColorMode.RANK;
+    protected boolean sounds = true;
+    
+    //World
+    protected Weather worldWeather = Weather.CLEAR;
+    protected Time worldTime = Time.NOON;
+    protected boolean weatherProgression = false;
+    protected boolean timeProgression = false;
+    protected boolean showBorders = true;
+    protected float tntYield = 3.0F;
+    protected int tntFuseTicks = 20;
+    
+    //Game
+    protected boolean gracePeriod = false;
+    protected int warmupLength = 10; // Default: 30
+    protected int gracePeriodLength = 60;
+    protected int gameLength = 10; //Default: 20
+    protected int nextGameTimerLength = 10;
+    
+    //Deathmatch
+    protected int deathmatchThreshold = 2; //Default: 4
+    protected int deathmatchLength = 5;
+    protected int deathmatchWarmupLength = 10;
+    protected int deathmatchCountdownLength = 60;
+    protected boolean allowDeathmatch = true;
+
+    public boolean isAllowDeathmatch() {
+        return allowDeathmatch;
+    }
+
+    public boolean isAllowCombatTag() {
+        return allowCombatTag;
+    }
+
+    public int getMaxSponsorships() {
+        return maxSponsorships;
+    }
+
+    public boolean isShowBorders() {
+        return showBorders;
+    }
+
+    public boolean isAllowBounties() {
+        return allowBounties;
+    }
 
     public void setGracePeriod(boolean gracePeriod) {
         this.gracePeriod = gracePeriod;
@@ -160,10 +213,6 @@ public class GameSettings implements Cloneable {
     
     public boolean isWeatherProgression() {
         return weatherProgression;
-    }
-    
-    public boolean isMultiplier() {
-        return applyMultipliers;
     }
     
     public Time getTime() {

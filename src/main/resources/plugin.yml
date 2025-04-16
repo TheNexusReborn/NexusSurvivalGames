@@ -2,7 +2,7 @@ main: com.thenexusreborn.survivalgames.SurvivalGames
 version: ${version}
 name: SurvivalGames
 description: The Survival Games plugin for The Nexus Reborn
-depend: [NexusCore, NexusMaps, ProtocolLib]
+depend: [NexusCore, NexusMaps, ProtocolLib, WorldEdit]
 softdepend: [Vulcan, NexusHub]
 author: Firestar311
 commands:
@@ -22,3 +22,8 @@ commands:
     aliases: [sponsors]
   sgmap:
   graceperiod:
+  tributes:
+  spectators:
+  mutations:
+  survivalgamesadmin:
+    aliases: [sga, sgadmin]

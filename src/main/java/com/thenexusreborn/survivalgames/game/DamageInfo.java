@@ -25,6 +25,10 @@ public class DamageInfo {
     public List<UUID> getDamagers() {
         return new ArrayList<>(damagers);
     }
+    
+    public boolean hasDamagers() {
+        return !damagers.isEmpty();
+    }
 
     @Override
     public String toString() {

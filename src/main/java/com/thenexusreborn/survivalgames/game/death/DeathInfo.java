@@ -1,21 +1,19 @@
 package com.thenexusreborn.survivalgames.game.death;
 
-import com.stardevllc.colors.StarColors;
+import com.stardevllc.starcore.StarColors;
 import com.stardevllc.starcore.utils.EntityNames;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.settings.enums.ColorMode;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
+import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.*;
+import java.util.UUID;
 
 public class DeathInfo {
     
@@ -98,7 +96,7 @@ public class DeathInfo {
         if (game.getSettings().getColorMode() == ColorMode.GAME_TEAM) {
             playerName = teamColor;
         } else {
-            playerName = gamePlayer.getRank().getColor();
+            playerName = gamePlayer.getEffectiveRank().getColor();
         }
         
         playerName += gamePlayer.getName() + "&7";
@@ -112,7 +110,7 @@ public class DeathInfo {
                     if (game.getSettings().getColorMode() == ColorMode.GAME_TEAM) {
                         killerName = killer.getTeamColor() + killerPlayer.getName();
                     } else {
-                        killerName = killerPlayer.getRank().getColor() + killerPlayer.getName();
+                        killerName = killerPlayer.getEffectiveRank().getColor() + killerPlayer.getName();
                     }
                 } else { //TODO Maybe just reset the dead player?
                     killerName = "&r" + killer.getName();

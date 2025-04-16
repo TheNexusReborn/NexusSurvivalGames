@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.threads.lobby;
 
 import com.stardevllc.starcore.utils.StarThread;
-import com.thenexusreborn.survivalgames.ControlType;
+import com.thenexusreborn.survivalgames.control.ControlType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
@@ -36,7 +36,7 @@ public class TimerCountdownCheckThread extends StarThread<SurvivalGames> {
 
             if (playerCount >= lobby.getLobbySettings().getMinPlayers()) {
                 lobby.startTimer();
-                lobby.sendMessage("&eMinimum player count has been met, starting countdown to game start.");
+                lobby.sendMessage("&6&l>> &aMinimum player requirement met! Game starting shortly...");
             }
         }
     }

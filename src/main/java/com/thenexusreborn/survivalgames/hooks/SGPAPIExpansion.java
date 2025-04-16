@@ -87,13 +87,13 @@ public class SGPAPIExpansion extends PlaceholderExpansion {
             }
 
             String prefix = "";
-            if (gamePlayer.getRank() != Rank.MEMBER) {
-                prefix = gamePlayer.getRank().getPrefix() + " ";
+            if (gamePlayer.getEffectiveRank() != Rank.MEMBER) {
+                prefix = gamePlayer.getEffectiveRank().getPrefix() + " ";
             }
 
             String nameColor;
             if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
-                nameColor = gamePlayer.getRank().getColor();
+                nameColor = gamePlayer.getEffectiveRank().getColor();
             } else {
                 nameColor = gamePlayer.getTeam().getColor();
             }
@@ -167,7 +167,7 @@ public class SGPAPIExpansion extends PlaceholderExpansion {
                     if (lobby.getGameMap() == null) {
                         return "&fNo Map Set";
                     } else {
-                        Position center = lobby.getGameMap().getCenter();
+                        Position center = lobby.getGameMap().getSpawnCenter();
                         if (center != null) {
                             return center.getX() + "," + center.getY() + "," + center.getZ();
                         } else {
@@ -184,13 +184,13 @@ public class SGPAPIExpansion extends PlaceholderExpansion {
                     if (lobby.getGameMap() == null) {
                         return "0";
                     } else {
-                        return String.valueOf(lobby.getGameMap().getBorderDistance());
+                        return String.valueOf(lobby.getGameMap().getArenaBorderLength());
                     }
                 } else if (mapOption.equalsIgnoreCase("dmborderradius")) {
                     if (lobby.getGameMap() == null) {
                         return "0";
                     } else {
-                        return String.valueOf(lobby.getGameMap().getDeathmatchBorderDistance());
+                        return String.valueOf(lobby.getGameMap().getDeathmatchBorderLength());
                     }
                 } else if (mapOption.equalsIgnoreCase("creatorcount")) {
                     if (lobby.getGameMap() == null) {

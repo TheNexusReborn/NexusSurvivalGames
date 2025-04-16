@@ -26,6 +26,7 @@ public class PlayerUpdateThread extends StarThread<SurvivalGames> {
                 for (GamePlayer player : game.getPlayers().values()) {
                     if (player.getTeam() == GameTeam.SPECTATORS) {
                         SGUtils.updatePlayerHealthAndFood(Bukkit.getPlayer(player.getUniqueId()));
+                        player.updateMutationItem();
                     } else if (player.getTeam() == GameTeam.MUTATIONS) {
                         player.setFood(20, 20F);
                     } else if (player.getTeam() == GameTeam.TRIBUTES) {

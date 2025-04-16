@@ -1,8 +1,8 @@
 package com.thenexusreborn.survivalgames.menu.manage;
 
-import com.stardevllc.colors.StarColors;
-import com.stardevllc.itembuilder.ItemBuilder;
-import com.stardevllc.itembuilder.XMaterial;
+import com.stardevllc.starcore.StarColors;
+import com.stardevllc.starcore.base.XMaterial;
+import com.stardevllc.starcore.base.itembuilder.ItemBuilder;
 import com.stardevllc.starui.GuiManager;
 import com.stardevllc.starui.element.button.Button;
 import com.stardevllc.starui.gui.InventoryGUI;
@@ -11,13 +11,11 @@ import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.SpigotUtils;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.Game;
-import com.thenexusreborn.survivalgames.game.GamePlayer;
+import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.mutations.MutationBuilder;
 import com.thenexusreborn.survivalgames.mutations.MutationType;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -43,7 +41,7 @@ public class ManageMutateMenu extends InventoryGUI implements UpdatingGUI {
         GuiManager manager = Bukkit.getServicesManager().getRegistration(GuiManager.class).getProvider();
         MutationType type = builder.getType();
         Button typeButton = new Button().iconCreator(p -> ItemBuilder.of(type.getIcon()).displayName("&a&lTYPE").addLoreLine("&e&l" + type.getDisplayName()).build())
-                .consumer(e -> manager.openGUI(new ManageMutateSelectMenu(plugin, actor, builder, this), (Player) e.getWhoClicked()));
+                .consumer(e -> manager.openGUI(new ManageMutateSelectMenu(plugin, actor, builder, this), e.getWhoClicked()));
         addElement(typeButton);
 
         Button targetButton = new Button().iconCreator(p -> {
@@ -60,7 +58,7 @@ public class ManageMutateMenu extends InventoryGUI implements UpdatingGUI {
                     skull.setItemMeta(meta);
                     return skull;
                 })
-                .consumer(e -> manager.openGUI(new ManageMutateTargetMenu(plugin, actor, game, builder, this), (Player) e.getWhoClicked()));
+                .consumer(e -> manager.openGUI(new ManageMutateTargetMenu(plugin, actor, game, builder, this), e.getWhoClicked()));
         addElement(targetButton);
 
         Button bypassTimer = new Button().iconCreator(p -> 
@@ -72,7 +70,7 @@ public class ManageMutateMenu extends InventoryGUI implements UpdatingGUI {
         addElement(bypassTimer);
         
         Button cancelButton = new Button().iconCreator(p -> ItemBuilder.of(XMaterial.REDSTONE_BLOCK).displayName("&4&lCANCEL").build())
-                .consumer(e -> manager.openGUI(new PlayerManageMenu(plugin, game, actor, builder.getPlayer()), (Player) e.getWhoClicked()));
+                .consumer(e -> manager.openGUI(new PlayerManageMenu(plugin, game, new PlayerManageBuilder(actor, builder.getPlayer())), e.getWhoClicked()));
         setElement(7, cancelButton);
 
         Button confirmButton = new Button().iconCreator(p -> ItemBuilder.of(XMaterial.EMERALD_BLOCK).displayName("&a&lCONFIRM").build())

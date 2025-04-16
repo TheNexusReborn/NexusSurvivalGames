@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.threads.lobby;
 
-import com.stardevllc.colors.StarColors;
+import com.stardevllc.starcore.StarColors;
 import com.stardevllc.starcore.utils.StarThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
@@ -22,7 +22,7 @@ public class StatSignUpdateThread extends StarThread<SurvivalGames> {
             if (lobby == null) {
                 continue;
             }
-            if (lobby.getState() == LobbyState.MAP_EDITING) {
+            if (lobby.getState() == LobbyState.MAP_CONFIGURATING) {
                 continue;
             }
 
@@ -38,10 +38,10 @@ public class StatSignUpdateThread extends StarThread<SurvivalGames> {
                         continue;
                     }
                     
-                    if (player.getWorld() != statSign.getLocation().getWorld()) {
+                    if (!player.getWorld().getName().equalsIgnoreCase(statSign.getLocation().getWorld().getName())) {
                         continue;
                     }
-
+                    
                     String[] lines = {StarColors.color("&n" + statSign.getDisplayName()), "", lobbyPlayer.getStats().getValue(statSign.getStat()) + "", ""};
                     player.sendSignChange(statSign.getLocation(), lines);
                 }

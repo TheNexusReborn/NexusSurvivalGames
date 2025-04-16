@@ -3,7 +3,6 @@ package com.thenexusreborn.survivalgames.threads.lobby;
 import com.stardevllc.starcore.utils.StarThread;
 import com.stardevllc.time.TimeUnit;
 import com.thenexusreborn.api.player.Rank;
-import com.thenexusreborn.nexuscore.util.ServerProperties;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
@@ -15,7 +14,9 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 public class LobbyThread extends StarThread<SurvivalGames> {
 
@@ -32,7 +33,8 @@ public class LobbyThread extends StarThread<SurvivalGames> {
             if (lobby == null) {
                 continue;
             }
-            World world = Bukkit.getWorld(ServerProperties.getLevelName());
+            
+            World world = lobby.getWorld();
             for (Entity entity : world.getEntities()) {
                 if (!(entity instanceof Player)) {
                     entity.remove();
@@ -48,15 +50,22 @@ public class LobbyThread extends StarThread<SurvivalGames> {
                 
                 SGUtils.updatePlayerHealthAndFood(Bukkit.getPlayer(player.getUniqueId()));
 
-                if (state != LobbyState.MAP_EDITING) {
+                if (state != LobbyState.MAP_CONFIGURATING) {
                     if (player.getLocation().getBlockY() < lobby.getSpawnpoint().getBlockY() - 20) {
                         player.teleport(lobby.getSpawnpoint());
                     }
                 }
             }
-
-            world.setThundering(false);
-            world.setStorm(false);
+            
+            if (world.isThundering()) {
+                world.setThundering(false);
+                world.setWeatherDuration(Integer.MAX_VALUE);
+            }
+            
+            if (world.hasStorm()) {
+                world.setStorm(false);
+                world.setWeatherDuration(Integer.MAX_VALUE);
+            }
 
             world.setGameRuleValue("doFireSpread", "false");
 
@@ -103,7 +112,7 @@ public class LobbyThread extends StarThread<SurvivalGames> {
             }
 
             boolean resetLobby = false;
-            if (!(state == LobbyState.WAITING || state == LobbyState.MAP_EDITING)) {
+            if (!(state == LobbyState.WAITING || state == LobbyState.MAP_CONFIGURATING)) {
                 if (lobby.getTimer() == null) {
                     resetLobby = true;
                 } else if (TimeUnit.SECONDS.fromMillis(lobby.getTimer().getTime()) <= 0) {

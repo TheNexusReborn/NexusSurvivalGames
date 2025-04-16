@@ -1,66 +1,43 @@
 package com.thenexusreborn.survivalgames.listener;
 
-import com.stardevllc.colors.StarColors;
+import com.sk89q.worldedit.bukkit.BukkitUtil;
 import com.stardevllc.helper.Pair;
-import com.stardevllc.itembuilder.ItemBuilder;
-import com.stardevllc.itembuilder.XMaterial;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
+import com.stardevllc.starcore.StarColors;
+import com.stardevllc.starcore.base.XMaterial;
+import com.stardevllc.starcore.base.itembuilder.ItemBuilder;
 import com.stardevllc.starui.GuiManager;
 import com.stardevllc.time.TimeUnit;
 import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.api.player.NexusPlayer;
-import com.thenexusreborn.api.player.Rank;
-import com.thenexusreborn.api.player.Toggle;
-import com.thenexusreborn.nexuscore.api.events.NexusPlayerLoadEvent;
-import com.thenexusreborn.nexuscore.api.events.ToggleChangeEvent;
+import com.thenexusreborn.api.nickname.NickTime;
+import com.thenexusreborn.api.player.*;
+import com.thenexusreborn.nexuscore.api.events.*;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.chat.GameTeamChatroom;
 import com.thenexusreborn.survivalgames.game.*;
-import com.thenexusreborn.survivalgames.game.death.DeathInfo;
-import com.thenexusreborn.survivalgames.game.death.DeathType;
-import com.thenexusreborn.survivalgames.game.death.KillerInfo;
-import com.thenexusreborn.survivalgames.lobby.Lobby;
-import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
-import com.thenexusreborn.survivalgames.lobby.LobbyState;
+import com.thenexusreborn.survivalgames.game.death.*;
+import com.thenexusreborn.survivalgames.lobby.*;
 import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.loot.tables.SGLootTable;
 import com.thenexusreborn.survivalgames.menu.MutateGui;
 import com.thenexusreborn.survivalgames.menu.SwagShackMenu;
-import com.thenexusreborn.survivalgames.mutations.Mutation;
-import com.thenexusreborn.survivalgames.mutations.MutationType;
+import com.thenexusreborn.survivalgames.mutations.*;
 import com.thenexusreborn.survivalgames.mutations.impl.ChickenMutation;
 import com.thenexusreborn.survivalgames.mutations.impl.CreeperMutation;
-import com.thenexusreborn.survivalgames.util.SGPlayerStats;
-import com.thenexusreborn.survivalgames.util.SGUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.Chest;
-import org.bukkit.block.Sign;
+import com.thenexusreborn.survivalgames.util.*;
+import org.bukkit.*;
+import org.bukkit.block.*;
 import org.bukkit.entity.*;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
+import org.bukkit.event.*;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.inventory.PrepareItemCraftEvent;
+import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.*;
 import org.bukkit.event.player.PlayerFishEvent.State;
-import org.bukkit.inventory.CraftingInventory;
-import org.bukkit.inventory.EnchantingInventory;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Openable;
 import org.bukkit.potion.PotionEffect;
@@ -68,10 +45,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Stream;
 
 @SuppressWarnings({"DuplicatedCode"})
@@ -148,7 +122,9 @@ public class PlayerListener implements Listener {
                         if (item.getType() == Material.ROTTEN_FLESH) {
                             Pair<Boolean, String> canMutateResult = gamePlayer.canMutate();
                             if (canMutateResult.key()) {
-                                manager.openGUI(new MutateGui(plugin, gamePlayer), player);
+                                MutationBuilder mutationBuilder = new MutationBuilder(gamePlayer);
+                                mutationBuilder.setUsePass(true);
+                                manager.openGUI(new MutateGui(plugin, mutationBuilder), player);
                             } else {
                                 gamePlayer.sendMessage(MsgType.WARN + canMutateResult.value());
                             }
@@ -309,11 +285,11 @@ public class PlayerListener implements Listener {
                         if (!useTieredLoot) {
                             lootTable = lootManager.getLootTable("tierOne");
                         } else {
-                            if (game.getState() == GameState.DEATHMATCH) {
+                            if (game.getState() == Game.State.DEATHMATCH) {
                                 lootTable = lootManager.getLootTable("tierFour");
                             } else {
-                                boolean withinCenter = game.getGameMap().getDeathmatchArea().contains(player);
-                                if (game.getState() == GameState.INGAME || game.getState() == GameState.INGAME_DEATHMATCH) {
+                                boolean withinCenter = game.getGameMap().getDeathmatchRegion().contains(BukkitUtil.toVector(player.getLocation()));
+                                if (game.getState() == Game.State.INGAME || game.getState() == Game.State.INGAME_DEATHMATCH) {
                                     boolean afterRestock = game.getTimedRestockCount() > 0;
                                     if (withinCenter) {
                                         if (afterRestock) {
@@ -722,10 +698,11 @@ public class PlayerListener implements Listener {
             public void run() {
                 player.spigot().respawn();
                 if (e.getEntity().getLastDamageCause().getCause() == DamageCause.VOID) {
-                    player.teleport(game.getGameMap().getCenter().toLocation(game.getGameMap().getWorld()));
+                    player.teleport(game.getGameMap().getSpawnCenter().toLocation(game.getGameMap().getWorld()));
                 } else {
                     player.teleport(deathLocation);
                 }
+                gamePlayer.setPosition(player.getLocation());
                 game.killPlayer(gamePlayer, deathInfo);
             }
         }.runTaskLater(plugin, 2L);
@@ -753,8 +730,21 @@ public class PlayerListener implements Listener {
         } catch (Throwable ex) {
             stats = new SGPlayerStats(e.getNexusPlayer().getUniqueId());
         }
+        
+        NickSGPlayerStats fakeStats;
+        try {
+            fakeStats = NexusAPI.getApi().getPrimaryDatabase().get(NickSGPlayerStats.class, "uniqueid", e.getNexusPlayer().getUniqueId()).getFirst();
+            
+            if (nexusPlayer.getNickname() != null) {
+                fakeStats.setPersist(nexusPlayer.getNickname().isPersist());
+            }
+            
+        } catch (Throwable ex) {
+            fakeStats = null;
+        }
 
         sgPlayer.setStats(stats);
+        sgPlayer.setNickSGPlayerStats(fakeStats);
 
         plugin.getPlayerRegistry().register(sgPlayer);
         e.setJoinMessage(null);
@@ -781,6 +771,7 @@ public class PlayerListener implements Listener {
 
         e.setQuitMessage(null);
         NexusAPI.getApi().getPrimaryDatabase().saveSilent(sgPlayer.getStats());
+        NexusAPI.getApi().getPrimaryDatabase().saveSilent(sgPlayer.getTrueStats());
         plugin.getPlayerRegistry().unregister(e.getPlayer().getUniqueId());
     }
     
@@ -822,5 +813,25 @@ public class PlayerListener implements Listener {
             changed.setY(e.getTo().clone().subtract(e.getFrom()).toVector().getY());
             player.setVelocity(changed);
         }
+    }
+    
+    @EventHandler
+    public void onNickSet(NicknameSetEvent e) {
+        NexusPlayer nexusPlayer = e.getNexusPlayer();
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId());
+        if (sgPlayer == null) {
+            return;
+        }
+        
+        if (sgPlayer.getNickSGPlayerStats() != null) {
+            sgPlayer.getNickSGPlayerStats().setPersist(e.getNickname().isPersist());
+        } else {
+            sgPlayer.setNickSGPlayerStats(new NickSGPlayerStats(nexusPlayer.getUniqueId(), sgPlayer.getTrueStats(), e.getNickname().isPersist()));
+        }
+    }
+    
+    @EventHandler
+    public void onNickRemove(NicknameRemoveEvent e) {
+        NexusAPI.getApi().getPrimaryDatabase().deleteSilent(NickTime.class, e.getNexusPlayer().getUniqueId().toString(), new Object[]{"persist"}, new Object[]{false});
     }
 }

@@ -1,16 +1,13 @@
 package com.thenexusreborn.survivalgames.loot.item;
 
-import com.stardevllc.colors.StarColors;
+import com.stardevllc.starcore.StarColors;
 import com.stardevllc.starcore.utils.MaterialNames;
 import com.thenexusreborn.survivalgames.loot.category.LootCategory;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class LootItem {
     protected final LootCategory category;

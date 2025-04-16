@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.util;
 
-import com.stardevllc.colors.StarColors;
+import com.stardevllc.starcore.StarColors;
 import com.thenexusreborn.api.scoreboard.wrapper.ITeam;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.util.MsgType;
@@ -26,7 +26,7 @@ public final class SGUtils {
         if (map != null) {
             setTeamValueForString(map.getName(), team);
         } else {
-            team.setPrefix("&fNot Set");
+            setTeamValueForString("Not Set", team);
         }
     }
     

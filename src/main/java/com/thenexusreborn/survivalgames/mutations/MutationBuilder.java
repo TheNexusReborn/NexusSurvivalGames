@@ -7,6 +7,7 @@ public class MutationBuilder {
     private MutationType type = MutationType.PIG_ZOMBIE;
     private GamePlayer target;
     private boolean bypassTimer = false;
+    private boolean usePass = false;
 
     public MutationBuilder(GamePlayer player) {
         this.player = player;
@@ -27,7 +28,11 @@ public class MutationBuilder {
         this.bypassTimer = bypassTimer;
         return this;
     }
-
+    
+    public void setUsePass(boolean usePass) {
+        this.usePass = usePass;
+    }
+    
     public GamePlayer getPlayer() {
         return player;
     }
@@ -42,5 +47,9 @@ public class MutationBuilder {
 
     public boolean isBypassTimer() {
         return bypassTimer;
+    }
+    
+    public boolean isUsePass() {
+        return usePass;
     }
 }

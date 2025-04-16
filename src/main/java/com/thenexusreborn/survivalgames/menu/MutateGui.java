@@ -1,8 +1,8 @@
 package com.thenexusreborn.survivalgames.menu;
 
 import com.stardevllc.helper.Pair;
-import com.stardevllc.itembuilder.ItemBuilder;
-import com.stardevllc.itembuilder.XMaterial;
+import com.stardevllc.starcore.base.XMaterial;
+import com.stardevllc.starcore.base.itembuilder.ItemBuilder;
 import com.stardevllc.starui.element.Element;
 import com.stardevllc.starui.element.button.Button;
 import com.stardevllc.starui.gui.InventoryGUI;
@@ -12,20 +12,17 @@ import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
-import com.thenexusreborn.survivalgames.mutations.Mutation;
-import com.thenexusreborn.survivalgames.mutations.MutationType;
-import com.thenexusreborn.survivalgames.mutations.PlayerMutations;
-import com.thenexusreborn.survivalgames.mutations.UnlockedMutation;
+import com.thenexusreborn.survivalgames.mutations.*;
 import org.bukkit.Bukkit;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class MutateGui extends InventoryGUI {
-    public MutateGui(SurvivalGames plugin, GamePlayer player) {
-        super(3, "&lMutate as...");
+    public MutateGui(SurvivalGames plugin, MutationBuilder mutationBuilder) {
+        super(3, "&lMutate on " + mutationBuilder.getTarget().getName() + " as...");
 
+        GamePlayer player = mutationBuilder.getPlayer();
+        
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
         Game game = sgPlayer.getGame();
         
@@ -70,26 +67,27 @@ public class MutateGui extends InventoryGUI {
                             return;
                         }
 
-                        GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
-                        Pair<Boolean, String> canMutateResult = gamePlayer.canMutate();
+                        Pair<Boolean, String> canMutateResult = player.canMutate();
                         if (!canMutateResult.key()) {
                             player.sendMessage(MsgType.WARN + canMutateResult.value());
                             return;
                         }
 
-                        double passUseValue = new Random().nextDouble();
-                        if (passUseValue <= game.getSettings().getPassUseChance()) {
-                            if (!game.getSettings().isUnlimitedPasses()) {
-                                player.getStats().addMutationPasses(-1);
+                        if (mutationBuilder.isUsePass()) {
+                            double passUseValue = new Random().nextDouble();
+                            if (passUseValue <= game.getSettings().getPassUseChance()) {
+                                if (!game.getSettings().isUnlimitedPasses()) {
+                                    player.getStats().addMutationPasses(-1);
+                                }
+                            } else {
+                                player.sendMessage(MsgType.INFO + "&2&lLUCKY! &aYou did not use a pass for this mutation!");
                             }
-                        } else {
-                            player.sendMessage(MsgType.INFO + "&aYou got lucky and you did not use a pass for this mutation!");
                         }
 
                         player.getStats().addTimesMutated(1);
 
-                        Mutation mutation = Mutation.createInstance(game, type, player.getUniqueId(), gamePlayer.getMutationTarget());
-                        gamePlayer.setMutation(mutation);
+                        Mutation mutation = Mutation.createInstance(game, type, player.getUniqueId(), mutationBuilder.getTarget().getUniqueId());
+                        player.setMutation(mutation);
                         mutation.startCountdown();
                         e.getWhoClicked().closeInventory();
                     });

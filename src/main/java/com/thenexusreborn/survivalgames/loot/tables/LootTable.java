@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.loot.tables;
 
-import com.stardevllc.colors.StarColors;
+import com.stardevllc.starcore.StarColors;
 import com.thenexusreborn.survivalgames.loot.item.LootItem;
 import org.bukkit.inventory.ItemStack;
 
@@ -72,7 +72,11 @@ public class LootTable {
         List<ItemStack> loot = new ArrayList<>();
         Random random = new Random();
         for (int i = 0; i < rolls; i++) {
-            loot.add(items[random.nextInt(items.length)].getItemStack());
+            try {
+                loot.add(items[random.nextInt(items.length)].getItemStack());
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
         }
 
         return loot;

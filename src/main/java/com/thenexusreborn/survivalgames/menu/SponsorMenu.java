@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.menu;
 
-import com.stardevllc.itembuilder.ItemBuilder;
+import com.stardevllc.starcore.base.itembuilder.ItemBuilder;
 import com.stardevllc.starui.element.button.Button;
 import com.stardevllc.starui.gui.InventoryGUI;
 import com.thenexusreborn.nexuscore.util.MsgType;
@@ -13,9 +13,7 @@ import com.thenexusreborn.survivalgames.sponsoring.SponsorManager;
 import org.bukkit.Bukkit;
 import org.bukkit.event.inventory.ClickType;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class SponsorMenu extends InventoryGUI {
     public SponsorMenu(SurvivalGames plugin, GamePlayer actor, GamePlayer target) {
@@ -60,8 +58,8 @@ public class SponsorMenu extends InventoryGUI {
                     return;
                 }
                 
-                if (actor.hasSponsored()) {
-                    actor.sendMessage(MsgType.WARN + "You can only sponsor once per game.");
+                if (!actor.canSponsor()) {
+                    actor.sendMessage(MsgType.WARN + "You can only sponsor " + game.getSettings().getMaxSponsorships() + " time(s).");
                     return;
                 }
 
@@ -87,6 +85,7 @@ public class SponsorMenu extends InventoryGUI {
                     actor.getStats().addScore(-cost);
                 }
                 actor.setSponsored(true);
+                actor.incrementSponsors();
 
                 Object chosen = category.getEntries().get(new Random().nextInt(category.getEntries().size()));
                 category.apply(Bukkit.getPlayer(target.getUniqueId()), chosen);

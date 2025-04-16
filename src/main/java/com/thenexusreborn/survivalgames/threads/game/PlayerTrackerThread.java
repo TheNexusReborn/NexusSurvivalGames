@@ -32,7 +32,7 @@ public class PlayerTrackerThread extends StarThread<SurvivalGames> {
                 continue;
             }
 
-            if (!(game.getState().ordinal() >= GameState.INGAME.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal())) {
+            if (!(game.getState().ordinal() >= Game.State.INGAME.ordinal() && game.getState().ordinal() <= Game.State.DEATHMATCH.ordinal())) {
                 continue;
             }
 
@@ -92,13 +92,13 @@ public class PlayerTrackerThread extends StarThread<SurvivalGames> {
                 if (target == null) {
                     continue;
                 }
-                
-                if (!player.getLocation().getWorld().getName().equals(target.getLocation().getWorld().getName())) {
-                    continue;
-                }
 
                 if (distance == -1) {
                     distance = player.getLocation().distance(target.getLocation());
+                }
+                
+                if (!player.getLocation().getWorld().getName().equals(target.getLocation().getWorld().getName())) {
+                    continue;
                 }
 
                 Player finalClosest = target;

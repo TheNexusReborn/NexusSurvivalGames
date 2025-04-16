@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.cmd;
 
-import com.stardevllc.cmdflags.FlagResult;
+import com.stardevllc.starcore.cmdflags.FlagResult;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.nexuscore.api.command.NexusCommand;
 import com.thenexusreborn.nexuscore.util.MsgType;
@@ -9,6 +9,8 @@ import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.List;
 
 public class GraceperiodCmd extends NexusCommand<SurvivalGames> {
     public GraceperiodCmd(SurvivalGames plugin) {
@@ -63,12 +65,17 @@ public class GraceperiodCmd extends NexusCommand<SurvivalGames> {
                 }
 
                 settings.setGracePeriod(true);
-                settings.setGracePeriodLength(30);
+                settings.setGracePeriodLength(seconds);
                 MsgType.INFO.send(player, "You turned the graceperiod &aon %bwith a time of %v seconds", seconds);
                 MsgType.DETAIL.send(player, "Note: It will apply on the next game");
             }
         }
         
         return true;
+    }
+
+    @Override
+    public List<String> getCompletions(CommandSender sender, Rank senderRank, String label, String[] args, FlagResult flagResult) {
+        return List.of("on", "off");
     }
 }

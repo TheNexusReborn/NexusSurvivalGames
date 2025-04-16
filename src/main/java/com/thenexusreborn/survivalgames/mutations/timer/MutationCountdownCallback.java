@@ -2,13 +2,10 @@ package com.thenexusreborn.survivalgames.mutations.timer;
 
 import com.stardevllc.clock.callback.ClockCallback;
 import com.stardevllc.clock.snapshot.TimerSnapshot;
-import com.stardevllc.colors.StarColors;
+import com.stardevllc.starcore.StarColors;
 import com.stardevllc.time.TimeUnit;
-import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.game.Game;
-import com.thenexusreborn.survivalgames.gamelog.GameMutateAction;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -44,11 +41,7 @@ public class MutationCountdownCallback implements ClockCallback<TimerSnapshot> {
         }
 
         if (secondsLeft <= 0) {
-            NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(p.getUniqueId());
-            t.sendMessage(StarColors.color("&6&l>> " + nexusPlayer.getColoredName().toUpperCase() + " &c&lIS AFTER YOU! RUN!"));
-
             game.addMutation(mutation);
-            game.getGameInfo().getActions().add(new GameMutateAction(nexusPlayer.getName(), t.getName(), mutation.getType()));
         }
     }
 

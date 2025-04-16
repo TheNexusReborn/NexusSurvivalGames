@@ -21,11 +21,11 @@ public class SGPlayerStats {
     }
     
     @PrimaryKey
-    private UUID uniqueId;
-    private int score = 100, kills, highestKillstreak, games, wins, winStreak, deaths, deathmatchesReached, chestsLooted, assists, mutationKills;
-    private int mutationDeaths, mutationPasses, sponsoredOthers, sponsorsReceived, timesMutated;
-
-    private SGPlayerStats() {}
+    protected UUID uniqueId;
+    protected int score = 100, kills, highestKillstreak, games, wins, winStreak, deaths, deathmatchesReached, chestsLooted, assists, mutationKills;
+    protected int mutationDeaths, mutationPasses, sponsoredOthers, sponsorsReceived, timesMutated;
+    
+    protected SGPlayerStats() {}
     
     public SGPlayerStats(UUID uniqueId) {
         this.uniqueId = uniqueId;

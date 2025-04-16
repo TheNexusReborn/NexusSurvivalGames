@@ -21,43 +21,43 @@ public class GameActionBar implements IActionBar {
     @Override
     public String getText() {
         Game game = sgPlayer.getGame();
-        if (game == null || game.getState() == GameState.UNDEFINED || game.getState() == GameState.ERROR) {
+        if (game == null || game.getState() == Game.State.UNDEFINED || game.getState() == Game.State.ERROR) {
             return null;
         }
 
-        if (game.getState() == GameState.SETTING_UP) {
+        if (game.getState() == Game.State.SETTING_UP) {
             return "&aSetting up the map...";
         }
 
-        if (game.getState() == GameState.SETUP_COMPLETE) {
+        if (game.getState() == Game.State.SETUP_COMPLETE) {
             return "&aGame Setup.";
         }
 
-        if (game.getState() == GameState.ASSIGN_TEAMS) {
+        if (game.getState() == Game.State.ASSIGN_TEAMS) {
             return "&aAssigning starting teams...";
         }
 
-        if (game.getState() == GameState.TEAMS_ASSIGNED) {
+        if (game.getState() == Game.State.TEAMS_ASSIGNED) {
             return "&aTeams assigned";
         }
 
-        if (game.getState() == GameState.TELEPORT_START) {
+        if (game.getState() == Game.State.TELEPORT_START) {
             return "&aTeleporting players to arena...";
         }
 
-        if (game.getState() == GameState.TELEPORT_START_DONE) {
+        if (game.getState() == Game.State.TELEPORT_START_DONE) {
             return "&aTeleport complete.";
         }
 
-        if (game.getState() == GameState.WARMUP) {
+        if (game.getState() == Game.State.WARMUP) {
             return "&fGAME BEGINS IN &c&l" + ((int) TimeUnit.MILLISECONDS.toSeconds(game.getTimer().getTime()) + 1) + " SECONDS&f...";
         }
 
-        if (game.getState() == GameState.WARMUP_DONE) {
+        if (game.getState() == Game.State.WARMUP_DONE) {
             return "&aWarmup done, waiting for game to start...";
         }
 
-        if (game.getState().ordinal() >= GameState.INGAME.ordinal() && game.getState().ordinal() <= GameState.DEATHMATCH.ordinal()) {
+        if (game.getState().ordinal() >= Game.State.INGAME.ordinal() && game.getState().ordinal() <= Game.State.DEATHMATCH.ordinal()) {
             TrackerInfo trackerInfo = player.getTrackerInfo();
             if (trackerInfo != null) {
                 String target = trackerInfo.target();
@@ -86,39 +86,43 @@ public class GameActionBar implements IActionBar {
             return "&f&lGrace Period ends in &e" + Game.LONG_TIME_FORMAT.format(game.getGraceperiodTimer().getTime());
         }
 
-        if (game.getState() == GameState.INGAME) {
-            if (game.willRestockChests()) {
+        if (game.getState() == Game.State.INGAME) {
+            if (game.getNextRestock() > 0) {
                 return "&f&lChests restock in &e" + Game.LONG_TIME_FORMAT.format(game.getNextRestock());
             } else {
-                return "&f&lDeathmatch in &e" + Game.LONG_TIME_FORMAT.format(game.getTimer().getTime() + 1000);
+                if (game.getSettings().isAllowDeathmatch()) {
+                    return "&f&lDeathmatch in &e" + Game.LONG_TIME_FORMAT.format(game.getTimer().getTime() + 1000);
+                } else {
+                    return "&f&lGame ends in &e" + Game.LONG_TIME_FORMAT.format(game.getTimer().getTime() + 1000);
+                }
             }
         }
 
-        if (game.getState() == GameState.INGAME_DEATHMATCH) {
+        if (game.getState() == Game.State.INGAME_DEATHMATCH) {
             return "&f&lDeathmatch in &e" + Game.LONG_TIME_FORMAT.format(game.getTimer().getTime() + 1000);
         }
 
-        if (game.getState() == GameState.TELEPORT_DEATHMATCH) {
+        if (game.getState() == Game.State.TELEPORT_DEATHMATCH) {
             return "&aTeleporting to deathmatch...";
         }
 
-        if (game.getState() == GameState.TELEPORT_DEATHMATCH_DONE) {
+        if (game.getState() == Game.State.TELEPORT_DEATHMATCH_DONE) {
             return "&aDeathmatch teleport completed.";
         }
 
-        if (game.getState() == GameState.DEATHMATCH_WARMUP) {
-            return "&f&lYou have &e" + Game.LONG_TIME_FORMAT.format(game.getTimer().getTime() + 1000);
+        if (game.getState() == Game.State.DEATHMATCH_WARMUP) {
+            return "&f&lDeathmatch starts in &e" + Game.LONG_TIME_FORMAT.format(game.getTimer().getTime() + 1000);
         }
 
-        if (game.getState() == GameState.DEATHMATCH_WARMUP_DONE) {
+        if (game.getState() == Game.State.DEATHMATCH_WARMUP_DONE) {
             return "&aDeathmatch warmup complete";
         }
 
-        if (game.getState() == GameState.DEATHMATCH) {
-            return "&f&lYou have &e" + Game.LONG_TIME_FORMAT.format(game.getTimer().getTime() + 1000);
+        if (game.getState() == Game.State.DEATHMATCH) {
+            return "&f&lGame ends in &e" + Game.LONG_TIME_FORMAT.format(game.getTimer().getTime() + 1000);
         }
 
-        if (game.getState() == GameState.ENDING) {
+        if (game.getState() == Game.State.ENDING) {
             if (game.getTimer() == null) {
                 return "&aArchiving game...";
             }
