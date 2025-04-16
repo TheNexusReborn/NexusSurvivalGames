@@ -98,4 +98,8 @@ public class LobbyPlayer {
     public String getTrueName() {
         return this.player.getTrueName();
     }
+    
+    public boolean isNicked() {
+        return this.player.getNexusPlayer().isNicked();
+    }
 }

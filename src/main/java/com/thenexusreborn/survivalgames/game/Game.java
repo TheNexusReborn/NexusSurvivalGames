@@ -11,8 +11,7 @@ import com.stardevllc.starcore.StarColors;
 import com.stardevllc.time.TimeFormat;
 import com.stardevllc.time.TimeUnit;
 import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.api.gamearchive.GameAction;
-import com.thenexusreborn.api.gamearchive.GameInfo;
+import com.thenexusreborn.api.gamearchive.*;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.sql.objects.SQLDatabase;
@@ -136,7 +135,7 @@ public class Game implements Controllable, IHasState {
         for (MapSpawn spawn : this.gameMap.getSpawns()) {
             this.spawns.put(spawn.getIndex(), null);
         }
-        List<String> playerNames = new ArrayList<>();
+        Set<PlayerInfo> playerInfos = new HashSet<>();
         int tributeCount = 0;
         for (LobbyPlayer player : players) {
             SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
@@ -146,7 +145,7 @@ public class Game implements Controllable, IHasState {
                 gamePlayer.setTeam(GameTeam.SPECTATORS);
             } else {
                 gamePlayer.setTeam(GameTeam.TRIBUTES);
-                playerNames.add(player.getName());
+                playerInfos.add(new PlayerInfo(player.getName(), player.getUniqueId(), player.isNicked()));
                 tributeCount++;
             }
             player.setActionBar(new GameActionBar(plugin, gamePlayer));
@@ -158,7 +157,7 @@ public class Game implements Controllable, IHasState {
             }
         }
         gameInfo.setPlayerCount(tributeCount);
-        gameInfo.setPlayers(playerNames.toArray(new String[0]));
+        gameInfo.setPlayers(playerInfos);
     }
     
     public Graceperiod getGraceperiod() {
@@ -1068,8 +1067,9 @@ public class Game implements Controllable, IHasState {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             NexusAPI.getApi().getPrimaryDatabase().saveSilent(gameInfo);
             try {
-                NexusAPI.getApi().getGameLogExporter().exportGameInfo(gameInfo);
+                NexusAPI.getApi().getGameLogManager().exportGameInfo(gameInfo);
             } catch (IOException e) {
+                e.printStackTrace();
             }
             if (gameInfo.getId() == 0) {
                 sendMessage("&4&l>> &cThere was a database error archiving the game. Please report with date and time.");
@@ -1079,9 +1079,9 @@ public class Game implements Controllable, IHasState {
                 //sendMessage("&6&l>> &aGame Log: &bhttp://thenexusreborn.com:8051/game?id=" + gameInfo.getId());
 
                 if (gameInfo.getId() % 1000 == 0) {
-                    for (String p : gameInfo.getPlayers()) {
+                    for (PlayerInfo p : gameInfo.getPlayers()) {
                         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-                            UUID uuid = NexusAPI.getApi().getPlayerManager().getUUIDFromName(p);
+                            UUID uuid = NexusAPI.getApi().getPlayerManager().getUUIDFromName(p.getName());
 
                             Tag tag = new Tag(uuid, gameInfo.getId() + "th", System.currentTimeMillis());
                             NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(uuid);
