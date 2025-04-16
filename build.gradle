@@ -35,12 +35,11 @@ processResources {
 }
 
 dependencies {
-    compileOnly 'com.thenexusreborn:NexusCore:1.14.6-ALPHA'
+    compileOnly 'com.thenexusreborn:NexusCore:1.15-ALPHA'
     compileOnly 'com.thenexusreborn:NexusMaps:1.2-ALPHA'
     compileOnly 'com.thenexusreborn:NexusHub:1.7.1-ALPHA'
-//    compileOnly 'com.github.StarDevelopmentLLC:converter:0.1.1'
-    compileOnly 'com.github.StarDevelopmentLLC:StarCore:0.2.0'
-    compileOnly 'com.github.StarDevelopmentLLC:StarChat:0.2.0'
+    compileOnly 'com.github.StarDevelopmentLLC:StarCore:0.2.2'
+    compileOnly 'com.github.StarDevelopmentLLC:StarChat:0.2.2'
     compileOnly 'com.github.StarDevelopmentLLC:StarItems:0.1.4'
     compileOnly 'me.clip:placeholderapi:2.11.5'
     compileOnly 'org.spigotmc:spigot:1.8.8-R0.1-SNAPSHOT'
@@ -50,7 +49,7 @@ dependencies {
 }
 
 group = 'com.thenexusreborn'
-version = '1.18.7-ALPHA'
+version = '1.19-ALPHA'
 description = 'NexusSurvivalGames'
 
 jar {
