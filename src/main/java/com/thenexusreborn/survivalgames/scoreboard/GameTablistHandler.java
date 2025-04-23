@@ -6,17 +6,13 @@ import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.scoreboard.TablistHandler;
 import com.thenexusreborn.api.scoreboard.wrapper.ITeam;
+import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.Game;
-import com.thenexusreborn.survivalgames.game.GamePlayer;
-import com.thenexusreborn.survivalgames.game.GameTeam;
+import com.thenexusreborn.survivalgames.game.*;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.EnumMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class GameTablistHandler extends TablistHandler {
     
@@ -40,34 +36,29 @@ public class GameTablistHandler extends TablistHandler {
     public void update() {
         removeDisconnectedPlayers();
         
-        for (Player other : Bukkit.getOnlinePlayers()) {
-            NexusPlayer otherNexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(other.getUniqueId());
-            if (otherNexusPlayer != null) {
-                NexusPlayer player = scoreboard.getPlayer();
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(player.getUniqueId());
+            if (nexusPlayer != null) {
                 GamePlayer gamePlayer = plugin.getPlayerRegistry().get(player.getUniqueId()).getGamePlayer();
-                ITeam otherTeam = getPlayerTeams().get(otherNexusPlayer.getUniqueId());
                 if (gamePlayer == null) {
                     continue;
                 }
                 
+                ITeam team = getPlayerTeams().get(nexusPlayer.getUniqueId());
                 String correctChar = BEGIN_CHARS.get(gamePlayer.getTeam());
-                if (otherTeam == null) {
-                    createPlayerTeam(otherNexusPlayer);
+                if (team == null) {
+                    createPlayerTeam(nexusPlayer);
                 } else {
-                    try {
-                        if (otherTeam.getName().startsWith(correctChar)) {
-                            updatePlayerTeam(otherNexusPlayer);
-                        } else {
-                            refreshPlayerTeam(otherNexusPlayer);
-                        }
-                    } catch (IllegalStateException e) {
-                        refreshPlayerTeam(otherNexusPlayer);
+                    if (team.getName().startsWith(correctChar)) {
+                        updatePlayerTeam(nexusPlayer);
+                    } else {
+                        refreshPlayerTeam(nexusPlayer);
                     }
                 }
             }
         }
     }
-
+    
     public void removeDisconnectedPlayers() {
         Iterator<Map.Entry<UUID, ITeam>> teamIterator = this.playerTeams.entrySet().iterator();
         while (teamIterator.hasNext()) {
@@ -88,30 +79,47 @@ public class GameTablistHandler extends TablistHandler {
     
     @Override
     public String getPlayerTeamName(NexusPlayer player) {
-        Game game = plugin.getPlayerRegistry().get(player.getUniqueId()).getGame();
-        if (game != null) {
-            GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
-            GameTeam gameTeam = gamePlayer.getTeam();
-            String beginChar = BEGIN_CHARS.get(gameTeam);
-            String teamName = beginChar + "_";
-    
-            String pName = player.getName();
-            if (pName.length() > 13) {
-                teamName += pName.substring(0, 14);
-            } else {
-                teamName += pName;
-            }
-            return teamName;
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
+        if (sgPlayer == null) {
+            return "z_" + player.getName();
         }
-        return null;
+        
+        Game game = sgPlayer.getGame();
+        
+        if (game == null) {
+            return "y_" + player.getName();
+        }
+        
+        GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
+        if (gamePlayer != null) {
+            return "x_" + player.getName();
+        }
+        
+        return BEGIN_CHARS.get(gamePlayer.getTeam()) + "_" + player.getName();
     }
     
     @Override
     public void setDisplayOptions(NexusPlayer nexusPlayer, ITeam team) {
-        Game game = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId()).getGame();
-        if (game != null) {
-            GamePlayer gamePlayer = game.getPlayer(nexusPlayer.getUniqueId());
-            team.setPrefix(StarColors.color(gamePlayer.getTeam().getColor()));
+        String color;
+        SGPlayer sgPlayer = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId());
+        if (sgPlayer == null) {
+            color = "&0";
+        } else {
+            Game game = sgPlayer.getGame();
+            
+            if (game == null) {
+                color = "&1";
+            } else {
+                GamePlayer gamePlayer = game.getPlayer(nexusPlayer.getUniqueId());
+                
+                if (gamePlayer == null) {
+                    color = "&3";
+                } else {
+                    color = gamePlayer.getTeam().getColor();
+                }
+            }
         }
+        
+        team.setPrefix(StarColors.color(color));
     }
 }
