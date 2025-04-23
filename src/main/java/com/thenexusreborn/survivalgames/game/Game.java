@@ -1186,14 +1186,12 @@ public class Game implements Controllable, IHasState {
             boolean claimedFirstBlood = false;
             
             int scoreGain = 0, currentStreak = 0, personalBest = 0, xpGain = 0, creditGain = 0, nexiteGain = 0;
-            Rank killerRank = null;
             boolean claimedScoreBounty = false, claimedCreditBounty = false;
             Bounty bounty = gamePlayer.getBounty();
             double scoreBounty = bounty.getAmount(Bounty.Type.SCORE);
             double creditBounty = bounty.getAmount(Bounty.Type.CREDITS);
             if (playerKiller) {
                 GamePlayer killerPlayer = getPlayer(killer.getKiller());
-                killerRank = killerPlayer.getRank();
                 scoreGain = lost;
                 
                 if (this.firstBlood == null) {
@@ -1584,7 +1582,6 @@ public class Game implements Controllable, IHasState {
     public void removeMutation(Mutation mutation) {
         Player player = Bukkit.getPlayer(mutation.getPlayer());
         DisguiseAPI.undisguiseToAll(player);
-        GameTeam.TRIBUTES.getPlayerState().apply(player);
         GamePlayer gamePlayer = getPlayer(player.getUniqueId());
         gamePlayer.setMutation(null);
         gamePlayer.sendMessage("&d&l>> &7You're no longer disguised.");
