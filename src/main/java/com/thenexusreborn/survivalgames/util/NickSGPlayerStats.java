@@ -2,6 +2,7 @@ package com.thenexusreborn.survivalgames.util;
 
 import com.thenexusreborn.api.sql.annotations.column.ColumnIgnored;
 import com.thenexusreborn.api.sql.annotations.table.TableName;
+import com.thenexusreborn.survivalgames.SurvivalGames;
 
 import java.util.UUID;
 
@@ -22,6 +23,10 @@ public class NickSGPlayerStats extends SGPlayerStats {
     protected NickSGPlayerStats() {}
     
     public SGPlayerStats getTrueStats() {
+        if (this.trueStats == null) {
+            this.trueStats = SurvivalGames.getInstance().getPlayerRegistry().get(this.uniqueId).getTrueStats();
+        }
+        
         return trueStats;
     }
     
@@ -39,97 +44,97 @@ public class NickSGPlayerStats extends SGPlayerStats {
     
     @Override
     public void setWinStreak(int winStreak) {
-        this.trueStats.setWinStreak(winStreak);
+        getTrueStats().setWinStreak(winStreak);
         super.setWinStreak(winStreak);
     }
     
     @Override
     public void addScore(int i) {
-        this.trueStats.addScore(i);
+        getTrueStats().addScore(i);
         super.addScore(i);
     }
     
     @Override
     public void addDeathmatchesReached(int i) {
-        this.trueStats.addDeathmatchesReached(i);
+        getTrueStats().addDeathmatchesReached(i);
         super.addDeathmatchesReached(i);
     }
     
     @Override
     public void addGames(int i) {
-        this.trueStats.addGames(i);
+        getTrueStats().addGames(i);
         super.addGames(i);
     }
     
     @Override
     public void addWins(int i) {
-        this.trueStats.addWins(i);
+        getTrueStats().addWins(i);
         super.addWins(i);
     }
     
     @Override
     public void addWinStreak(int i) {
-        this.trueStats.addWinStreak(i);
+        getTrueStats().addWinStreak(i);
         super.addWinStreak(i);
     }
     
     @Override
     public void addMutationPasses(int i) {
-        this.trueStats.addMutationPasses(i);
+        getTrueStats().addMutationPasses(i);
         super.addMutationPasses(i);
     }
     
     @Override
     public void addDeaths(int i) {
-        this.trueStats.addDeaths(i);
+        getTrueStats().addDeaths(i);
         super.addDeaths(i);
     }
     
     @Override
     public void addMutationDeaths(int i) {
-        this.trueStats.addMutationDeaths(i);
+        getTrueStats().addMutationDeaths(i);
         super.addMutationDeaths(i);
     }
     
     @Override
     public void addKills(int i) {
-        this.trueStats.addKills(i);
+        getTrueStats().addKills(i);
         super.addKills(i);
     }
     
     @Override
     public void addMutationKills(int i) {
-        this.trueStats.addMutationKills(i);
+        getTrueStats().addMutationKills(i);
         super.addMutationKills(i);
     }
     
     @Override
     public void addAssists(int i) {
-        this.trueStats.addAssists(i);
+        getTrueStats().addAssists(i);
         super.addAssists(i);
     }
     
     @Override
     public void addChestsLooted(int i) {
-        this.trueStats.addChestsLooted(i);
+        getTrueStats().addChestsLooted(i);
         super.addChestsLooted(i);
     }
     
     @Override
     public void addTimesMutated(int i) {
-        this.trueStats.addTimesMutated(i);
+        getTrueStats().addTimesMutated(i);
         super.addTimesMutated(i);
     }
     
     @Override
     public void addSponsoredOthers(int i) {
-        this.trueStats.addSponsoredOthers(i);
+        getTrueStats().addSponsoredOthers(i);
         super.addSponsoredOthers(i);
     }
     
     @Override
     public void addSponsorsReceived(int i) {
-        this.trueStats.addSponsorsReceived(i);
+        getTrueStats().addSponsorsReceived(i);
         super.addSponsorsReceived(i);
     }
     
