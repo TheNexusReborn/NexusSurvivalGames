@@ -35,7 +35,9 @@ processResources {
 }
 
 dependencies {
-    compileOnly 'com.thenexusreborn:NexusCore:1.15.1-ALPHA'
+    compileOnly 'com.thenexusreborn:NexusAPI:1.16.1-ALPHA'
+    compileOnly 'com.thenexusreborn:NexusCore:1.15.2-ALPHA'
+    compileOnly 'com.github.StarDevelopmentLLC:StarUI:0.1.4'
     compileOnly 'com.thenexusreborn:NexusMaps:1.2-ALPHA'
     compileOnly 'com.thenexusreborn:NexusHub:1.7.1-ALPHA'
     compileOnly 'com.github.StarDevelopmentLLC:StarCore:0.2.2'
@@ -49,7 +51,7 @@ dependencies {
 }
 
 group = 'com.thenexusreborn'
-version = '1.19-ALPHA'
+version = '1.19.1-ALPHA'
 description = 'NexusSurvivalGames'
 
 jar {
