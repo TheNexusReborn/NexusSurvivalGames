@@ -9,7 +9,6 @@ import com.stardevllc.starcore.base.itembuilder.ItemBuilder;
 import com.stardevllc.starui.GuiManager;
 import com.stardevllc.time.TimeUnit;
 import com.thenexusreborn.api.NexusAPI;
-import com.thenexusreborn.api.nickname.NickTime;
 import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.nexuscore.api.events.*;
 import com.thenexusreborn.nexuscore.util.MsgType;
@@ -832,6 +831,6 @@ public class PlayerListener implements Listener {
     
     @EventHandler
     public void onNickRemove(NicknameRemoveEvent e) {
-        NexusAPI.getApi().getPrimaryDatabase().deleteSilent(NickTime.class, e.getNexusPlayer().getUniqueId().toString(), new Object[]{"persist"}, new Object[]{false});
+        NexusAPI.getApi().getPrimaryDatabase().deleteSilent(NickSGPlayerStats.class, e.getNexusPlayer().getUniqueId().toString(), new Object[]{"persist"}, new Object[]{false});
     }
 }
