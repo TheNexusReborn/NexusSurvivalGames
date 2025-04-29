@@ -1580,11 +1580,16 @@ public class Game implements Controllable, IHasState {
     }
     
     public void removeMutation(Mutation mutation) {
+        if (mutation == null) {
+            return;
+        }
+        
         Player player = Bukkit.getPlayer(mutation.getPlayer());
         DisguiseAPI.undisguiseToAll(player);
         GamePlayer gamePlayer = getPlayer(player.getUniqueId());
         gamePlayer.setMutation(null);
         gamePlayer.sendMessage("&d&l>> &7You're no longer disguised.");
+        gamePlayer.getTeam().getPlayerState().apply(player);
         if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
             gamePlayer.giveSpectatorItems(this);
         }
