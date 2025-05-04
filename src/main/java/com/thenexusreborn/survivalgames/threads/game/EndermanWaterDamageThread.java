@@ -31,6 +31,10 @@ public class EndermanWaterDamageThread extends StarThread<SurvivalGames> {
                 if (gamePlayer.getTeam() != GameTeam.MUTATIONS) {
                     continue;
                 }
+                
+                if (gamePlayer.getMutation() == null) {
+                    continue;
+                }
 
                 if (!gamePlayer.getMutation().getType().getId().equals("enderman")) {
                     continue;
