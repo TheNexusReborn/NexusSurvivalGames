@@ -1247,6 +1247,7 @@ public class Game implements Controllable, IHasState {
                     removeMutation(killerPlayer.getMutation());
                     killerPlayer.sendMessage(killerPlayer.getTeam().getLeaveMessage());
                     killerPlayer.setTeam(GameTeam.TRIBUTES);
+                    killerPlayer.getTeam().getPlayerState().apply(killerPlayer);
                     killerPlayer.sendMessage(killerPlayer.getTeam().getJoinMessage());
                 }
             }
