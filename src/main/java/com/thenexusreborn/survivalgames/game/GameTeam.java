@@ -17,6 +17,7 @@ public enum GameTeam {
                     .flying(false)
                     .collisions(true)
                     .maxHealth(p -> p.getGame().getSettings().getMaxHealth())
+                    .health(p -> p.getGame().getSettings().getMaxHealth())
                     .saturation(p -> (int) p.getGame().getSettings().getStartingSaturation())
                     .clearInventory(true)
                     .clearEffects(true)
