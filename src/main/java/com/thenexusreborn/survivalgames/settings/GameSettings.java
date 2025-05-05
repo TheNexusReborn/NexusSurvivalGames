@@ -58,6 +58,7 @@ public class GameSettings implements Cloneable, ISettings {
     protected boolean allowKillersKiller = true;
     protected int maxMutationAmount = 1;
     protected boolean mutationsEnabled = true;
+    protected boolean allowMutateOnMutationDeath = false;
     
     //Player
     protected boolean earnNexites = false;
@@ -102,7 +103,11 @@ public class GameSettings implements Cloneable, ISettings {
     protected int deathmatchWarmupLength = 10;
     protected int deathmatchCountdownLength = 60;
     protected boolean allowDeathmatch = true;
-
+    
+    public boolean isAllowMutateOnMutationDeath() {
+        return allowMutateOnMutationDeath;
+    }
+    
     public boolean isAllowDeathmatch() {
         return allowDeathmatch;
     }
