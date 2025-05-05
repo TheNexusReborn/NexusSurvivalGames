@@ -35,7 +35,7 @@ public abstract class GamePlayerSubCmd extends SubCommand<SurvivalGames> {
         
         GamePlayer target = game.getPlayer(args[0]);
         if (target == null) {
-            sender.sendMessage(MsgType.WARN.format("Unknown player %v", args[3]));
+            sender.sendMessage(MsgType.WARN.format("Unknown player %v", args[0]));
             return true;
         }
         
