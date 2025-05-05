@@ -1,5 +1,7 @@
 package com.thenexusreborn.survivalgames.game;
 
+import com.thenexusreborn.survivalgames.SurvivalGames;
+import com.thenexusreborn.survivalgames.mutations.Mutation;
 import com.thenexusreborn.survivalgames.util.PlayerState;
 import org.bukkit.*;
 
@@ -52,8 +54,24 @@ public enum GameTeam {
                     .allowFlight(false)
                     .flying(false)
                     .collisions(true)
-                    .maxHealth(p -> p.getGamePlayer().getMutation().getType().getHealth())
-                    .health(p -> p.getGamePlayer().getMutation().getType().getHealth())
+                    .maxHealth(p -> {
+                        Mutation mutation = p.getGamePlayer().getMutation();
+                        if (mutation != null) {
+                            return mutation.getType().getHealth();
+                        } else {
+                            SurvivalGames.getInstance().getLogger().warning("Mutations Team player state apply().maxHealth called and mutation is null");
+                            return p.getGame().getSettings().getMaxHealth();
+                        }
+                    })
+                    .health(p -> {
+                        Mutation mutation = p.getGamePlayer().getMutation();
+                        if (mutation != null) {
+                            return mutation.getType().getHealth();
+                        } else {
+                            SurvivalGames.getInstance().getLogger().warning("Mutations Team player state apply().health() called and mutation is null");
+                            return p.getGame().getSettings().getMaxHealth();
+                        }
+                    })
                     .food(20)
                     .saturation(20)
                     .clearInventory(true)

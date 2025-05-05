@@ -816,8 +816,8 @@ public class Game implements Controllable, IHasState {
             for (GamePlayer gp : this.players.values()) {
                 if (gp.getTeam() == GameTeam.MUTATIONS) {
                     gp.sendMessage(gp.getTeam().getLeaveMessage());
-                    removeMutation(gp.getMutation());
                     gp.setTeam(GameTeam.SPECTATORS);
+                    removeMutation(gp.getMutation());
                     gp.giveSpectatorItems(this);
                     gp.sendMessage(gp.getTeam().getJoinMessage());
                     gp.sendMessage("&6&l>> &cYou were made a spectator because deathmatch started.");
