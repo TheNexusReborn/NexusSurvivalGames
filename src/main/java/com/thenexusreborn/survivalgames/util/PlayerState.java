@@ -3,6 +3,7 @@ package com.thenexusreborn.survivalgames.util;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
+import com.thenexusreborn.survivalgames.disguises.DisguiseAPI;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
 import org.bukkit.Bukkit;
@@ -32,6 +33,7 @@ public class PlayerState {
     protected ToDoubleFunction<SGPlayer> flySpeed; //MC Default is 0.2
     protected ToDoubleFunction<SGPlayer> walkSpeed; //MC Default is 0.2
     protected Function<SGPlayer, Boolean> itemPickup;
+    protected Function<SGPlayer, Boolean> disguises;
 
     public PlayerState itemPickup(Function<SGPlayer, Boolean> itemPickup) {
         this.itemPickup = itemPickup;
@@ -112,6 +114,11 @@ public class PlayerState {
         this.health = health;
         return this;
     }
+    
+    public PlayerState disguises(Function<SGPlayer, Boolean> disguises) {
+        this.disguises = disguises;
+        return this;
+    }
 
     public PlayerState itemPickup(boolean itemPickup) {
         this.itemPickup = p -> itemPickup;
@@ -190,6 +197,11 @@ public class PlayerState {
 
     public PlayerState health(double health) {
         this.health = p -> health;
+        return this;
+    }
+    
+    public PlayerState disguises(boolean disguises) {
+        this.disguises = p -> disguises;
         return this;
     }
     
@@ -290,6 +302,10 @@ public class PlayerState {
         
         if (this.itemPickup != null) {
             player.setCanPickupItems(this.itemPickup.apply(sgPlayer));
+        }
+        
+        if (this.disguises != null && !this.disguises.apply(sgPlayer)) {
+            DisguiseAPI.undisguiseToAll(Bukkit.getPlayer(sgPlayer.getUniqueId()));
         }
     }
     

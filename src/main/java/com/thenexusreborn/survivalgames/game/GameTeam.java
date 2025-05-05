@@ -23,7 +23,8 @@ public enum GameTeam {
                     .clearEffects(true)
                     .totalExperience(0)
                     .level(0)
-                    .exp(0), 
+                    .exp(0)
+                    .disguises(false), 
             "&8<&3%nexussg_score%&8> &8(&2&l%nexuscore_level%&8) &r%nexussg_displayname%&8: %nexuscore_chatcolor%{message}"
     ), 
     
@@ -42,7 +43,8 @@ public enum GameTeam {
                     .clearEffects(true)
                     .totalExperience(0)
                     .level(0)
-                    .exp(0),
+                    .exp(0)
+                    .disguises(false),
             "&8[&cSpectators&8] &r%nexussg_displayname%&8: %nexuscore_chatcolor%{message}"
     ), 
     
