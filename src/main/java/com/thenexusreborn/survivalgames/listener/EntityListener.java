@@ -30,11 +30,11 @@ import java.util.Set;
 
 @SuppressWarnings("DuplicatedCode")
 public class EntityListener implements Listener {
-
+    
     private final SurvivalGames plugin;
-
+    
     private static final Set<DamageCause> GRACE_DAMAGE_STOP = new HashSet<>(Arrays.asList(DamageCause.BLOCK_EXPLOSION, DamageCause.ENTITY_EXPLOSION, DamageCause.FIRE, DamageCause.FIRE_TICK));
-
+    
     public EntityListener(SurvivalGames plugin) {
         this.plugin = plugin;
     }
@@ -44,7 +44,7 @@ public class EntityListener implements Listener {
         if (!(e.getTarget() instanceof Player target)) {
             return;
         }
-
+        
         SGPlayer targetPlayer = plugin.getPlayerRegistry().get(target.getUniqueId());
         if (targetPlayer.getGame() != null) {
             if (targetPlayer.getGamePlayer().getTeam() == GameTeam.SPECTATORS || targetPlayer.getGamePlayer().getTeam() == GameTeam.MUTATIONS) {
@@ -57,14 +57,14 @@ public class EntityListener implements Listener {
     public void onEntityExplode(EntityExplodeEvent e) {
         e.setCancelled(true);
     }
-
+    
     @EventHandler
     public void onHangingBreak(HangingBreakEvent e) {
         if ((e.getCause() == RemoveCause.EXPLOSION || e.getCause() == RemoveCause.ENTITY)) {
             e.setCancelled(true);
         }
     }
-
+    
     @EventHandler
     public void onEntityDamage(EntityDamageEvent e) {
         if (e.getEntity() instanceof Item) {
@@ -77,30 +77,36 @@ public class EntityListener implements Listener {
         if (!(e.getEntity() instanceof Player player)) {
             return;
         }
-
+        
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
         Game game = sgPlayer.getGame();
-
+        
         if (game != null) {
             GamePlayer gamePlayer = game.getPlayer(e.getEntity().getUniqueId());
-
+            
             if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
                 e.setCancelled(true);
                 e.getEntity().setFireTicks(0);
                 return;
             } else if (gamePlayer.getTeam() == GameTeam.MUTATIONS) {
-                MutationType mutationType = gamePlayer.getMutation().getType();
+                Mutation mutation = gamePlayer.getMutation();
+                if (mutation == null) {
+                    SurvivalGames.getInstance().getLogger().warning("Entity Damage Event called for a mutation that is null.");
+                    return;
+                }
+                
+                MutationType mutationType = mutation.getType();
                 if (mutationType.getDamageImmunities().contains(e.getCause())) {
                     e.setCancelled(true);
                 }
             }
-
+            
             if (game.isGraceperiod()) {
                 if (GRACE_DAMAGE_STOP.contains(e.getCause())) {
                     e.setCancelled(true);
                 }
             }
-
+            
             if (game.getState().ordinal() >= Game.State.SETTING_UP.ordinal() && game.getState().ordinal() <= Game.State.WARMUP_DONE.ordinal() ||
                     game.getState().ordinal() >= Game.State.DEATHMATCH_WARMUP.ordinal() && game.getState().ordinal() <= Game.State.DEATHMATCH_WARMUP_DONE.ordinal() ||
                     game.getState().ordinal() >= Game.State.ENDING.ordinal() && game.getState().ordinal() <= Game.State.ENDED.ordinal()) {
@@ -111,7 +117,7 @@ public class EntityListener implements Listener {
             e.getEntity().setFireTicks(0);
         }
     }
-
+    
     @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
         Game game = null;
@@ -125,7 +131,7 @@ public class EntityListener implements Listener {
                 break;
             }
         }
-
+        
         if (game == null) {
             Lobby lobby = null;
             for (SGVirtualServer server : plugin.getServers().getObjects().values()) {
@@ -136,14 +142,14 @@ public class EntityListener implements Listener {
                     lobby = server.getLobby();
                 }
             }
-
+            
             if (lobby != null) {
                 e.setCancelled(true);
             }
-
+            
             return;
         }
-
+        
         if (e.getDamager() instanceof Player) {
             GamePlayer gamePlayer = game.getPlayer(e.getDamager().getUniqueId());
             if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
@@ -151,7 +157,7 @@ public class EntityListener implements Listener {
                 return;
             }
         }
-
+        
         if (e.getDamager() instanceof Player damager && e.getEntity() instanceof Player target) {
             GamePlayer damagerPlayer = game.getPlayer(damager.getUniqueId());
             GamePlayer targetPlayer = game.getPlayer(target.getUniqueId());
@@ -159,15 +165,15 @@ public class EntityListener implements Listener {
                 e.setCancelled(true);
                 return;
             }
-
+            
             checkMutationDamage(damagerPlayer, targetPlayer, e);
-
+            
             if (e.isCancelled()) {
                 return;
             }
             damagerPlayer.setCombat(targetPlayer);
             targetPlayer.setCombat(damagerPlayer);
-
+            
             targetPlayer.getDamageInfo().addDamager(damager.getUniqueId());
         } else if (e.getEntity() instanceof ItemFrame || e.getEntity() instanceof ArmorStand) {
             e.setCancelled(true);
@@ -175,21 +181,21 @@ public class EntityListener implements Listener {
             if (!(e.getDamager() instanceof Snowball || e.getDamager() instanceof Egg || e.getDamager() instanceof Arrow || e.getDamager() instanceof FishHook)) {
                 return;
             }
-
+            
             if (!(e.getEntity() instanceof Player target)) {
                 return;
             }
-
+            
             if (!(projectile.getShooter() instanceof Player shooter)) {
                 return;
             }
-
+            
             if (game.isGraceperiod()) {
                 shooter.sendMessage(StarColors.color("&6&l>> &cYou cannot harm others during grace period!"));
                 e.setCancelled(true);
                 return;
             }
-
+            
             GamePlayer damagerPlayer = game.getPlayer(shooter.getUniqueId());
             GamePlayer targetPlayer = game.getPlayer(target.getUniqueId());
             damagerPlayer.setCombat(targetPlayer);
@@ -197,18 +203,18 @@ public class EntityListener implements Listener {
             if (targetPlayer.getUniqueId() != damagerPlayer.getUniqueId()) {
                 targetPlayer.getDamageInfo().addDamager(damagerPlayer.getUniqueId());
             }
-
+            
             checkMutationDamage(game.getPlayer(shooter.getUniqueId()), game.getPlayer(e.getEntity().getUniqueId()), e);
             if (e.isCancelled()) {
                 return;
             }
-
+            
             if (e.getDamager() instanceof Snowball) {
                 target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 160, 0));
             } else if (e.getDamager() instanceof Egg) {
                 target.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 160, 1));
                 target.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 160, 1));
-
+                
                 Mutation mutation = game.getPlayer(shooter.getUniqueId()).getMutation();
                 if (mutation instanceof ChickenMutation) {
                     if (mutation.getTarget().equals(target.getUniqueId())) {
@@ -248,58 +254,63 @@ public class EntityListener implements Listener {
             }
         }
     }
-
+    
     private void checkMutationDamage(GamePlayer damagerPlayer, GamePlayer targetPlayer, EntityDamageByEntityEvent e) {
         if (damagerPlayer.getTeam() == GameTeam.MUTATIONS) {
-            if (damagerPlayer.getMutation() == null) {
+            Mutation mutation = damagerPlayer.getMutation();
+            
+            if (mutation == null) {
+                SurvivalGames.getInstance().getLogger().warning("Entity Damage By Entity Event called for damager mutation that is null.");
                 damagerPlayer.sendMessage(MsgType.ERROR.format("&lYou are set to the Mutation GameTeam, but your mutation information is null. Please report this to Firestar311."));
                 e.setCancelled(true);
                 return;
             }
             
-            if (damagerPlayer.getMutation().getTarget() == null) {
+            if (mutation.getTarget() == null) {
                 damagerPlayer.sendMessage(MsgType.ERROR.format("&lYou are set to the Mutation GameTeam, but your target is null. Please report this to Firestar311."));
                 e.setCancelled(true);
                 return;
             }
             
-            if (!damagerPlayer.getMutation().getTarget().equals(targetPlayer.getUniqueId())) {
+            if (!mutation.getTarget().equals(targetPlayer.getUniqueId())) {
                 e.setCancelled(true);
                 damagerPlayer.sendMessage("&4&l>> &cYou can only damage your target.");
             }
         } else if (targetPlayer.getTeam() == GameTeam.MUTATIONS) {
-            if (targetPlayer.getMutation() == null) {
+            Mutation mutation = targetPlayer.getMutation();
+            if (mutation == null) {
+                SurvivalGames.getInstance().getLogger().warning("Entity Damage By Entity Event called for target mutation that is null.");
                 targetPlayer.sendMessage(MsgType.ERROR.format("&lYou are set to the Mutation GameTeam, but your mutation information is null. Please report this to Firestar311."));
                 e.setCancelled(true);
                 return;
             }
             
-            if (targetPlayer.getMutation().getTarget() == null) {
+            if (mutation.getTarget() == null) {
                 targetPlayer.sendMessage(MsgType.ERROR.format("&lYou are set to the Mutation GameTeam, but your target is null. Please report this to Firestar311."));
                 e.setCancelled(true);
                 return;
             }
             
-            if (!targetPlayer.getMutation().getTarget().equals(damagerPlayer.getUniqueId())) {
+            if (!mutation.getTarget().equals(damagerPlayer.getUniqueId())) {
                 e.setCancelled(true);
                 damagerPlayer.sendMessage("&4&l>> &cYou can only damage mutations that are after you.");
             } else {
-                if (targetPlayer.getMutation() instanceof SkeletonMutation) {
+                if (mutation instanceof SkeletonMutation) {
                     e.setDamage(e.getDamage() * 1.5);
                 }
             }
         }
     }
-
+    
     @EventHandler
     public void onHealthRegen(EntityRegainHealthEvent e) {
         if (!(e.getEntity() instanceof Player player)) {
             return;
         }
-
+        
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
         Game game = sgPlayer.getGame();
-
+        
         if (game != null) {
             if (e.getEntity() instanceof Player) {
                 GamePlayer gamePlayer = game.getPlayer(e.getEntity().getUniqueId());
@@ -308,9 +319,16 @@ public class EntityListener implements Listener {
                         e.setCancelled(true);
                     }
                 }
-
+                
                 if (gamePlayer.getTeam() == GameTeam.MUTATIONS) {
-                    MutationType mutationType = gamePlayer.getMutation().getType();
+                    Mutation mutation = gamePlayer.getMutation();
+                    
+                    if (mutation == null) {
+                        SurvivalGames.getInstance().getLogger().warning("Entity Regain Health Event called for a mutation that is null.");
+                        return;
+                    }
+                    
+                    MutationType mutationType = mutation.getType();
                     if (!mutationType.healthRegen()) {
                         e.setCancelled(true);
                     }

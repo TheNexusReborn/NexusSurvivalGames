@@ -145,10 +145,6 @@ public class ReflectionManager {
                         innerMap.put(methodMatcher.group(7), methodMatcher.group(6));
                     }
                 }
-                System.out.println("[LibsDisguises] Loaded in Cauldron/Forge mode");
-                System.out.println("[LibsDisguises] Loaded " + ForgeClassMappings.size() + " Cauldron class mappings");
-                System.out.println("[LibsDisguises] Loaded " + ForgeFieldMappings.size() + " Cauldron field mappings");
-                System.out.println("[LibsDisguises] Loaded " + ForgeMethodMappings.size() + " Cauldron method mappings");
             } catch (ClassNotFoundException | IOException e) {
                 e.printStackTrace(System.out);
                 System.err

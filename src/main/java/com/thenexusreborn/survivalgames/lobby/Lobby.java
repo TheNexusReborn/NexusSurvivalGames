@@ -780,6 +780,10 @@ public class Lobby implements Controllable, IHasState {
     }
 
     public void fromGame(Game game) {
+        if (this.lobbySettings == null) {
+            this.lobbySettings = new LobbySettings();
+        }
+        
         if (this.lobbySettings.isKeepPreviousGameSettings()) {
             this.gameSettings = game.getSettings();
         } else {
