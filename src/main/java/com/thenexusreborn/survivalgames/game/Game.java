@@ -1110,10 +1110,8 @@ public class Game implements Controllable, IHasState {
     }
     
     public void nextGame() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (this.players.containsKey(player.getUniqueId())) {
-                Lobby.PLAYER_STATE.apply(player);
-            }
+        for (GamePlayer player : this.players.values()) {
+            Lobby.PLAYER_STATE.apply(player);
         }
         
         StringRegistry<ChatRoom> roomRegistry = plugin.getStarChat().getRoomRegistry();
