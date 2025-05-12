@@ -6,7 +6,6 @@ import com.stardevllc.staritems.model.CustomItem;
 import com.stardevllc.staritems.model.types.PlayerEvent;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -26,20 +25,8 @@ public class ToHubItem extends CustomItem {
                 return;
             }
 
-            Game game = sgPlayer.getGame();
-
-            if (game == null) {
-                return;
-            }
-
-            GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
-
-            if (gamePlayer.getTeam() != GameTeam.SPECTATORS) {
-                return;
-            }
-
             SGUtils.sendToHub(player);
-            gamePlayer.sendMessage("&6&l>> &eSending you to the hub.");
+            sgPlayer.sendMessage("&6&l>> &eSending you to the hub.");
         });
     }
 }
