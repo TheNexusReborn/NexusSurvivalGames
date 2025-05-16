@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames;
 
 import com.stardevllc.starcore.StarColors;
-import com.thenexusreborn.api.NexusAPI;
+import com.thenexusreborn.api.NexusReborn;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
@@ -46,7 +46,7 @@ public class SGPlayer {
     }
 
     public SGPlayer(Player spigotPlayer) {
-        this(NexusAPI.getApi().getPlayerManager().getNexusPlayer(spigotPlayer.getUniqueId()), spigotPlayer);
+        this(NexusReborn.getPlayerManager().getNexusPlayer(spigotPlayer.getUniqueId()), spigotPlayer);
     }
     
     public void sendMessage(String message) {

@@ -8,7 +8,7 @@ import com.stardevllc.starcore.base.XMaterial;
 import com.stardevllc.starcore.base.itembuilder.ItemBuilder;
 import com.stardevllc.starui.GuiManager;
 import com.stardevllc.time.TimeUnit;
-import com.thenexusreborn.api.NexusAPI;
+import com.thenexusreborn.api.NexusReborn;
 import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.nexuscore.api.events.*;
 import com.thenexusreborn.nexuscore.util.MsgType;
@@ -342,7 +342,7 @@ public class PlayerListener implements Listener {
                             game.addLootedChest(secondHalf.getLocation());
                         }
                     } else if (block.getState() instanceof Sign) {
-                        NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(player.getUniqueId());
+                        NexusPlayer nexusPlayer = NexusReborn.getPlayerManager().getNexusPlayer(player.getUniqueId());
                         if (nexusPlayer.getToggleValue("vanish")) {
                             nexusPlayer.sendMessage(MsgType.WARN + "You cannot vote for a map while in vanish.");
                             return;
@@ -725,14 +725,14 @@ public class PlayerListener implements Listener {
 
         SGPlayerStats stats;
         try {
-            stats = NexusAPI.getApi().getPrimaryDatabase().get(SGPlayerStats.class, "uniqueid", e.getNexusPlayer().getUniqueId()).getFirst();
+            stats = NexusReborn.getPrimaryDatabase().get(SGPlayerStats.class, "uniqueid", e.getNexusPlayer().getUniqueId()).getFirst();
         } catch (Throwable ex) {
             stats = new SGPlayerStats(e.getNexusPlayer().getUniqueId());
         }
         
         NickSGPlayerStats fakeStats;
         try {
-            fakeStats = NexusAPI.getApi().getPrimaryDatabase().get(NickSGPlayerStats.class, "uniqueid", e.getNexusPlayer().getUniqueId()).getFirst();
+            fakeStats = NexusReborn.getPrimaryDatabase().get(NickSGPlayerStats.class, "uniqueid", e.getNexusPlayer().getUniqueId()).getFirst();
             
             if (nexusPlayer.getNickname() != null) {
                 fakeStats.setPersist(nexusPlayer.getNickname().isPersist());
@@ -769,8 +769,8 @@ public class PlayerListener implements Listener {
         }
 
         e.setQuitMessage(null);
-        NexusAPI.getApi().getPrimaryDatabase().saveSilent(sgPlayer.getStats());
-        NexusAPI.getApi().getPrimaryDatabase().saveSilent(sgPlayer.getTrueStats());
+        NexusReborn.getPrimaryDatabase().saveSilent(sgPlayer.getStats());
+        NexusReborn.getPrimaryDatabase().saveSilent(sgPlayer.getTrueStats());
         plugin.getPlayerRegistry().unregister(e.getPlayer().getUniqueId());
     }
     
@@ -831,6 +831,6 @@ public class PlayerListener implements Listener {
     
     @EventHandler
     public void onNickRemove(NicknameRemoveEvent e) {
-        NexusAPI.getApi().getPrimaryDatabase().deleteSilent(NickSGPlayerStats.class, e.getNexusPlayer().getUniqueId().toString(), new Object[]{"persist"}, new Object[]{false});
+        NexusReborn.getPrimaryDatabase().deleteSilent(NickSGPlayerStats.class, e.getNexusPlayer().getUniqueId().toString(), new Object[]{"persist"}, new Object[]{false});
     }
 }

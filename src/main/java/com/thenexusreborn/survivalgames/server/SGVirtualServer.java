@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.server;
 
 import com.stardevllc.starchat.context.ChatContext;
-import com.thenexusreborn.api.NexusAPI;
+import com.thenexusreborn.api.NexusReborn;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.server.InstanceServer;
@@ -36,8 +36,8 @@ public class SGVirtualServer extends VirtualServer {
 
     @Override
     public boolean recalculateVisibility(UUID playerUUID, UUID otherPlayerUUID) {
-        NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(playerUUID);
-        NexusPlayer otherNexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(otherPlayerUUID);
+        NexusPlayer nexusPlayer = NexusReborn.getPlayerManager().getNexusPlayer(playerUUID);
+        NexusPlayer otherNexusPlayer = NexusReborn.getPlayerManager().getNexusPlayer(otherPlayerUUID);
 
         if (nexusPlayer == null) {
             return false;
@@ -81,7 +81,7 @@ public class SGVirtualServer extends VirtualServer {
     @Override
     public void teleportToSpawn(UUID uuid) {
         if (!this.players.contains(uuid)) {
-            NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(uuid);
+            NexusPlayer nexusPlayer = NexusReborn.getPlayerManager().getNexusPlayer(uuid);
             join(nexusPlayer);
         } else {
             SGPlayer sgPlayer = plugin.getPlayerRegistry().get(uuid);

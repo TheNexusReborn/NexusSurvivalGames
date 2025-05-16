@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.scoreboard;
 
 import com.stardevllc.starcore.StarColors;
-import com.thenexusreborn.api.NexusAPI;
+import com.thenexusreborn.api.NexusReborn;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.scoreboard.TablistHandler;
@@ -37,7 +37,7 @@ public class GameTablistHandler extends TablistHandler {
         removeDisconnectedPlayers();
         
         for (Player player : Bukkit.getOnlinePlayers()) {
-            NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(player.getUniqueId());
+            NexusPlayer nexusPlayer = NexusReborn.getPlayerManager().getNexusPlayer(player.getUniqueId());
             if (nexusPlayer != null) {
                 GamePlayer gamePlayer = plugin.getPlayerRegistry().get(player.getUniqueId()).getGamePlayer();
                 if (gamePlayer == null) {

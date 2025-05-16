@@ -10,7 +10,7 @@ import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.starcore.StarColors;
 import com.stardevllc.time.TimeFormat;
 import com.stardevllc.time.TimeUnit;
-import com.thenexusreborn.api.NexusAPI;
+import com.thenexusreborn.api.NexusReborn;
 import com.thenexusreborn.api.gamearchive.*;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
@@ -405,7 +405,7 @@ public class Game implements Controllable, IHasState {
     }
     
     public void quit(UUID uuid) {
-        NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(uuid);
+        NexusPlayer nexusPlayer = NexusReborn.getPlayerManager().getNexusPlayer(uuid);
         if (nexusPlayer != null) {
             quit(nexusPlayer);
         } else {
@@ -436,7 +436,7 @@ public class Game implements Controllable, IHasState {
         sgPlayer.setGame(null, null);
         
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            SQLDatabase database = NexusAPI.getApi().getPrimaryDatabase();
+            SQLDatabase database = NexusReborn.getPrimaryDatabase();
             database.saveSilent(sgPlayer.getStats());
             database.saveSilent(gamePlayer.getTrueStats());
             database.saveSilent(sgPlayer.getNexusPlayer().getBalance());
@@ -1045,9 +1045,9 @@ public class Game implements Controllable, IHasState {
         gameInfo.setLength(this.end - this.start);
         
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            NexusAPI.getApi().getPrimaryDatabase().saveSilent(gameInfo);
+            NexusReborn.getPrimaryDatabase().saveSilent(gameInfo);
             try {
-                NexusAPI.getApi().getGameLogManager().exportGameInfo(gameInfo);
+                NexusReborn.getGameLogManager().exportGameInfo(gameInfo);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -1061,26 +1061,26 @@ public class Game implements Controllable, IHasState {
                 if (gameInfo.getId() % 1000 == 0) {
                     for (PlayerInfo p : gameInfo.getPlayers()) {
                         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-                            UUID uuid = NexusAPI.getApi().getPlayerManager().getUUIDFromName(p.getName());
+                            UUID uuid = NexusReborn.getPlayerManager().getUUIDFromName(p.getName());
                             
                             Tag tag = new Tag(uuid, gameInfo.getId() + "th", System.currentTimeMillis());
-                            NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(uuid);
+                            NexusPlayer nexusPlayer = NexusReborn.getPlayerManager().getNexusPlayer(uuid);
                             if (nexusPlayer != null) {
                                 nexusPlayer.sendMessage(MsgType.INFO + "Unlocked the tag " + tag.getDisplayName());
                             }
-                            NexusAPI.getApi().getPrimaryDatabase().saveSilent(tag);
+                            NexusReborn.getPrimaryDatabase().saveSilent(tag);
                         });
                     }
                 }
                 
                 for (GamePlayer gamePlayer : players.values()) {
-                    NexusAPI.getApi().getPrimaryDatabase().queue(gamePlayer.getStats());
-                    NexusAPI.getApi().getPrimaryDatabase().queue(gamePlayer.getTrueStats());
-                    NexusAPI.getApi().getPrimaryDatabase().queue(gamePlayer.getBalance());
-                    NexusAPI.getApi().getPrimaryDatabase().queue(gamePlayer.getNexusPlayer().getExperience());
+                    NexusReborn.getPrimaryDatabase().queue(gamePlayer.getStats());
+                    NexusReborn.getPrimaryDatabase().queue(gamePlayer.getTrueStats());
+                    NexusReborn.getPrimaryDatabase().queue(gamePlayer.getBalance());
+                    NexusReborn.getPrimaryDatabase().queue(gamePlayer.getNexusPlayer().getExperience());
                 }
                 
-                NexusAPI.getApi().getPrimaryDatabase().flush();
+                NexusReborn.getPrimaryDatabase().flush();
             }
         });
         

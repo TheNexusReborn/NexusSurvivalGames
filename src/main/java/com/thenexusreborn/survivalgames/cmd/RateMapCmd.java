@@ -2,7 +2,7 @@ package com.thenexusreborn.survivalgames.cmd;
 
 import com.stardevllc.starcore.cmdflags.FlagResult;
 import com.stardevllc.time.TimeUnit;
-import com.thenexusreborn.api.NexusAPI;
+import com.thenexusreborn.api.NexusReborn;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.gamemaps.model.MapRating;
 import com.thenexusreborn.gamemaps.model.SGMap;
@@ -72,7 +72,7 @@ public class RateMapCmd extends NexusCommand<SurvivalGames> {
             player.sendMessage(MsgType.INFO.format("You rated the map %v &ea %v", gameMap.getName(), rating));
         }
 
-        NexusAPI.getApi().getPrimaryDatabase().saveSilent(mapRating);
+        NexusReborn.getPrimaryDatabase().saveSilent(mapRating);
         return true;
     }
 }
