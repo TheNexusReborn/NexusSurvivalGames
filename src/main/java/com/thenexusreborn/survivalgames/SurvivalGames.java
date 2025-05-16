@@ -9,7 +9,7 @@ import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.staritems.model.CustomItem;
 import com.stardevllc.staritems.model.ItemRegistry;
 import com.stardevllc.starui.GuiManager;
-import com.thenexusreborn.api.NexusAPI;
+import com.thenexusreborn.api.NexusReborn;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.registry.ToggleRegistry;
 import com.thenexusreborn.api.server.InstanceServer;
@@ -224,7 +224,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         }
 
         getLogger().info("Loading all unlocked mutations");
-        SQLDatabase database = NexusAPI.getApi().getPrimaryDatabase();
+        SQLDatabase database = NexusReborn.getPrimaryDatabase();
         try {
             List<UnlockedMutation> unlockedMutations = database.get(UnlockedMutation.class);
             for (UnlockedMutation unlockedMutation : unlockedMutations) {

@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.cmd;
 
 import com.stardevllc.starcore.cmdflags.FlagResult;
-import com.thenexusreborn.api.NexusAPI;
+import com.thenexusreborn.api.NexusReborn;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.nexuscore.api.command.NexusCommand;
@@ -29,7 +29,7 @@ public class VoteStartCommand extends NexusCommand<SurvivalGames> {
             return true;
         }
 
-        NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(senderPlayer.getUniqueId());
+        NexusPlayer nexusPlayer = NexusReborn.getPlayerManager().getNexusPlayer(senderPlayer.getUniqueId());
         Lobby lobby = sgPlayer.getLobby();
 
         if (!lobby.getLobbySettings().isAllowVoteStart()) {

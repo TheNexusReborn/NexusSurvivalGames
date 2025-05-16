@@ -10,7 +10,7 @@ import com.stardevllc.starcore.base.XMaterial;
 import com.stardevllc.starcore.base.itembuilder.ItemBuilder;
 import com.stardevllc.starcore.utils.ProgressBar;
 import com.stardevllc.time.TimeUnit;
-import com.thenexusreborn.api.NexusAPI;
+import com.thenexusreborn.api.NexusReborn;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.gamemaps.model.MapRating;
@@ -235,7 +235,7 @@ public class Lobby implements Controllable, IHasState {
     }
 
     public void resetInvalidState() {
-        NexusAPI.logMessage(Level.SEVERE, "Resetting Lobby from an Invalid State, see below for the stored information", this + "");
+        NexusReborn.logMessage(Level.SEVERE, "Resetting Lobby from an Invalid State, see below for the stored information", this + "");
 
         this.players.entrySet().removeIf(entry -> Bukkit.getPlayer(entry.getKey()) == null);
 
@@ -394,7 +394,7 @@ public class Lobby implements Controllable, IHasState {
 
     public void startTimer() {
         this.state = LobbyState.COUNTDOWN;
-        this.timer = NexusAPI.getApi().getClockManager().createTimer(TimeUnit.SECONDS.toMillis(lobbySettings.getTimerLength()));
+        this.timer = NexusReborn.getClockManager().createTimer(TimeUnit.SECONDS.toMillis(lobbySettings.getTimerLength()));
         this.timer.addRepeatingCallback(new LobbyTimerCallback(this), TimeUnit.SECONDS.toMillis(1));
         this.timer.start();
     }
@@ -418,7 +418,7 @@ public class Lobby implements Controllable, IHasState {
             Rank.MEMBER, 1);
 
     private int getVoteCount(int position, UUID uuid) {
-        NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(uuid);
+        NexusPlayer nexusPlayer = NexusReborn.getPlayerManager().getNexusPlayer(uuid);
         if (nexusPlayer == null) {
             return 0;
         }
@@ -665,7 +665,7 @@ public class Lobby implements Controllable, IHasState {
     }
 
     public void removePlayer(UUID uniqueId) {
-        NexusPlayer nexusPlayer = NexusAPI.getApi().getPlayerManager().getNexusPlayer(uniqueId);
+        NexusPlayer nexusPlayer = NexusReborn.getPlayerManager().getNexusPlayer(uniqueId);
 
         if (nexusPlayer == null || Bukkit.getPlayer(uniqueId) == null) {
             this.players.remove(uniqueId);

@@ -6,7 +6,7 @@ import com.stardevllc.starcore.base.itembuilder.ItemBuilder;
 import com.stardevllc.starui.element.Element;
 import com.stardevllc.starui.element.button.Button;
 import com.stardevllc.starui.gui.InventoryGUI;
-import com.thenexusreborn.api.NexusAPI;
+import com.thenexusreborn.api.NexusReborn;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -101,7 +101,7 @@ public class MutateGui extends InventoryGUI {
                     .consumer(e -> {
                         player.removeCredits(type.getUnlockCost());
                         UnlockedMutation unlockedMutation = new UnlockedMutation(player.getUniqueId(), type.getId(), System.currentTimeMillis());
-                        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> NexusAPI.getApi().getPrimaryDatabase().saveSilent(unlockedMutation));
+                        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> NexusReborn.getPrimaryDatabase().saveSilent(unlockedMutation));
                         unlockedMutations.add(unlockedMutation);
                         player.sendMessage(MsgType.INFO + "You bought the mutation &b" + type.getDisplayName() + " &efor &b" + type.getUnlockCost() + " &ecredits.");
                         e.getWhoClicked().closeInventory();
