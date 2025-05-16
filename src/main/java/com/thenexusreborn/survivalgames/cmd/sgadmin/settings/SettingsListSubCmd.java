@@ -66,9 +66,9 @@ public class SettingsListSubCmd extends SubCommand<SurvivalGames> {
         
         if (args.length > 0) {
             try {
-                page = Integer.parseInt(args[1]);
+                page = Integer.parseInt(args[0]);
             } catch (Exception e) {
-                MsgType.WARN.send(sender, "Invalid number %v", args[1]);
+                MsgType.WARN.send(sender, "Invalid number %v", args[0]);
                 return true;
             }
         }
