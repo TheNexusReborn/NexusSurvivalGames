@@ -7,6 +7,7 @@ import com.thenexusreborn.survivalgames.cmd.sgadmin.game.SGAGameCmd;
 import com.thenexusreborn.survivalgames.cmd.sgadmin.lobby.SGALobbyCmd;
 import com.thenexusreborn.survivalgames.cmd.sgadmin.maps.SGAMapsSubCmd;
 import com.thenexusreborn.survivalgames.cmd.sgadmin.settings.SGASettingsCmd;
+import com.thenexusreborn.survivalgames.cmd.sgadmin.timer.SGATimerCmd;
 
 public class SGAdminCmd extends NexusCommand<SurvivalGames> {
     public SGAdminCmd(SurvivalGames plugin) {
@@ -15,5 +16,6 @@ public class SGAdminCmd extends NexusCommand<SurvivalGames> {
         this.subCommands.add(new SGALobbyCmd(plugin, this));
         this.subCommands.add(new SGASettingsCmd(plugin, this));
         this.subCommands.add(new SGAMapsSubCmd(plugin, this));
+        this.subCommands.add(new SGATimerCmd(plugin, this));
     }
 }
