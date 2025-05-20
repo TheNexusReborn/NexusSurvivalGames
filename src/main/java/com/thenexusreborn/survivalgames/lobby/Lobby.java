@@ -408,6 +408,7 @@ public class Lobby implements Controllable, IHasState {
             Rank.HELPER, 7, 
             Rank.MVP, 10, 
             Rank.VIP, 6, 
+            Rank.MEDIA, 5,
             Rank.ARCHITECT, 5, 
             Rank.PLATINUM, 4, 
             Rank.DIAMOND, 3, 
