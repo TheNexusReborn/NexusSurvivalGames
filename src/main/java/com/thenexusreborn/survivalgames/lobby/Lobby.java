@@ -434,7 +434,7 @@ public class Lobby implements Controllable, IHasState {
         int votes = 0;
         for (LobbyPlayer player : getPlayers()) {
             if (player.getMapVote() == position) {
-                if (getLobbySettings().isVoteWeight()) {
+                if (getLobbySettings().isVoteWeight() && VOTE_WEIGHTS.containsKey(player.getEffectiveRank())) {
                     votes += VOTE_WEIGHTS.get(player.getEffectiveRank());
                 } else {
                     votes += 1;
