@@ -1,7 +1,6 @@
 package com.thenexusreborn.survivalgames.scoreboard;
 
 import com.stardevllc.starcore.StarColors;
-import com.thenexusreborn.api.NexusReborn;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.scoreboard.TablistHandler;
@@ -36,23 +35,21 @@ public class GameTablistHandler extends TablistHandler {
     public void update() {
         removeDisconnectedPlayers();
         
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            NexusPlayer nexusPlayer = NexusReborn.getPlayerManager().getNexusPlayer(player.getUniqueId());
-            if (nexusPlayer != null) {
-                GamePlayer gamePlayer = plugin.getPlayerRegistry().get(player.getUniqueId()).getGamePlayer();
-                if (gamePlayer == null) {
-                    continue;
-                }
-                
-                ITeam team = getPlayerTeams().get(nexusPlayer.getUniqueId());
-                String correctChar = BEGIN_CHARS.get(gamePlayer.getTeam());
-                if (team == null) {
-                    createPlayerTeam(nexusPlayer);
-                } else {
-                    if (team.getName().startsWith(correctChar)) {
-                        updatePlayerTeam(nexusPlayer);
+        for (SGPlayer sgPlayer : plugin.getPlayerRegistry()) {
+            
+            if (sgPlayer.getGame() != null) {
+                GamePlayer gamePlayer = sgPlayer.getGamePlayer();
+                if (gamePlayer != null) {
+                    ITeam team = getPlayerTeams().get(sgPlayer.getUniqueId());
+                    String correctChar = BEGIN_CHARS.get(gamePlayer.getTeam());
+                    if (team == null || team.getName().isEmpty()) {
+                        createPlayerTeam(sgPlayer.getNexusPlayer());
                     } else {
-                        refreshPlayerTeam(nexusPlayer);
+                        if (team.getName().startsWith(correctChar)) {
+                            updatePlayerTeam(sgPlayer.getNexusPlayer());
+                        } else {
+                            refreshPlayerTeam(sgPlayer.getNexusPlayer());
+                        }
                     }
                 }
             }
@@ -80,22 +77,28 @@ public class GameTablistHandler extends TablistHandler {
     @Override
     public String getPlayerTeamName(NexusPlayer player) {
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
+        String beginChars = "";
         if (sgPlayer == null) {
-            return "z_" + player.getName();
+            beginChars = "z_";
         }
         
         Game game = sgPlayer.getGame();
         
         if (game == null) {
-            return "y_" + player.getName();
+            beginChars =  "y_";
         }
         
         GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
-        if (gamePlayer != null) {
-            return "x_" + player.getName();
+        if (gamePlayer == null) {
+            beginChars = "x_";
         }
         
-        return BEGIN_CHARS.get(gamePlayer.getTeam()) + "_" + player.getName();
+        String name = beginChars + "_" + sgPlayer.getName();
+        if (name.length() > 15) {
+            return name.substring(0, 16);
+        }
+        
+        return name;
     }
     
     @Override
