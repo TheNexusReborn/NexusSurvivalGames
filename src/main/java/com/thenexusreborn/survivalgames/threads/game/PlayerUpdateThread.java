@@ -22,18 +22,16 @@ public class PlayerUpdateThread extends StarThread<SurvivalGames> {
                 continue;
             }
             
-            if (game != null) {
-                for (GamePlayer player : game.getPlayers().values()) {
-                    if (player.getTeam() == GameTeam.SPECTATORS) {
-                        SGUtils.updatePlayerHealthAndFood(Bukkit.getPlayer(player.getUniqueId()));
-                        player.updateMutationItem();
-                    } else if (player.getTeam() == GameTeam.MUTATIONS) {
-                        player.setFood(20, 20F);
-                    } else if (player.getTeam() == GameTeam.TRIBUTES) {
-                        Player bukkitPlayer = Bukkit.getPlayer(player.getUniqueId());
-                        if (bukkitPlayer.getHealth() >= bukkitPlayer.getMaxHealth()) {
-                            player.getDamageInfo().clearDamagers();
-                        }
+            for (GamePlayer player : game.getPlayers().values()) {
+                if (player.getTeam() == GameTeam.SPECTATORS) {
+                    SGUtils.updatePlayerHealthAndFood(Bukkit.getPlayer(player.getUniqueId()));
+                    player.updateMutationItem();
+                } else if (player.getTeam() == GameTeam.MUTATIONS) {
+                    player.setFood(20, 20F);
+                } else if (player.getTeam() == GameTeam.TRIBUTES) {
+                    Player bukkitPlayer = Bukkit.getPlayer(player.getUniqueId());
+                    if (bukkitPlayer.getHealth() >= bukkitPlayer.getMaxHealth()) {
+                        player.getDamageInfo().clearDamagers();
                     }
                 }
             }
