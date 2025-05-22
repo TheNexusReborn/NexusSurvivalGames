@@ -491,6 +491,7 @@ public class Game implements Controllable, IHasState {
     }
     
     private void teleportToGameSpawn(Player player, Location spawn, GameTeam gameTeam) {
+        player.setFallDistance(0);
         player.teleport(spawn);
         GamePlayer gamePlayer = this.players.get(player.getUniqueId());
         gamePlayer.setPosition(player.getLocation());
