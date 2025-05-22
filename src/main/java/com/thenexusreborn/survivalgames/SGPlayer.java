@@ -10,7 +10,10 @@ import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
 import com.thenexusreborn.survivalgames.util.NickSGPlayerStats;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
+import org.bukkit.Location;
+import org.bukkit.entity.*;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 import java.util.UUID;
 
@@ -141,5 +144,61 @@ public class SGPlayer {
     
     public String getTrueColoredName() {
         return getNexusPlayer().getTrueColoredName();
+    }
+    
+    public ItemStack getItemInHand() {
+        Player player = getSpigotPlayer();
+        if (player != null) {
+            return player.getItemInHand();
+        }
+        
+        return null;
+    }
+    
+    public boolean isBlocking() {
+        Player player = getSpigotPlayer();
+        if (player != null) {
+            return player.isBlocking();
+        }
+        
+        return false;
+    }
+    
+    public void launchProjectile(Class<? extends Projectile> projectileClass) {
+        Player player = getSpigotPlayer();
+        if (player != null) {
+            player.launchProjectile(projectileClass);
+        }
+    }
+    
+    public void setLevel(int level) {
+        Player player = getSpigotPlayer();
+        if (player != null) {
+            player.setLevel(level);
+        }
+    }
+    
+    public Location getLocation() {
+        Player player = getSpigotPlayer();
+        if (player != null) {
+            player.getLocation();
+        }
+        return null;
+    }
+    
+    public Vector getVelocity() {
+        Player player = getSpigotPlayer();
+        if (player != null) {
+            return player.getVelocity();
+        }
+        
+        return null;
+    }
+    
+    public void setVelocity(Vector vector) {
+        Player player = getSpigotPlayer();
+        if (player != null) {
+            player.setVelocity(vector);
+        }
     }
 }

@@ -3,15 +3,11 @@ package com.thenexusreborn.survivalgames.threads.game;
 import com.stardevllc.starcore.utils.StarThread;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.Game;
-import com.thenexusreborn.survivalgames.game.GamePlayer;
-import com.thenexusreborn.survivalgames.game.GameTeam;
+import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.mutations.impl.ChickenMutation;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Egg;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public class ChickenMutationThread extends StarThread<SurvivalGames> {
@@ -26,8 +22,7 @@ public class ChickenMutationThread extends StarThread<SurvivalGames> {
     
     @Override
     public void onRun() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
+        for (SGPlayer sgPlayer : plugin.getPlayerRegistry()) {
             if (sgPlayer == null) {
                 continue;
             }
@@ -37,33 +32,33 @@ public class ChickenMutationThread extends StarThread<SurvivalGames> {
                 continue;
             }
             
-            GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
+            GamePlayer gamePlayer = game.getPlayer(sgPlayer.getUniqueId());
             if (gamePlayer == null) {
                 continue;
             }
+            
             if (gamePlayer.getTeam() != GameTeam.MUTATIONS) {
                 continue;
             }
         
             if (gamePlayer.getMutation() instanceof ChickenMutation chickenMutation) {
-    
                 if (this.eggGain == 0) {
                     chickenMutation.incrementAmmunition();
                 }
                 
-                ItemStack hand = player.getItemInHand();
-                if (player.isBlocking() && hand != null && hand.getType() == Material.WOOD_SWORD && chickenMutation.getAmmunition() > 0) {
-                    player.launchProjectile(Egg.class);
+                ItemStack hand = sgPlayer.getItemInHand();
+                if (sgPlayer.isBlocking() && hand != null && hand.getType() == Material.WOOD_SWORD && chickenMutation.getAmmunition() > 0) {
+                    sgPlayer.launchProjectile(Egg.class);
                     chickenMutation.decrementAmmunition();
                 }
-    
-                player.setLevel(chickenMutation.getAmmunition());
+                
+                sgPlayer.setLevel(chickenMutation.getAmmunition());
                 
                 if (chickenMutation.isChuteActive()) {
-                    Location location = player.getLocation();
+                    Location location = sgPlayer.getLocation();
                     location.setY(location.getBlockY() - 1);
                     if (location.getBlock().getType() == Material.AIR) {
-                        player.setVelocity(player.getVelocity().setY(-0.2));
+                        sgPlayer.setVelocity(sgPlayer.getVelocity().setY(-0.2));
                     } else {
                         chickenMutation.deactivateChute();
                     }
