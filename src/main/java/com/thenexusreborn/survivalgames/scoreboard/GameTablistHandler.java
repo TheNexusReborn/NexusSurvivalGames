@@ -10,9 +10,9 @@ import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 public class GameTablistHandler extends TablistHandler {
     
@@ -121,5 +121,10 @@ public class GameTablistHandler extends TablistHandler {
         }
         
         team.setPrefix(StarColors.color(color));
+    }
+    
+    @Override
+    public Logger getLogger() {
+        return plugin.getLogger();
     }
 }
