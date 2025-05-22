@@ -35,8 +35,8 @@ public class GameWorldThread extends StarThread<SurvivalGames> {
             if (weather == Weather.CLEAR) {
                 world.setStorm(false);
                 world.setThundering(false);
-                world.setWeatherDuration(0);
-                world.setThunderDuration(0);
+                world.setWeatherDuration(Integer.MAX_VALUE);
+                world.setThunderDuration(Integer.MAX_VALUE);
             } else if (weather == Weather.RAIN) {
                 world.setStorm(true);
                 world.setThundering(false);
