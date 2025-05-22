@@ -274,7 +274,7 @@ public class GamePlayer {
     
     public Pair<Boolean, String> canMutate() {
         if (game == null) {
-            return new Pair<>(false, "You cannot mutate because there is not game running.");
+            return new Pair<>(false, "You cannot mutate because there is no game running.");
         }
 
         if (!(game.getState() == Game.State.INGAME || game.getState() == Game.State.INGAME_DEATHMATCH)) {
@@ -524,7 +524,7 @@ public class GamePlayer {
         PlayerInventory inv = player.getInventory();
 
         ItemStack mutateItem = inv.getItem(5);
-        if (mutateItem == null || mutateItem.getType() == Material.AIR) {
+        if (mutateItem == null || mutateItem.getType() != Material.ROTTEN_FLESH) {
             return;
         }
         
