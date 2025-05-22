@@ -264,7 +264,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
 
         new GameStateThread(this).start();
         new TimerCountdownCheckThread(this).start();
-        new DeathmatchSetupThread(this).start();
         new GameWorldThread(this).start();
         new LobbyThread(this).start();
         new PlayerTrackerThread(this).start();
