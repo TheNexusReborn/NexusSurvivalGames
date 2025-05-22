@@ -446,7 +446,7 @@ public class PlayerListener implements Listener {
             }
         }
 
-        String symbolColor = e.newValue() ? "a" : "c";
+        String symbolColor = !e.newValue() ? "a" : "c";
         String symbol = !e.newValue() ? ">>" : "<<";
         String action = !e.newValue() ? "joined" : "left";
         String silent = incognito ? " &e&osilently" : "";
