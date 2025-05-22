@@ -58,7 +58,9 @@ public class SGVirtualServer extends VirtualServer {
                 return playerRank.ordinal() < otherPlayerRank.ordinal();
             } else if (playerIsVanished && !otherPlayerIsVanished) {
                 return true;
-            } else return !otherPlayerIsVanished || playerIsVanished;
+            } else {
+                return !otherPlayerIsVanished || playerIsVanished;
+            }
         } else {
             if (game.getState() == Game.State.ENDING) {
                 return true;
@@ -74,7 +76,9 @@ public class SGVirtualServer extends VirtualServer {
                 return false;
             } else if (playerIsSpectator && !otherPlayerIsSpectator) {
                 return true;
-            } else return playerIsSpectator || !otherPlayerIsSpectator;
+            } else {
+                return playerIsSpectator || !otherPlayerIsSpectator;
+            }
         }
     }
 
