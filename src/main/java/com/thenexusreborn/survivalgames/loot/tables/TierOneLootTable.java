@@ -14,7 +14,7 @@ public class TierOneLootTable extends SGLootTable {
         addItems(30, Items.PORKCHOP, Items.STEAK, Items.GRILLED_CHICKEN, Items.VILE_CREATURE, Items.BAKED_POTATO, Items.PUMPKIN_PIE);
         addItems(50, Items.RAW_PORKCHOP, Items.RAW_BEEF, Items.RAW_FISH);
         addItems(35, Items.CAKE, Items.MELON, Items.CARROT, Items.APPLE, Items.MUSHROOM_SOUP);
-        addItems(15, Items.GOLDEN_CARROT, Items.GOLDEN_MUNCHIE, Items.WET_NODDLE);
+        addItems(15, Items.GOLDEN_CARROT, Items.WET_NODDLE);
 
         addItems(30, Items.LEATHER_HELMET, Items.LEATHER_CHESTPLATE, Items.LEATHER_LEGGINGS, Items.LEATHER_BOOTS);
         addItems(20, Items.THE_CROWN, Items.GOLD_CHESTPLATE, Items.GOLD_LEGGINGS, Items.GOLD_BOOTS, Items.LINGERIE_HELMET, Items.LINGERIE_CHESTPLATE, Items.LINGERIE_LEGGINGS, Items.LINGERIE_BOOTS);
@@ -30,8 +30,7 @@ public class TierOneLootTable extends SGLootTable {
         addItems(15, Items.PLAYER_TRACKER, Items.FISHING_ROD);
 
         addItems(20, Items.FEATHER, Items.FLINT, Items.STICK);
-        addItems(15, Items.GOLD_INGOT, Items.IRON_INGOT);
-        addItems(3, Items.ENDER_PEARL);
-        addItems(3, Items.DIAMOND);
+        addItems(20, Items.GOLD_INGOT, Items.IRON_INGOT);
+        addItems(3, Items.ENDER_PEARL, Items.DIAMOND, Items.GOLDEN_MUNCHIE);
     }
 }

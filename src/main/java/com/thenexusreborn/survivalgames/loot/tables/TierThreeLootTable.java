@@ -12,7 +12,7 @@ public class TierThreeLootTable extends SGLootTable {
     @Override
     public void loadDefaultData() {
         addItems(50, Items.BAKED_POTATO, Items.VILE_CREATURE, Items.PORKCHOP, Items.STEAK, Items.GRILLED_CHICKEN, Items.PUMPKIN_PIE);
-        addItems(40, Items.APPLE, Items.CAKE, Items.GOLDEN_CARROT, Items.GOLDEN_MUNCHIE);
+        addItems(40, Items.APPLE, Items.CAKE, Items.GOLDEN_CARROT);
 
         addItems(30, Items.LINGERIE_HELMET, Items.LINGERIE_CHESTPLATE, Items.LINGERIE_LEGGINGS, Items.LINGERIE_BOOTS);
         addItems(20, Items.IRON_HELMET, Items.IRON_CHESTPLATE, Items.IRON_LEGGINGS, Items.IRON_BOOTS);
@@ -21,7 +21,7 @@ public class TierThreeLootTable extends SGLootTable {
         addItems(20, Items.STONE_SWORD);
         addItems(10, Items.IRON_SWORD);
 
-        addItems(15, Items.EGG_OF_DOOM, Items.SLOWBALL, Items.XP_BOTTLE, Items.ENDER_PEARL);
+        addItems(15, Items.EGG_OF_DOOM, Items.SLOWBALL, Items.XP_BOTTLE, Items.ENDER_PEARL, Items.GOLDEN_MUNCHIE);
         addItems(10, Items.COBWEB, Items.TNT);
 
         addItems(30, Items.ARROW.setAmount(5));
@@ -29,6 +29,6 @@ public class TierThreeLootTable extends SGLootTable {
 
         addItems(30, Items.FEATHER, Items.FLINT, Items.STICK, Items.GOLD_INGOT);
         addItems(25, Items.IRON_INGOT);
-        addItems(10, Items.DIAMOND);
+        addItems(15, Items.DIAMOND);
     }
 }
