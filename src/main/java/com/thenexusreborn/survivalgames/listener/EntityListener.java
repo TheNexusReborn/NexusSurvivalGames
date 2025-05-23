@@ -33,7 +33,7 @@ public class EntityListener implements Listener {
     
     private final SurvivalGames plugin;
     
-    private static final Set<DamageCause> GRACE_DAMAGE_STOP = new HashSet<>(Arrays.asList(DamageCause.BLOCK_EXPLOSION, DamageCause.ENTITY_EXPLOSION, DamageCause.FIRE, DamageCause.FIRE_TICK));
+    private static final Set<DamageCause> GRACE_DAMAGE_STOP = EnumSet.of(DamageCause.BLOCK_EXPLOSION, DamageCause.ENTITY_EXPLOSION, DamageCause.FIRE, DamageCause.FIRE_TICK);
     
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,##0.#");
     
@@ -62,7 +62,7 @@ public class EntityListener implements Listener {
     
     @EventHandler
     public void onHangingBreak(HangingBreakEvent e) {
-        if ((e.getCause() == RemoveCause.EXPLOSION || e.getCause() == RemoveCause.ENTITY)) {
+        if (e.getCause() == RemoveCause.EXPLOSION || e.getCause() == RemoveCause.ENTITY) {
             e.setCancelled(true);
         }
     }
