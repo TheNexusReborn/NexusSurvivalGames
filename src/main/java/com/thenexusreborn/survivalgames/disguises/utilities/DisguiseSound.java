@@ -1,5 +1,7 @@
 package com.thenexusreborn.survivalgames.disguises.utilities;
 
+import com.stardevllc.converter.string.EnumStringConverter;
+import com.stardevllc.converter.string.StringConverters;
 import org.bukkit.Sound;
 
 import java.util.HashMap;
@@ -69,6 +71,10 @@ public enum DisguiseSound {
             "mob.zombie.woodbreak", "mob.zombie.metal", "mob.zombie.wood"),
     ZOMBIE_VILLAGER("mob.zombie.hurt", "mob.zombie.step", "mob.zombie.death", "mob.zombie.say", "mob.zombie.infect",
             "mob.zombie.woodbreak", "mob.zombie.metal", "mob.zombie.wood");
+    
+    static {
+        StringConverters.addConverter(DisguiseSound.class, new EnumStringConverter<>(DisguiseSound.class));
+    }
 
     public enum SoundType {
 

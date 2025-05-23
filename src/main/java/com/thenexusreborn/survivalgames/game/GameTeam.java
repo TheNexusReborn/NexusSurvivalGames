@@ -1,5 +1,7 @@
 package com.thenexusreborn.survivalgames.game;
 
+import com.stardevllc.converter.string.EnumStringConverter;
+import com.stardevllc.converter.string.StringConverters;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
 import com.thenexusreborn.survivalgames.util.PlayerState;
@@ -91,6 +93,10 @@ public enum GameTeam {
             new PlayerState(), 
             "%&8<&3nexussg_score%&8> &8(&2&l%nexuscore_level%&8) &r%nexussg_displayname%&8: %nexuscore_chatcolor%{message}"
     );
+    
+    static {
+        StringConverters.addConverter(GameTeam.class, new EnumStringConverter<>(GameTeam.class));
+    }
     
     private final String name, color, remainColor, chatFormat;
     private final Sound deathSound;

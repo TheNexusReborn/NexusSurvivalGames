@@ -39,7 +39,7 @@ dependencies {
     compileOnly 'com.github.StarDevelopmentLLC:StarUI:0.1.4'
     compileOnly 'com.thenexusreborn:NexusMaps:0.1.0'
     compileOnly 'com.thenexusreborn:NexusHub:0.1.0'
-    compileOnly 'com.github.StarDevelopmentLLC:StarCore:0.4.1'
+    compileOnly 'com.github.StarDevelopmentLLC:StarCore:0.4.2'
     compileOnly 'com.github.StarDevelopmentLLC:StarChat:0.2.4'
     compileOnly 'com.github.StarDevelopmentLLC:StarItems:0.1.5'
     compileOnly 'me.clip:placeholderapi:2.11.5'

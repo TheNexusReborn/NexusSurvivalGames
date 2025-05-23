@@ -1,5 +1,7 @@
 package com.thenexusreborn.survivalgames.disguises.disguisetypes;
 
+import com.stardevllc.converter.string.EnumStringConverter;
+import com.stardevllc.converter.string.StringConverters;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -82,6 +84,10 @@ public enum DisguiseType {
     ZOMBIE,
     ZOMBIE_VILLAGER,
     UNKNOWN;
+    
+    static {
+        StringConverters.addConverter(DisguiseType.class, new EnumStringConverter<>(DisguiseType.class));
+    }
 
     private static Method isVillager, getVariant, getSkeletonType, isElder;
 

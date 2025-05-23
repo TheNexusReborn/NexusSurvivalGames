@@ -1,10 +1,17 @@
 package com.thenexusreborn.survivalgames.control;
 
+import com.stardevllc.converter.string.EnumStringConverter;
+import com.stardevllc.converter.string.StringConverters;
+
 public enum ControlType {
     MANUAL("mnl", "m"), //No timers or progression logic is used. Progress triggered manually
     STEP, //Allows use of /sg game next to step forward in phases and steps
     SEMI_AUTO, //Timers run, but does not trigger next steps
     AUTO("automatic", "a"); //Fully auto, timers and progression logic
+    
+    static {
+        StringConverters.addConverter(ControlType.class, new EnumStringConverter<>(ControlType.class));
+    }
     
     private final String[] aliases;
 

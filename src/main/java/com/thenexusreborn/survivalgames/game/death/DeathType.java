@@ -1,5 +1,7 @@
 package com.thenexusreborn.survivalgames.game.death;
 
+import com.stardevllc.converter.string.EnumStringConverter;
+import com.stardevllc.converter.string.StringConverters;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
@@ -33,6 +35,10 @@ public enum DeathType {
     VANISH(true),
     SPECTATE, 
     CACTUS(true);
+    
+    static {
+        StringConverters.addConverter(DeathType.class, new EnumStringConverter<>(DeathType.class));
+    }
     
     private final boolean playerSubtype;
     
