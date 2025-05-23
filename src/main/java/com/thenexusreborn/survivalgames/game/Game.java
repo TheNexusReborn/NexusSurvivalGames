@@ -2,6 +2,8 @@ package com.thenexusreborn.survivalgames.game;
 
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.stardevllc.clock.clocks.Timer;
+import com.stardevllc.converter.string.EnumStringConverter;
+import com.stardevllc.converter.string.StringConverters;
 import com.stardevllc.helper.StringHelper;
 import com.stardevllc.registry.StringRegistry;
 import com.stardevllc.starchat.context.ChatContext;
@@ -89,6 +91,11 @@ public class Game implements Controllable, IHasState {
         ADD_AS_TRIBUTE, REMOVE_FROM_GAME, REVIVE_PLAYER, MUTATE_PLAYER, PLAYER_JOIN, PLAYER_QUIT,
         REMOVING_MUTATIONS,
         TIMER_SHUTDOWN, DETERMINE_WINNER, SET_GAME_STATS
+    }
+    
+    static {
+        StringConverters.addConverter(State.class, new EnumStringConverter<>(State.class));
+        StringConverters.addConverter(SubState.class, new EnumStringConverter<>(SubState.class));
     }
     
     private final SGMap gameMap;

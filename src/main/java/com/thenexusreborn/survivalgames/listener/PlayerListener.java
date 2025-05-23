@@ -362,6 +362,8 @@ public class PlayerListener implements Listener {
                             player.sendMessage(MsgType.WARN.format("That loot table is being reloaded, try again in a few seconds."));
                             return;
                         }
+                        
+                        NexusReborn.sendDebugMessage(player, "Loot Table: " + lootTable.getName());
 
                         List<ItemStack> items = lootTable.generateLoot(new Random().nextInt(maxAmount - 2) + 2);
 
