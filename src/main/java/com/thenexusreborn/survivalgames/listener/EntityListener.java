@@ -72,6 +72,8 @@ public class EntityListener implements Listener {
         NexusReborn.sendDebugMessage("Handling EntityDamageEvent in SurvivalGames...");
         NexusReborn.sendDebugMessage("  Target: " + (e.getEntity() instanceof Player player ? player.getName() : e.getEntity().getType().name()));
         NexusReborn.sendDebugMessage("  Cause: " + e.getCause().name());
+        World eventWorld = e.getEntity().getWorld();
+        NexusReborn.sendDebugMessage("  - World: " + eventWorld.getName());
         NexusReborn.sendDebugMessage("  Damage Values (Original - Modified)");
         for (DamageModifier modifier : DamageModifier.values()) {
             if (e.isApplicable(modifier)) {
@@ -143,6 +145,8 @@ public class EntityListener implements Listener {
         NexusReborn.sendDebugMessage("  Damager: " + (e.getDamager() instanceof Player player ? player.getName() : e.getDamager().getType().name()));
         NexusReborn.sendDebugMessage("  Target: " + (e.getEntity() instanceof Player player ? player.getName() : e.getEntity().getType().name()));
         NexusReborn.sendDebugMessage("  Cause: " + e.getCause().name());
+        World eventWorld = e.getEntity().getWorld();
+        NexusReborn.sendDebugMessage("  - World: " + eventWorld.getName());
         NexusReborn.sendDebugMessage("  Damage Values (Original - Modified)");
         for (DamageModifier modifier : DamageModifier.values()) {
             if (e.isApplicable(modifier)) {
@@ -150,39 +154,30 @@ public class EntityListener implements Listener {
             }
         }
         Game game = null;
-        World eventWorld = e.getEntity().getWorld();
-        NexusReborn.sendDebugMessage("  - World: " + eventWorld.getName());
+        Lobby lobby = null;
+        
         for (SGVirtualServer server : plugin.getServers().getObjects().values()) {
-            if (server.getGame() == null) {
-                continue;
+            if (server.getGame() != null) {
+                if (server.getGame().getGameMap().getWorld().equals(eventWorld)) {
+                    game = server.getGame();
+                    break;
+                }
             }
-            if (server.getGame().getGameMap().getWorld().equals(eventWorld)) {
-                game = server.getGame();
-                break;
+            
+            if (server.getLobby() != null) {
+                if (server.getLobby().getWorld().equals(eventWorld)) {
+                    lobby = server.getLobby();
+                    break;
+                }
             }
         }
         
-        if (game == null) {
-            Lobby lobby = null;
-            for (SGVirtualServer server : plugin.getServers().getObjects().values()) {
-                if (server.getLobby() == null) {
-                    continue;
-                }
-                if (server.getLobby().getWorld().equals(eventWorld)) {
-                    lobby = server.getLobby();
-                }
-            }
-            
-            if (lobby != null) {
-                e.setCancelled(true);
-            }
-            
+        if (lobby != null) {
+            e.setCancelled(true);
             return;
         }
         
         NexusReborn.sendDebugMessage("  Game State: " + game.getState().name() + (game.getSubState() != SubState.UNDEFINED ? "." + game.getSubState().name() : ""));
-        
-        
         
         if (e.getDamager() instanceof Player damager) {
             GamePlayer damagerPlayer = game.getPlayer(damager.getUniqueId());
