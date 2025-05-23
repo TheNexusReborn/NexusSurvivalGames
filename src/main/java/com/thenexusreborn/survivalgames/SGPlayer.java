@@ -181,7 +181,7 @@ public class SGPlayer {
     public Location getLocation() {
         Player player = getSpigotPlayer();
         if (player != null) {
-            player.getLocation();
+            return player.getLocation();
         }
         return null;
     }
@@ -200,5 +200,14 @@ public class SGPlayer {
         if (player != null) {
             player.setVelocity(vector);
         }
+    }
+    
+    public boolean isOnline() {
+        Player player = getSpigotPlayer();
+        if (player != null) {
+            return player.isOnline();
+        }
+        
+        return false;
     }
 }

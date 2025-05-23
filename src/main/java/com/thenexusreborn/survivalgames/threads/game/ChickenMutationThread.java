@@ -26,6 +26,11 @@ public class ChickenMutationThread extends StarThread<SurvivalGames> {
             if (sgPlayer == null) {
                 continue;
             }
+            
+            if (!sgPlayer.isOnline()) {
+                continue;
+            }
+            
             Game game = sgPlayer.getGame();
             
             if (game == null) {
@@ -56,11 +61,13 @@ public class ChickenMutationThread extends StarThread<SurvivalGames> {
                 
                 if (chickenMutation.isChuteActive()) {
                     Location location = sgPlayer.getLocation();
-                    location.setY(location.getBlockY() - 1);
-                    if (location.getBlock().getType() == Material.AIR) {
-                        sgPlayer.setVelocity(sgPlayer.getVelocity().setY(-0.2));
-                    } else {
-                        chickenMutation.deactivateChute();
+                    if (location != null) {
+                        location.setY(location.getBlockY() - 1);
+                        if (location.getBlock().getType() == Material.AIR) {
+                            sgPlayer.setVelocity(sgPlayer.getVelocity().setY(-0.2));
+                        } else {
+                            chickenMutation.deactivateChute();
+                        }
                     }
                 }
             }
