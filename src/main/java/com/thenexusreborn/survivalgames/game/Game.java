@@ -273,6 +273,9 @@ public class Game implements Controllable, IHasState {
         
         setSubState(SubState.REMOVE_FROM_GAME);
         target.sendMessage(target.getTeam().getLeaveMessage());
+        if (target.getMutation() != null) {
+            removeMutation(target.getMutation());
+        }
         target.setTeam(GameTeam.SPECTATORS);
         GameTeam.SPECTATORS.getPlayerState().apply(target);
         target.giveSpectatorItems(this);
