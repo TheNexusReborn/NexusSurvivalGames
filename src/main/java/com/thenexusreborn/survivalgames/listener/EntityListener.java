@@ -69,7 +69,6 @@ public class EntityListener implements Listener {
     
     @EventHandler
     public void onEntityDamage(EntityDamageEvent e) {
-        long start = System.currentTimeMillis();
         NexusReborn.sendDebugMessage("Handling EntityDamageEvent in SurvivalGames...");
         NexusReborn.sendDebugMessage("  Target: " + (e.getEntity() instanceof Player player ? player.getName() : e.getEntity().getType().name()));
         NexusReborn.sendDebugMessage("  Cause: " + e.getCause().name());
@@ -85,6 +84,9 @@ public class EntityListener implements Listener {
                 e.setCancelled(true);
                 return;
             }
+        } else if (e.getEntity() instanceof ItemFrame || e.getEntity() instanceof ArmorStand) {
+            e.setCancelled(true);
+            return;
         }
         
         if (!(e.getEntity() instanceof Player player)) {
@@ -180,10 +182,7 @@ public class EntityListener implements Listener {
         
         NexusReborn.sendDebugMessage("  Game State: " + game.getState().name() + (game.getSubState() != SubState.UNDEFINED ? "." + game.getSubState().name() : ""));
         
-        if (e.getEntity() instanceof ItemFrame || e.getEntity() instanceof ArmorStand) {
-            e.setCancelled(true);
-            return;
-        }
+        
         
         if (e.getDamager() instanceof Player damager) {
             GamePlayer damagerPlayer = game.getPlayer(damager.getUniqueId());
