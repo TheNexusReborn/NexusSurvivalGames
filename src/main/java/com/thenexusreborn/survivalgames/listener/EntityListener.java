@@ -1,12 +1,12 @@
 package com.thenexusreborn.survivalgames.listener;
 
 import com.stardevllc.starcore.StarColors;
+import com.thenexusreborn.api.NexusReborn;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.Game;
-import com.thenexusreborn.survivalgames.game.GamePlayer;
-import com.thenexusreborn.survivalgames.game.GameTeam;
+import com.thenexusreborn.survivalgames.game.*;
+import com.thenexusreborn.survivalgames.game.Game.SubState;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
 import com.thenexusreborn.survivalgames.mutations.MutationType;
@@ -19,14 +19,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.hanging.HangingBreakEvent.RemoveCause;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.text.DecimalFormat;
+import java.util.*;
 
 @SuppressWarnings("DuplicatedCode")
 public class EntityListener implements Listener {
@@ -34,6 +34,8 @@ public class EntityListener implements Listener {
     private final SurvivalGames plugin;
     
     private static final Set<DamageCause> GRACE_DAMAGE_STOP = new HashSet<>(Arrays.asList(DamageCause.BLOCK_EXPLOSION, DamageCause.ENTITY_EXPLOSION, DamageCause.FIRE, DamageCause.FIRE_TICK));
+    
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,##0.#");
     
     public EntityListener(SurvivalGames plugin) {
         this.plugin = plugin;
@@ -67,6 +69,17 @@ public class EntityListener implements Listener {
     
     @EventHandler
     public void onEntityDamage(EntityDamageEvent e) {
+        long start = System.currentTimeMillis();
+        NexusReborn.sendDebugMessage("Handling EntityDamageEvent in SurvivalGames...");
+        NexusReborn.sendDebugMessage("  Target: " + (e.getEntity() instanceof Player player ? player.getName() : e.getEntity().getType().name()));
+        NexusReborn.sendDebugMessage("  Cause: " + e.getCause().name());
+        NexusReborn.sendDebugMessage("  Damage Values (Original - Modified)");
+        for (DamageModifier modifier : DamageModifier.values()) {
+            if (e.isApplicable(modifier)) {
+                NexusReborn.sendDebugMessage("    " + modifier.name() + ": " + e.getOriginalDamage(modifier) + " - " + e.getDamage(modifier));
+            }
+        }
+        
         if (e.getEntity() instanceof Item) {
             if (e.getCause() == DamageCause.ENTITY_EXPLOSION || e.getCause() == DamageCause.ENTITY_EXPLOSION) {
                 e.setCancelled(true);
@@ -82,7 +95,9 @@ public class EntityListener implements Listener {
         Game game = sgPlayer.getGame();
         
         if (game != null) {
+            NexusReborn.sendDebugMessage("  Game State: " + game.getState().name() + (game.getSubState() != SubState.UNDEFINED ? "." + game.getSubState().name() : ""));
             GamePlayer gamePlayer = game.getPlayer(e.getEntity().getUniqueId());
+            NexusReborn.sendDebugMessage("  Target Team: " + gamePlayer.getTeam().name());
             
             if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
                 e.setCancelled(true);
@@ -116,12 +131,25 @@ public class EntityListener implements Listener {
             e.setCancelled(true);
             e.getEntity().setFireTicks(0);
         }
+        
+        long end = System.currentTimeMillis();
     }
     
     @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
+        NexusReborn.sendDebugMessage("Handling EntityDamageByEntityEvent in SurvivalGames...");
+        NexusReborn.sendDebugMessage("  Damager: " + (e.getDamager() instanceof Player player ? player.getName() : e.getDamager().getType().name()));
+        NexusReborn.sendDebugMessage("  Target: " + (e.getEntity() instanceof Player player ? player.getName() : e.getEntity().getType().name()));
+        NexusReborn.sendDebugMessage("  Cause: " + e.getCause().name());
+        NexusReborn.sendDebugMessage("  Damage Values (Original - Modified)");
+        for (DamageModifier modifier : DamageModifier.values()) {
+            if (e.isApplicable(modifier)) {
+                NexusReborn.sendDebugMessage("    " + modifier.name() + ": " + DECIMAL_FORMAT.format(e.getOriginalDamage(modifier)) + " - " + DECIMAL_FORMAT.format(e.getDamage(modifier)));
+            }
+        }
         Game game = null;
         World eventWorld = e.getEntity().getWorld();
+        NexusReborn.sendDebugMessage("  - World: " + eventWorld.getName());
         for (SGVirtualServer server : plugin.getServers().getObjects().values()) {
             if (server.getGame() == null) {
                 continue;
@@ -150,34 +178,42 @@ public class EntityListener implements Listener {
             return;
         }
         
-        if (e.getDamager() instanceof Player) {
-            GamePlayer gamePlayer = game.getPlayer(e.getDamager().getUniqueId());
-            if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
+        NexusReborn.sendDebugMessage("  Game State: " + game.getState().name() + (game.getSubState() != SubState.UNDEFINED ? "." + game.getSubState().name() : ""));
+        
+        if (e.getEntity() instanceof ItemFrame || e.getEntity() instanceof ArmorStand) {
+            e.setCancelled(true);
+            return;
+        }
+        
+        if (e.getDamager() instanceof Player damager) {
+            GamePlayer damagerPlayer = game.getPlayer(damager.getUniqueId());
+            NexusReborn.sendDebugMessage("  Damager Team: " + damagerPlayer.getTeam().name());
+            if (damagerPlayer.getTeam() == GameTeam.SPECTATORS) {
                 e.setCancelled(true);
                 return;
+            }
+            
+            if (e.getEntity() instanceof Player target) {
+                GamePlayer targetPlayer = game.getPlayer(target.getUniqueId());
+                NexusReborn.sendDebugMessage("  Target Team: " + targetPlayer.getTeam());
+                if (game.isGraceperiod()) {
+                    e.setCancelled(true);
+                    return;
+                }
+                
+                checkMutationDamage(damagerPlayer, targetPlayer, e);
+                
+                if (e.isCancelled()) {
+                    return;
+                }
+                damagerPlayer.setCombat(targetPlayer);
+                targetPlayer.setCombat(damagerPlayer);
+                
+                targetPlayer.getDamageInfo().addDamager(damager.getUniqueId());
             }
         }
         
-        if (e.getDamager() instanceof Player damager && e.getEntity() instanceof Player target) {
-            GamePlayer damagerPlayer = game.getPlayer(damager.getUniqueId());
-            GamePlayer targetPlayer = game.getPlayer(target.getUniqueId());
-            if (game.isGraceperiod()) {
-                e.setCancelled(true);
-                return;
-            }
-            
-            checkMutationDamage(damagerPlayer, targetPlayer, e);
-            
-            if (e.isCancelled()) {
-                return;
-            }
-            damagerPlayer.setCombat(targetPlayer);
-            targetPlayer.setCombat(damagerPlayer);
-            
-            targetPlayer.getDamageInfo().addDamager(damager.getUniqueId());
-        } else if (e.getEntity() instanceof ItemFrame || e.getEntity() instanceof ArmorStand) {
-            e.setCancelled(true);
-        } else if (e.getDamager() instanceof Projectile projectile) {
+        if (e.getDamager() instanceof Projectile projectile) {
             if (!(e.getDamager() instanceof Snowball || e.getDamager() instanceof Egg || e.getDamager() instanceof Arrow || e.getDamager() instanceof FishHook)) {
                 return;
             }
@@ -234,9 +270,8 @@ public class EntityListener implements Listener {
                     }
                 }
             }
-        } else if (e.getDamager() instanceof TNTPrimed) {
+        } else if (e.getDamager() instanceof TNTPrimed tntPrimed) {
             if (e.getEntity() instanceof Player target) {
-                TNTPrimed tntPrimed = (TNTPrimed) e.getDamager();
                 if (tntPrimed.getSource() instanceof Player) {
                     GamePlayer sourcePlayer = game.getPlayer(tntPrimed.getSource().getUniqueId());
                     if (sourcePlayer != null) {
