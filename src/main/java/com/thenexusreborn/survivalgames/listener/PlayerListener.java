@@ -25,6 +25,7 @@ import com.thenexusreborn.survivalgames.menu.SwagShackMenu;
 import com.thenexusreborn.survivalgames.mutations.*;
 import com.thenexusreborn.survivalgames.mutations.impl.ChickenMutation;
 import com.thenexusreborn.survivalgames.mutations.impl.CreeperMutation;
+import com.thenexusreborn.survivalgames.settings.enums.LootMode;
 import com.thenexusreborn.survivalgames.util.*;
 import org.bukkit.*;
 import org.bukkit.block.*;
@@ -51,10 +52,32 @@ import java.util.stream.Stream;
 public class PlayerListener implements Listener {
     private final SurvivalGames plugin;
     private final GuiManager manager;
+    
+    private List<String> tableChancesFirstHalf = new ArrayList<>(), tableChancesSecondHalf = new ArrayList<>();
 
     public PlayerListener(SurvivalGames plugin) {
         this.plugin = plugin;
         manager = plugin.getServer().getServicesManager().getRegistration(GuiManager.class).getProvider();
+        
+        for (int i = 0; i < 100; i++) {
+            if (i > 95) {
+                tableChancesFirstHalf.add("tierFour");
+            } else if (i > 70) {
+                tableChancesFirstHalf.add("tierThree");
+            } else if (i > 40) {
+                tableChancesFirstHalf.add("tierTwo");
+            } else {
+                tableChancesFirstHalf.add("tierOne");
+            }
+            
+            if (i > 80) {
+                tableChancesSecondHalf.add("tierFour");
+            } else if (i > 50) {
+                tableChancesSecondHalf.add("tierThree");
+            } else {
+                tableChancesSecondHalf.add("tierTwo");
+            }
+        }
     }
 
     @EventHandler
@@ -291,10 +314,9 @@ public class PlayerListener implements Listener {
 
                         SGLootTable lootTable = null;
 
-                        boolean useTieredLoot = game.getSettings().isUseNewLoot();
-                        if (!useTieredLoot) {
+                        if (game.getSettings().getLootMode() == LootMode.CLASSIC) {
                             lootTable = lootManager.getLootTable("tierOne");
-                        } else {
+                        } else if (game.getSettings().getLootMode() == LootMode.TIERED) {
                             if (game.getState() == Game.State.DEATHMATCH) {
                                 lootTable = lootManager.getLootTable("tierFour");
                             } else {
@@ -315,6 +337,19 @@ public class PlayerListener implements Listener {
                                         }
                                     }
                                 }
+                            }
+                        } else if (game.getSettings().getLootMode() == LootMode.RANDOM) {
+                            if (game.getState() == Game.State.DEATHMATCH) {
+                                lootTable = lootManager.getLootTable("tierFour");
+                            } else {
+                                List<String> chances;
+                                if (game.getTimer().getTime() < game.getTimer().getLength() / 2) {
+                                    chances = this.tableChancesSecondHalf;
+                                } else {
+                                    chances = this.tableChancesFirstHalf;
+                                }
+                                
+                                lootTable = lootManager.getLootTable(chances.get(new Random().nextInt(chances.size())));
                             }
                         }
 
