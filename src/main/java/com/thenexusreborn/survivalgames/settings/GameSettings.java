@@ -1,9 +1,7 @@
 package com.thenexusreborn.survivalgames.settings;
 
 import com.thenexusreborn.api.sql.annotations.table.TableName;
-import com.thenexusreborn.survivalgames.settings.enums.ColorMode;
-import com.thenexusreborn.survivalgames.settings.enums.Time;
-import com.thenexusreborn.survivalgames.settings.enums.Weather;
+import com.thenexusreborn.survivalgames.settings.enums.*;
 
 @TableName("sggamesettings")
 public class GameSettings implements Cloneable, ISettings {
@@ -58,10 +56,10 @@ public class GameSettings implements Cloneable, ISettings {
     protected boolean allowKillersKiller = true;
     protected int maxMutationAmount = 1;
     protected boolean mutationsEnabled = true;
-    protected boolean allowMutateOnMutationDeath = false;
+    protected boolean allowMutateOnMutationDeath;
     
     //Player
-    protected boolean earnNexites = false;
+    protected boolean earnNexites;
     protected double firstBloodMultiplier = 1.25;
     protected double scoreDivisor = 10;
     protected float startingSaturation = 5;
@@ -75,7 +73,7 @@ public class GameSettings implements Cloneable, ISettings {
     
     //Loot
     protected boolean enderchestsEnabled = true;
-    protected boolean useTieredLoot = true;
+    protected LootMode lootMode = LootMode.TIERED;
     
     //Cosmetic
     protected ColorMode colorMode = ColorMode.RANK;
@@ -84,14 +82,14 @@ public class GameSettings implements Cloneable, ISettings {
     //World
     protected Weather worldWeather = Weather.CLEAR;
     protected Time worldTime = Time.NOON;
-    protected boolean weatherProgression = false;
-    protected boolean timeProgression = false;
+    protected boolean weatherProgression;
+    protected boolean timeProgression;
     protected boolean showBorders = true;
     protected float tntYield = 3.0F;
     protected int tntFuseTicks = 20;
     
     //Game
-    protected boolean gracePeriod = false;
+    protected boolean gracePeriod;
     protected int warmupLength = 10; // Default: 30
     protected int gracePeriodLength = 60;
     protected int gameLength = 10; //Default: 20
@@ -244,8 +242,8 @@ public class GameSettings implements Cloneable, ISettings {
         return earnNetworkXp;
     }
     
-    public boolean isUseNewLoot() {
-        return useTieredLoot;
+    public LootMode getLootMode() {
+        return lootMode;
     }
     
     public boolean isAllowEnderchests() {
