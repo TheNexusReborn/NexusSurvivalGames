@@ -114,6 +114,17 @@ public class PlayerListener implements Listener {
 
         if (game != null) {
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
+            
+            if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
+                Block block = e.getClickedBlock();
+                if (block != null) {
+                    if (block.getType() == Material.BEACON) {
+                        e.setCancelled(true);
+                        return;
+                    }
+                }
+            }
+            
             if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
                 if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
                     if (e.getItem() != null) {
