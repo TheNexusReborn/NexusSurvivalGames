@@ -41,11 +41,12 @@ public class GameStatusSubCmd extends SubCommand<SurvivalGames> {
         sendStatusLine(sender, "Server", game.getServer().getName());
         sendStatusLine(sender, "Control Mode", game.getControlType().name());
         sendStatusLine(sender, "Mode", game.getMode().name());
-        sendStatusLine(sender, "State", game.getState().name() + ((game.getSubState() != SubState.UNDEFINED) ? "." + game.getSubState().name() : ""));
+        sendStatusLine(sender, "State", game.getState().name() + (game.getSubState() != SubState.UNDEFINED ? "." + game.getSubState().name() : ""));
         sendStatusLine(sender, "Start", dateFormat.format(game.getStart()));
         sendStatusLine(sender, "First Blood", game.getFirstBlood() != null ? game.getFirstBlood().getName() : "No one");
         sendStatusLine(sender, "Graceperiod", game.getGraceperiod().name());
         sendStatusLine(sender, "Timer", timeFormat.format(game.getTimer() != null ? game.getTimer().getTime() : 0L));
+        sendStatusLine(sender, "Timed Restocks: ", game.getTimedRestockCount() + "/" + game.getTotalTimedRestocks());
         
         return true;
     }
