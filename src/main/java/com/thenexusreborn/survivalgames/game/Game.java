@@ -114,6 +114,7 @@ public class Game implements Controllable, IHasState {
     
     private UUID restockCallbackId;
     private int timedRestockCount;
+    private int totalTimedRestocks;
     
     public Game(SGVirtualServer server, SGMap gameMap, GameSettings settings, Collection<LobbyPlayer> players) {
         this.gameMap = gameMap;
@@ -735,6 +736,7 @@ public class Game implements Controllable, IHasState {
         } else {
             restockLength = settings.getChestRestockInterval();
         }
+        this.totalTimedRestocks = (int) (settings.getGameLength() / restockLength - 1);
         this.restockCallbackId = this.timer.addRepeatingCallback(timerSnapshot -> {
             if (timerSnapshot.getTime() == timerSnapshot.getLength()) {
                 return;
@@ -1680,6 +1682,10 @@ public class Game implements Controllable, IHasState {
     
     public int getTimedRestockCount() {
         return timedRestockCount;
+    }
+    
+    public int getTotalTimedRestocks() {
+        return totalTimedRestocks;
     }
     
     @Override
