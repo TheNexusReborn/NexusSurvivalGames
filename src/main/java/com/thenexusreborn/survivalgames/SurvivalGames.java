@@ -89,6 +89,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
     public static CustomItem tpToMapCenterItem;
     public static CustomItem toHubItem;
     public static CustomItem mutateItem;
+    public static CustomItem modifierItem;
     
     public static SurvivalGames getInstance() {
         return INSTANCE;
@@ -312,8 +313,9 @@ public class SurvivalGames extends NexusSpigotPlugin {
         tpToMapCenterItem = new TPToMapCenterItem(this);
         toHubItem = new ToHubItem(this);
         mutateItem = new MutateItem(this);
+        modifierItem = new GameModifierItem(this);
         
-        itemRegistry.registerAll(tributesBook, mutationsBook, spectatorsBook, playerTrackerItem, tpToMapCenterItem, toHubItem, mutateItem);
+        itemRegistry.registerAll(tributesBook, mutationsBook, spectatorsBook, playerTrackerItem, tpToMapCenterItem, toHubItem, mutateItem, modifierItem);
         
         new NexusDisguises().init(this);
         getLogger().info("Loaded the disguises for mutations.");

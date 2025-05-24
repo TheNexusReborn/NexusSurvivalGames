@@ -373,7 +373,327 @@ public class GameSettings implements Cloneable, ISettings {
     public int getChestRestockInterval() {
         return chestRestockInterval;
     }
-
+    
+    public GameSettings setChestRestockInterval(int chestRestockInterval) {
+        this.chestRestockInterval = chestRestockInterval;
+        return this;
+    }
+    
+    public GameSettings setChestRestockDenomination(int chestRestockDenomination) {
+        this.chestRestockDenomination = chestRestockDenomination;
+        return this;
+    }
+    
+    public GameSettings setChestRestockRelative(boolean chestRestockRelative) {
+        this.chestRestockRelative = chestRestockRelative;
+        return this;
+    }
+    
+    public GameSettings setAllowSwagShack(boolean allowSwagShack) {
+        this.allowSwagShack = allowSwagShack;
+        return this;
+    }
+    
+    public GameSettings setSponsorScoreCost(int sponsorScoreCost) {
+        this.sponsorScoreCost = sponsorScoreCost;
+        return this;
+    }
+    
+    public GameSettings setSponsorCreditCost(int sponsorCreditCost) {
+        this.sponsorCreditCost = sponsorCreditCost;
+        return this;
+    }
+    
+    public GameSettings setAllowSponsoring(boolean allowSponsoring) {
+        this.allowSponsoring = allowSponsoring;
+        return this;
+    }
+    
+    public GameSettings setMaxSponsorships(int maxSponsorships) {
+        this.maxSponsorships = maxSponsorships;
+        return this;
+    }
+    
+    public GameSettings setCombatTagLength(int combatTagLength) {
+        this.combatTagLength = combatTagLength;
+        return this;
+    }
+    
+    public GameSettings setAllowCombatTag(boolean allowCombatTag) {
+        this.allowCombatTag = allowCombatTag;
+        return this;
+    }
+    
+    public GameSettings setMaxScoreBounty(int maxScoreBounty) {
+        this.maxScoreBounty = maxScoreBounty;
+        return this;
+    }
+    
+    public GameSettings setMaxCreditBounty(int maxCreditBounty) {
+        this.maxCreditBounty = maxCreditBounty;
+        return this;
+    }
+    
+    public GameSettings setAllowBounties(boolean allowBounties) {
+        this.allowBounties = allowBounties;
+        return this;
+    }
+    
+    public GameSettings setAssistNexiteGain(int assistNexiteGain) {
+        this.assistNexiteGain = assistNexiteGain;
+        return this;
+    }
+    
+    public GameSettings setAssistXpGain(int assistXpGain) {
+        this.assistXpGain = assistXpGain;
+        return this;
+    }
+    
+    public GameSettings setAssistCreditGain(int assistCreditGain) {
+        this.assistCreditGain = assistCreditGain;
+        return this;
+    }
+    
+    public GameSettings setAllowAssists(boolean allowAssists) {
+        this.allowAssists = allowAssists;
+        return this;
+    }
+    
+    public GameSettings setKillNexiteGain(int killNexiteGain) {
+        this.killNexiteGain = killNexiteGain;
+        return this;
+    }
+    
+    public GameSettings setKillXpGain(int killXpGain) {
+        this.killXpGain = killXpGain;
+        return this;
+    }
+    
+    public GameSettings setKillCreditGain(int killCreditGain) {
+        this.killCreditGain = killCreditGain;
+        return this;
+    }
+    
+    public GameSettings setWinNexiteBaseGain(int winNexiteBaseGain) {
+        this.winNexiteBaseGain = winNexiteBaseGain;
+        return this;
+    }
+    
+    public GameSettings setWinXpBaseGain(int winXpBaseGain) {
+        this.winXpBaseGain = winXpBaseGain;
+        return this;
+    }
+    
+    public GameSettings setWinCreditsBaseGain(int winCreditsBaseGain) {
+        this.winCreditsBaseGain = winCreditsBaseGain;
+        return this;
+    }
+    
+    public GameSettings setWinScoreBaseGain(int winScoreBaseGain) {
+        this.winScoreBaseGain = winScoreBaseGain;
+        return this;
+    }
+    
+    public GameSettings setMaxMutationsAllowed(int maxMutationsAllowed) {
+        this.maxMutationsAllowed = maxMutationsAllowed;
+        return this;
+    }
+    
+    public GameSettings setUseAllMutationTypes(boolean useAllMutationTypes) {
+        this.useAllMutationTypes = useAllMutationTypes;
+        return this;
+    }
+    
+    public GameSettings setPassUseChance(double passUseChance) {
+        this.passUseChance = passUseChance;
+        return this;
+    }
+    
+    public GameSettings setPassAwardChance(double passAwardChance) {
+        this.passAwardChance = passAwardChance;
+        return this;
+    }
+    
+    public GameSettings setMutationSpawnDelay(int mutationSpawnDelay) {
+        this.mutationSpawnDelay = mutationSpawnDelay;
+        return this;
+    }
+    
+    public GameSettings setUnlimitedMutationPasses(boolean unlimitedMutationPasses) {
+        this.unlimitedMutationPasses = unlimitedMutationPasses;
+        return this;
+    }
+    
+    public GameSettings setAllowKillersKiller(boolean allowKillersKiller) {
+        this.allowKillersKiller = allowKillersKiller;
+        return this;
+    }
+    
+    public GameSettings setMaxMutationAmount(int maxMutationAmount) {
+        this.maxMutationAmount = maxMutationAmount;
+        return this;
+    }
+    
+    public GameSettings setMutationsEnabled(boolean mutationsEnabled) {
+        this.mutationsEnabled = mutationsEnabled;
+        return this;
+    }
+    
+    public GameSettings setAllowMutateOnMutationDeath(boolean allowMutateOnMutationDeath) {
+        this.allowMutateOnMutationDeath = allowMutateOnMutationDeath;
+        return this;
+    }
+    
+    public GameSettings setEarnNexites(boolean earnNexites) {
+        this.earnNexites = earnNexites;
+        return this;
+    }
+    
+    public GameSettings setFirstBloodMultiplier(double firstBloodMultiplier) {
+        this.firstBloodMultiplier = firstBloodMultiplier;
+        return this;
+    }
+    
+    public GameSettings setScoreDivisor(double scoreDivisor) {
+        this.scoreDivisor = scoreDivisor;
+        return this;
+    }
+    
+    public GameSettings setStartingSaturation(float startingSaturation) {
+        this.startingSaturation = startingSaturation;
+        return this;
+    }
+    
+    public GameSettings setEarnNetworkXp(boolean earnNetworkXp) {
+        this.earnNetworkXp = earnNetworkXp;
+        return this;
+    }
+    
+    public GameSettings setEarnCredits(boolean earnCredits) {
+        this.earnCredits = earnCredits;
+        return this;
+    }
+    
+    public GameSettings setRegeneration(boolean regeneration) {
+        this.regeneration = regeneration;
+        return this;
+    }
+    
+    public GameSettings setMaxHealth(int maxHealth) {
+        this.maxHealth = maxHealth;
+        return this;
+    }
+    
+    public GameSettings setMaxTeamAmount(int maxTeamAmount) {
+        this.maxTeamAmount = maxTeamAmount;
+        return this;
+    }
+    
+    public GameSettings setAllowTeaming(boolean allowTeaming) {
+        this.allowTeaming = allowTeaming;
+        return this;
+    }
+    
+    public GameSettings setTributesSeeSpectatorChat(boolean tributesSeeSpectatorChat) {
+        this.tributesSeeSpectatorChat = tributesSeeSpectatorChat;
+        return this;
+    }
+    
+    public GameSettings setEnderchestsEnabled(boolean enderchestsEnabled) {
+        this.enderchestsEnabled = enderchestsEnabled;
+        return this;
+    }
+    
+    public GameSettings setLootMode(LootMode lootMode) {
+        this.lootMode = lootMode;
+        return this;
+    }
+    
+    public GameSettings setColorMode(ColorMode colorMode) {
+        this.colorMode = colorMode;
+        return this;
+    }
+    
+    public GameSettings setSounds(boolean sounds) {
+        this.sounds = sounds;
+        return this;
+    }
+    
+    public GameSettings setWorldWeather(Weather worldWeather) {
+        this.worldWeather = worldWeather;
+        return this;
+    }
+    
+    public GameSettings setWorldTime(Time worldTime) {
+        this.worldTime = worldTime;
+        return this;
+    }
+    
+    public GameSettings setWeatherProgression(boolean weatherProgression) {
+        this.weatherProgression = weatherProgression;
+        return this;
+    }
+    
+    public GameSettings setTimeProgression(boolean timeProgression) {
+        this.timeProgression = timeProgression;
+        return this;
+    }
+    
+    public GameSettings setShowBorders(boolean showBorders) {
+        this.showBorders = showBorders;
+        return this;
+    }
+    
+    public GameSettings setTntYield(float tntYield) {
+        this.tntYield = tntYield;
+        return this;
+    }
+    
+    public GameSettings setTntFuseTicks(int tntFuseTicks) {
+        this.tntFuseTicks = tntFuseTicks;
+        return this;
+    }
+    
+    public GameSettings setWarmupLength(int warmupLength) {
+        this.warmupLength = warmupLength;
+        return this;
+    }
+    
+    public GameSettings setGameLength(int gameLength) {
+        this.gameLength = gameLength;
+        return this;
+    }
+    
+    public GameSettings setNextGameTimerLength(int nextGameTimerLength) {
+        this.nextGameTimerLength = nextGameTimerLength;
+        return this;
+    }
+    
+    public GameSettings setDeathmatchThreshold(int deathmatchThreshold) {
+        this.deathmatchThreshold = deathmatchThreshold;
+        return this;
+    }
+    
+    public GameSettings setDeathmatchLength(int deathmatchLength) {
+        this.deathmatchLength = deathmatchLength;
+        return this;
+    }
+    
+    public GameSettings setDeathmatchWarmupLength(int deathmatchWarmupLength) {
+        this.deathmatchWarmupLength = deathmatchWarmupLength;
+        return this;
+    }
+    
+    public GameSettings setDeathmatchCountdownLength(int deathmatchCountdownLength) {
+        this.deathmatchCountdownLength = deathmatchCountdownLength;
+        return this;
+    }
+    
+    public GameSettings setAllowDeathmatch(boolean allowDeathmatch) {
+        this.allowDeathmatch = allowDeathmatch;
+        return this;
+    }
+    
     @Override
     public GameSettings clone() {
         try {

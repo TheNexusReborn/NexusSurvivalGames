@@ -22,7 +22,7 @@ import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.chat.LobbyChatRoom;
 import com.thenexusreborn.survivalgames.control.ControlType;
 import com.thenexusreborn.survivalgames.control.Controllable;
-import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.lobby.timer.LobbyTimerCallback;
 import com.thenexusreborn.survivalgames.scoreboard.lobby.*;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
@@ -76,6 +76,11 @@ public class Lobby implements Controllable, IHasState {
     private final List<StatSign> statSigns = new ArrayList<>();
     private final List<TributeSign> tributeSigns = new ArrayList<>();
     private boolean debugMode;
+    
+    private Map<GameModifier, Set<UUID>> modifierYesVotes = new EnumMap<>(GameModifier.class);
+    private Map<GameModifier, Set<UUID>> modifierNoVotes = new EnumMap<>(GameModifier.class);
+    
+    private SGMode mode;
 
     private World world;
 
@@ -87,6 +92,9 @@ public class Lobby implements Controllable, IHasState {
     public Lobby(SurvivalGames plugin, SGVirtualServer server, LobbyType type) {
         this.plugin = plugin;
         this.server = server;
+        
+        this.mode = SGMode.CLASSIC;
+        this.gameSettings = this.mode.getDefaultSettings().clone();
 
         this.file = new File(plugin.getDataFolder() + File.separator + "lobby" + File.separator + type.name().toLowerCase() + ".yml");
         if (!file.exists()) {
@@ -100,7 +108,35 @@ public class Lobby implements Controllable, IHasState {
 
         config = YamlConfiguration.loadConfiguration(file);
     }
-
+    
+    public void addModifierYesVote(GameModifier gameModifier, UUID player) {
+        if (this.modifierYesVotes.containsKey(gameModifier)) {
+            this.modifierYesVotes.get(gameModifier).add(player);
+        } else {
+            this.modifierYesVotes.put(gameModifier, new HashSet<>(Set.of(player)));
+        }
+        
+        if (this.modifierNoVotes.containsKey(gameModifier)) {
+            this.modifierNoVotes.get(gameModifier).remove(player);
+        }
+    }
+    
+    public void addModifierNoVote(GameModifier gameModifier, UUID player) {
+        if (this.modifierNoVotes.containsKey(gameModifier)) {
+            this.modifierNoVotes.get(gameModifier).add(player);
+        } else {
+            this.modifierNoVotes.put(gameModifier, new HashSet<>(Set.of(player)));
+        }
+        
+        if (this.modifierYesVotes.containsKey(gameModifier)) {
+            this.modifierYesVotes.get(gameModifier).remove(player);
+        }
+    }
+    
+    public SGMode getMode() {
+        return mode;
+    }
+    
     public void setup() {
         if (this.getConfig().contains("zipfile")) {
             File zipFile = new File(this.getConfig().getString("zipfile"));
@@ -496,8 +532,28 @@ public class Lobby implements Controllable, IHasState {
         sendMessage("&6&l> " + ratingMsg);
         sendMessage("&6&l> &7Votes: &e" + gameMap.getVotes());
         sendMessage("");
-
-        Game game = new Game(server, gameMap, this.gameSettings, getPlayers());
+        
+        GameSettings settings = this.gameSettings.clone();
+        
+        this.mode.getModifiers().forEach((modifier, status) -> {
+            if (status != GameModifierStatus.ALLOWED) {
+                return;
+            }
+            
+            int yesVotes = getModifierYesVotes(modifier), noVotes = getModifierNoVotes(modifier);
+            
+            if (yesVotes == 0 && noVotes == 0) {
+                return;
+            }
+            
+            if (yesVotes > noVotes) {
+                modifier.getYesConsumer().accept(settings);
+            } else {
+                modifier.getNoConsumer().accept(settings);
+            }
+        });
+        
+        Game game = new Game(server, gameMap, this.mode, settings, getPlayers());
         this.players.clear();
         server.setGame(game);
         if (game.getControlType() == ControlType.AUTO) {
@@ -647,6 +703,7 @@ public class Lobby implements Controllable, IHasState {
         XMaterial sponsorsItemMaterial = sponsors ? XMaterial.GLOWSTONE_DUST : XMaterial.GUNPOWDER;
         String statusMessage = sponsors ? "&a&lENABLED" : "&c&lDISABLED";
         player.getInventory().setItem(0, ItemBuilder.of(sponsorsItemMaterial).displayName("&e&lSponsors " + statusMessage + " &7&o(Right click to toggle)").build());
+        player.getInventory().setItem(1, SurvivalGames.modifierItem.toItemStack());
         player.getInventory().setItem(8, SurvivalGames.toHubItem.toItemStack());
 
         if (nexusPlayer.getRank().ordinal() <= Rank.DIAMOND.ordinal()) {
@@ -1001,5 +1058,21 @@ public class Lobby implements Controllable, IHasState {
 
     public World getWorld() {
         return this.world;
+    }
+    
+    public int getModifierYesVotes(GameModifier modifier) {
+        if (this.modifierYesVotes.containsKey(modifier)) {
+            return this.modifierYesVotes.get(modifier).size();
+        }
+        
+        return 0;
+    }
+    
+    public int getModifierNoVotes(GameModifier modifier) {
+        if (this.modifierNoVotes.containsKey(modifier)) {
+            return this.modifierNoVotes.get(modifier).size();
+        }
+        
+        return 0;
     }
 }
