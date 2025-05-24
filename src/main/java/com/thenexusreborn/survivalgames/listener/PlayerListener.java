@@ -1,7 +1,6 @@
 package com.thenexusreborn.survivalgames.listener;
 
 import com.sk89q.worldedit.bukkit.BukkitUtil;
-import com.stardevllc.helper.Pair;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.starcore.StarColors;
 import com.stardevllc.starcore.base.XMaterial;
@@ -20,9 +19,9 @@ import com.thenexusreborn.survivalgames.game.death.*;
 import com.thenexusreborn.survivalgames.lobby.*;
 import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.loot.tables.SGLootTable;
-import com.thenexusreborn.survivalgames.menu.MutateGui;
 import com.thenexusreborn.survivalgames.menu.SwagShackMenu;
-import com.thenexusreborn.survivalgames.mutations.*;
+import com.thenexusreborn.survivalgames.mutations.Mutation;
+import com.thenexusreborn.survivalgames.mutations.MutationType;
 import com.thenexusreborn.survivalgames.mutations.impl.ChickenMutation;
 import com.thenexusreborn.survivalgames.mutations.impl.CreeperMutation;
 import com.thenexusreborn.survivalgames.settings.enums.LootMode;
@@ -148,26 +147,7 @@ public class PlayerListener implements Listener {
                 }
             }
             
-            if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
-                if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
-                    if (e.getItem() != null) {
-                        ItemStack item = e.getItem();
-                        if (item.getType() == Material.ROTTEN_FLESH) {
-                            Pair<Boolean, String> canMutateResult = gamePlayer.canMutate();
-                            if (canMutateResult.key()) {
-                                MutationBuilder mutationBuilder = new MutationBuilder(gamePlayer);
-                                mutationBuilder.setUsePass(true);
-                                manager.openGUI(new MutateGui(plugin, mutationBuilder), player);
-                            } else {
-                                gamePlayer.sendMessage(MsgType.WARN + canMutateResult.value());
-                            }
-                        }
-                    }
-                }
-
-                e.setCancelled(true);
-                return;
-            } else if (gamePlayer.getTeam() == GameTeam.MUTATIONS) {
+            if (gamePlayer.getTeam() == GameTeam.MUTATIONS) {
                 Mutation mutation = gamePlayer.getMutation();
                 ItemStack item = player.getItemInHand();
                 if (item == null) {
