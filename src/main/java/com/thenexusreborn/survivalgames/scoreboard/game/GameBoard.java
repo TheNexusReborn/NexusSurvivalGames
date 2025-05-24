@@ -10,7 +10,7 @@ import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.game.GameTeam;
-import com.thenexusreborn.survivalgames.game.Mode;
+import com.thenexusreborn.survivalgames.game.SGMode;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.ChatColor;
 
@@ -62,10 +62,10 @@ public class GameBoard extends SpigotScoreboardView {
             Game game = plugin.getPlayerRegistry().get(player.getUniqueId()).getGame();
             int mutations = game.getTeamCount(GameTeam.MUTATIONS);
             int zombies = game.getTeamCount(GameTeam.ZOMBIES);
-            if (game.getMode() == Mode.CLASSIC) {
+            if (game.getMode() == SGMode.CLASSIC) {
                 team.setPrefix("&fMutations: ");
                 team.setSuffix("&d" + mutations);
-            } else if (game.getMode() == Mode.UNDEAD) {
+            } else if (game.getMode() == SGMode.UNDEAD) {
                 team.setPrefix("&fZombies: ");
                 team.setSuffix("&2" + zombies);
             } 

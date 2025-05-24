@@ -115,7 +115,7 @@ public class Game implements Controllable, IHasState {
     private GamePlayer firstBlood;
     private final Map<Location, Inventory> enderchestInventories = new HashMap<>();
     private SponsorManager sponsorManager = new SponsorManager();
-    private Mode mode = Mode.CLASSIC; //This will be implemented later, this is mainly for some other checks to exist
+    private SGMode mode; //This will be implemented later, this is mainly for some other checks to exist
     private boolean debugMode; //Debug Mode. This may be replaced with a class with other settings
     private Graceperiod graceperiod = Graceperiod.INACTIVE;
     
@@ -123,11 +123,13 @@ public class Game implements Controllable, IHasState {
     private int timedRestockCount;
     private int totalTimedRestocks;
     
-    public Game(SGVirtualServer server, SGMap gameMap, GameSettings settings, Collection<LobbyPlayer> players) {
+    public Game(SGVirtualServer server, SGMap gameMap, SGMode mode, GameSettings settings, Collection<LobbyPlayer> players) {
         this.gameMap = gameMap;
         this.server = server;
         this.settings = settings;
         this.gameInfo = new GameInfo();
+        
+        this.mode = mode;
         
         this.gameChatroom = new GameChatRoom(this);
         plugin.getStarChat().getRoomRegistry().register(gameChatroom.getName(), gameChatroom);
@@ -1629,7 +1631,7 @@ public class Game implements Controllable, IHasState {
         return sponsorManager;
     }
     
-    public Mode getMode() {
+    public SGMode getMode() {
         return mode;
     }
     
