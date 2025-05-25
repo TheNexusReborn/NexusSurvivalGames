@@ -1556,6 +1556,7 @@ public class Game implements Controllable, IHasState {
         }
         
         sendMessage("&6&l>> &4&lTHE DEATHMATCH COUNTDOWN HAS STARTED");
+        playSound(Sound.ENDERDRAGON_GROWL);
         this.timer = plugin.getClockManager().createTimer(TimeUnit.SECONDS.toMillis(settings.getDeathmatchTimerLength()) + 50L);
         this.timer.addRepeatingCallback(new GameSecondsCallback(this, "&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b{time}&e."), TimeUnit.SECONDS, 1);
         this.timer.setEndCondition(new DMTimerEndCondition(this));
