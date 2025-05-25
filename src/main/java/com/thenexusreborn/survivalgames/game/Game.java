@@ -700,9 +700,7 @@ public class Game implements Controllable, IHasState {
             }
         }, TimeUnit.SECONDS, 1);
         this.timer.addCallback(timerSnapshot -> {
-            if (getSettings().isSounds()) {
-                playSound(Sound.WOLF_HOWL);
-            }
+            playSound(Sound.WOLF_HOWL);
             sendMessage("&5&l/ / / / / / &d&lTHE NEXUS REBORN &5&l/ / / / / /");
             sendMessage("&6&lSurvival Games &7&oFree-for-all Deathmatch &8- &3Classic Mode");
             sendMessage("&8- &7Loot chests scattered around the map for gear.");
@@ -832,6 +830,10 @@ public class Game implements Controllable, IHasState {
     }
     
     public void playSound(Sound sound) {
+        if (!settings.isSounds()) {
+            return;
+        }
+        
         for (GamePlayer player : this.players.values()) {
             Player p = Bukkit.getPlayer(player.getUniqueId());
             if (p != null) {
