@@ -821,6 +821,7 @@ public class Game implements Controllable, IHasState {
     public void restockChests() {
         setSubState(SubState.RESTOCKING_CHESTS);
         this.lootedChests.clear();
+        playSound(Sound.LEVEL_UP);
         setSubState(SubState.UNDEFINED);
     }
     
