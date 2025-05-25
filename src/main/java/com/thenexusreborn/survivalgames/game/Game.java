@@ -911,6 +911,7 @@ public class Game implements Controllable, IHasState {
         
         this.timer = plugin.getClockManager().createTimer(TimeUnit.SECONDS.toMillis(settings.getDeathmatchWarmupLength()) + 50L);
         this.timer.addRepeatingCallback(new GameSecondsCallback(this, "&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b{time}&e."), TimeUnit.SECONDS, 1);
+        this.timer.addRepeatingCallback(timerSnapshot -> playSound(Sound.ENDERDRAGON_WINGS), TimeUnit.SECONDS, 1);
         this.timer.setEndCondition(new DMWarmupEndCondition(this));
         this.timer.start();
         setSubState(SubState.UNDEFINED);
