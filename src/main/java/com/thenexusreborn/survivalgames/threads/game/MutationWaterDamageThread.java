@@ -3,6 +3,7 @@ package com.thenexusreborn.survivalgames.threads.game;
 import com.stardevllc.starcore.utils.StarThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
+import com.thenexusreborn.survivalgames.mutations.MutationModifier;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -10,9 +11,9 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 
-public class EndermanWaterDamageThread extends StarThread<SurvivalGames> {
+public class MutationWaterDamageThread extends StarThread<SurvivalGames> {
 
-    public EndermanWaterDamageThread(SurvivalGames plugin) {
+    public MutationWaterDamageThread(SurvivalGames plugin) {
         super(plugin, 20L, 0L, false);
     }
 
@@ -35,8 +36,8 @@ public class EndermanWaterDamageThread extends StarThread<SurvivalGames> {
                 if (gamePlayer.getMutation() == null) {
                     continue;
                 }
-
-                if (!gamePlayer.getMutation().getType().getId().equals("enderman")) {
+            
+                if (!gamePlayer.getMutation().getType().getModifiers().contains(MutationModifier.ALLERGIC_TO_WATER)) {
                     continue;
                 }
 

@@ -27,10 +27,10 @@ public enum MutationType {
             UNBREAKABLE_GOLD_SWORD.build(), //Weapon 
             0, //Unlock cost
             20, //Health
-            true, //Health regen
             List.of(DamageCause.FIRE, DamageCause.LAVA), //Damage Immunities
             List.of(new MutationEffect(PotionEffectType.SPEED, 1), new MutationEffect(PotionEffectType.INCREASE_DAMAGE, 0)), //Potion Effects
-            List.of() //Additional Items
+            List.of(), //Additional Items
+            List.of() //Modifiers
     ),
     
     ZOMBIE(
@@ -42,10 +42,10 @@ public enum MutationType {
             UNBREAKABLE_GOLD_SWORD.build(), //Weapon 
             3000, //Unlock cost
             20, //Health
-            true, //Health regen
             List.of(), //Damage Immunities
             List.of(new MutationEffect(PotionEffectType.SLOW, 0)), //Potion Effects
-            List.of() //Additional Items
+            List.of(), //Additional Items
+            List.of() //Modifiers
     ),
     
     ENDERMAN(
@@ -57,10 +57,10 @@ public enum MutationType {
             UNBREAKABLE_GOLD_SWORD.build(), //Weapon 
             5000, //Unlock cost
             20, //Health
-            true, //Health regen
             List.of(DamageCause.FALL, DamageCause.PROJECTILE), //Damage Immunities
             List.of(), //Potion Effects
-            List.of(new MutationItem(1, new ItemStack(Material.ENDER_PEARL, 32))) //Additional Items
+            List.of(new MutationItem(1, new ItemStack(Material.ENDER_PEARL, 32))), //Additional Items
+            List.of(MutationModifier.ALLERGIC_TO_WATER) //Modifiers
     ),
     
     SKELETON(
@@ -69,16 +69,16 @@ public enum MutationType {
             DisguiseType.SKELETON, //Disguise Type
             XMaterial.BOW, //Icon
             ArmorSet.LEATHER, //Armor
-            new ItemStack(Material.WOOD_SWORD), //Weapon 
+            ItemBuilder.of(XMaterial.WOODEN_SWORD).displayName("&fWooden Sword").build(), //Weapon 
             3000, //Unlock cost
             20, //Health
-            true, //Health regen
             List.of(), //Damage Immunities
             List.of(new MutationEffect(PotionEffectType.SPEED, 0)), //Potion Effects
             List.of(
                     new MutationItem(1, ItemBuilder.of(XMaterial.BOW).addEnchant(Enchantment.ARROW_DAMAGE, 1).build()), 
                     new MutationItem(2, new ItemStack(Material.ARROW, 32))
-            ) //Additional Items
+            ), //Additional Items
+            List.of(MutationModifier.FIFTY_PERCENT_INCREASED_DAMAGE) //Modifiers
     ),
     
     CHICKEN(
@@ -90,13 +90,13 @@ public enum MutationType {
             ItemBuilder.of(XMaterial.WOODEN_SWORD).displayName("&bEgg Launcher").addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS).addEnchant(Enchantment.ARROW_DAMAGE, 1).build(), //Weapon 
             5000, //Unlock cost
             4, //Health
-            true, //Health regen
             List.of(DamageCause.FALL), //Damage Immunities
             List.of(), //Potion Effects
             List.of(
                     new MutationItem(1, ItemBuilder.of(XMaterial.SLIME_BALL).displayName("&bChicken Launch").build()),
                     new MutationItem(2, ItemBuilder.of(XMaterial.FEATHER).displayName("&bChicken Chute").build())
-            ) //Additional Items
+            ), //Additional Items
+            List.of() //Modifiers
     ),
     
     CREEPER(
@@ -108,13 +108,13 @@ public enum MutationType {
             new ItemStack(Material.WOOD_AXE), //Weapon 
             5000, //Unlock cost
             10, //Health
-            true, //Health regen
             List.of(DamageCause.BLOCK_EXPLOSION, DamageCause.ENTITY_EXPLOSION), //Damage Immunities
             List.of(new MutationEffect(PotionEffectType.SPEED, 1)), //Potion Effects
             List.of(
                     new MutationItem(1, new ItemStack(Material.TNT, 32)), 
                     new MutationItem(2, ItemBuilder.of(XMaterial.GUNPOWDER).displayName("&cSuicide").build())
-            ) //Additional Items
+            ), //Additional Items
+            List.of() //Modifiers
     ),
     ;
     
@@ -129,12 +129,12 @@ public enum MutationType {
     private final ItemStack weapon;
     private final int unlockCost;
     private final int health;
-    private final boolean healthRegen;
     private final List<DamageCause> damageImmunities;
     private final List<MutationEffect> effects;
     private final List<MutationItem> items;
+    private final List<MutationModifier> modifiers;
     
-    MutationType(String id, String displayName, Class<? extends Mutation> clazz, DisguiseType disguiseType, XMaterial icon, ArmorSet armorType, ItemStack weapon, int unlockCost, int health, boolean healthRegen, List<DamageCause> damageImmunities, List<MutationEffect> effects, List<MutationItem> items) {
+    MutationType(String id, String displayName, Class<? extends Mutation> clazz, DisguiseType disguiseType, XMaterial icon, ArmorSet armorType, ItemStack weapon, int unlockCost, int health, List<DamageCause> damageImmunities, List<MutationEffect> effects, List<MutationItem> items, List<MutationModifier> modifiers) {
         this.id = id;
         this.displayName = displayName;
         this.clazz = clazz;
@@ -144,26 +144,14 @@ public enum MutationType {
         this.weapon = weapon;
         this.unlockCost = unlockCost;
         this.health = health;
-        this.healthRegen = healthRegen;
         this.damageImmunities = damageImmunities;
         this.effects = effects;
         this.items = items;
+        this.modifiers = modifiers;
     }
     
-    MutationType(String id, Class<? extends Mutation> clazz, DisguiseType disguiseType, XMaterial icon, ArmorSet armorType, ItemStack weapon, int unlockCost, int health, boolean healthRegen, List<DamageCause> damageImmunities, List<MutationEffect> effects, List<MutationItem> items) {
-        this.id = id;
-        this.displayName = StringHelper.titlize(id);
-        this.clazz = clazz;
-        this.disguiseType = disguiseType;
-        this.icon = icon;
-        this.armorType = armorType;
-        this.weapon = weapon;
-        this.unlockCost = unlockCost;
-        this.health = health;
-        this.healthRegen = healthRegen;
-        this.damageImmunities = damageImmunities;
-        this.effects = effects;
-        this.items = items;
+    MutationType(String id, Class<? extends Mutation> clazz, DisguiseType disguiseType, XMaterial icon, ArmorSet armorType, ItemStack weapon, int unlockCost, int health, List<DamageCause> damageImmunities, List<MutationEffect> effects, List<MutationItem> items, List<MutationModifier> modifiers) {
+        this(id, StringHelper.titlize(id), clazz, disguiseType, icon, armorType, weapon, unlockCost, health, damageImmunities, effects, items, modifiers);
     }
     
     public static MutationType getType(String name) {
@@ -222,8 +210,8 @@ public enum MutationType {
     public List<MutationItem> getItems() {
         return items;
     }
-
-    public boolean healthRegen() {
-        return healthRegen;
+    
+    public List<MutationModifier> getModifiers() {
+        return modifiers;
     }
 }

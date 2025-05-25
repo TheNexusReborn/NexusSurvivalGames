@@ -8,10 +8,8 @@ import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.game.Game.SubState;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
-import com.thenexusreborn.survivalgames.mutations.Mutation;
-import com.thenexusreborn.survivalgames.mutations.MutationType;
+import com.thenexusreborn.survivalgames.mutations.*;
 import com.thenexusreborn.survivalgames.mutations.impl.ChickenMutation;
-import com.thenexusreborn.survivalgames.mutations.impl.SkeletonMutation;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import org.bukkit.World;
 import org.bukkit.entity.*;
@@ -26,7 +24,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.EnumSet;
+import java.util.Set;
 
 @SuppressWarnings("DuplicatedCode")
 public class EntityListener implements Listener {
@@ -257,12 +256,6 @@ public class EntityListener implements Listener {
                         e.setCancelled(true);
                     }
                 }
-            } else if (e.getDamager() instanceof Arrow) {
-                if (targetPlayer.getMutation() != null) {
-                    if (targetPlayer.getMutation().getType() == MutationType.ENDERMAN) {
-                        e.setCancelled(true);
-                    }
-                }
             }
         } else if (e.getDamager() instanceof TNTPrimed tntPrimed) {
             if (e.getEntity() instanceof Player target) {
@@ -328,7 +321,7 @@ public class EntityListener implements Listener {
                 e.setCancelled(true);
                 damagerPlayer.sendMessage("&4&l>> &cYou can only damage mutations that are after you.");
             } else {
-                if (mutation instanceof SkeletonMutation) {
+                if (mutation.getType().getModifiers().contains(MutationModifier.FIFTY_PERCENT_INCREASED_DAMAGE)) {
                     e.setDamage(e.getDamage() * 1.5);
                 }
             }
@@ -362,7 +355,7 @@ public class EntityListener implements Listener {
                     }
                     
                     MutationType mutationType = mutation.getType();
-                    if (!mutationType.healthRegen()) {
+                    if (mutationType.getModifiers().contains(MutationModifier.NO_HEALTH_REGEN)) {
                         e.setCancelled(true);
                     }
                 }
