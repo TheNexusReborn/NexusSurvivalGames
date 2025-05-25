@@ -239,7 +239,6 @@ public class Lobby implements Controllable, IHasState {
         }
 
         this.lobbySettings = new LobbySettings();
-        this.gameSettings = new GameSettings();
 
         this.lobbyChatRoom = new LobbyChatRoom(this);
         plugin.getStarChat().getRoomRegistry().register(this.lobbyChatRoom.getName(), this.lobbyChatRoom);
@@ -586,7 +585,7 @@ public class Lobby implements Controllable, IHasState {
 
     public GameSettings getGameSettings() {
         if (this.gameSettings == null) {
-            this.gameSettings = new GameSettings();
+            this.gameSettings = mode.getDefaultSettings();
         }
 
         return gameSettings;
@@ -845,7 +844,7 @@ public class Lobby implements Controllable, IHasState {
         if (this.lobbySettings.isKeepPreviousGameSettings()) {
             this.gameSettings = game.getSettings();
         } else {
-            this.gameSettings = new GameSettings();
+            this.gameSettings = this.mode.getDefaultSettings();
         }
 
         for (UUID player : game.getPlayers().keySet()) {
