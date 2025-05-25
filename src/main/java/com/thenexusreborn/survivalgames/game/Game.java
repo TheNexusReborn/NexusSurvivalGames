@@ -684,6 +684,7 @@ public class Game implements Controllable, IHasState {
         this.timer = Game.getPlugin().getClockManager().createTimer(TimeUnit.SECONDS.toMillis(getSettings().getWarmupLength()) + 50L);
         this.timer.setEndCondition(new WarmupEndCondition(this));
         this.timer.addRepeatingCallback(new GameSecondsCallback(this, "&6&l>> &eThe game begins in &b{time}&e."), TimeUnit.SECONDS, 1);
+        this.timer.addRepeatingCallback(snapshot -> playSound(Sound.NOTE_BASS), TimeUnit.SECONDS, 1);
         List<MapSpawn> mapSpawns = gameMap.getSpawns();
         this.timer.addRepeatingCallback(snapshot -> {
             if (!settings.isLightning()) {
