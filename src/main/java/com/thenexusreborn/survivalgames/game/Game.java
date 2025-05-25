@@ -755,7 +755,14 @@ public class Game implements Controllable, IHasState {
             sendMessage("&6&l>> &9&lWHAT DO YOU THINK OF &e&l" + getGameMap().getName().toUpperCase() + "&9&l?");
             sendMessage("&6&l>> &7Type &8[&6/ratemap &4&l1 &c&l2 &6&l3 &e&l4 &a&l5&8] &7to submit a rating!");
             sendMessage("");
-        }, TimeUnit.MINUTES.toMillis(settings.getGameLength()) / 4);
+        }, TimeUnit.MINUTES.toMillis(settings.getGameLength() / 4));
+        
+        this.timer.addRepeatingCallback(timerSnapshot -> {
+            if (timerSnapshot.getTime() == timerSnapshot.getLength()) {
+                return;
+            }
+            sendMessage(MsgType.INFO.format("&7There are &e" + Game.this.getTeamCount(GameTeam.TRIBUTES) + " &7alive &a&lTributes &7with &e" + Game.this.getTeamCount(GameTeam.SPECTATORS) + " &7watching &c&lSpectators&7."));
+        }, TimeUnit.SECONDS, 90);
         
         setSubState(SubState.CALCULATE_RESTOCK);
         long restockLength;
