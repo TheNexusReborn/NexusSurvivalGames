@@ -1,7 +1,10 @@
 package com.thenexusreborn.survivalgames.menu;
 
-import com.stardevllc.helper.Pair;
+import com.stardevllc.helper.*;
+import com.stardevllc.starcore.base.colors.ColorHandler;
 import com.stardevllc.starcore.base.itembuilder.ItemBuilder;
+import com.stardevllc.starcore.utils.MaterialNames;
+import com.stardevllc.starcore.utils.PotionNames;
 import com.stardevllc.starui.GuiManager;
 import com.stardevllc.starui.element.button.Button;
 import com.stardevllc.starui.gui.InventoryGUI;
@@ -12,8 +15,11 @@ import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.mutations.*;
 import org.bukkit.Bukkit;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.Random;
+import java.util.*;
 
 public class MutateGui extends InventoryGUI {
     public MutateGui(SurvivalGames plugin, MutationBuilder builder) {
@@ -35,7 +41,71 @@ public class MutateGui extends InventoryGUI {
                 continue;
             }
             
-            Button button = new Button().iconCreator(p -> ItemBuilder.of(type.getIcon()).displayName("&e&l" + type.getDisplayName()).build())
+            List<String> rawImmunities = new ArrayList<>();
+            if (type.getDamageImmunities().isEmpty()) {
+                rawImmunities.add("None");
+            } else {
+                boolean handledExplosion = false;
+                for (DamageCause damageImmunity : type.getDamageImmunities()) {
+                    if (damageImmunity == DamageCause.BLOCK_EXPLOSION || damageImmunity == DamageCause.ENTITY_EXPLOSION) {
+                        if (!handledExplosion) {
+                            rawImmunities.add("Explosion");
+                            handledExplosion = true;
+                        }
+                    } else {
+                        rawImmunities.add(StringHelper.titlize(damageImmunity.name()));
+                    }
+                }
+            }
+            
+            String damageImmunities = StringHelper.join(rawImmunities, ", ");
+            
+            List<String> lore = new ArrayList<>(List.of(
+                    "&fArmor: &e" + StringHelper.titlize(type.getArmorType().name()),
+                    "&fHealth: &e" + type.getHealth() / 2 + "❤", // u2764
+                    "&fDamage Immunities: &e" + damageImmunities,
+                    "",
+                    "&6&lPotion Effects"
+            ));
+            
+            if (type.getEffects().isEmpty()) {
+                lore.add("&7- None");
+            } else {
+                for (MutationEffect effect : type.getEffects()) {
+                    lore.add("&7- " + PotionNames.getDefaultName(effect.getPotionType()) + " " + RomanNumerals.decimalToRoman(effect.getAmplifier() + 1));
+                }
+            }
+            
+            lore.add("");
+            lore.add("&6&lItems");
+            lore.add("&7- Player Tracker (Target Only)");
+            lore.add("&7- " + getItemName(type.getWeapon()));
+            for (MutationItem item : type.getItems()) {
+                String line = "&7- ";
+                if (item.itemStack().getAmount() > 1) {
+                    line += item.itemStack().getAmount() + "x ";
+                } 
+                
+                line += getItemName(item.itemStack());
+                lore.add(line);
+            }
+            
+            lore.add("&6&lAdditional Modifiers");
+            if (type.getModifiers().isEmpty()) {
+                lore.add("&7- None");
+            } else {
+                for (MutationModifier modifier : type.getModifiers()) {
+                    lore.add("&7- " + modifier.getDisplayName());
+                }
+            }
+            
+            Button button = new Button()
+                    .iconCreator(p ->
+                            ItemBuilder.of(type.getIcon())
+                                    .displayName("&e&l" + type.getDisplayName())
+                                    .setLore(lore)
+                                    .build()
+                    )
                     .consumer(e -> {
                         if (game == null) {
                             player.sendMessage(MsgType.WARN + "You cannot mutate, You are not in a game.");
@@ -68,5 +138,16 @@ public class MutateGui extends InventoryGUI {
                     });
             addElement(button);
         }
+    }
+    
+    private String getItemName(ItemStack itemStack) {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta != null) {
+            if (itemMeta.getDisplayName() != null && !itemMeta.getDisplayName().isEmpty()) {
+                return ColorHandler.stripColor(itemMeta.getDisplayName());
+            }
+        }
+        
+        return ColorHandler.stripColor(MaterialNames.getDefaultName(itemStack.getType()));
     }
 }
