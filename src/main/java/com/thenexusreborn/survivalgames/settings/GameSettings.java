@@ -94,6 +94,7 @@ public class GameSettings implements Cloneable, ISettings {
     protected int gracePeriodLength = 60;
     protected int gameLength = 10; //Default: 20
     protected int nextGameTimerLength = 10;
+    protected boolean lightning;
     
     //Deathmatch
     protected int deathmatchThreshold = 2; //Default: 4
@@ -692,6 +693,10 @@ public class GameSettings implements Cloneable, ISettings {
     public GameSettings setAllowDeathmatch(boolean allowDeathmatch) {
         this.allowDeathmatch = allowDeathmatch;
         return this;
+    }
+    
+    public boolean isLightning() {
+        return lightning;
     }
     
     @Override

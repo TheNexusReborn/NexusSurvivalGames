@@ -96,6 +96,7 @@ public class ClassicGameSettings extends GameSettings {
         gracePeriodLength = 60;
         gameLength = 10; //Default: 20
         nextGameTimerLength = 10;
+        lightning = true;
         
         //Deathmatch
         deathmatchThreshold = 2; //Default: 4
