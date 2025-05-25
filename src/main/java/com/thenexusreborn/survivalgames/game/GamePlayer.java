@@ -24,6 +24,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.text.DecimalFormat;
 import java.util.*;
@@ -634,6 +635,32 @@ public class GamePlayer {
     
     public String getTrueName() {
         return this.sgPlayer.getNexusPlayer().getTrueName();
+    }
+    
+    public boolean hasPotionEffect(PotionEffectType type) {
+        Player player = Bukkit.getPlayer(this.getUniqueId());
+        if (player == null) {
+            return false;
+        }
+        
+        return player.hasPotionEffect(type);
+    }
+    
+    public int getEffectLevel(PotionEffectType type) {
+        Player player = Bukkit.getPlayer(this.getUniqueId());
+        if (player == null) {
+            return 0;
+        }
+        
+        for (PotionEffect effect : player.getActivePotionEffects()) {
+            if (effect.getType() != type) {
+                continue;
+            }
+            
+            return effect.getAmplifier() + 1;
+        }
+        
+        return 0;
     }
     
     

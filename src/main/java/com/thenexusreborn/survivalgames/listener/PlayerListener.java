@@ -21,7 +21,6 @@ import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.loot.tables.SGLootTable;
 import com.thenexusreborn.survivalgames.menu.SwagShackMenu;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
-import com.thenexusreborn.survivalgames.mutations.MutationType;
 import com.thenexusreborn.survivalgames.mutations.impl.ChickenMutation;
 import com.thenexusreborn.survivalgames.mutations.impl.CreeperMutation;
 import com.thenexusreborn.survivalgames.settings.enums.LootMode;
@@ -808,8 +807,25 @@ public class PlayerListener implements Listener {
         Block fromBlock = e.getFrom().getBlock();
         Block toBlock = e.getTo().getBlock();
         
+        double fromX = fromBlock.getX();
+        double fromZ = fromBlock.getZ();
+        double toX = toBlock.getX();
+        double toZ = toBlock.getZ();
+        
+        double variance = 0.1;
+        
         if ((fromBlock.getType() == Material.WATER || fromBlock.getType() == Material.STATIONARY_WATER) && 
                 toBlock.getType() == Material.WATER || toBlock.getType() == Material.STATIONARY_WATER) {
+            
+            if (fromX - variance >= toX && toX <= fromX + variance &&
+                    fromZ - variance >= toZ && toZ <= fromZ + variance) {
+                return;
+            }
+            
+            if (fromX == toX && fromZ == toZ) {
+                return;
+            }
+            
             SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
             if (sgPlayer == null) {
                 return;
@@ -832,11 +848,13 @@ public class PlayerListener implements Listener {
                 return;
             }
             
-            if (gamePlayer.getMutation().getType() != MutationType.PIG_ZOMBIE) {
+            if (!gamePlayer.hasPotionEffect(PotionEffectType.SPEED)) {
                 return;
             }
             
-            Vector changed = e.getTo().clone().subtract(e.getFrom()).toVector().multiply(1.4);
+            int level = gamePlayer.getEffectLevel(PotionEffectType.SPEED);
+            
+            Vector changed = e.getTo().clone().subtract(e.getFrom()).toVector().multiply(1 + .2 * level);
             changed.setY(e.getTo().clone().subtract(e.getFrom()).toVector().getY());
             player.setVelocity(changed);
         }

@@ -57,7 +57,7 @@ public class GameMutatePlayerSubCmd extends GamePlayerSubCmd {
         }
         
         if (args[1].equalsIgnoreCase("random")) {
-            List<MutationType> types = new ArrayList<>(MutationType.TYPES);
+            List<MutationType> types = List.of(MutationType.values());
             mutationBuilder.setType(types.get(new Random().nextInt(types.size())));
         } else {
             mutationBuilder.setType(MutationType.getType(args[1]));
