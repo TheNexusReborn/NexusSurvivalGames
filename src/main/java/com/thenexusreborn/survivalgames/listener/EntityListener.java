@@ -176,6 +176,10 @@ public class EntityListener implements Listener {
             return;
         }
         
+        if (game == null) {
+            return;
+        }
+        
         NexusReborn.sendDebugMessage("  Game State: " + game.getState().name() + (game.getSubState() != SubState.UNDEFINED ? "." + game.getSubState().name() : ""));
         
         if (e.getDamager() instanceof Player damager) {
