@@ -5,6 +5,7 @@ import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
+import org.bukkit.Sound;
 
 import java.util.UUID;
 
@@ -55,6 +56,10 @@ public class LobbyPlayer {
     
     public int getMapVote() {
         return mapVote;
+    }
+    
+    public void playSound(Sound sound) {
+        this.player.playSound(sound);
     }
     
     public void sendMessage(String message) {

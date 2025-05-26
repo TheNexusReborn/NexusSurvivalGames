@@ -9,9 +9,9 @@ import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
 import com.thenexusreborn.survivalgames.util.NickSGPlayerStats;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.entity.*;
+import org.bukkit.*;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
@@ -72,6 +72,15 @@ public class SGPlayer {
         }
         
         return spigotPlayer;
+    }
+    
+    public void playSound(Sound sound) {
+        Player player = getSpigotPlayer();
+        if (player == null) {
+            return;
+        }
+        
+        player.playSound(player.getLocation(), sound, 0.5F, 1F);
     }
     
     public SGPlayerStats getTrueStats() {
