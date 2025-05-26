@@ -30,7 +30,7 @@ public enum MutationType {
             List.of(DamageCause.FIRE, DamageCause.LAVA), //Damage Immunities
             List.of(new MutationEffect(PotionEffectType.SPEED, 1), new MutationEffect(PotionEffectType.INCREASE_DAMAGE, 0)), //Potion Effects
             List.of(), //Additional Items
-            List.of() //Modifiers
+            List.of(MutationModifier.NO_HEALTH_REGEN) //Modifiers
     ),
     
     ZOMBIE(
