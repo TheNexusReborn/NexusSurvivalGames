@@ -1,8 +1,7 @@
 package com.thenexusreborn.survivalgames.lobby;
 
 import com.stardevllc.clock.clocks.Timer;
-import com.stardevllc.helper.FileHelper;
-import com.stardevllc.helper.MapHelper;
+import com.stardevllc.helper.*;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
@@ -950,15 +949,20 @@ public class Lobby implements Controllable, IHasState {
                 }
 
                 SGMap sgMap = this.mapOptions.get(entry.getKey());
-
+                
                 if (sgMap == null) {
                     MsgType.WARN.send(Bukkit.getPlayer(nexusPlayer.getUniqueId()), "Invalid Vote Option");
                     return;
-                } else if (player.getMapVote() > -1) {
-                    player.sendMessage("&6&l>> &eYou changed your vote to &b" + sgMap.getName());
-                } else {
-                    player.sendMessage("&6&l>> &eYou voted for the map &b" + sgMap.getName());
                 }
+                
+                String creators = StringHelper.join(sgMap.getCreators(), ", ");
+
+                if (player.getMapVote() > -1) {
+                    player.sendMessage("&6&l>> &eYou changed your vote to&8: &b" + sgMap.getName() + " &7&oby &3" + creators);
+                } else {
+                    player.sendMessage("&6&l>> &eYou voted for&8: &b" + sgMap.getName() + " &7&oby &3" + creators + "&e.");
+                }
+                player.sendMessage("&6&l>> Voting Weight&8&l: &b" + VOTE_WEIGHTS.get(nexusPlayer.getEffectiveRank()) + " Vote(s)&e.");
 
                 player.setMapVote(entry.getKey());
                 return;
