@@ -97,6 +97,7 @@ public class ClassicGameSettings extends GameSettings {
         gameLength = 10; //Default: 20
         nextGameTimerLength = 10;
         lightning = true;
+        fireworks = true;
         
         //Deathmatch
         deathmatchThreshold = 2; //Default: 4

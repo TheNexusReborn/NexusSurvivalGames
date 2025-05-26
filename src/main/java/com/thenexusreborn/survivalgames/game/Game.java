@@ -10,6 +10,8 @@ import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.starcore.StarColors;
+import com.stardevllc.starcore.base.XMaterial;
+import com.stardevllc.starcore.base.itembuilder.material.FireworkItemBuilder;
 import com.stardevllc.time.TimeFormat;
 import com.stardevllc.time.TimeUnit;
 import com.thenexusreborn.api.NexusReborn;
@@ -49,6 +51,8 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.*;
+import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -56,6 +60,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -1134,6 +1139,46 @@ public class Game implements Controllable, IHasState {
         if (!(this.players.isEmpty() || Bukkit.getOnlinePlayers().isEmpty())) {
             this.timer = plugin.getClockManager().createTimer(TimeUnit.SECONDS.toMillis(settings.getNextGameStart()));
             this.timer.addRepeatingCallback(new GameSecondsCallback(this, "&6&l>> &eNext game starts in &b{time}&e."), TimeUnit.SECONDS, 1);
+            FireworkItemBuilder fireworkBuilder = new FireworkItemBuilder(FireworkEffect.builder().with(FireworkEffect.Type.BALL).trail(true).withColor(SurvivalGames.COLORS).build(), 1);
+            fireworkBuilder.material(XMaterial.FIREWORK_ROCKET);
+            List<MapSpawn> spawns = gameMap.getSpawns();
+            
+            List<MapSpawn> firstHalfSpawns = new ArrayList<>();
+            List<MapSpawn> secondHalfSpawns = new ArrayList<>();
+            
+            for (int i = 0; i < spawns.size(); i++) {
+                if (i % 2 == 0) {
+                    firstHalfSpawns.add(spawns.get(i));
+                } else {
+                    secondHalfSpawns.add(spawns.get(i));
+                }
+            }
+            
+            AtomicBoolean firstHalfRan = new AtomicBoolean(false);
+            this.timer.addRepeatingCallback(timerSnapshot -> {
+                if (!getSettings().isFireworks()) {
+                    return;
+                }
+                
+                ItemStack fireworkItemstack = fireworkBuilder.build();
+                ItemMeta itemMeta = fireworkItemstack.getItemMeta();
+                
+                List<MapSpawn> fireworkSpawns;
+                if (!firstHalfRan.get()) {
+                    fireworkSpawns = firstHalfSpawns;
+                    firstHalfRan.set(true);
+                } else {
+                    fireworkSpawns = secondHalfSpawns;
+                    firstHalfRan.set(false);
+                }
+                
+                for (MapSpawn spawn : fireworkSpawns) {
+                    FireworkMeta fireworkMeta = (FireworkMeta) itemMeta; 
+                    Location location = spawn.toBlockLocation(gameMap.getWorld());
+                    Firework firework = location.getWorld().spawn(location, Firework.class);
+                    firework.setFireworkMeta(fireworkMeta);
+                }
+            }, TimeUnit.SECONDS, 2);
             this.timer.setEndCondition(snapshot -> {
                 if (snapshot.getTime() == 0) {
                     if (getState() != ENDING) {

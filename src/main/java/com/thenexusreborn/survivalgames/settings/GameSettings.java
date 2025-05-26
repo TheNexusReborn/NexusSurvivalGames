@@ -95,6 +95,7 @@ public class GameSettings implements Cloneable, ISettings {
     protected int gameLength = 10; //Default: 20
     protected int nextGameTimerLength = 10;
     protected boolean lightning;
+    protected boolean fireworks;
     
     //Deathmatch
     protected int deathmatchThreshold = 2; //Default: 4
@@ -102,6 +103,10 @@ public class GameSettings implements Cloneable, ISettings {
     protected int deathmatchWarmupLength = 10;
     protected int deathmatchCountdownLength = 60;
     protected boolean allowDeathmatch = true;
+    
+    public boolean isFireworks() {
+        return fireworks;
+    }
     
     public boolean isAllowMutateOnMutationDeath() {
         return allowMutateOnMutationDeath;
@@ -692,6 +697,11 @@ public class GameSettings implements Cloneable, ISettings {
     
     public GameSettings setAllowDeathmatch(boolean allowDeathmatch) {
         this.allowDeathmatch = allowDeathmatch;
+        return this;
+    }
+    
+    public GameSettings setFireworks(boolean fireworks) {
+        this.fireworks = fireworks;
         return this;
     }
     
