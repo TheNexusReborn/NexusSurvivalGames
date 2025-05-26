@@ -701,7 +701,9 @@ public class Lobby implements Controllable, IHasState {
         XMaterial sponsorsItemMaterial = sponsors ? XMaterial.GLOWSTONE_DUST : XMaterial.GUNPOWDER;
         String statusMessage = sponsors ? "&a&lENABLED" : "&c&lDISABLED";
         player.getInventory().setItem(0, ItemBuilder.of(sponsorsItemMaterial).displayName("&e&lSponsors " + statusMessage + " &7&o(Right click to toggle)").build());
-        player.getInventory().setItem(1, SurvivalGames.modifierItem.toItemStack());
+        if (lobbySettings.isVoteForModifiers()) {
+            player.getInventory().setItem(1, SurvivalGames.modifierItem.toItemStack());
+        }
         player.getInventory().setItem(8, SurvivalGames.toHubItem.toItemStack());
 
         if (nexusPlayer.getRank().ordinal() <= Rank.DIAMOND.ordinal()) {

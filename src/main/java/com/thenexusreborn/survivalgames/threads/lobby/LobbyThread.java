@@ -5,8 +5,7 @@ import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.*;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import com.thenexusreborn.survivalgames.util.SGUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -47,6 +46,14 @@ public class LobbyThread extends StarThread<SurvivalGames> {
                 if (state != LobbyState.MAP_CONFIGURATING) {
                     if (player.getLocation().getBlockY() < lobby.getSpawnpoint().getBlockY() - 20) {
                         player.teleport(lobby.getSpawnpoint());
+                    }
+                    
+                    if (!lobby.getLobbySettings().isVoteForModifiers()) {
+                        player.getInventory().setItem(1, null);
+                    } else {
+                        if (player.getInventory().getItem(1) == null || player.getInventory().getItem(1).getType() != Material.REDSTONE_TORCH_ON) {
+                            player.getInventory().setItem(1, SurvivalGames.modifierItem.toItemStack());
+                        }
                     }
                 }
             }
