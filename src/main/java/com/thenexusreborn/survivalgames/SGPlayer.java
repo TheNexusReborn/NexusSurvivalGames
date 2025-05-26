@@ -37,17 +37,17 @@ public class SGPlayer {
     
     //Fields for things related to SG and the Player
     private long joinTime;
-
+    
     public SGPlayer(NexusPlayer nexusPlayer, Player spigotPlayer) {
         this.nexusPlayer = nexusPlayer;
         this.spigotPlayer = spigotPlayer;
         this.joinTime = System.currentTimeMillis();
     }
-
+    
     public SGPlayer(NexusPlayer nexusPlayer) {
         this(nexusPlayer, Bukkit.getPlayer(nexusPlayer.getUniqueId()));
     }
-
+    
     public SGPlayer(Player spigotPlayer) {
         this(NexusReborn.getPlayerManager().getNexusPlayer(spigotPlayer.getUniqueId()), spigotPlayer);
     }
@@ -59,12 +59,18 @@ public class SGPlayer {
     public String getName() {
         return getNexusPlayer().getName();
     }
-
+    
     public NexusPlayer getNexusPlayer() {
         return nexusPlayer;
     }
-
+    
     public Player getSpigotPlayer() {
+        if (this.spigotPlayer == null) {
+            this.spigotPlayer = Bukkit.getPlayer(getUniqueId());
+        } else if (!this.spigotPlayer.isOnline()) {
+            this.spigotPlayer = null;
+        }
+        
         return spigotPlayer;
     }
     
@@ -87,23 +93,23 @@ public class SGPlayer {
         
         return stats;
     }
-
+    
     public Lobby getLobby() {
         return lobby;
     }
-
+    
     public Game getGame() {
         return game;
     }
-
+    
     public LobbyPlayer getLobbyPlayer() {
         return lobbyPlayer;
     }
-
+    
     public GamePlayer getGamePlayer() {
         return gamePlayer;
     }
-
+    
     public void setStats(SGPlayerStats stats) {
         this.stats = stats;
     }
@@ -118,22 +124,22 @@ public class SGPlayer {
         this.game = null;
         this.gamePlayer = null;
     }
-
+    
     public void setGame(Game game, GamePlayer gamePlayer) {
         this.game = game;
         this.gamePlayer = gamePlayer;
         this.lobby = null;
         this.lobbyPlayer = null;
     }
-
+    
     public long getJoinTime() {
         return this.joinTime;
     }
-
+    
     public UUID getUniqueId() {
         return nexusPlayer.getUniqueId();
     }
-
+    
     public String getColoredName() {
         return getNexusPlayer().getColoredName();
     }
