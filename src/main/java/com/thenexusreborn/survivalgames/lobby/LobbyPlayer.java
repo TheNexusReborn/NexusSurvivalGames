@@ -59,6 +59,10 @@ public class LobbyPlayer {
     }
     
     public void playSound(Sound sound) {
+        if (!player.getLobby().getLobbySettings().isSounds()) {
+            return;
+        }
+        
         this.player.playSound(sound);
     }
     
