@@ -763,6 +763,29 @@ public class Game implements Controllable, IHasState {
         }, TimeUnit.MINUTES.toMillis(settings.getGameLength() / 4));
         
         this.timer.addRepeatingCallback(timerSnapshot -> {
+            for (GamePlayer player : getPlayers().values()) {
+                if (player.getTeam() != GameTeam.SPECTATORS) {
+                    continue;
+                }
+                
+                player.sendMessage("");
+                player.sendMessage(MsgType.INFO.format("You might be out of the game, but &f&lDON'T QUIT&e!"));
+                if (getSettings().isAllowMutations() && player.canMutate().key()) {
+                    player.sendMessage(MsgType.INFO.format("You can also mutate by right clicking the rotten flesh."));
+                }
+                
+                player.sendMessage(MsgType.INFO.format("Another game will be &f&lSTARTING SOON&e!"));
+//                    TextComponent clickHere = new TextComponent("§f§lCLICK HERE");
+//                    clickHere.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new BaseComponent[]{
+//                            new TextComponent("§6§lClick§f to go to the next available game.")
+//                    }));
+//                    clickHere.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nextGame"));
+//                    player.spigot().sendMessage(new TextComponent(MsgType.INFO + "Or, "), clickHere, new TextComponent("§e to go to the next available game."));
+                player.sendMessage("");
+            }
+        }, TimeUnit.SECONDS, 30);
+        
+        this.timer.addRepeatingCallback(timerSnapshot -> {
             if (timerSnapshot.getTime() == timerSnapshot.getLength()) {
                 return;
             }
