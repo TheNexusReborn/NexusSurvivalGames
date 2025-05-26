@@ -27,3 +27,5 @@ commands:
   mutations:
   survivalgamesadmin:
     aliases: [sga, sgadmin]
+  probability:
+    aliases: [prob]

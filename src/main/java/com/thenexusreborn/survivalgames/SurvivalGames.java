@@ -1,6 +1,7 @@
 package com.thenexusreborn.survivalgames;
 
 import com.stardevllc.clock.ClockManager;
+import com.stardevllc.helper.ReflectionHelper;
 import com.stardevllc.registry.IntegerRegistry;
 import com.stardevllc.registry.UUIDRegistry;
 import com.stardevllc.starchat.ChatSelector;
@@ -44,6 +45,7 @@ import com.thenexusreborn.survivalgames.threads.lobby.*;
 import com.thenexusreborn.survivalgames.util.NickSGPlayerStats;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -51,6 +53,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -90,6 +93,18 @@ public class SurvivalGames extends NexusSpigotPlugin {
     public static CustomItem toHubItem;
     public static CustomItem mutateItem;
     public static CustomItem modifierItem;
+    
+    public static final List<Color> COLORS = new ArrayList<>();
+    
+    static {
+        Set<Field> fields = ReflectionHelper.getClassFields(Color.class);
+        fields.removeIf(field -> !Color.class.isAssignableFrom(field.getType()));
+        for (Field field : fields) {
+            try {
+                COLORS.add((Color) field.get(null));
+            } catch (IllegalAccessException e) {}
+        }
+    }
     
     public static SurvivalGames getInstance() {
         return INSTANCE;
@@ -257,6 +272,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         new ToggleCmd(this, "allowsponsors", "sponsors");
         new RateMapCmd(this);
         new GraceperiodCmd(this);
+        new ProbabilityCmd(this);
         
         new GameTeamCmd(this, GameTeam.TRIBUTES);
         new GameTeamCmd(this, GameTeam.SPECTATORS);

@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames.loot.tables;
 
+import com.mysql.cj.exceptions.NumberOutOfRange;
 import com.stardevllc.starcore.StarColors;
 import com.thenexusreborn.survivalgames.loot.item.LootItem;
 import org.bukkit.inventory.ItemStack;
@@ -10,7 +11,9 @@ public class LootTable {
     protected final String name;
 
     private LootItem[] items = new LootItem[0];
-    private int lastIndex = 0;
+    private int lastIndex;
+    
+    private Map<String, LootItem> registeredItems = new HashMap<>();
 
     protected final Map<String, Integer> itemWeights = new HashMap<>();
 
@@ -22,6 +25,7 @@ public class LootTable {
         this.items = new LootItem[0];
         this.lastIndex = 0;
         this.itemWeights.clear();
+        this.registeredItems.clear();
     }
 
     public void addItem(LootItem item, int weight) {
@@ -43,6 +47,8 @@ public class LootTable {
         } else {
             itemWeights.put(normalizedName, weight);
         }
+        
+        registeredItems.put(normalizedName, item);
     }
 
     public void addItems(int weight, LootItem... items) {
@@ -88,5 +94,26 @@ public class LootTable {
 
     public Map<String, Integer> getItemWeights() {
         return itemWeights;
+    }
+    
+    public LootItem getItem(String name) {
+        return registeredItems.get(StarColors.stripColor(name).replace(" ", "_").replace("'", "").toLowerCase());
+    }
+    
+    public int getItemWeight(String name) {
+        String normalizedName = StarColors.stripColor(name).replace(" ", "_").replace("'", "").toLowerCase();
+        if (itemWeights.containsKey(normalizedName)) {
+            return itemWeights.get(normalizedName);
+        }
+        
+        return 0;
+    }
+    
+    public int getWeightTotal() {
+        int total = 0;
+        for (Integer weight : itemWeights.values()) {
+            total += weight;
+        }
+        return total;
     }
 }
