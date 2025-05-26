@@ -3,6 +3,7 @@ PLAYER: '%playername% was killed by %killername% using %helditem%'
 PLAYER_PROJECTILE: '%playername% was shot by %killername% from %distance% blocks'
 ENTITY: '%playername% was killed by %entityname%'
 ENTITY_PROJECTILE: '%playername% was shot by %entityname% from %distance% blocks'
+LEAVE_ARENA: '%playername% was killed for leaving the arena'
 SUFFOCATION:
   normal: '%playername% suffocated in a wall'
   player: '%playername% suffocated while fighting %killername%'

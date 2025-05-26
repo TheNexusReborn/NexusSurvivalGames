@@ -34,7 +34,7 @@ public enum DeathType {
     LEAVE(true), 
     VANISH(true),
     SPECTATE, 
-    CACTUS(true);
+    CACTUS(true), LEAVE_ARENA;
     
     static {
         StringConverters.addConverter(DeathType.class, new EnumStringConverter<>(DeathType.class));
