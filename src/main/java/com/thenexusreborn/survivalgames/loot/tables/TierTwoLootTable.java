@@ -27,7 +27,7 @@ public class TierTwoLootTable extends SGLootTable {
         addItems(30, Items.EGG_OF_DOOM, Items.SLOWBALL, Items.XP_BOTTLE);
         addItems(15, Items.COBWEB, Items.TNT);
 
-        addItems(20, Items.ARROW.setAmount(5));
+        addItems(20, Items.ARROW);
         addItems(15, Items.PLAYER_TRACKER, Items.FLINT_AND_STEEL, Items.FISHING_ROD, Items.ENDER_PEARL);
 
         addItems(25, Items.FEATHER, Items.FLINT, Items.STICK);

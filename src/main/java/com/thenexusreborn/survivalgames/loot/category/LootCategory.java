@@ -1,18 +1,28 @@
 package com.thenexusreborn.survivalgames.loot.category;
 
-import java.util.Objects;
-
-public class LootCategory {
+public enum LootCategory {
+    
+    COOKED_FOOD("cooked_food"),
+    RAW_FOOD("raw_food"),
+    MISC_FOOD("misc_food"),
+    HELMETS("helmets", 1),
+    CHESTPLATES("chestplates", 1),
+    LEGGINGS("leggings", 1),
+    BOOTS("boots", 1),
+    WEAPONS("weapons", 1),
+    COMPONENTS("components"),
+    THROWABLES("throwables"),
+    PLACEABLES("placeables"),
+    TOOLS("tools", 1);
+    
     private final String name;
     private int maxAmountPerChest;
 
-    public LootCategory(String name) {
+    LootCategory(String name) {
         this.name = name;
-        
-        Categories.REGISTRY.register(this);
     }
 
-    public LootCategory(String name, int maxAmountPerChest) {
+    LootCategory(String name, int maxAmountPerChest) {
         this(name);
         this.maxAmountPerChest = maxAmountPerChest;
     }
@@ -23,22 +33,5 @@ public class LootCategory {
 
     public int getMaxAmountPerChest() {
         return maxAmountPerChest;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        LootCategory that = (LootCategory) o;
-        return Objects.equals(name, that.name);
-    }
-    
-    @Override
-    public int hashCode() {
-        return Objects.hash(name);
     }
 }

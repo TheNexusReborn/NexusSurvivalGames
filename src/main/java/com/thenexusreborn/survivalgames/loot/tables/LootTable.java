@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.loot.tables;
 
-import com.mysql.cj.exceptions.NumberOutOfRange;
 import com.stardevllc.starcore.StarColors;
+import com.thenexusreborn.survivalgames.loot.category.LootCategory;
 import com.thenexusreborn.survivalgames.loot.item.LootItem;
 import org.bukkit.inventory.ItemStack;
 
@@ -75,6 +75,9 @@ public class LootTable {
     }
 
     public List<ItemStack> generateLoot(int rolls) {
+        List<LootItem> chances = new ArrayList<>(Arrays.asList(this.items));
+        Map<LootCategory, Integer> categoryCounts = new EnumMap<>(LootCategory.class);
+        
         List<ItemStack> loot = new ArrayList<>();
         Random random = new Random();
         for (int i = 0; i < rolls; i++) {

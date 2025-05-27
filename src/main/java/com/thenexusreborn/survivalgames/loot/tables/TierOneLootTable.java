@@ -26,7 +26,7 @@ public class TierOneLootTable extends SGLootTable {
         addItems(20, Items.EGG_OF_DOOM, Items.SLOWBALL, Items.XP_BOTTLE);
         addItems(10, Items.COBWEB, Items.TNT);
 
-        addItems(30, Items.ARROW.setAmount(5));
+        addItems(30, Items.ARROW);
         addItems(15, Items.PLAYER_TRACKER, Items.FISHING_ROD);
 
         addItems(20, Items.FEATHER, Items.FLINT, Items.STICK);
