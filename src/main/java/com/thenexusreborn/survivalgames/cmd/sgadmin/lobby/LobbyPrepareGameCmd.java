@@ -20,6 +20,12 @@ public class LobbyPrepareGameCmd extends LobbySubCommand {
             sender.sendMessage(MsgType.WARN.format("The server has a game in progress."));
             return true;
         }
+        
+        if (lobby.getPlayingCount() <= 1) {
+            MsgType.WARN.send(sender, "Cannot start the game because only one player exists.");
+            return true;
+        }
+        
         LobbyState lobbyState = lobby.getState();
         if (lobbyState == LobbyState.WAITING || lobbyState == LobbyState.COUNTDOWN) {
             lobby.prepareGame();
