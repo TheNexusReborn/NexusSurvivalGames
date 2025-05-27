@@ -82,6 +82,8 @@ public class SurvivalGames extends NexusSpigotPlugin {
     private ClockManager clockManager;
     private LootManager lootManager;
     
+    private boolean sgGlobalDebug;
+    
     public static final GameSettings globalGameSettings = new GameSettings();
     public static final LobbySettings globalLobbySettings = new LobbySettings();
     
@@ -129,6 +131,11 @@ public class SurvivalGames extends NexusSpigotPlugin {
         INSTANCE = this;
         getLogger().info("Loading NexusSurvivalGames v" + getDescription().getVersion());
         saveDefaultConfig();
+        
+        if (getConfig().contains("sgglobaldebug")) {
+            this.sgGlobalDebug = getConfig().getBoolean("sgglobaldebug");
+            System.out.println("SG Global Debug: " + sgGlobalDebug);
+        }
 
         PluginManager pluginManager = Bukkit.getPluginManager();
         if (pluginManager.getPlugin("PlaceholderAPI") == null) {
@@ -337,6 +344,14 @@ public class SurvivalGames extends NexusSpigotPlugin {
         getLogger().info("Loaded the disguises for mutations.");
     }
     
+    public boolean isSgGlobalDebug() {
+        return sgGlobalDebug;
+    }
+    
+    public void setSgGlobalDebug(boolean sgGlobalDebug) {
+        this.sgGlobalDebug = sgGlobalDebug;
+    }
+    
     @Override
     public void registerChannels(NexusBot nexusBot) {
 //        Bukkit.getScheduler().runTaskLater(this, () -> {
@@ -373,6 +388,8 @@ public class SurvivalGames extends NexusSpigotPlugin {
         }
         
         this.lootManager.saveData();
+        
+        this.getConfig().set("sgglobaldebug", this.sgGlobalDebug);
 
         saveConfig();
     }

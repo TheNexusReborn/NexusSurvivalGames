@@ -62,6 +62,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import static com.thenexusreborn.survivalgames.game.Game.State.*;
@@ -1239,10 +1240,35 @@ public class Game implements Controllable, IHasState {
         server.getLobby().fromGame(this);
     }
     
+    public Logger getLogger() {
+        return plugin.getLogger();
+    }
+    
+    public void logDebug(String message) {
+        if (isDebugMode()) {
+            getLogger().info(message);
+        }
+    } 
+    
+    public void enableDebug() {
+        this.debugMode = true;
+    }
+    
+    public void disableDebug() {
+        this.debugMode = false;
+    }
+    
+    public boolean isDebugMode() {
+        return debugMode || plugin.isSgGlobalDebug();
+    }
+    
     public void killPlayer(GamePlayer gamePlayer, DeathInfo deathInfo) {
         setSubState(SubState.PLAYER_DEATH);
+        logDebug("Handling killPlayer method for " + gamePlayer.getName());
+        logDebug("  DeathInfo: " + deathInfo);
         try {
             GameTeam oldTeam = gamePlayer.getTeam();
+            logDebug("  Old Team: " + oldTeam);
             gamePlayer.addDeathInfo(deathInfo);
             gamePlayer.setTeam(GameTeam.SPECTATORS);
             Player player = Bukkit.getPlayer(gamePlayer.getUniqueId());
@@ -1254,9 +1280,12 @@ public class Game implements Controllable, IHasState {
             deathAction.addValueData("type", deathInfo.getType().name());
             deathAction.addValueData("team", deathInfo.getTeam().name());
             boolean deathByLeave = deathInfo.getType() == DeathType.SUICIDE;
+            logDebug("  Death By Leave: " + deathByLeave);
             gamePlayer.setSpectatorByDeath(!deathByLeave);
             KillerInfo killer = deathInfo.getKiller();
+            logDebug("  Killer Info: " + killer);
             gamePlayer.setDeathByMutation(killer != null && killer.isMutationKill());
+            logDebug("  Death By Mutation: " + gamePlayer.deathByMutation());
             if (deathInfo.getKiller() != null) {
                 deathAction.addValueData("killerType", killer.getType().name());
                 if (killer.getDistance() > 0) {
@@ -1273,14 +1302,19 @@ public class Game implements Controllable, IHasState {
             }
             
             GameTeam.SPECTATORS.getPlayerState().apply(player);
+            logDebug("  Applied SPECTATORS PlayerState");
             gamePlayer.giveSpectatorItems(this);
+            logDebug("  Gave Spectator Items");
             
             boolean deathByVanish = deathInfo.getType() == DeathType.VANISH;
+            logDebug("  Death By Vanish: " + deathByVanish);
             int score = gamePlayer.getStats().getScore();
             int lost = (int) Math.ceil(score / settings.getScoreDivisor());
             if (score - lost < 0) {
                 lost = 0;
             }
+            
+            logDebug("  Score Lost: " + lost);
             
             if (!(deathByVanish || deathByLeave)) {
                 if (lost > 0) {
@@ -1292,9 +1326,12 @@ public class Game implements Controllable, IHasState {
                 if (oldTeam == GameTeam.MUTATIONS) {
                     gamePlayer.getStats().addMutationDeaths(1);
                 }
+                
+                logDebug("  Updated Stats");
             }
             
             boolean playerKiller = killer != null && killer.getType() == EntityType.PLAYER;
+            logDebug("  Player Killer: " + playerKiller);
             
             boolean claimedFirstBlood = false;
             
@@ -1302,69 +1339,86 @@ public class Game implements Controllable, IHasState {
             boolean claimedScoreBounty = false, claimedCreditBounty = false;
             Bounty bounty = gamePlayer.getBounty();
             double scoreBounty = bounty.getAmount(Bounty.Type.SCORE);
+            logDebug("  Score Bounty: " + scoreBounty);
             double creditBounty = bounty.getAmount(Bounty.Type.CREDITS);
+            logDebug("  Credit Bounty: " + creditBounty);
             if (playerKiller) {
                 GamePlayer killerPlayer = getPlayer(killer.getKiller());
-                scoreGain = lost;
-                
-                if (this.firstBlood == null) {
-                    this.firstBlood = killerPlayer;
-                    claimedFirstBlood = true;
-                }
-                
-                if (claimedFirstBlood) {
-                    scoreGain = (int) (scoreGain * settings.getFirstBloodMultiplier());
-                }
-                
-                if (scoreBounty > 0) {
-                    scoreGain += (int) scoreBounty;
-                    claimedScoreBounty = true;
-                    bounty.remove(Bounty.Type.SCORE);
-                }
-                
-                killerPlayer.getStats().addScore(scoreGain);
-                
-                killerPlayer.setKillStreak(killerPlayer.getKillStreak() + 1);
-                currentStreak = killerPlayer.getKillStreak();
-                killerPlayer.setKills(killerPlayer.getKills() + 1);
-                personalBest = killerPlayer.getStats().getHighestKillstreak();
-                
-                if (currentStreak > personalBest) {
-                    killerPlayer.getStats().setHighestKillstreak(currentStreak);
-                }
-                
-                if (getSettings().isGiveXp()) {
-                    xpGain = settings.getKillXPGain();
-                    killerPlayer.getNexusPlayer().addXp(xpGain);
-                }
-                
-                if (getSettings().isGiveCredits()) {
-                    creditGain = settings.getKillCreditGain();
+                if (killerPlayer == null) {
+                    getLogger().severe("The killer of " + player.getName() + " does not have a GamePlayer instance.");
+                    getLogger().severe("The killerInfo.getKiller() method returned " + killer.getKiller());
+                    sendMessage("");
+                    sendMessage("&c&lThere was a recoverable problem while handling " + player.getName() + "'s death.");
+                    sendMessage("&c&lPlease report to Firestar311");
+                    sendMessage("");
+                } else {
+                    scoreGain = lost;
                     
-                    if (creditBounty > 0) {
-                        creditGain += (int) creditBounty;
-                        bounty.remove(Bounty.Type.CREDITS);
-                        claimedCreditBounty = true;
+                    if (this.firstBlood == null) {
+                        this.firstBlood = killerPlayer;
+                        claimedFirstBlood = true;
                     }
-                    killerPlayer.getBalance().addCredits(creditGain);
-                }
-                
-                if (getSettings().isEarnNexites()) {
-                    nexiteGain = settings.getKillNexiteGain();
-                    killerPlayer.getBalance().addNexites(nexiteGain);
-                }
-                
-                killerPlayer.getStats().addKills(1);
-                if (killer.isMutationKill()) {
-                    killerPlayer.getStats().addMutationKills(1);
-                    killerPlayer.sendMessage(killerPlayer.getTeam().getLeaveMessage());
-                    killerPlayer.setTeam(GameTeam.TRIBUTES);
-                    removeMutation(killerPlayer.getMutation());
-                    killerPlayer.sendMessage(killerPlayer.getTeam().getJoinMessage());
+                    
+                    if (claimedFirstBlood) {
+                        scoreGain = (int) (scoreGain * settings.getFirstBloodMultiplier());
+                    }
+                    
+                    if (scoreBounty > 0) {
+                        scoreGain += (int) scoreBounty;
+                        claimedScoreBounty = true;
+                        bounty.remove(Bounty.Type.SCORE);
+                    }
+                    
+                    logDebug("  Killer Score Gain: " + scoreGain);
+                    killerPlayer.getStats().addScore(scoreGain);
+                    
+                    killerPlayer.setKillStreak(killerPlayer.getKillStreak() + 1);
+                    currentStreak = killerPlayer.getKillStreak();
+                    killerPlayer.setKills(killerPlayer.getKills() + 1);
+                    personalBest = killerPlayer.getStats().getHighestKillstreak();
+                    
+                    if (currentStreak > personalBest) {
+                        killerPlayer.getStats().setHighestKillstreak(currentStreak);
+                    }
+                    
+                    if (getSettings().isGiveXp()) {
+                        xpGain = settings.getKillXPGain();
+                        killerPlayer.getNexusPlayer().addXp(xpGain);
+                    }
+                    
+                    if (getSettings().isGiveCredits()) {
+                        creditGain = settings.getKillCreditGain();
+                        
+                        if (creditBounty > 0) {
+                            creditGain += (int) creditBounty;
+                            bounty.remove(Bounty.Type.CREDITS);
+                            claimedCreditBounty = true;
+                        }
+                        killerPlayer.getBalance().addCredits(creditGain);
+                    }
+                    
+                    if (getSettings().isEarnNexites()) {
+                        nexiteGain = settings.getKillNexiteGain();
+                        killerPlayer.getBalance().addNexites(nexiteGain);
+                    }
+                    
+                    killerPlayer.getStats().addKills(1);
+                    
+                    logDebug("  Updated Killer Stats");
+                    
+                    if (killer.isMutationKill()) {
+                        killerPlayer.getStats().addMutationKills(1);
+                        killerPlayer.sendMessage(killerPlayer.getTeam().getLeaveMessage());
+                        killerPlayer.setTeam(GameTeam.TRIBUTES);
+                        removeMutation(killerPlayer.getMutation());
+                        killerPlayer.sendMessage(killerPlayer.getTeam().getJoinMessage());
+                        logDebug("  Added " + killerPlayer.getName() + " back to the game due to taking revenge.");
+                    }
                 }
             }
             
             List<UUID> damagers = gamePlayer.getDamageInfo().getDamagers();
+            logDebug("  Total Damagers: " + damagers);
             List<AssisterInfo> assistors = new ArrayList<>();
             List<String> assistorNames = new ArrayList<>();
             if (settings.isAllowAssists()) {
@@ -1401,6 +1455,8 @@ public class Game implements Controllable, IHasState {
                 }
             }
             
+            logDebug("  Old Team Remaining Members: " + oldTeamRemaining);
+            
             if (oldTeam == GameTeam.MUTATIONS) {
                 removeMutation(gamePlayer.getMutation());
             }
@@ -1417,15 +1473,27 @@ public class Game implements Controllable, IHasState {
                     }
                     
                     if (!playerKiller) {
-                        gp.sendMessage("&6&l>> &cYour target, you have been made a spectator.");
+                        gp.sendMessage("&6&l>> &cYour target without a killer, you have been made a spectator.");
                         gp.setTeam(GameTeam.SPECTATORS);
                         removeMutation(mutation);
                         gp.sendMessage(gp.getTeam().getLeaveMessage());
                         Player mutationPlayer = Bukkit.getPlayer(gp.getUniqueId());
                         gp.sendMessage(gp.getTeam().getJoinMessage());
+                        logDebug("  Mutation Target died without a killer, set as spectator.");
                     } else {
-                        mutation.setTarget(killer.getKiller());
-                        gp.sendMessage("&6&l>> &cYour target died, your new target is &a" + getPlayer(killer.getKiller()).getName());
+                        GamePlayer killersKiller = getPlayer(killer.getKiller());
+                        if (killersKiller != null && killersKiller.getTeam() == GameTeam.TRIBUTES) {
+                            mutation.setTarget(killer.getKiller());
+                            gp.sendMessage("&6&l>> &cYour target died, your new target is &a" + killersKiller.getName());
+                            logDebug("  Mutation target died with a killer, setting new target to " + killersKiller.getName());
+                        } else {
+                            gp.setTeam(GameTeam.SPECTATORS);
+                            removeMutation(mutation);
+                            gp.sendMessage(gp.getTeam().getLeaveMessage());
+                            Player mutationPlayer = Bukkit.getPlayer(gp.getUniqueId());
+                            gp.sendMessage(gp.getTeam().getJoinMessage());
+                            logDebug("  Mutation target died without a killer in TRIBUTES, removing mutation");
+                        }
                     }
                 }
             }
@@ -1436,7 +1504,7 @@ public class Game implements Controllable, IHasState {
                     totalTributes++;
                 }
             }
-            
+            logDebug("  Total Tributes: " + totalTributes);
             
             GamePlayer killerPlayer = null;
             if (playerKiller) {
@@ -1448,6 +1516,7 @@ public class Game implements Controllable, IHasState {
             if (killerPlayer != null) {
                 if (killer.isMutationKill()) {
                     sendMessage("&6&l>> " + killerPlayer.getColoredName() + " &ahas taken revenge and is back in the game!");
+                    playSound(Sound.ENDERDRAGON_GROWL);
                 }
                 if (currentStreak > personalBest) {
                     if (!killerPlayer.isNewPersonalBestNotified()) {
@@ -1734,10 +1803,6 @@ public class Game implements Controllable, IHasState {
     
     public SGMode getMode() {
         return mode;
-    }
-    
-    public boolean isDebug() {
-        return this.debugMode;
     }
     
     public boolean isGraceperiod() {

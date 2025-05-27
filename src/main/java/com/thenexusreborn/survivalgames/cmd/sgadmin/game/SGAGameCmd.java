@@ -30,5 +30,6 @@ public class SGAGameCmd extends SubCommand<SurvivalGames> {
         this.subCommands.add(new GameGiveAllSubCmd(plugin, this));
         this.subCommands.add(new SGAGPlayerCmd(plugin, this));
         this.subCommands.add(new GameStatusSubCmd(plugin, this));
+        this.subCommands.add(new GameDebugSubCmd(plugin, this));
     }
 }
