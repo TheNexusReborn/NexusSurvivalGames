@@ -658,7 +658,7 @@ public class PlayerListener implements Listener {
         GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
         EntityDamageEvent lastDamageCause = player.getLastDamageCause();
 
-        if (gamePlayer.getTeam() != GameTeam.TRIBUTES) {
+        if (gamePlayer.getTeam() != GameTeam.TRIBUTES && player.isOnline()) {
             e.getDrops().clear();
             e.setDroppedExp(0);
         }
