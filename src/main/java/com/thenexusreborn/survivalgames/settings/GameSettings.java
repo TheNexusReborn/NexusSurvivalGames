@@ -57,6 +57,7 @@ public class GameSettings implements Cloneable, ISettings {
     protected int maxMutationAmount = 1;
     protected boolean mutationsEnabled = true;
     protected boolean allowMutateOnMutationDeath;
+    protected long chickenEggLaunchCooldown = 500;
     
     //Player
     protected boolean earnNexites;
@@ -103,6 +104,10 @@ public class GameSettings implements Cloneable, ISettings {
     protected int deathmatchWarmupLength = 10;
     protected int deathmatchCountdownLength = 60;
     protected boolean allowDeathmatch = true;
+    
+    public long getChickenEggLaunchCooldown() {
+        return chickenEggLaunchCooldown;
+    }
     
     public boolean isFireworks() {
         return fireworks;

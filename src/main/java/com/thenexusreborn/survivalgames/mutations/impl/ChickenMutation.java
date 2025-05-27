@@ -26,11 +26,20 @@ public class ChickenMutation extends Mutation {
     
     private int ammunition;
     private boolean chuteActive;
+    private long lastEggLaunch;
     
     private List<Entity> chickens = new ArrayList<>();
     
     protected ChickenMutation(Game game, UUID player, UUID target) {
         super(game, MutationType.CHICKEN, player, target);
+    }
+    
+    public long getLastEggLaunch() {
+        return lastEggLaunch;
+    }
+    
+    public void setLastEggLaunch(long lastEggLaunch) {
+        this.lastEggLaunch = lastEggLaunch;
     }
     
     public boolean isLaunchOnCooldown() {
