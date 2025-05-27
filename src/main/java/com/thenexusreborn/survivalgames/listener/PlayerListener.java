@@ -719,7 +719,10 @@ public class PlayerListener implements Listener {
         }
 
         DeathInfo deathInfo = new DeathInfo(game, System.currentTimeMillis(), gamePlayer, deathType, deathLocation, killerInfo);
-
+        
+        gamePlayer.setPosition(player.getLocation());
+        game.killPlayer(gamePlayer, deathInfo);
+        
         new BukkitRunnable() {
             public void run() {
                 player.spigot().respawn();
@@ -728,8 +731,6 @@ public class PlayerListener implements Listener {
                 } else {
                     player.teleport(deathLocation);
                 }
-                gamePlayer.setPosition(player.getLocation());
-                game.killPlayer(gamePlayer, deathInfo);
             }
         }.runTaskLater(plugin, 2L);
     }
