@@ -56,7 +56,7 @@ public class PlayerScoreboardThread extends StarThread<SurvivalGames> {
                     if (!(view instanceof MutationBoard)) {
                         scoreboard.setView(new MutationBoard(scoreboard, plugin));
                     }
-                } else if (!game.isDebug()) {
+                } else /*if (!game.isDebugMode()) */ {
                     if (!(view instanceof GameBoard)) {
                         scoreboard.setView(new GameBoard(scoreboard, plugin));
                     }
