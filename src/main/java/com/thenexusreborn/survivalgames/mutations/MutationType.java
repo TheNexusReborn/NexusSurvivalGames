@@ -112,7 +112,7 @@ public enum MutationType {
             List.of(new MutationEffect(PotionEffectType.SPEED, 1)), //Potion Effects
             List.of(
                     new MutationItem(1, new ItemStack(Material.TNT, 32)), 
-                    new MutationItem(2, ItemBuilder.of(XMaterial.GUNPOWDER).displayName("&cSuicide").build())
+                    new MutationItem(2, ItemBuilder.of(XMaterial.GUNPOWDER).displayName("&cSuicide Bomb").build())
             ), //Additional Items
             List.of() //Modifiers
     ),
