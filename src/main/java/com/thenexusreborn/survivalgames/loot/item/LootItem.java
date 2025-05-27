@@ -73,6 +73,9 @@ public class LootItem {
         }
         itemMeta.setLore(lore);
         itemStack.setItemMeta(itemMeta);
+        
+        int amount = new Random().nextInt(1, this.amount + 1);
+        
         itemStack.setAmount(amount);
         return itemStack;
     }
@@ -87,8 +90,13 @@ public class LootItem {
 
     @Override
     public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
+        if (this == object) {
+            return true;
+        }
+        
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
 
         LootItem lootItem = (LootItem) object;
         return Objects.equals(name, lootItem.name);
