@@ -93,8 +93,16 @@ public enum MutationType {
             List.of(DamageCause.FALL), //Damage Immunities
             List.of(), //Potion Effects
             List.of(
-                    new MutationItem(1, ItemBuilder.of(XMaterial.SLIME_BALL).displayName("&bChicken Launch").build()),
-                    new MutationItem(2, ItemBuilder.of(XMaterial.FEATHER).displayName("&bChicken Chute").build())
+                    new MutationItem(1, 
+                            ItemBuilder.of(XMaterial.SLIME_BALL).displayName("&bChicken Launch")
+                                    .addLoreLine("&7Launch yourself into the air. (5s cooldown)")
+                                    .build()
+                    ),
+                    new MutationItem(2, 
+                            ItemBuilder.of(XMaterial.FEATHER).displayName("&bChicken Chute")
+                                    .addLoreLine("&7Create a parachute of chickens (5s cooldown)")
+                                    .build()
+                    )
             ), //Additional Items
             List.of() //Modifiers
     ),
@@ -112,7 +120,15 @@ public enum MutationType {
             List.of(new MutationEffect(PotionEffectType.SPEED, 1)), //Potion Effects
             List.of(
                     new MutationItem(1, new ItemStack(Material.TNT, 32)), 
-                    new MutationItem(2, ItemBuilder.of(XMaterial.GUNPOWDER).displayName("&cSuicide Bomb").build())
+                    new MutationItem(2, 
+                            ItemBuilder.of(XMaterial.GUNPOWDER).displayName("&cSuicide Bomb")
+                                    .setLore(List.of(
+                                            "&7Explode yourself for higher damage",
+                                            "&7If you kill your target, you take revenge",
+                                            "&7If you don't, you become a spectator again"
+                                    ))
+                                    .build()
+                    )
             ), //Additional Items
             List.of() //Modifiers
     ),
