@@ -151,17 +151,17 @@ public class DeathInfo {
     public Location getDeathLocation() {
         return deathLocation;
     }
-
+    
     @Override
     public String toString() {
         return "DeathInfo{" +
-                "game=" + game +
-                ", player=" + player +
+                "player=" + player +
                 ", type=" + type +
                 ", teamColor='" + teamColor + '\'' +
                 ", killer=" + killer +
                 ", team=" + team +
                 ", time=" + time +
+                ", deathLocation=" + deathLocation +
                 '}';
     }
 }

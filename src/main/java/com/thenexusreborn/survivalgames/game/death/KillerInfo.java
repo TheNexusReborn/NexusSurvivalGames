@@ -80,4 +80,18 @@ public class KillerInfo {
     public String getName() {
         return name;
     }
+    
+    @Override
+    public String toString() {
+        return "KillerInfo{" +
+                "type=" + type +
+                ", health=" + health +
+                ", killer=" + killer +
+                ", teamColor='" + teamColor + '\'' +
+                ", handItem=" + handItem +
+                ", mutationKill=" + mutationKill +
+                ", distance=" + distance +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }
