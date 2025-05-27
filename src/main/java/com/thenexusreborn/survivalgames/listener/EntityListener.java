@@ -250,14 +250,20 @@ public class EntityListener implements Listener {
             if (e.getDamager() instanceof Snowball) {
                 if (targetPlayer.getTeam() == GameTeam.TRIBUTES) {
                     target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 160, 0));
+                } else {
+                    e.setCancelled(true);
                 }
             } else if (e.getDamager() instanceof Egg) {
+                Mutation mutation = game.getPlayer(shooter.getUniqueId()).getMutation();
                 if (targetPlayer.getTeam() == GameTeam.TRIBUTES) {
                     target.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 160, 1));
                     target.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 160, 1));
+                } else {
+                    if (!(mutation instanceof ChickenMutation)) {
+                        e.setCancelled(true);
+                    }
                 }
                 
-                Mutation mutation = game.getPlayer(shooter.getUniqueId()).getMutation();
                 if (mutation instanceof ChickenMutation) {
                     if (mutation.getTarget().equals(target.getUniqueId())) {
                         target.damage(2.5, shooter);
