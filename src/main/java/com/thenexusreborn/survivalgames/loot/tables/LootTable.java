@@ -82,7 +82,20 @@ public class LootTable {
         Random random = new Random();
         for (int i = 0; i < rolls; i++) {
             try {
-                loot.add(items[random.nextInt(items.length)].getItemStack());
+                LootItem lootitem = chances.get(random.nextInt(chances.size()));
+                loot.add(lootitem.getItemStack());
+                categoryCounts.put(lootitem.getCategory(), categoryCounts.getOrDefault(lootitem.getCategory(), 0) + 1);
+                chances.removeIf(l -> {
+                    if (l.getCategory().getMaxAmountPerChest() > 0) {
+                        if (categoryCounts.containsKey(l.getCategory())) {
+                            if (categoryCounts.get(l.getCategory()) >= l.getCategory().getMaxAmountPerChest()) {
+                                return true;
+                            }
+                        }
+                    }
+                    
+                    return l.getName().equals(lootitem.getName());
+                });
             } catch (Throwable t) {
                 t.printStackTrace();
             }
