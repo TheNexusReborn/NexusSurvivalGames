@@ -80,6 +80,8 @@ public class EntityListener implements Listener {
             }
         }
         
+        NexusReborn.sendDebugMessage("    ACTUAL: " + e.getDamage() + " - " + e.getFinalDamage());
+        
         if (e.getEntity() instanceof Item) {
             if (e.getCause() == DamageCause.ENTITY_EXPLOSION || e.getCause() == DamageCause.ENTITY_EXPLOSION) {
                 e.setCancelled(true);
@@ -152,6 +154,9 @@ public class EntityListener implements Listener {
                 NexusReborn.sendDebugMessage("    " + modifier.name() + ": " + DECIMAL_FORMAT.format(e.getOriginalDamage(modifier)) + " - " + DECIMAL_FORMAT.format(e.getDamage(modifier)));
             }
         }
+        
+        NexusReborn.sendDebugMessage("    ACTUAL: " + e.getDamage() + " - " + e.getFinalDamage());
+        
         Game game = null;
         Lobby lobby = null;
         
