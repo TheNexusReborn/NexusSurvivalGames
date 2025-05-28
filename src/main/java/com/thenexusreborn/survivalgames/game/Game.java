@@ -1473,7 +1473,7 @@ public class Game implements Controllable, IHasState {
                     }
                     
                     if (!playerKiller) {
-                        gp.sendMessage("&6&l>> &cYour target without a killer, you have been made a spectator.");
+                        gp.sendMessage("&6&l>> &cYour target died without a killer, you have been made a spectator.");
                         gp.setTeam(GameTeam.SPECTATORS);
                         removeMutation(mutation);
                         gp.sendMessage(gp.getTeam().getLeaveMessage());
