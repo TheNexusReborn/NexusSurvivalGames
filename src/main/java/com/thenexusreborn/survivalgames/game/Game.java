@@ -1314,17 +1314,22 @@ public class Game implements Controllable, IHasState {
             logDebug("  Killer Info: " + killer);
             gamePlayer.setDeathByMutation(killer != null && killer.isMutationKill());
             logDebug("  Death By Mutation: " + gamePlayer.deathByMutation());
-            if (deathInfo.getKiller() != null) {
-                deathAction.addValueData("killerType", killer.getType().name());
-                if (killer.getDistance() > 0) {
-                    deathAction.addValueData("killerDistance", killer.getDistance());
-                }
-                if (killer.getType() == EntityType.PLAYER) {
-                    deathAction.addValueData("killerIsMutation", killer.isMutationKill());
-                    deathAction.addValueData("killerName", killer.getName());
-                    deathAction.addValueData("killerHealth", killer.getHealth());
-                    if (killer.getHandItem() != null) {
-                        deathAction.addValueData("killerHand", killer.getHandItem().getType().name().toLowerCase());
+            if (killer != null) {
+                if (killer.getKiller() == null) {
+                    killer = null;
+                    deathInfo.setKiller(null);
+                } else {
+                    deathAction.addValueData("killerType", killer.getType().name());
+                    if (killer.getDistance() > 0) {
+                        deathAction.addValueData("killerDistance", killer.getDistance());
+                    }
+                    if (killer.getType() == EntityType.PLAYER) {
+                        deathAction.addValueData("killerIsMutation", killer.isMutationKill());
+                        deathAction.addValueData("killerName", killer.getName());
+                        deathAction.addValueData("killerHealth", killer.getHealth());
+                        if (killer.getHandItem() != null) {
+                            deathAction.addValueData("killerHand", killer.getHandItem().getType().name().toLowerCase());
+                        }
                     }
                 }
             }
@@ -1379,6 +1384,7 @@ public class Game implements Controllable, IHasState {
                     sendMessage("&c&lThere was a recoverable problem while handling " + player.getName() + "'s death.");
                     sendMessage("&c&lPlease report to Firestar311");
                     sendMessage("");
+                    deathInfo.setKiller(null);
                 } else {
                     scoreGain = lost;
                     
