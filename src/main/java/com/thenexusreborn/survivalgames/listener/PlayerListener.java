@@ -813,15 +813,8 @@ public class PlayerListener implements Listener {
         double toX = toBlock.getX();
         double toZ = toBlock.getZ();
         
-        double variance = 0.1;
-        
         if ((fromBlock.getType() == Material.WATER || fromBlock.getType() == Material.STATIONARY_WATER) && 
                 toBlock.getType() == Material.WATER || toBlock.getType() == Material.STATIONARY_WATER) {
-            
-            if (fromX - variance >= toX && toX <= fromX + variance &&
-                    fromZ - variance >= toZ && toZ <= fromZ + variance) {
-                return;
-            }
             
             if (fromX == toX && fromZ == toZ) {
                 return;
