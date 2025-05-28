@@ -509,12 +509,10 @@ public class Game implements Controllable, IHasState {
     
     public void teleportTributes(List<UUID> tributes, Location mapSpawn) {
         List<MapSpawn> spawns = this.gameMap.getSpawns();
-        int totalSpawns = spawns.size();
-        float totalPlayers = players.size();
         
-        for (int i = 0; i < totalPlayers; i++) {
+        for (int i = 0; i < tributes.size(); i++) {
             Player player = Bukkit.getPlayer(tributes.get(i));
-            int index = Math.min(i < totalSpawns ? Math.round(i * (totalSpawns / totalPlayers)) : 0, totalSpawns - 1);
+            int index = Math.min(i < spawns.size() ? Math.round(i * (spawns.size() / (float) tributes.size())) : 0, spawns.size() - 1);
             Location location = spawns.get(index).toGameLocation(gameMap.getWorld(), mapSpawn);
             this.spawns.put(index, player.getUniqueId());
             teleportTribute(player, location);
@@ -928,6 +926,7 @@ public class Game implements Controllable, IHasState {
             }
             
             sendMessage("&6&l>> &e&LPREPARE FOR DEATHMATCH...");
+            resetSpawns();
             List<UUID> tributes = new LinkedList<>(), spectators = new LinkedList<>();
             for (GamePlayer player : this.players.values()) {
                 if (player.getTeam() == GameTeam.TRIBUTES) {
@@ -937,7 +936,6 @@ public class Game implements Controllable, IHasState {
                     spectators.add(player.getUniqueId());
                 }
             }
-            resetSpawns();
             Location mapSpawn = gameMap.getSpawnCenter().toLocation(gameMap.getWorld());
             setSubState(SubState.TELEPORT_TRIBUTES);
             teleportTributes(tributes, mapSpawn);
