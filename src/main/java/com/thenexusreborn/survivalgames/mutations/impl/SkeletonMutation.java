@@ -7,6 +7,6 @@ import java.util.UUID;
 
 public class SkeletonMutation extends Mutation {
     protected SkeletonMutation(Game game, UUID player, UUID target) {
-        super(game, MutationType.SKELETON, player, target);
+        super(game, StandardMutations.SKELETON, player, target);
     }
 }

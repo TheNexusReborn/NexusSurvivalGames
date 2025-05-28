@@ -10,8 +10,7 @@ import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.menu.MutateGui;
 import com.thenexusreborn.survivalgames.menu.manage.ManageMutateMenu;
-import com.thenexusreborn.survivalgames.mutations.MutationBuilder;
-import com.thenexusreborn.survivalgames.mutations.MutationType;
+import com.thenexusreborn.survivalgames.mutations.*;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -57,10 +56,10 @@ public class GameMutatePlayerSubCmd extends GamePlayerSubCmd {
         }
         
         if (args[1].equalsIgnoreCase("random")) {
-            List<MutationType> types = List.of(MutationType.values());
+            List<IMutationType> types = List.of(StandardMutations.values());
             mutationBuilder.setType(types.get(new Random().nextInt(types.size())));
         } else {
-            mutationBuilder.setType(MutationType.getType(args[1]));
+            mutationBuilder.setType(StandardMutations.getType(args[1]));
             
             if (mutationBuilder.getType() == null) {
                 sender.sendMessage(MsgType.WARN.format("Invalid mutation type %v.", args[1]));

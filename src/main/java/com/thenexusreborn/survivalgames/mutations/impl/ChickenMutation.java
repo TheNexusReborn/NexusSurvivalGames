@@ -5,7 +5,7 @@ import com.stardevllc.starcore.StarColors;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
-import com.thenexusreborn.survivalgames.mutations.MutationType;
+import com.thenexusreborn.survivalgames.mutations.StandardMutations;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -31,7 +31,7 @@ public class ChickenMutation extends Mutation {
     private List<Entity> chickens = new ArrayList<>();
     
     protected ChickenMutation(Game game, UUID player, UUID target) {
-        super(game, MutationType.CHICKEN, player, target);
+        super(game, StandardMutations.CHICKEN, player, target);
     }
     
     public long getLastEggLaunch() {

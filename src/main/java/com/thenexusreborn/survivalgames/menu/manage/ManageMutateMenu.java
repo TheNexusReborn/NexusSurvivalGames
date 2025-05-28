@@ -12,8 +12,7 @@ import com.thenexusreborn.nexuscore.util.SpigotUtils;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
-import com.thenexusreborn.survivalgames.mutations.MutationBuilder;
-import com.thenexusreborn.survivalgames.mutations.MutationType;
+import com.thenexusreborn.survivalgames.mutations.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -39,7 +38,7 @@ public class ManageMutateMenu extends InventoryGUI implements UpdatingGUI {
     @Override
     public void createItems() {
         GuiManager manager = Bukkit.getServicesManager().getRegistration(GuiManager.class).getProvider();
-        MutationType type = builder.getType();
+        IMutationType type = builder.getType();
         Button typeButton = new Button().iconCreator(p -> ItemBuilder.of(type.getIcon()).displayName("&a&lTYPE").addLoreLine("&e&l" + type.getDisplayName()).build())
                 .consumer(e -> manager.openGUI(new ManageMutateSelectMenu(plugin, actor, builder, this), e.getWhoClicked()));
         addElement(typeButton);

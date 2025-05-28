@@ -67,7 +67,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
     private MapManager mapManager;
 
     private final Map<UUID, PlayerMutations> playerUnlockedMutations = new HashMap<>();
-    private final Set<MutationType> disabledMutations = EnumSet.noneOf(MutationType.class);
+    private final Set<IMutationType> disabledMutations = new HashSet<>();
 
     private UUIDRegistry<SGPlayer> playerRegistry = new UUIDRegistry<>(null, null, SGPlayer::getUniqueId, null, null);
 
@@ -140,7 +140,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         if (getConfig().contains("disabledmutations")) {
             List<String> rawDisabledMutations = getConfig().getStringList("disabledmutations");
             for (String rawDisabledMutation : rawDisabledMutations) {
-                this.disabledMutations.add(MutationType.valueOf(rawDisabledMutation.toUpperCase()));
+                this.disabledMutations.add(IMutationType.valueOf(rawDisabledMutation.toUpperCase()));
             }
         }
 
@@ -352,16 +352,16 @@ public class SurvivalGames extends NexusSpigotPlugin {
         getLogger().info("Loaded the disguises for mutations.");
     }
     
-    public Set<MutationType> getDisabledMutations() {
+    public Set<IMutationType> getDisabledMutations() {
         return disabledMutations;
     }
     
-    public void disableMutation(MutationType mutationType) {
-        this.disabledMutations.add(mutationType);
+    public void disableMutation(IMutationType IMutationType) {
+        this.disabledMutations.add(IMutationType);
     }
     
-    public void enableMutation(MutationType mutationType) {
-        this.disabledMutations.remove(mutationType);
+    public void enableMutation(IMutationType IMutationType) {
+        this.disabledMutations.remove(IMutationType);
     }
     
     public boolean isSgGlobalDebug() {
@@ -415,7 +415,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
             this.getConfig().set("disabledmutations", null);
         } else {
             List<String> rawDisabledMutations = new ArrayList<>();
-            for (MutationType type : this.disabledMutations) {
+            for (IMutationType type : this.disabledMutations) {
                 rawDisabledMutations.add(type.name());
             }
             

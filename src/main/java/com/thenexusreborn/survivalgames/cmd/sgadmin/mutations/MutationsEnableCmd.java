@@ -6,7 +6,7 @@ import com.thenexusreborn.nexuscore.api.command.ICommand;
 import com.thenexusreborn.nexuscore.api.command.SubCommand;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.mutations.MutationType;
+import com.thenexusreborn.survivalgames.mutations.StandardMutations;
 import org.bukkit.command.CommandSender;
 
 public class MutationsEnableCmd extends SubCommand<SurvivalGames> {
@@ -21,9 +21,9 @@ public class MutationsEnableCmd extends SubCommand<SurvivalGames> {
             return true;
         }
         
-        MutationType type;
+        StandardMutations type;
         try {
-            type = MutationType.valueOf(args[0].toUpperCase());
+            type = StandardMutations.valueOf(args[0].toUpperCase());
         } catch (Exception e) {
             MsgType.WARN.send(sender, "Sorry, but %v is not a valid mutation type.", args[0]);
             return true;

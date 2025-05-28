@@ -7,6 +7,6 @@ import java.util.UUID;
 
 public class EndermanMutation extends Mutation {
     protected EndermanMutation(Game game, UUID player, UUID target) {
-        super(game, MutationType.ENDERMAN, player, target);
+        super(game, StandardMutations.ENDERMAN, player, target);
     }
 }

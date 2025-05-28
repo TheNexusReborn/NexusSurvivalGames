@@ -18,7 +18,7 @@ import java.util.List;
 
 import static com.thenexusreborn.survivalgames.mutations.MutationItem.UNBREAKABLE_GOLD_SWORD;
 
-public enum MutationType {
+public enum StandardMutations implements IMutationType {
     PIG_ZOMBIE(
             "pig_zombie", //id
             PigZombieMutation.class, //class 
@@ -144,7 +144,7 @@ public enum MutationType {
     private final List<MutationItem> items;
     private final List<MutationModifier> modifiers;
     
-    MutationType(String id, String displayName, Class<? extends Mutation> clazz, DisguiseType disguiseType, XMaterial icon, ArmorSet armorType, ItemStack weapon, int unlockCost, int health, List<DamageCause> damageImmunities, List<MutationEffect> effects, List<MutationItem> items, List<MutationModifier> modifiers) {
+    StandardMutations(String id, String displayName, Class<? extends Mutation> clazz, DisguiseType disguiseType, XMaterial icon, ArmorSet armorType, ItemStack weapon, int unlockCost, int health, List<DamageCause> damageImmunities, List<MutationEffect> effects, List<MutationItem> items, List<MutationModifier> modifiers) {
         this.id = id;
         this.displayName = displayName;
         this.clazz = clazz;
@@ -158,14 +158,16 @@ public enum MutationType {
         this.effects = effects;
         this.items = items;
         this.modifiers = modifiers;
+        
+        IMutationType.REGISTRY.register(this);
     }
     
-    MutationType(String id, Class<? extends Mutation> clazz, DisguiseType disguiseType, XMaterial icon, ArmorSet armorType, ItemStack weapon, int unlockCost, int health, List<DamageCause> damageImmunities, List<MutationEffect> effects, List<MutationItem> items, List<MutationModifier> modifiers) {
+    StandardMutations(String id, Class<? extends Mutation> clazz, DisguiseType disguiseType, XMaterial icon, ArmorSet armorType, ItemStack weapon, int unlockCost, int health, List<DamageCause> damageImmunities, List<MutationEffect> effects, List<MutationItem> items, List<MutationModifier> modifiers) {
         this(id, StringHelper.titlize(id), clazz, disguiseType, icon, armorType, weapon, unlockCost, health, damageImmunities, effects, items, modifiers);
     }
     
-    public static MutationType getType(String name) {
-        for (MutationType type : values()) {
+    public static IMutationType getType(String name) {
+        for (IMutationType type : values()) {
             if (type.getId().equalsIgnoreCase(name)) {
                 return type;
             }
@@ -173,54 +175,67 @@ public enum MutationType {
         return null;
     }
     
+    @Override
     public String getId() {
         return id;
     }
     
+    @Override
     public String getDisplayName() {
         return displayName;
     }
     
+    @Override
     public ArmorSet getArmorType() {
         return armorType;
     }
     
+    @Override
     public XMaterial getIcon() {
         return icon;
     }
     
+    @Override
     public Class<? extends Mutation> getClazz() {
         return clazz;
     }
     
+    @Override
     public ItemStack getWeapon() {
         return weapon;
     }
     
+    @Override
     public DisguiseType getDisguiseType() {
         return disguiseType;
     }
     
+    @Override
     public int getUnlockCost() {
         return unlockCost;
     }
     
+    @Override
     public int getHealth() {
         return health;
     }
     
+    @Override
     public List<DamageCause> getDamageImmunities() {
         return damageImmunities;
     }
     
+    @Override
     public List<MutationEffect> getEffects() {
         return effects;
     }
     
+    @Override
     public List<MutationItem> getItems() {
         return items;
     }
     
+    @Override
     public List<MutationModifier> getModifiers() {
         return modifiers;
     }

@@ -20,13 +20,13 @@ public abstract class Mutation {
     
     protected static final SurvivalGames plugin = SurvivalGames.getPlugin(SurvivalGames.class);
     
-    protected final MutationType type;
+    protected final IMutationType type;
     protected final UUID player;
     protected UUID target;
     protected Timer countdownTimer;
     protected Game game;
     
-    public static Mutation createInstance(Game game, MutationType type, UUID player, UUID target) {
+    public static Mutation createInstance(Game game, IMutationType type, UUID player, UUID target) {
         Class<? extends Mutation> clazz = type.getClazz();
         Constructor<? extends Mutation> constructor;
         try {
@@ -48,14 +48,14 @@ public abstract class Mutation {
         return null;
     }
     
-    protected Mutation(Game game, MutationType type, UUID player, UUID target) {
+    protected Mutation(Game game, IMutationType type, UUID player, UUID target) {
         this.game = game;
         this.type = type;
         this.player = player;
         this.target = target;
     }
     
-    public MutationType getType() {
+    public IMutationType getType() {
         return type;
     }
     

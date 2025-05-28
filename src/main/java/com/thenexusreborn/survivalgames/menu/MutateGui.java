@@ -23,7 +23,7 @@ import java.util.*;
 
 public class MutateGui extends InventoryGUI {
     public MutateGui(SurvivalGames plugin, MutationBuilder builder) {
-        super(Math.min(6, MutationType.values().length / 9 + 1), "&lMutate on " + builder.getTarget().getName() + " as...", builder.getPlayer().getUniqueId());
+        super(Math.min(6, StandardMutations.values().length / 9 + 1), "&lMutate on " + builder.getTarget().getName() + " as...", builder.getPlayer().getUniqueId());
         GamePlayer player = builder.getPlayer();
         
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
@@ -36,7 +36,7 @@ public class MutateGui extends InventoryGUI {
         }
         
         GuiManager manager = Bukkit.getServicesManager().getRegistration(GuiManager.class).getProvider();
-        for (MutationType type : MutationType.values()) {
+        for (IMutationType type : StandardMutations.values()) {
             if (plugin.getDisabledMutations().contains(type)) {
                 continue;
             }

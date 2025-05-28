@@ -344,7 +344,7 @@ public class Game implements Controllable, IHasState {
         mutatePlayer(actor, builder.getPlayer(), builder.getType(), builder.getTarget(), builder.isBypassTimer());
     }
     
-    public void mutatePlayer(SGPlayer actor, GamePlayer target, MutationType type, GamePlayer mutationTarget, boolean bypassTimer) {
+    public void mutatePlayer(SGPlayer actor, GamePlayer target, IMutationType type, GamePlayer mutationTarget, boolean bypassTimer) {
         if (target.getTeam() != GameTeam.SPECTATORS) {
             return;
         }
@@ -1780,7 +1780,7 @@ public class Game implements Controllable, IHasState {
         GameTeam.MUTATIONS.getPlayerState().apply(player);
         mutation.cancelTimer();
         
-        MutationType type = mutation.getType();
+        IMutationType type = mutation.getType();
         PlayerInventory inv = player.getInventory();
         inv.setItem(0, type.getWeapon());
         inv.setItem(1, Items.PLAYER_TRACKER.getItemStack());

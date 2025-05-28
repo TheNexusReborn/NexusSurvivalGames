@@ -7,6 +7,6 @@ import java.util.UUID;
 
 public class CreeperMutation extends Mutation {
     protected CreeperMutation(Game game, UUID player, UUID target) {
-        super(game, MutationType.CREEPER, player, target);
+        super(game, StandardMutations.CREEPER, player, target);
     }
 }

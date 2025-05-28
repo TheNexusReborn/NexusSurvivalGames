@@ -115,8 +115,8 @@ public class EntityListener implements Listener {
                     return;
                 }
                 
-                MutationType mutationType = mutation.getType();
-                if (mutationType.getDamageImmunities().contains(e.getCause())) {
+                IMutationType IMutationType = mutation.getType();
+                if (IMutationType.getDamageImmunities().contains(e.getCause())) {
                     e.setCancelled(true);
                 }
             }
@@ -369,8 +369,8 @@ public class EntityListener implements Listener {
                         return;
                     }
                     
-                    MutationType mutationType = mutation.getType();
-                    if (mutationType.getModifiers().contains(MutationModifier.NO_HEALTH_REGEN)) {
+                    IMutationType IMutationType = mutation.getType();
+                    if (IMutationType.getModifiers().contains(MutationModifier.NO_HEALTH_REGEN)) {
                         e.setCancelled(true);
                     }
                 }

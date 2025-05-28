@@ -7,6 +7,6 @@ import java.util.UUID;
 
 public class ZombieMutation extends Mutation {
     protected ZombieMutation(Game game, UUID player, UUID target) {
-        super(game, MutationType.ZOMBIE, player, target);
+        super(game, StandardMutations.ZOMBIE, player, target);
     }
 }
