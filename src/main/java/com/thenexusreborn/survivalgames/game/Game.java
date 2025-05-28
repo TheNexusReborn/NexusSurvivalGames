@@ -492,22 +492,51 @@ public class Game implements Controllable, IHasState {
         setSubState(SubState.UNDEFINED);
     }
     
+//    public Map<Player, Location> spreadPlayers(List<Player> players, List<Location> spawns){
+//        Map<Player, Location> spawnPoints = new HashMap<>();
+//        int totalSpawns = spawns.size();
+//        int totalPlayers = players.size();
+//        
+//        for (int i = 0; i < totalPlayers; i++) {
+//            int index = i < totalSpawns
+//                    ? Math.round(i * (totalSpawns / (float) totalPlayers))
+//                    : 0;
+//            index = Math.min(index, totalSpawns - 1); // safety bound
+//            spawnPoints.put(players.get(i), spawns.get(index));
+//        }
+//        
+//        return spawnPoints;
+//    }
+    
     public void teleportTributes(List<UUID> tributes, Location mapSpawn) {
-        List<Entry<Integer, UUID>> spawns = new ArrayList<>(this.spawns.entrySet());
-        Collections.shuffle(spawns);
-        for (UUID tribute : tributes) {
-            Player player = Bukkit.getPlayer(tribute);
-            if (player != null) {
-                int index = new Random().nextInt(spawns.size());
-                Entry<Integer, UUID> entry = spawns.get(index);
-                MapSpawn spawnPosition = this.gameMap.getSpawns().get(entry.getKey());
-                Location spawn = spawnPosition.toGameLocation(gameMap.getWorld(), mapSpawn);
-                teleportTribute(player, spawn);
-                this.spawns.put(entry.getKey(), player.getUniqueId());
-                spawns.remove(index);
-            }
+        List<MapSpawn> spawns = this.gameMap.getSpawns();
+        int totalSpawns = spawns.size();
+        float totalPlayers = players.size();
+        
+        for (int i = 0; i < totalPlayers; i++) {
+            Player player = Bukkit.getPlayer(tributes.get(i));
+            int index = Math.min(i < totalSpawns ? Math.round(i * (totalSpawns / totalPlayers)) : 0, totalSpawns - 1);
+            Location location = spawns.get(index).toGameLocation(gameMap.getWorld(), mapSpawn);
+            teleportTribute(player, location);
         }
     }
+    
+//    public void teleportTributes(List<UUID> tributes, Location mapSpawn) {
+//        List<Entry<Integer, UUID>> spawns = new ArrayList<>(this.spawns.entrySet());
+//        Collections.shuffle(spawns);
+//        for (UUID tribute : tributes) {
+//            Player player = Bukkit.getPlayer(tribute);
+//            if (player != null) {
+//                int index = new Random().nextInt(spawns.size());
+//                Entry<Integer, UUID> entry = spawns.get(index);
+//                MapSpawn spawnPosition = this.gameMap.getSpawns().get(entry.getKey());
+//                Location spawn = spawnPosition.toGameLocation(gameMap.getWorld(), mapSpawn);
+//                teleportTribute(player, spawn);
+//                this.spawns.put(entry.getKey(), player.getUniqueId());
+//                spawns.remove(index);
+//            }
+//        }
+//    }
     
     private void teleportToGameSpawn(Player player, Location spawn, GameTeam gameTeam) {
         player.setFallDistance(0);
@@ -1870,7 +1899,6 @@ public class Game implements Controllable, IHasState {
                 ", controlType=" + controlType +
                 ", settings=" + settings +
                 ", players=" + players +
-                ", spawns=" + spawns +
                 ", gameChatroom=" + gameChatroom +
                 ", chatRooms=" + chatRooms +
                 ", state=" + state +
