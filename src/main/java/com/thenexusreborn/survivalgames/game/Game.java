@@ -59,7 +59,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
@@ -517,6 +516,7 @@ public class Game implements Controllable, IHasState {
             Player player = Bukkit.getPlayer(tributes.get(i));
             int index = Math.min(i < totalSpawns ? Math.round(i * (totalSpawns / totalPlayers)) : 0, totalSpawns - 1);
             Location location = spawns.get(index).toGameLocation(gameMap.getWorld(), mapSpawn);
+            this.spawns.put(index, player.getUniqueId());
             teleportTribute(player, location);
         }
     }
