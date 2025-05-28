@@ -94,6 +94,7 @@ public class MutateGui extends InventoryGUI {
                 lore.add(line);
             }
             
+            lore.add("");
             lore.add("&6&lAdditional Modifiers");
             if (type.getModifiers().isEmpty()) {
                 lore.add("&7- None");
