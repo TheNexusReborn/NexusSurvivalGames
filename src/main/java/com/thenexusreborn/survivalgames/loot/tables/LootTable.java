@@ -1,6 +1,7 @@
 package com.thenexusreborn.survivalgames.loot.tables;
 
 import com.stardevllc.starcore.StarColors;
+import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.loot.category.LootCategory;
 import com.thenexusreborn.survivalgames.loot.item.LootItem;
 import org.bukkit.inventory.ItemStack;
@@ -82,7 +83,12 @@ public class LootTable {
         Random random = new Random();
         for (int i = 0; i < rolls; i++) {
             try {
-                LootItem lootitem = chances.get(random.nextInt(chances.size()));
+                int index = random.nextInt(chances.size());
+                LootItem lootitem = chances.get(index);
+                if (lootitem == null) {
+                    SurvivalGames.getInstance().getLogger().warning("Loot item was null for random index " + index);
+                    continue;
+                }
                 loot.add(lootitem.getItemStack());
                 categoryCounts.put(lootitem.getCategory(), categoryCounts.getOrDefault(lootitem.getCategory(), 0) + 1);
                 chances.removeIf(l -> {
