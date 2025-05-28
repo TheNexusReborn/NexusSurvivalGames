@@ -23,12 +23,12 @@ public enum MutationType {
             PigZombieMutation.class, //class 
             DisguiseType.PIG_ZOMBIE, //Disguise Type
             XMaterial.PORKCHOP, //Icon
-            ArmorSet.LEATHER, //Armor
+            ArmorSet.CHAINMAIL, //Armor
             UNBREAKABLE_GOLD_SWORD.build(), //Weapon 
             0, //Unlock cost
             20, //Health
             List.of(DamageCause.FIRE, DamageCause.LAVA), //Damage Immunities
-            List.of(new MutationEffect(PotionEffectType.SPEED, 1), new MutationEffect(PotionEffectType.INCREASE_DAMAGE, 0)), //Potion Effects
+            List.of(new MutationEffect(PotionEffectType.SPEED, 1)), //Potion Effects
             List.of(), //Additional Items
             List.of(MutationModifier.NO_HEALTH_REGEN) //Modifiers
     ),
