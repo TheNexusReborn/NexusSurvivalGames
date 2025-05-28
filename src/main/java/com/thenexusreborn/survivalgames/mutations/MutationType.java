@@ -27,7 +27,7 @@ public enum MutationType {
             UNBREAKABLE_GOLD_SWORD.build(), //Weapon 
             0, //Unlock cost
             20, //Health
-            List.of(DamageCause.FIRE, DamageCause.LAVA), //Damage Immunities
+            List.of(DamageCause.FIRE, DamageCause.FIRE_TICK, DamageCause.LAVA), //Damage Immunities
             List.of(new MutationEffect(PotionEffectType.SPEED, 1)), //Potion Effects
             List.of(), //Additional Items
             List.of(MutationModifier.NO_HEALTH_REGEN) //Modifiers
