@@ -6,8 +6,9 @@ import com.stardevllc.staritems.model.CustomItem;
 import com.stardevllc.staritems.model.types.PlayerEvent;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.GamePlayer;
-import com.thenexusreborn.survivalgames.game.GameTeam;
+import com.thenexusreborn.survivalgames.game.*;
+import com.thenexusreborn.survivalgames.game.death.DeathInfo;
+import com.thenexusreborn.survivalgames.game.death.DeathType;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -48,7 +49,8 @@ public class CreeperSuicideBomb extends CustomItem {
             SGUtils.spawnTNTWithSource(loc, e.getPlayer(), 1, 4F);
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 if (gamePlayer.getTeam() == GameTeam.MUTATIONS) {
-                    e.getPlayer().setHealth(0);
+                    Game game = gamePlayer.getGame();
+                    game.killPlayer(gamePlayer, new DeathInfo(game, System.currentTimeMillis(), gamePlayer, DeathType.SUICIDE, e.getPlayer().getLocation()));
                 }
             }, 10L);
         });
