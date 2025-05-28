@@ -84,6 +84,8 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
     private boolean sgGlobalDebug;
     
+    private IMutationType defaultMutationType;
+    
     public static final GameSettings globalGameSettings = new GameSettings();
     public static final LobbySettings globalLobbySettings = new LobbySettings();
     
@@ -130,6 +132,20 @@ public class SurvivalGames extends NexusSpigotPlugin {
     @Override
     public void onEnable() {
         INSTANCE = this;
+        ItemRegistry itemRegistry = Bukkit.getServicesManager().getRegistration(ItemRegistry.class).getProvider();
+        tributesBook = new GameTeamBook(this, GameTeam.TRIBUTES);
+        mutationsBook = new GameTeamBook(this, GameTeam.MUTATIONS);
+        spectatorsBook = new GameTeamBook(this, GameTeam.SPECTATORS);
+        playerTrackerItem = new PlayerTrackerItem(this);
+        tpToMapCenterItem = new TPToMapCenterItem(this);
+        toHubItem = new ToHubItem(this);
+        mutateItem = new MutateItem(this);
+        modifierItem = new GameModifierItem(this);
+        creeperBombItem = new CreeperSuicideBomb(this);
+        
+        itemRegistry.registerAll(tributesBook, mutationsBook, spectatorsBook, playerTrackerItem, tpToMapCenterItem, toHubItem, mutateItem, modifierItem, creeperBombItem);
+        
+        this.defaultMutationType = StandardMutations.PIG_ZOMBIE;
         getLogger().info("Loading NexusSurvivalGames v" + getDescription().getVersion());
         saveDefaultConfig();
         
@@ -140,8 +156,17 @@ public class SurvivalGames extends NexusSpigotPlugin {
         if (getConfig().contains("disabledmutations")) {
             List<String> rawDisabledMutations = getConfig().getStringList("disabledmutations");
             for (String rawDisabledMutation : rawDisabledMutations) {
-                this.disabledMutations.add(IMutationType.valueOf(rawDisabledMutation.toUpperCase()));
+                IMutationType type = IMutationType.valueOf(rawDisabledMutation.toUpperCase());
+                if (type == null) {
+                    getLogger().warning("Could not get the mutation type for the disabled mutation: " + rawDisabledMutation);
+                    continue;
+                }
+                this.disabledMutations.add(type);
             }
+        }
+        
+        for (IMutationType type : IMutationType.REGISTRY) {
+            System.out.println("Mutation Type: " + type.name());
         }
 
         PluginManager pluginManager = Bukkit.getPluginManager();
@@ -334,20 +359,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
 //            return line1 + "\n" + line2;
 //        });
         
-        ItemRegistry itemRegistry = Bukkit.getServicesManager().getRegistration(ItemRegistry.class).getProvider();
-        
-        tributesBook = new GameTeamBook(this, GameTeam.TRIBUTES);
-        mutationsBook = new GameTeamBook(this, GameTeam.MUTATIONS);
-        spectatorsBook = new GameTeamBook(this, GameTeam.SPECTATORS);
-        playerTrackerItem = new PlayerTrackerItem(this);
-        tpToMapCenterItem = new TPToMapCenterItem(this);
-        toHubItem = new ToHubItem(this);
-        mutateItem = new MutateItem(this);
-        modifierItem = new GameModifierItem(this);
-        creeperBombItem = new CreeperSuicideBomb(this);
-        
-        itemRegistry.registerAll(tributesBook, mutationsBook, spectatorsBook, playerTrackerItem, tpToMapCenterItem, toHubItem, mutateItem, modifierItem, creeperBombItem);
-        
         new NexusDisguises().init(this);
         getLogger().info("Loaded the disguises for mutations.");
     }
@@ -416,6 +427,10 @@ public class SurvivalGames extends NexusSpigotPlugin {
         } else {
             List<String> rawDisabledMutations = new ArrayList<>();
             for (IMutationType type : this.disabledMutations) {
+                if (type == null) {
+                    continue;
+                }
+                
                 rawDisabledMutations.add(type.name());
             }
             

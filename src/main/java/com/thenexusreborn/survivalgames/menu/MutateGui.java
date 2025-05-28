@@ -92,11 +92,18 @@ public class MutateGui extends InventoryGUI {
             lore.add("&7- " + getItemName(type.getWeapon()));
             for (MutationItem item : type.getItems()) {
                 String line = "&7- ";
-                if (item.itemStack().getAmount() > 1) {
-                    line += item.itemStack().getAmount() + "x ";
+                ItemStack itemStack = item.itemStack();
+                
+                if (itemStack == null) {
+                    plugin.getLogger().severe("ItemStack is null for Mutation Item " + item.slotOffset() + " in type " + type.name());
+                    continue;
+                }
+                
+                if (itemStack.getAmount() > 1) {
+                    line += itemStack.getAmount() + "x ";
                 } 
                 
-                line += getItemName(item.itemStack());
+                line += getItemName(itemStack);
                 lore.add(line);
             }
             

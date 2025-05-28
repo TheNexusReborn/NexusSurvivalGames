@@ -12,6 +12,7 @@ import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.menu.MutateGui;
 import com.thenexusreborn.survivalgames.mutations.MutationBuilder;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 
@@ -24,7 +25,7 @@ public class MutateItem extends CustomItem {
         this.guiManager = plugin.getServer().getServicesManager().getRegistration(GuiManager.class).getProvider();
         
         addEventHandler(PlayerEvent.INTERACT, e -> {
-            if (!(e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR)) {
+            if (e.getAction() != Action.RIGHT_CLICK_BLOCK && e.getAction() != Action.RIGHT_CLICK_AIR) {
                 return;
             }
             
@@ -42,6 +43,10 @@ public class MutateItem extends CustomItem {
             
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
             
+            if (gamePlayer == null) {
+                return;
+            }
+            
             if (gamePlayer.getTeam() != GameTeam.SPECTATORS) {
                 return;
             }
@@ -50,7 +55,7 @@ public class MutateItem extends CustomItem {
             if (canMutateResult.key()) {
                 MutationBuilder mutationBuilder = new MutationBuilder(gamePlayer);
                 mutationBuilder.setUsePass(true);
-                guiManager.openGUI(new MutateGui(plugin, mutationBuilder), player);
+                Bukkit.getScheduler().runTaskLater(plugin, () -> guiManager.openGUI(new MutateGui(plugin, mutationBuilder), player), 1L);
             } else {
                 gamePlayer.sendMessage(MsgType.WARN + canMutateResult.value());
             }
