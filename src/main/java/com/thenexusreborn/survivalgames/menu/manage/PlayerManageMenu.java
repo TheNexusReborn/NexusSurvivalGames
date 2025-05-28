@@ -103,7 +103,7 @@ public class PlayerManageMenu extends InventoryGUI implements UpdatingGUI {
                             e.getWhoClicked().closeInventory();
                         } else if (e.getClick() == ClickType.RIGHT) {
                             e.getWhoClicked().closeInventory();
-                            Bukkit.getScheduler().runTaskLater(plugin, () -> new ConversationFactory(plugin).withFirstPrompt(new SelectLootTablePrompt(plugin, this, manageBuilder)).buildConversation((Player) e).begin(), 1L);
+                            Bukkit.getScheduler().runTaskLater(plugin, () -> new ConversationFactory(plugin).withFirstPrompt(new SelectLootTablePrompt(plugin, this, manageBuilder)).buildConversation((Player) e.getWhoClicked()).begin(), 1L);
                         }
                     });
             addElement(reviveButton);
