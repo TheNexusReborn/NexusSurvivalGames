@@ -1023,6 +1023,8 @@ public class Game implements Controllable, IHasState {
             this.graceperiodTimer = null;
         }
         
+        this.gameMap.disableWorldBorder();
+        
         setSubState(SubState.DETERMINE_WINNER);
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (!this.players.containsKey(player.getUniqueId())) {
