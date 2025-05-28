@@ -11,20 +11,17 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.EnumSet;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.bukkit.Material.*;
 
 public class BlockListener implements Listener {
-    public static final Set<Material> ALLOWED_BREAK, NO_DROPS, ALLOWED_PLACE;
-
-    static {
-        ALLOWED_BREAK = new HashSet<>(Arrays.asList(LONG_GRASS, RED_ROSE, YELLOW_FLOWER, LEAVES, FIRE, WEB, MELON_BLOCK, CROPS, CARROT, POTATO, LEAVES, LEAVES_2, CAKE_BLOCK, DOUBLE_PLANT));
-        NO_DROPS = new HashSet<>(Arrays.asList(YELLOW_FLOWER, LONG_GRASS, COCOA, RED_ROSE));
-        ALLOWED_PLACE = new HashSet<>(Arrays.asList(CAKE_BLOCK, WEB, FIRE, TNT));
-    }
-
+    public static final Set<Material> ALLOWED_BREAK = EnumSet.of(LONG_GRASS, RED_ROSE, YELLOW_FLOWER, LEAVES, FIRE, WEB, MELON_BLOCK, CROPS, CARROT, POTATO, LEAVES_2, CAKE_BLOCK, DOUBLE_PLANT), 
+            NO_DROPS = EnumSet.of(YELLOW_FLOWER, LONG_GRASS, COCOA, RED_ROSE), 
+            ALLOWED_PLACE = EnumSet.of(CAKE_BLOCK, WEB, FIRE, TNT);
+    
     private SurvivalGames plugin;
 
     public BlockListener(SurvivalGames plugin) {
@@ -90,7 +87,8 @@ public class BlockListener implements Listener {
         
         if (game != null) {
             if (Stream.of(Game.State.INGAME, Game.State.INGAME_DEATHMATCH, Game.State.DEATHMATCH).anyMatch(gameState -> game.getState() == gameState)) {
-                if (game.getPlayer(e.getPlayer().getUniqueId()).getTeam() != GameTeam.TRIBUTES) {
+                GamePlayer player = game.getPlayer(e.getPlayer().getUniqueId());
+                if (!(player.getTeam() == GameTeam.TRIBUTES || player.getTeam() == GameTeam.MUTATIONS)) {
                     e.setCancelled(true);
                     return;
                 }

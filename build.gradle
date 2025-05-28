@@ -55,7 +55,7 @@ dependencies {
 
 group = 'com.thenexusreborn'
 //version = '1.19.3-ALPHA'
-version = '0.2.2'
+version = '0.2.3'
 
 jar {
     destinationDirectory = file(System.getProperty("user.home") + File.separator + "Documents" + File.separator + "JarOutput" + File.separator + "NexusReborn")
