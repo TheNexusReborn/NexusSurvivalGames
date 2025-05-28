@@ -564,6 +564,13 @@ public class PlayerListener implements Listener {
             itemMeta.setDisplayName(StarColors.color("&fFrederick"));
             itemStack.setItemMeta(itemMeta);
             inv.setResult(itemStack);
+        } else if (inv.getRecipe().getResult().getType() == Material.GOLD_AXE) {
+            ItemStack itemStack = new ItemStack(Material.GOLD_AXE);
+            ItemMeta itemMeta = itemStack.getItemMeta();
+            itemMeta.setDisplayName(StarColors.color("&fSacrificial Axe"));
+            itemMeta.setLore(List.of("", "&7In honor of TheDragonFox"));
+            itemStack.setItemMeta(itemMeta);
+            inv.setResult(itemStack);
         }
     }
 
