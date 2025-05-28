@@ -771,11 +771,10 @@ public class Game implements Controllable, IHasState {
                 
                 player.sendMessage("");
                 player.sendMessage(MsgType.INFO.format("You might be out of the game, but &f&lDON'T QUIT&e!"));
-                if (getSettings().isAllowMutations() && player.canMutate().key()) {
-                    player.sendMessage(MsgType.INFO.format("You can also mutate by right clicking the rotten flesh."));
-                }
-                
                 player.sendMessage(MsgType.INFO.format("Another game will be &f&lSTARTING SOON&e!"));
+                if (getSettings().isAllowMutations() && player.canMutate().key()) {
+                    player.sendMessage(MsgType.INFO.format("You can &f&lMUTATE &eby using the &bRotten Flesh&e."));
+                }
 //                    TextComponent clickHere = new TextComponent("§f§lCLICK HERE");
 //                    clickHere.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new BaseComponent[]{
 //                            new TextComponent("§6§lClick§f to go to the next available game.")
@@ -784,7 +783,7 @@ public class Game implements Controllable, IHasState {
 //                    player.spigot().sendMessage(new TextComponent(MsgType.INFO + "Or, "), clickHere, new TextComponent("§e to go to the next available game."));
                 player.sendMessage("");
             }
-        }, TimeUnit.SECONDS, 30);
+        }, TimeUnit.MINUTES, 2);
         
         this.timer.addRepeatingCallback(timerSnapshot -> {
             if (timerSnapshot.getTime() == timerSnapshot.getLength()) {
