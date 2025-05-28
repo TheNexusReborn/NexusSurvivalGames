@@ -245,7 +245,8 @@ public class ReflectionManager {
                     }
                 }
             }
-            return new FakeBoundingBox(x, y, z);
+            
+            return new FakeBoundingBox(x, Math.min(y, 2), z);
             
         } catch (Exception ex) {
             ex.printStackTrace(System.out);
