@@ -404,6 +404,11 @@ public class GamePlayer {
             return null;
         }
         
+        if (killerInfo.getKiller() == null) {
+            mostRecentDeath.setKiller(null);
+            return null;
+        }
+        
         if (killerInfo.getKiller().equals(this.getUniqueId())) {
             return killerInfo.getKiller();
         }
