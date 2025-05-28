@@ -111,7 +111,7 @@ public class Game implements Controllable, IHasState {
     private final Map<UUID, GamePlayer> players = new HashMap<>();
     private final Map<Integer, UUID> spawns = new HashMap<>();
     private final ChatRoom gameChatroom;
-    private final Map<GameTeam, GameTeamChatroom> chatRooms = new HashMap<>();
+    private final Map<GameTeam, GameTeamChatroom> chatRooms = new EnumMap<>(GameTeam.class);
     private State state = UNDEFINED;
     private SubState subState = SubState.UNDEFINED;
     private Timer timer, graceperiodTimer;
