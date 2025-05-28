@@ -42,7 +42,7 @@ dependencies {
     compileOnly 'com.thenexusreborn:NexusCore:0.1.0'
     compileOnly 'com.github.StarDevelopmentLLC:StarUI:0.1.4'
     compileOnly 'com.thenexusreborn:NexusMaps:0.2.0'
-    compileOnly 'com.thenexusreborn:NexusHub:0.1.0'
+    compileOnly 'com.thenexusreborn:NexusHub:0.1.1'
     compileOnly 'com.github.StarDevelopmentLLC:StarCore:0.4.2'
     compileOnly 'com.github.StarDevelopmentLLC:StarChat:0.2.4'
     compileOnly 'com.github.StarDevelopmentLLC:StarItems:0.1.7'
@@ -55,7 +55,7 @@ dependencies {
 
 group = 'com.thenexusreborn'
 //version = '1.19.3-ALPHA'
-version = '0.2.3'
+version = '0.2.4'
 
 jar {
     destinationDirectory = file(System.getProperty("user.home") + File.separator + "Documents" + File.separator + "JarOutput" + File.separator + "NexusReborn")
