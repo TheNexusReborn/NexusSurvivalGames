@@ -22,9 +22,9 @@ import com.thenexusreborn.survivalgames.loot.tables.SGLootTable;
 import com.thenexusreborn.survivalgames.menu.SwagShackMenu;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
 import com.thenexusreborn.survivalgames.mutations.impl.ChickenMutation;
-import com.thenexusreborn.survivalgames.mutations.impl.CreeperMutation;
 import com.thenexusreborn.survivalgames.settings.enums.LootMode;
-import com.thenexusreborn.survivalgames.util.*;
+import com.thenexusreborn.survivalgames.util.NickSGPlayerStats;
+import com.thenexusreborn.survivalgames.util.SGPlayerStats;
 import org.bukkit.*;
 import org.bukkit.block.*;
 import org.bukkit.entity.*;
@@ -152,17 +152,8 @@ public class PlayerListener implements Listener {
                 if (item == null) {
                     return;
                 }
-                if (mutation instanceof CreeperMutation) {
-                    if (item.getType() == Material.SULPHUR) {
-                        Location loc = player.getLocation();
-                        SGUtils.spawnTNTWithSource(loc, player, 1, 4F);
-                        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                            if (gamePlayer.getTeam() == GameTeam.MUTATIONS) {
-                                e.getPlayer().setHealth(0);
-                            }
-                        }, 10L);
-                    }
-                } else if (mutation instanceof ChickenMutation chickenMutation) {
+                
+                if (mutation instanceof ChickenMutation chickenMutation) {
                     if (item.getType() == Material.SLIME_BALL) {
                         if (!chickenMutation.isLaunchOnCooldown()) {
                             player.setVelocity(new Vector(0, 2, 0));

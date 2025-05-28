@@ -95,6 +95,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
     public static CustomItem toHubItem;
     public static CustomItem mutateItem;
     public static CustomItem modifierItem;
+    public static CustomItem creeperBombItem;
     
     public static final List<Color> COLORS = new ArrayList<>();
     
@@ -343,8 +344,9 @@ public class SurvivalGames extends NexusSpigotPlugin {
         toHubItem = new ToHubItem(this);
         mutateItem = new MutateItem(this);
         modifierItem = new GameModifierItem(this);
+        creeperBombItem = new CreeperSuicideBomb(this);
         
-        itemRegistry.registerAll(tributesBook, mutationsBook, spectatorsBook, playerTrackerItem, tpToMapCenterItem, toHubItem, mutateItem, modifierItem);
+        itemRegistry.registerAll(tributesBook, mutationsBook, spectatorsBook, playerTrackerItem, tpToMapCenterItem, toHubItem, mutateItem, modifierItem, creeperBombItem);
         
         new NexusDisguises().init(this);
         getLogger().info("Loaded the disguises for mutations.");

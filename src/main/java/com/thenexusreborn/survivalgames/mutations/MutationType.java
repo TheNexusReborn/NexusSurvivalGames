@@ -4,6 +4,7 @@ import com.stardevllc.helper.StringHelper;
 import com.stardevllc.starcore.base.XMaterial;
 import com.stardevllc.starcore.base.itembuilder.ItemBuilder;
 import com.stardevllc.starcore.utils.ArmorSet;
+import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.disguises.disguisetypes.DisguiseType;
 import com.thenexusreborn.survivalgames.mutations.impl.*;
 import org.bukkit.Material;
@@ -119,15 +120,8 @@ public enum MutationType {
             List.of(DamageCause.BLOCK_EXPLOSION, DamageCause.ENTITY_EXPLOSION), //Damage Immunities
             List.of(new MutationEffect(PotionEffectType.SPEED, 1)), //Potion Effects
             List.of(
-                    new MutationItem(1, new ItemStack(Material.TNT, 32)), 
-                    new MutationItem(2, 
-                            ItemBuilder.of(XMaterial.GUNPOWDER).displayName("&cSuicide Bomb")
-                                    .setLore(List.of(
-                                            "&7Explode yourself for higher damage",
-                                            "&7If you kill your target, you take revenge",
-                                            "&7If you don't, you become a spectator again"
-                                    ))
-                                    .build()
+                    new MutationItem(1, new ItemStack(Material.TNT, 32)),
+                    new MutationItem(2, SurvivalGames.creeperBombItem
                     )
             ), //Additional Items
             List.of() //Modifiers

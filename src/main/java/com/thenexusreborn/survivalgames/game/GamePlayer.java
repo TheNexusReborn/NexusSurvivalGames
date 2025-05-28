@@ -668,6 +668,10 @@ public class GamePlayer {
         return 0;
     }
     
+    public Location getLocation() {
+        return sgPlayer.getLocation();
+    }
+    
     
     public enum Status {
         SETTING_UP_PLAYER, TELEPORTING_TO_CENTER, CALCULATING_VISIBILITY, SETTING_UP_SCOREBOARD, READY, SETTING_UP_ACTIONBAR, ADDING_TO_GAME
