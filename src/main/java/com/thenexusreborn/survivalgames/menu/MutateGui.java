@@ -50,11 +50,17 @@ public class MutateGui extends InventoryGUI {
                 rawImmunities.add("None");
             } else {
                 boolean handledExplosion = false;
+                boolean handledFire = false;
                 for (DamageCause damageImmunity : type.getDamageImmunities()) {
                     if (damageImmunity == DamageCause.BLOCK_EXPLOSION || damageImmunity == DamageCause.ENTITY_EXPLOSION) {
                         if (!handledExplosion) {
                             rawImmunities.add("Explosion");
                             handledExplosion = true;
+                        }
+                    } else if (damageImmunity == DamageCause.FIRE || damageImmunity == DamageCause.FIRE_TICK) {
+                        if (!handledFire) {
+                            rawImmunities.add("Fire");
+                            handledFire = true;
                         }
                     } else {
                         rawImmunities.add(StringHelper.titlize(damageImmunity.name()));
