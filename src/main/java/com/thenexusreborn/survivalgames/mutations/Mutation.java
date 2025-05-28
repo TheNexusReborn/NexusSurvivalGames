@@ -3,8 +3,10 @@ package com.thenexusreborn.survivalgames.mutations;
 import com.stardevllc.clock.clocks.Timer;
 import com.stardevllc.starcore.StarColors;
 import com.stardevllc.time.TimeUnit;
+import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.mutations.timer.MutationCountdownCallback;
 import com.thenexusreborn.survivalgames.mutations.timer.MutationEndCondition;
 import org.bukkit.Bukkit;
@@ -65,9 +67,22 @@ public abstract class Mutation {
         return target;
     }
     
+    public GamePlayer getGamePlayer() {
+        return game.getPlayer(getPlayer());
+    }
+    
     public void startCountdown() {
         Player p = Bukkit.getPlayer(this.player);
         if (p == null) {
+            return;
+        }
+        
+        if (plugin.getDisabledMutations().contains(this.type)) {
+            MsgType.WARN.send(p, "Sorry but %v is currently disabled.", this.type.getDisplayName());
+            GamePlayer gamePlayer = getGamePlayer();
+            if (gamePlayer != null) {
+                gamePlayer.setMutation(null);
+            }
             return;
         }
         

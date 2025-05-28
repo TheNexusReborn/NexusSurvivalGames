@@ -34,8 +34,7 @@ import com.thenexusreborn.survivalgames.listener.*;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.map.SQLMapManager;
-import com.thenexusreborn.survivalgames.mutations.PlayerMutations;
-import com.thenexusreborn.survivalgames.mutations.UnlockedMutation;
+import com.thenexusreborn.survivalgames.mutations.*;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.settings.LobbySettings;
@@ -68,6 +67,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
     private MapManager mapManager;
 
     private final Map<UUID, PlayerMutations> playerUnlockedMutations = new HashMap<>();
+    private final Set<MutationType> disabledMutations = EnumSet.noneOf(MutationType.class);
 
     private UUIDRegistry<SGPlayer> playerRegistry = new UUIDRegistry<>(null, null, SGPlayer::getUniqueId, null, null);
 
@@ -134,7 +134,13 @@ public class SurvivalGames extends NexusSpigotPlugin {
         
         if (getConfig().contains("sgglobaldebug")) {
             this.sgGlobalDebug = getConfig().getBoolean("sgglobaldebug");
-            System.out.println("SG Global Debug: " + sgGlobalDebug);
+        }
+        
+        if (getConfig().contains("disabledmutations")) {
+            List<String> rawDisabledMutations = getConfig().getStringList("disabledmutation");
+            for (String rawDisabledMutation : rawDisabledMutations) {
+                this.disabledMutations.add(MutationType.valueOf(rawDisabledMutation.toUpperCase()));
+            }
         }
 
         PluginManager pluginManager = Bukkit.getPluginManager();
@@ -344,6 +350,18 @@ public class SurvivalGames extends NexusSpigotPlugin {
         getLogger().info("Loaded the disguises for mutations.");
     }
     
+    public Set<MutationType> getDisabledMutations() {
+        return disabledMutations;
+    }
+    
+    public void disableMutation(MutationType mutationType) {
+        this.disabledMutations.add(mutationType);
+    }
+    
+    public void enableMutation(MutationType mutationType) {
+        this.disabledMutations.remove(mutationType);
+    }
+    
     public boolean isSgGlobalDebug() {
         return sgGlobalDebug;
     }
@@ -390,6 +408,17 @@ public class SurvivalGames extends NexusSpigotPlugin {
         this.lootManager.saveData();
         
         this.getConfig().set("sgglobaldebug", this.sgGlobalDebug);
+        
+        if (this.disabledMutations.isEmpty()) {
+            this.getConfig().set("disabledmutations", null);
+        } else {
+            List<String> rawDisabledMutations = new ArrayList<>();
+            for (MutationType type : this.disabledMutations) {
+                rawDisabledMutations.add(type.name());
+            }
+            
+            getConfig().set("disabledmutations", rawDisabledMutations);
+        }
 
         saveConfig();
     }

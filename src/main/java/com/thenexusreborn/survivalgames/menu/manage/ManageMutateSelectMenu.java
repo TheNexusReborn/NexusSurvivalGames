@@ -16,10 +16,14 @@ public class ManageMutateSelectMenu extends InventoryGUI {
         super(1, "&lMutate " + builder.getPlayer().getName() + " as...", actor.getUniqueId());
         GuiManager manager = Bukkit.getServicesManager().getRegistration(GuiManager.class).getProvider();
         for (MutationType type : MutationType.values()) {
+            if (plugin.getDisabledMutations().contains(type)) {
+                continue;
+            }
+            
             Button button = new Button().iconCreator(p -> ItemBuilder.of(type.getIcon()).displayName("&e&l" + type.getDisplayName()).build())
                     .consumer(e -> {
                         builder.setType(type);
-                        manager.openGUI(previousMenu, (Player) e.getWhoClicked());
+                        manager.openGUI(previousMenu, e.getWhoClicked());
                     });
             addElement(button);
         }

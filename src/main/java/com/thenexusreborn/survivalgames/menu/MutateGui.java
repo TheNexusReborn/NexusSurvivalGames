@@ -37,6 +37,10 @@ public class MutateGui extends InventoryGUI {
         
         GuiManager manager = Bukkit.getServicesManager().getRegistration(GuiManager.class).getProvider();
         for (MutationType type : MutationType.values()) {
+            if (plugin.getDisabledMutations().contains(type)) {
+                continue;
+            }
+            
             if (unlockedMutations.isUnlocked(type.getId()) && !game.getSettings().isUseAllMutations()) {
                 continue;
             }
