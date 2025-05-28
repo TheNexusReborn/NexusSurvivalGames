@@ -137,7 +137,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         }
         
         if (getConfig().contains("disabledmutations")) {
-            List<String> rawDisabledMutations = getConfig().getStringList("disabledmutation");
+            List<String> rawDisabledMutations = getConfig().getStringList("disabledmutations");
             for (String rawDisabledMutation : rawDisabledMutations) {
                 this.disabledMutations.add(MutationType.valueOf(rawDisabledMutation.toUpperCase()));
             }
