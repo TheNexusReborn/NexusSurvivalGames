@@ -58,7 +58,7 @@ public class ClassicGameSettings extends GameSettings {
         allowKillersKiller = true;
         maxMutationAmount = 1;
         mutationsEnabled = true;
-        allowMutateOnMutationDeath = false;
+        allowRecursiveMutations = false;
         
         //Player
         earnNexites = false;

@@ -302,7 +302,7 @@ public class GamePlayer {
             return new Pair<>(false, "You do not have any mutation passes.");
         }
 
-        if (deathByMutation && !game.getSettings().isAllowMutateOnMutationDeath()) {
+        if (deathByMutation && !game.getSettings().isAllowRecursiveMutations()) {
             return new Pair<>(false, "You cannot mutate because you were killed by a mutation.");
         }
 

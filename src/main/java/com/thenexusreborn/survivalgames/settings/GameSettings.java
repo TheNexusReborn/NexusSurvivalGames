@@ -56,7 +56,7 @@ public class GameSettings implements Cloneable, ISettings {
     protected boolean allowKillersKiller = true;
     protected int maxMutationAmount = 1;
     protected boolean mutationsEnabled = true;
-    protected boolean allowMutateOnMutationDeath;
+    protected boolean allowRecursiveMutations;
     protected long chickenEggLaunchCooldown = 100;
     
     //Player
@@ -113,8 +113,8 @@ public class GameSettings implements Cloneable, ISettings {
         return fireworks;
     }
     
-    public boolean isAllowMutateOnMutationDeath() {
-        return allowMutateOnMutationDeath;
+    public boolean isAllowRecursiveMutations() {
+        return allowRecursiveMutations;
     }
     
     public boolean isAllowDeathmatch() {
@@ -550,8 +550,8 @@ public class GameSettings implements Cloneable, ISettings {
         return this;
     }
     
-    public GameSettings setAllowMutateOnMutationDeath(boolean allowMutateOnMutationDeath) {
-        this.allowMutateOnMutationDeath = allowMutateOnMutationDeath;
+    public GameSettings setAllowRecursiveMutations(boolean allowRecursiveMutations) {
+        this.allowRecursiveMutations = allowRecursiveMutations;
         return this;
     }
     
