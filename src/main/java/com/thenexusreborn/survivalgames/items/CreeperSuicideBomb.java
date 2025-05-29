@@ -9,6 +9,7 @@ import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.game.death.DeathInfo;
 import com.thenexusreborn.survivalgames.game.death.DeathType;
+import com.thenexusreborn.survivalgames.mutations.StandardMutations;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -42,6 +43,18 @@ public class CreeperSuicideBomb extends CustomItem {
             
             GamePlayer gamePlayer = sgPlayer.getGamePlayer();
             if (gamePlayer == null)  {
+                return;
+            }
+            
+            if (gamePlayer.getTeam() != GameTeam.MUTATIONS) {
+                return;
+            }
+            
+            if (gamePlayer.getMutation() == null) {
+                return;
+            }
+            
+            if (gamePlayer.getMutation().getType() != StandardMutations.CREEPER) {
                 return;
             }
             
