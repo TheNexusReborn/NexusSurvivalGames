@@ -75,11 +75,7 @@ public class SettingsListSubCmd extends SubCommand<SurvivalGames> {
         
         int offset = (page - 1) * 7; // 7 is the amount per page
         
-        int remaining = lines.size() - offset;
-        
-        int offsetEnd = offset + Math.min(7, remaining);
-        
-        for (int i = 0; i < offsetEnd; i++) {
+        for (int i = 0; i < 7 && offset + i < lines.size(); i++) {
             StarColors.coloredMessage(sender, lines.get(offset + i));
         }
         
