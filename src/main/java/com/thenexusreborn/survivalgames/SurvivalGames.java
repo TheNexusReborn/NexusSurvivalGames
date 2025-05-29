@@ -100,6 +100,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
     public static CustomItem creeperBombItem;
     public static CustomItem chickenLaunchItem;
     public static CustomItem chickenParachuteItem;
+    public static CustomItem sponsorsItem;
     
     public static final List<Color> COLORS = new ArrayList<>();
     
@@ -146,6 +147,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         creeperBombItem = itemRegistry.register(new CreeperSuicideBomb(this));
         chickenLaunchItem = itemRegistry.register(new ChickenLaunchItem(this));
         chickenParachuteItem = itemRegistry.register(new ChickenChuteItem(this));
+        sponsorsItem = itemRegistry.register(new SponsorsItem(this));
         
         this.defaultMutationType = StandardMutations.PIG_ZOMBIE;
         getLogger().info("Loading NexusSurvivalGames v" + getDescription().getVersion());

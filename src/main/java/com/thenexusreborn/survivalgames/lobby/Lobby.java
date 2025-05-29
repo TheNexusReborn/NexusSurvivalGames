@@ -5,8 +5,6 @@ import com.stardevllc.helper.*;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
-import com.stardevllc.starcore.base.XMaterial;
-import com.stardevllc.starcore.base.itembuilder.ItemBuilder;
 import com.stardevllc.starcore.utils.ProgressBar;
 import com.stardevllc.time.TimeUnit;
 import com.thenexusreborn.api.NexusReborn;
@@ -697,10 +695,7 @@ public class Lobby implements Controllable, IHasState {
             }
         }
 
-        boolean sponsors = nexusPlayer.getToggleValue("allowsponsors");
-        XMaterial sponsorsItemMaterial = sponsors ? XMaterial.GLOWSTONE_DUST : XMaterial.GUNPOWDER;
-        String statusMessage = sponsors ? "&a&lENABLED" : "&c&lDISABLED";
-        player.getInventory().setItem(0, ItemBuilder.of(sponsorsItemMaterial).displayName("&e&lSponsors " + statusMessage + " &7&o(Right click to toggle)").build());
+        player.getInventory().setItem(0, SurvivalGames.sponsorsItem.toItemStack());
         if (lobbySettings.isVoteForModifiers()) {
             player.getInventory().setItem(1, SurvivalGames.modifierItem.toItemStack());
         }

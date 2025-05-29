@@ -1,5 +1,7 @@
 package com.thenexusreborn.survivalgames.threads.lobby;
 
+import com.stardevllc.starcore.StarColors;
+import com.stardevllc.starcore.base.XMaterial;
 import com.stardevllc.starcore.utils.StarThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.*;
@@ -8,6 +10,8 @@ import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 
@@ -42,6 +46,24 @@ public class LobbyThread extends StarThread<SurvivalGames> {
                 }
                 
                 SGUtils.updatePlayerHealthAndFood(Bukkit.getPlayer(player.getUniqueId()));
+                
+                boolean sponsorsValue = lobbyPlayer.getToggleValue("allowsponsors");
+                XMaterial sponsorsItemMaterial = sponsorsValue ? XMaterial.GLOWSTONE_DUST : XMaterial.GUNPOWDER;
+                String statusMessage = sponsorsValue ? "&a&lENABLED" : "&c&lDISABLED";
+                
+                for (ItemStack itemStack : player.getInventory()) {
+                    if (itemStack == null) {
+                        continue;
+                    }
+                    
+                    ItemMeta itemMeta = itemStack.getItemMeta();
+                    if (itemMeta.getDisplayName() != null && itemMeta.getDisplayName().contains("Sponsors")) {
+                        itemStack.setType(sponsorsItemMaterial.parseMaterial());
+                        itemMeta.setDisplayName(StarColors.color("&e&lSponsors " + statusMessage + " &7&o(Right Click to toggle)"));
+                        itemStack.setItemMeta(itemMeta);
+                        break;
+                    }
+                }
                 
                 if (state != LobbyState.MAP_CONFIGURATING) {
                     if (player.getLocation().getBlockY() < lobby.getSpawnpoint().getBlockY() - 20) {

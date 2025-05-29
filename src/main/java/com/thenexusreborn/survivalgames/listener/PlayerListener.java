@@ -3,8 +3,6 @@ package com.thenexusreborn.survivalgames.listener;
 import com.sk89q.worldedit.bukkit.BukkitUtil;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.starcore.StarColors;
-import com.stardevllc.starcore.base.XMaterial;
-import com.stardevllc.starcore.base.itembuilder.ItemBuilder;
 import com.stardevllc.starui.GuiManager;
 import com.thenexusreborn.api.NexusReborn;
 import com.thenexusreborn.api.player.*;
@@ -15,7 +13,8 @@ import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.chat.GameTeamChatroom;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.game.death.*;
-import com.thenexusreborn.survivalgames.lobby.*;
+import com.thenexusreborn.survivalgames.lobby.Lobby;
+import com.thenexusreborn.survivalgames.lobby.LobbyState;
 import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.loot.tables.SGLootTable;
 import com.thenexusreborn.survivalgames.menu.SwagShackMenu;
@@ -146,38 +145,6 @@ public class PlayerListener implements Listener {
                 if (block.getType() == Material.NOTE_BLOCK || block.getType() == Material.CHEST || block.getType().name().contains("REDSTONE")) {
                     e.setCancelled(true);
                     return;
-                }
-            } else {
-                if (e.getItem() == null) {
-                    return;
-                }
-                
-                if (e.getItem().getItemMeta() == null) {
-                    return;
-                }
-                
-                if (e.getItem().getItemMeta().getDisplayName() == null) {
-                    return;
-                }
-                
-                LobbyPlayer lobbyPlayer = null;
-                for (LobbyPlayer lp : lobby.getPlayers()) {
-                    if (lp.getUniqueId().equals(player.getUniqueId())) {
-                        lobbyPlayer = lp;
-                    }
-                }
-                
-                if (lobbyPlayer == null) {
-                    return;
-                }
-                
-                if (e.getItem().getItemMeta().getDisplayName().contains("Sponsors")) {
-                    boolean sponsorsValue = lobbyPlayer.getToggleValue("allowsponsors");
-                    lobbyPlayer.getPlayer().setToggleValue("allowsponsors", !sponsorsValue);
-                    sponsorsValue = lobbyPlayer.getToggleValue("allowsponsors");
-                    XMaterial sponsorsItemMaterial = sponsorsValue ? XMaterial.GLOWSTONE_DUST : XMaterial.GUNPOWDER;
-                    String statusMessage = sponsorsValue ? "&a&lENABLED" : "&c&lDISABLED";
-                    player.getInventory().setItem(0, ItemBuilder.of(sponsorsItemMaterial).displayName("&e&lSponsors " + statusMessage + " &7&o(Right Click to toggle)").build());
                 }
             }
         }
