@@ -19,8 +19,6 @@ import com.thenexusreborn.survivalgames.lobby.*;
 import com.thenexusreborn.survivalgames.loot.LootManager;
 import com.thenexusreborn.survivalgames.loot.tables.SGLootTable;
 import com.thenexusreborn.survivalgames.menu.SwagShackMenu;
-import com.thenexusreborn.survivalgames.mutations.Mutation;
-import com.thenexusreborn.survivalgames.mutations.impl.ChickenMutation;
 import com.thenexusreborn.survivalgames.settings.enums.LootMode;
 import com.thenexusreborn.survivalgames.util.NickSGPlayerStats;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
@@ -131,49 +129,18 @@ public class PlayerListener implements Listener {
         if (lobby != null && lobby.checkMapEditing(e.getPlayer())) {
             return;
         }
-
-        if (game != null) {
-            GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
-            
-            if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-                Block block = e.getClickedBlock();
-                if (block != null) {
-                    if (block.getType() == Material.BEACON) {
-                        e.setCancelled(true);
-                        return;
-                    }
-                }
-            }
-            
-            if (gamePlayer.getTeam() == GameTeam.MUTATIONS) {
-                Mutation mutation = gamePlayer.getMutation();
-                ItemStack item = player.getItemInHand();
-                if (item == null) {
+        
+        if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            Block block = e.getClickedBlock();
+            if (block != null) {
+                if (block.getType() == Material.BEACON) {
+                    e.setCancelled(true);
                     return;
                 }
-                
-                if (mutation instanceof ChickenMutation chickenMutation) {
-                    if (item.getType() == Material.SLIME_BALL) {
-                        if (!chickenMutation.isLaunchOnCooldown()) {
-                            player.setVelocity(new Vector(0, 2, 0));
-                            chickenMutation.startLaunchCooldown();
-                        } else {
-                            player.sendMessage(StarColors.color(MsgType.WARN + "Chicken Launch is still on cooldown: &e" + chickenMutation.getLaunchCooldownRemainingSeconds() + "s&c!"));
-                        }
-                    } else if (item.getType() == Material.FEATHER) {
-                        if (!chickenMutation.isParachuteOnCooldown()) {
-                            if (chickenMutation.isChuteActive()) {
-                                chickenMutation.deactivateChute();
-                            } else {
-                                chickenMutation.activateChute();
-                            }
-                        } else {
-                            player.sendMessage(StarColors.color(MsgType.WARN + "Chicken Chute is still on cooldown: &e" + chickenMutation.getParachuteCooldownRemainingSeconds() + "s&c!"));
-                        }
-                    }
-                }
             }
-        } else {
+        }
+        
+        if (lobby != null) {
             Block block = e.getClickedBlock();
             if (block != null) {
                 if (block.getType() == Material.NOTE_BLOCK || block.getType() == Material.CHEST || block.getType().name().contains("REDSTONE")) {
@@ -184,26 +151,26 @@ public class PlayerListener implements Listener {
                 if (e.getItem() == null) {
                     return;
                 }
-
+                
                 if (e.getItem().getItemMeta() == null) {
                     return;
                 }
-
+                
                 if (e.getItem().getItemMeta().getDisplayName() == null) {
                     return;
                 }
-
+                
                 LobbyPlayer lobbyPlayer = null;
                 for (LobbyPlayer lp : lobby.getPlayers()) {
                     if (lp.getUniqueId().equals(player.getUniqueId())) {
                         lobbyPlayer = lp;
                     }
                 }
-
+                
                 if (lobbyPlayer == null) {
                     return;
                 }
-
+                
                 if (e.getItem().getItemMeta().getDisplayName().contains("Sponsors")) {
                     boolean sponsorsValue = lobbyPlayer.getToggleValue("allowsponsors");
                     lobbyPlayer.getPlayer().setToggleValue("allowsponsors", !sponsorsValue);

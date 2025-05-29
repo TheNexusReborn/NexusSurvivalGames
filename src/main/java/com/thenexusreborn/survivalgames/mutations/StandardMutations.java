@@ -94,16 +94,8 @@ public enum StandardMutations implements IMutationType {
             List.of(DamageCause.FALL), //Damage Immunities
             List.of(), //Potion Effects
             List.of(
-                    new MutationItem(1, 
-                            ItemBuilder.of(XMaterial.SLIME_BALL).displayName("&bChicken Launch")
-                                    .addLoreLine("&7Launch yourself into the air. (5s cooldown)")
-                                    .build()
-                    ),
-                    new MutationItem(2, 
-                            ItemBuilder.of(XMaterial.FEATHER).displayName("&bChicken Chute")
-                                    .addLoreLine("&7Create a parachute of chickens (5s cooldown)")
-                                    .build()
-                    )
+                    new MutationItem(1, SurvivalGames.chickenLaunchItem),
+                    new MutationItem(2, SurvivalGames.chickenParachuteItem)
             ), //Additional Items
             List.of() //Modifiers
     ),

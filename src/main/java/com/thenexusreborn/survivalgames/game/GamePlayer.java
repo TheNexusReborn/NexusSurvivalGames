@@ -25,6 +25,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 
 import java.text.DecimalFormat;
 import java.util.*;
@@ -670,6 +671,10 @@ public class GamePlayer {
     
     public Location getLocation() {
         return sgPlayer.getLocation();
+    }
+    
+    public void setVelocity(Vector vector) {
+        sgPlayer.setVelocity(vector);
     }
     
     

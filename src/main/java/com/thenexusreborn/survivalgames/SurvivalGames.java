@@ -98,6 +98,8 @@ public class SurvivalGames extends NexusSpigotPlugin {
     public static CustomItem mutateItem;
     public static CustomItem modifierItem;
     public static CustomItem creeperBombItem;
+    public static CustomItem chickenLaunchItem;
+    public static CustomItem chickenParachuteItem;
     
     public static final List<Color> COLORS = new ArrayList<>();
     
@@ -133,17 +135,17 @@ public class SurvivalGames extends NexusSpigotPlugin {
     public void onEnable() {
         INSTANCE = this;
         ItemRegistry itemRegistry = Bukkit.getServicesManager().getRegistration(ItemRegistry.class).getProvider();
-        tributesBook = new GameTeamBook(this, GameTeam.TRIBUTES);
-        mutationsBook = new GameTeamBook(this, GameTeam.MUTATIONS);
-        spectatorsBook = new GameTeamBook(this, GameTeam.SPECTATORS);
-        playerTrackerItem = new PlayerTrackerItem(this);
-        tpToMapCenterItem = new TPToMapCenterItem(this);
-        toHubItem = new ToHubItem(this);
-        mutateItem = new MutateItem(this);
-        modifierItem = new GameModifierItem(this);
-        creeperBombItem = new CreeperSuicideBomb(this);
-        
-        itemRegistry.registerAll(tributesBook, mutationsBook, spectatorsBook, playerTrackerItem, tpToMapCenterItem, toHubItem, mutateItem, modifierItem, creeperBombItem);
+        tributesBook = itemRegistry.register(new GameTeamBook(this, GameTeam.TRIBUTES));
+        mutationsBook = itemRegistry.register(new GameTeamBook(this, GameTeam.MUTATIONS));
+        spectatorsBook = itemRegistry.register(new GameTeamBook(this, GameTeam.SPECTATORS));
+        playerTrackerItem = itemRegistry.register(new PlayerTrackerItem(this));
+        tpToMapCenterItem = itemRegistry.register(new TPToMapCenterItem(this));
+        toHubItem = itemRegistry.register(new ToHubItem(this));
+        mutateItem = itemRegistry.register(new MutateItem(this));
+        modifierItem = itemRegistry.register(new GameModifierItem(this));
+        creeperBombItem = itemRegistry.register(new CreeperSuicideBomb(this));
+        chickenLaunchItem = itemRegistry.register(new ChickenLaunchItem(this));
+        chickenParachuteItem = itemRegistry.register(new ChickenChuteItem(this));
         
         this.defaultMutationType = StandardMutations.PIG_ZOMBIE;
         getLogger().info("Loading NexusSurvivalGames v" + getDescription().getVersion());
@@ -165,10 +167,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
             }
         }
         
-        for (IMutationType type : IMutationType.REGISTRY) {
-            System.out.println("Mutation Type: " + type.name());
-        }
-
         PluginManager pluginManager = Bukkit.getPluginManager();
         if (pluginManager.getPlugin("PlaceholderAPI") == null) {
             getLogger().severe("PlaceholderAPI not found, disabling SurvivalGames.");
