@@ -5,8 +5,7 @@ import com.thenexusreborn.nexuscore.api.command.ICommand;
 import com.thenexusreborn.nexuscore.api.command.SubCommand;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.cmd.sgadmin.settings.SettingsListSubCmd;
-import com.thenexusreborn.survivalgames.cmd.sgadmin.settings.SettingsSetSubCmd;
+import com.thenexusreborn.survivalgames.cmd.sgadmin.settings.*;
 
 import java.util.function.Function;
 
@@ -27,5 +26,6 @@ public class SettingsGameSubCmd extends SubCommand<SurvivalGames> {
         
         this.subCommands.add(new SettingsListSubCmd(plugin, this, "game", SETTINGS_GETTER));
         this.subCommands.add(new SettingsSetSubCmd(plugin, this, "game", SETTINGS_GETTER));
+        this.subCommands.add(new SettingsMenuSubCmd(plugin, this, "game", SETTINGS_GETTER));
     }
 }
