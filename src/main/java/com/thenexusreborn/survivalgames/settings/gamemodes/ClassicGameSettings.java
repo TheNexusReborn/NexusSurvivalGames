@@ -72,6 +72,7 @@ public class ClassicGameSettings extends GameSettings {
         maxTeamAmount = 2;
         allowTeaming = true;
         tributesSeeSpectatorChat = true;
+        allowSingleTribute = false;
         
         //Loot
         enderchestsEnabled = true;

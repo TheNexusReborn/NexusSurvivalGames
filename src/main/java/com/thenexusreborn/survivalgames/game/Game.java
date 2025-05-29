@@ -1045,6 +1045,7 @@ public class Game implements Controllable, IHasState {
             gamePlayer.getCombatTag().setOther(null);
             
             if (gamePlayer.getMutation() != null) {
+                gamePlayer.setTeam(GameTeam.SPECTATORS);
                 removeMutation(gamePlayer.getMutation());
             }
         }
@@ -1690,8 +1691,43 @@ public class Game implements Controllable, IHasState {
         
         //Check to see if the game is in progress, if it is in progress and one or less players remain, mark game complete, this will detect the winner
         if (Stream.of(INGAME, INGAME_DEATHMATCH, DEATHMATCH, TELEPORT_DEATHMATCH, TELEPORT_DEATHMATCH_DONE, DEATHMATCH_WARMUP, DEATHMATCH_WARMUP_DONE).anyMatch(gameState -> this.state == gameState)) {
-            if (totalTributes <= 1) {
+            if (totalTributes == 0) {
                 gameComplete();
+            } else if (totalTributes == 1) {
+                //TODO handle zombies for undead mode
+                boolean gameComplete = false;
+                if (!settings.isAllowSingleTribute()) {
+                    gameComplete = true;
+                } else {
+                    if (!settings.isAllowMutations() && this.mode != SGMode.UNDEAD) {
+                        gameComplete = true;
+                    } else {
+                        if (settings.isAllowDeathmatch()) {
+                            gameComplete = true;
+                        } else {
+                            int totalMutations = getTeamCount(GameTeam.MUTATIONS);
+                            
+                            if (totalMutations == 0) {
+                                int totalCanMutate = 0;
+                                for (GamePlayer player : this.players.values()) {
+                                    if (player.getTeam() == GameTeam.SPECTATORS) {
+                                        if (player.canMutate().key()) {
+                                            totalCanMutate++;
+                                        }
+                                    }
+                                }
+                                
+                                if (totalCanMutate == 0) {
+                                    gameComplete = true;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                if (gameComplete) {
+                    gameComplete();
+                }
             }
         }
         

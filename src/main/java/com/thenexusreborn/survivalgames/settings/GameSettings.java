@@ -71,6 +71,7 @@ public class GameSettings implements Cloneable, ISettings {
     protected int maxTeamAmount = 2;
     protected boolean allowTeaming = true;
     protected boolean tributesSeeSpectatorChat = true;
+    protected boolean allowSingleTribute;
     
     //Loot
     protected boolean enderchestsEnabled = true;
@@ -105,6 +106,15 @@ public class GameSettings implements Cloneable, ISettings {
     protected int deathmatchCountdownLength = 60;
     protected boolean allowDeathmatch = true;
     protected boolean deathmatchPlayerCount = true;
+    
+    public boolean isAllowSingleTribute() {
+        return this.allowSingleTribute;
+    }
+    
+    public GameSettings setAllowSingleTribute(boolean allowSingleTribute) {
+        this.allowSingleTribute = allowSingleTribute;
+        return this;
+    }
     
     public boolean isDeathmatchPlayerCount() {
         return deathmatchPlayerCount;
