@@ -63,7 +63,7 @@ public class PlayerMenu extends InventoryGUI implements UpdatingGUI {
                 Element vitalsElement = new Element().iconCreator(p -> ItemBuilder.of(XMaterial.GLASS_BOTTLE).displayName("&e&lVitals").setLore(vitalsLore).build());
                 addElement(vitalsElement);
 
-                Button viewInventoryButton = new Button().iconCreator(p -> ItemBuilder.of(XMaterial.ENDER_CHEST).displayName("Inventory").addLoreLine("&c&lNOT YET IMPLEMENTED").build())
+                Button viewInventoryButton = new Button().iconCreator(p -> ItemBuilder.of(XMaterial.CHEST).displayName("Inventory").addLoreLine("&c&lNOT YET IMPLEMENTED").build())
                         .consumer(e -> e.getWhoClicked().sendMessage(StarColors.color(MsgType.WARN + "This feature is not yet implemented.")));
                 addElement(viewInventoryButton);
             }
