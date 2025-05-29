@@ -6,7 +6,6 @@ import com.stardevllc.starcore.StarColors;
 import com.stardevllc.starcore.base.XMaterial;
 import com.stardevllc.starcore.base.itembuilder.ItemBuilder;
 import com.stardevllc.starui.GuiManager;
-import com.stardevllc.time.TimeUnit;
 import com.thenexusreborn.api.NexusReborn;
 import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.nexuscore.api.events.*;
@@ -159,7 +158,7 @@ public class PlayerListener implements Listener {
                             player.setVelocity(new Vector(0, 2, 0));
                             chickenMutation.startLaunchCooldown();
                         } else {
-                            player.sendMessage(StarColors.color(MsgType.WARN + "Chicken Launch is still on cooldown: &e" + TimeUnit.MILLISECONDS.toSeconds(chickenMutation.getLaunchCooldownTimer().getTime()) + "s&c!"));
+                            player.sendMessage(StarColors.color(MsgType.WARN + "Chicken Launch is still on cooldown: &e" + chickenMutation.getLaunchCooldownRemainingSeconds() + "s&c!"));
                         }
                     } else if (item.getType() == Material.FEATHER) {
                         if (!chickenMutation.isParachuteOnCooldown()) {
@@ -169,7 +168,7 @@ public class PlayerListener implements Listener {
                                 chickenMutation.activateChute();
                             }
                         } else {
-                            player.sendMessage(StarColors.color(MsgType.WARN + "Chicken Chute is still on cooldown: &e" + TimeUnit.MILLISECONDS.toSeconds(chickenMutation.getParachuteCooldownTimer().getTime()) + "s&c!"));
+                            player.sendMessage(StarColors.color(MsgType.WARN + "Chicken Chute is still on cooldown: &e" + chickenMutation.getParachuteCooldownRemainingSeconds() + "s&c!"));
                         }
                     }
                 }

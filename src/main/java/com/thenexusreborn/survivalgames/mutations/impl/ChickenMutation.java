@@ -2,6 +2,7 @@ package com.thenexusreborn.survivalgames.mutations.impl;
 
 import com.stardevllc.clock.clocks.Timer;
 import com.stardevllc.starcore.StarColors;
+import com.stardevllc.time.TimeUnit;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.mutations.Mutation;
@@ -50,12 +51,28 @@ public class ChickenMutation extends Mutation {
         return launchCooldownTimer.getTime() > 0;
     }
     
+    public int getLaunchCooldownRemainingSeconds() {
+        if (launchCooldownTimer == null) {
+            return 0;
+        }
+        
+        return (int) TimeUnit.SECONDS.fromMillis(launchCooldownTimer.getTime());
+    }
+    
     public boolean isParachuteOnCooldown() {
         if (parachuteCooldownTimer == null) {
             return false;
         }
         
         return parachuteCooldownTimer.getTime() > 0;
+    }
+    
+    public int getParachuteCooldownRemainingSeconds() {
+        if (parachuteCooldownTimer == null) {
+            return 0;
+        }
+        
+        return (int) TimeUnit.SECONDS.fromMillis(parachuteCooldownTimer.getTime());
     }
     
     public Timer getLaunchCooldownTimer() {
