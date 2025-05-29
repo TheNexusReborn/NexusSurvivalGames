@@ -771,14 +771,16 @@ public class Game implements Controllable, IHasState {
         }
         
         Supplier<String> msg = () -> {
-            String type;
+            String type, action;
             if (this.settings.isAllowDeathmatch()) {
                 type = "DEATHMATCH";
+                action = "begins";
             } else {
                 type = "GAME";
+                action = "ends";
             }
             
-            return "&6&l>> &eThe &c&l" + type + " &ebegins in &b{time}&e.";
+            return "&6&l>> &eThe &c&l" + type + " &e" + action + " in &b{time}&e.";
         };
         
         this.timer.addRepeatingCallback(new GameMinutesCallback(this, msg), TimeUnit.MINUTES, 1);
