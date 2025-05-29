@@ -105,5 +105,6 @@ public class ClassicGameSettings extends GameSettings {
         deathmatchWarmupLength = 10;
         deathmatchCountdownLength = 60;
         allowDeathmatch = true;
+        deathmatchPlayerCount = true;
     }
 }

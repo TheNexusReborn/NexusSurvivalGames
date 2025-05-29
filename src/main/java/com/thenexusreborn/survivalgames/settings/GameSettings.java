@@ -104,6 +104,16 @@ public class GameSettings implements Cloneable, ISettings {
     protected int deathmatchWarmupLength = 10;
     protected int deathmatchCountdownLength = 60;
     protected boolean allowDeathmatch = true;
+    protected boolean deathmatchPlayerCount = true;
+    
+    public boolean isDeathmatchPlayerCount() {
+        return deathmatchPlayerCount;
+    }
+    
+    public GameSettings setDeathmatchPlayerCount(boolean deathmatchPlayerCount) {
+        this.deathmatchPlayerCount = deathmatchPlayerCount;
+        return this;
+    }
     
     public long getChickenEggLaunchCooldown() {
         return chickenEggLaunchCooldown;

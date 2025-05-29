@@ -1655,6 +1655,10 @@ public class Game implements Controllable, IHasState {
             return;
         }
         
+        if (!settings.isDeathmatchPlayerCount()) {
+            return;
+        }
+        
         int totalTributes = 0;
         for (GamePlayer player : this.players.values()) {
             if (player.getTeam() == GameTeam.TRIBUTES) {
