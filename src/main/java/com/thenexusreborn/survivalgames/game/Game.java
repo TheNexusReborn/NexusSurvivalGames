@@ -1028,26 +1028,27 @@ public class Game implements Controllable, IHasState {
         this.gameMap.disableWorldBorder();
         
         setSubState(SubState.DETERMINE_WINNER);
+        
+        for (GamePlayer gamePlayer : this.players.values()) {
+            gamePlayer.setAllowFlight(true);
+            for (GamePlayer otherPlayer : this.players.values()) {
+                if (!otherPlayer.getToggleValue("vanish")) {
+                    gamePlayer.showPlayer(otherPlayer);
+                }
+                
+                if (!gamePlayer.getToggleValue("vanish")) {
+                    otherPlayer.showPlayer(gamePlayer);
+                }
+            }
+            
+            gamePlayer.getCombatTag().setOther(null);
+        }
+        
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (!this.players.containsKey(player.getUniqueId())) {
                 continue;
             }
-            player.setAllowFlight(true);
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                if (!this.players.containsKey(player.getUniqueId())) {
-                    continue;
-                }
-                player.showPlayer(p);
-                p.showPlayer(player);
-            }
             
-            GamePlayer gamePlayer = this.getPlayer(player.getUniqueId());
-            gamePlayer.getCombatTag().setOther(null);
-            
-            if (gamePlayer.getMutation() != null) {
-                gamePlayer.setTeam(GameTeam.SPECTATORS);
-                removeMutation(gamePlayer.getMutation());
-            }
         }
         
         GamePlayer winner = null;

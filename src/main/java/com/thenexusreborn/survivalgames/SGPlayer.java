@@ -225,4 +225,31 @@ public class SGPlayer {
         
         return false;
     }
+    
+    public void setAllowFlight(boolean allowFlight) {
+        Player player = getSpigotPlayer();
+        if (player != null) {
+            player.setAllowFlight(true);
+        }
+    }
+    
+    public void showPlayer(SGPlayer sgPlayer) {
+        Player player = getSpigotPlayer();
+        if (player != null) {
+            Player other = sgPlayer.getSpigotPlayer();
+            if (other != null) {
+                player.showPlayer(other);
+            }
+        }
+    }
+    
+    public void hidePlayer(SGPlayer sgPlayer) {
+        Player player = getSpigotPlayer();
+        if (player != null) {
+            Player other = sgPlayer.getSpigotPlayer();
+            if (other != null) {
+                player.hidePlayer(other);
+            }
+        }
+    }
 }

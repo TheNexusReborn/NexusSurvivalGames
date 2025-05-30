@@ -677,6 +677,14 @@ public class GamePlayer {
         sgPlayer.setVelocity(vector);
     }
     
+    public void setAllowFlight(boolean allowFlight) {
+        sgPlayer.setAllowFlight(allowFlight);
+    }
+    
+    public void showPlayer(GamePlayer other) {
+        sgPlayer.showPlayer(other.sgPlayer);
+    }
+    
     
     public enum Status {
         SETTING_UP_PLAYER, TELEPORTING_TO_CENTER, CALCULATING_VISIBILITY, SETTING_UP_SCOREBOARD, READY, SETTING_UP_ACTIONBAR, ADDING_TO_GAME
