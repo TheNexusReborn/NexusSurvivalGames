@@ -1044,13 +1044,6 @@ public class Game implements Controllable, IHasState {
             gamePlayer.getCombatTag().setOther(null);
         }
         
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (!this.players.containsKey(player.getUniqueId())) {
-                continue;
-            }
-            
-        }
-        
         GamePlayer winner = null;
         for (GamePlayer player : this.players.values()) {
             if (player.getTeam() == GameTeam.TRIBUTES) {
