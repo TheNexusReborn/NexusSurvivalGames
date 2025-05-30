@@ -19,7 +19,6 @@ public class TierThreeLootTable extends SGLootTable {
 
         addItems(30, Items.STONE_AXE, Items.BOW);
         addItems(20, Items.STONE_SWORD);
-        addItems(10, Items.IRON_SWORD);
 
         addItems(15, Items.EGG_OF_DOOM, Items.SLOWBALL, Items.XP_BOTTLE, Items.ENDER_PEARL, Items.GOLDEN_MUNCHIE);
         addItems(10, Items.COBWEB, Items.TNT);
