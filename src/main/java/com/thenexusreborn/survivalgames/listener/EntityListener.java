@@ -87,7 +87,7 @@ public class EntityListener implements Listener {
                 e.setCancelled(true);
                 return;
             }
-        } else if (e.getEntity() instanceof ItemFrame || e.getEntity() instanceof ArmorStand) {
+        } else if (e.getEntity() instanceof ItemFrame || e.getEntity() instanceof ArmorStand || e.getEntity() instanceof Villager) {
             e.setCancelled(true);
             return;
         }
