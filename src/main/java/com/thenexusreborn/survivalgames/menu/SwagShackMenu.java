@@ -61,10 +61,10 @@ public class SwagShackMenu extends InventoryGUI {
                 int cost;
 
                 if (e.getClick() == ClickType.LEFT) {
-                    currency = "credits";
+                    currency = "sg_score";
                     cost = item.getCreditsCost();
                 } else if (e.getClick() == ClickType.RIGHT) {
-                    currency = "sg_score";
+                    currency = "credits";
                     cost = item.getPointsCost();
                 } else {
                     return;
