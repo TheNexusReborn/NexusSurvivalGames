@@ -1866,6 +1866,10 @@ public class Game implements Controllable, IHasState {
     public int getTeamCount(GameTeam gameTeam) {
         int amount = 0;
         for (GamePlayer gamePlayer : new ArrayList<>(this.players.values())) {
+            if (gamePlayer.getToggleValue("vanish")) {
+                continue;
+            }
+            
             if (gamePlayer.getTeam() == gameTeam) {
                 amount++;
             }
