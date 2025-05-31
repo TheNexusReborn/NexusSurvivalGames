@@ -766,6 +766,16 @@ public class Game implements Controllable, IHasState {
             }
         }
         
+        if (settings.isAutomaticDeathmatchThreshold()) {
+            if (getTeamCount(GameTeam.TRIBUTES) < 6) {
+                settings.setDeathmatchThreshold(2);
+            } else if (getTeamCount(GameTeam.TRIBUTES) < 10) {
+                settings.setDeathmatchThreshold(3);
+            } else {
+                settings.setDeathmatchThreshold(4);
+            }
+        }
+        
         this.timer.start();
         setSubState(SubState.UNDEFINED);
     }

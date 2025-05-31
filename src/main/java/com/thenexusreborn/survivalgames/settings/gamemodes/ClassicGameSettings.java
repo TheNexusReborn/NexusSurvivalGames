@@ -112,5 +112,6 @@ public class ClassicGameSettings extends GameSettings {
         deathmatchCountdownLength = 60;
         allowDeathmatch = true;
         deathmatchPlayerCount = true;
+        automaticDeathmatchThreshold = true;
     }
 }

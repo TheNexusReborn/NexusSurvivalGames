@@ -111,6 +111,11 @@ public class GameSettings implements Cloneable, ISettings {
     protected int deathmatchCountdownLength = 60;
     protected boolean allowDeathmatch = true;
     protected boolean deathmatchPlayerCount = true;
+    protected boolean automaticDeathmatchThreshold = true;
+    
+    public boolean isAutomaticDeathmatchThreshold() {
+        return automaticDeathmatchThreshold;
+    }
     
     public int getAutoGracePeriodLength() {
         return autoGracePeriodLength;
