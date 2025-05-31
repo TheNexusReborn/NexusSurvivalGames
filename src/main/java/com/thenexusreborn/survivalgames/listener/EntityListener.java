@@ -11,6 +11,7 @@ import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.mutations.*;
 import com.thenexusreborn.survivalgames.mutations.impl.ChickenMutation;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -266,7 +267,14 @@ public class EntityListener implements Listener {
                 
                 if (mutation instanceof ChickenMutation) {
                     if (mutation.getTarget().equals(target.getUniqueId())) {
-                        target.damage(2.5, shooter);
+                        for (DamageModifier damageModifier : DamageModifier.values()) {
+                            try {
+                                e.setDamage(damageModifier, 0);
+                            } catch (Exception ex) {} 
+                        }
+                        
+                        e.setDamage(DamageModifier.BASE, 2.5);
+                        target.setLastDamageCause(new EntityDamageByEntityEvent(Bukkit.getPlayer(targetPlayer.getUniqueId()), e.getEntity(), DamageCause.ENTITY_ATTACK,  2.5));
                     } else {
                         e.setCancelled(true);
                     }
