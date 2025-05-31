@@ -90,10 +90,15 @@ public class GameSettings implements Cloneable, ISettings {
     protected float tntYield = 3.0F;
     protected int tntFuseTicks = 20;
     
-    //Game
+    //Graceperiod
     protected boolean gracePeriod;
-    protected int warmupLength = 10; // Default: 30
     protected int gracePeriodLength = 60;
+    protected boolean automaticGraceperiod = true;
+    protected int graceperiodThreshold = 12;
+    protected int autoGracePeriodLength = 60;
+    
+    //Game
+    protected int warmupLength = 10; // Default: 30
     protected int gameLength = 10; //Default: 20
     protected int nextGameTimerLength = 10;
     protected boolean lightning;
@@ -106,6 +111,18 @@ public class GameSettings implements Cloneable, ISettings {
     protected int deathmatchCountdownLength = 60;
     protected boolean allowDeathmatch = true;
     protected boolean deathmatchPlayerCount = true;
+    
+    public int getAutoGracePeriodLength() {
+        return autoGracePeriodLength;
+    }
+    
+    public boolean isAutomaticGraceperiod() {
+        return automaticGraceperiod;
+    }
+    
+    public int getGraceperiodThreshold() {
+        return graceperiodThreshold;
+    }
     
     public boolean isAllowSingleTribute() {
         return this.allowSingleTribute;

@@ -693,6 +693,7 @@ public class Game implements Controllable, IHasState {
             handleError("Could not setup the world settings..");
         }
         
+        
         setState(SETUP_COMPLETE);
     }
     
@@ -756,6 +757,15 @@ public class Game implements Controllable, IHasState {
                 sendMessage("&d&l>> &7There is a &e" + getSettings().getGracePeriodLength() + " second &7grace period.");
             }
         }, TimeUnit.SECONDS.toMillis(getSettings().getWarmupLength()) / 2);
+        
+        setSubState(SubState.SETUP_GRACE_PERIOD);
+        if (settings.isAutomaticGraceperiod()) {
+            if (getTeamCount(GameTeam.TRIBUTES) <= settings.getGraceperiodThreshold()) {
+                settings.setGracePeriod(true);
+                settings.setGracePeriodLength(settings.getAutoGracePeriodLength());
+            }
+        }
+        
         this.timer.start();
         setSubState(SubState.UNDEFINED);
     }

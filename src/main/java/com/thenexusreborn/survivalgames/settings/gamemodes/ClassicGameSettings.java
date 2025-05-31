@@ -91,10 +91,15 @@ public class ClassicGameSettings extends GameSettings {
         tntYield = 3.0F;
         tntFuseTicks = 20;
         
-        //Game
+        //Graceperiod
         gracePeriod = false;
-        warmupLength = 10; // Default: 30
         gracePeriodLength = 60;
+        automaticGraceperiod = true;
+        graceperiodThreshold = 12;
+        autoGracePeriodLength = 30;
+        
+        //Game
+        warmupLength = 10; // Default: 30
         gameLength = 10; //Default: 20
         nextGameTimerLength = 10;
         lightning = true;
