@@ -981,6 +981,12 @@ public class Game implements Controllable, IHasState {
             timer.cancel();
         }
         
+        if (this.graceperiodTimer != null) {
+            this.graceperiodTimer.cancel();
+            this.graceperiodTimer = null;
+            this.graceperiod = Graceperiod.INACTIVE;
+        }
+        
         for (GamePlayer player : this.players.values()) {
             if (player.getTeam() == GameTeam.TRIBUTES) {
                 Bukkit.getPlayer(player.getUniqueId()).removePotionEffect(PotionEffectType.BLINDNESS);
