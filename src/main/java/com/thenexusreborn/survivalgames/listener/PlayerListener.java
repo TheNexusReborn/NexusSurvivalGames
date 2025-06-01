@@ -21,6 +21,7 @@ import com.thenexusreborn.survivalgames.menu.SwagShackMenu;
 import com.thenexusreborn.survivalgames.settings.enums.LootMode;
 import com.thenexusreborn.survivalgames.util.NickSGPlayerStats;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
+import de.tr7zw.nbtapi.NBT;
 import org.bukkit.*;
 import org.bukkit.block.*;
 import org.bukkit.entity.*;
@@ -157,6 +158,44 @@ public class PlayerListener implements Listener {
         }
 
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
+            if (e.getItem() != null && e.getItem().getType() == Material.FISHING_ROD) {
+                int uses = NBT.get(e.getItem(), nbt -> {
+                    if (!nbt.hasTag("sg_uses")) {
+                        return 20;
+                    }
+                    return nbt.getInteger("sg_uses");
+                });
+                
+                int displayUses = NBT.get(e.getItem(), nbt -> {
+                    if (!nbt.hasTag("sg_display_uses")) {
+                        return 10;
+                    }
+                    
+                    return nbt.getInteger("sg_display_uses");
+                });
+                
+                uses--;
+                if (uses % 2 == 0) {
+                    displayUses--;
+                }
+                
+                if (uses <= 0) {
+                    e.getItem().setDurability((short) (e.getItem().getType().getMaxDurability() + 1));
+                    sgPlayer.playSound(Sound.ITEM_BREAK);
+                } else {
+                    ItemMeta itemMeta = e.getItem().getItemMeta();
+                    List<String> lore = List.of("", StarColors.color("&fUses Left: &e" + displayUses));
+                    itemMeta.setLore(lore);
+                    e.getItem().setItemMeta(itemMeta);
+                    int finalUses = uses;
+                    int finalDisplayUses = displayUses;
+                    NBT.modify(e.getItem(), nbt -> {
+                        nbt.setInteger("sg_uses", finalUses);
+                        nbt.setInteger("sg_display_uses", finalDisplayUses);
+                    });
+                }
+            }
+            
             if (e.getClickedBlock() != null) {
                 if (Stream.of(Material.DISPENSER, Material.FURNACE, Material.BURNING_FURNACE, Material.WORKBENCH, Material.ENCHANTMENT_TABLE, Material.ANVIL).noneMatch(material -> block.getType() == material)) {
                     LootManager lootManager = plugin.getLootManager();
