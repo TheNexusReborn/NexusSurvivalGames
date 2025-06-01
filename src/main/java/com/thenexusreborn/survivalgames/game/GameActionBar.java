@@ -82,7 +82,7 @@ public class GameActionBar implements IActionBar {
             return "&c&lSEEKING REVENGE ON &a" + target.getName();
         }
 
-        if (game.isGraceperiod()) {
+        if (game.isGraceperiod() && game.getGraceperiodTimer() != null) {
             return "&f&lGrace Period ends in &e" + Game.LONG_TIME_FORMAT.format(game.getGraceperiodTimer().getTime());
         }
 
