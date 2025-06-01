@@ -35,6 +35,7 @@ public class GameSecondsCallback implements ClockCallback<TimerSnapshot> {
         this.game = game;
         this.msgSupplier = msgSupplier;
         this.announceMinute = announceMinute;
+        this.sound = sound;
     }
     
     @Override
