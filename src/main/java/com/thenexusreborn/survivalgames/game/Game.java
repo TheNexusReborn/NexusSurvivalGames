@@ -717,7 +717,7 @@ public class Game implements Controllable, IHasState {
         setSubState(SubState.TIMER_INIT);
         this.timer = Game.getPlugin().getClockManager().createTimer(TimeUnit.SECONDS.toMillis(getSettings().getWarmupLength()) + 50L);
         this.timer.setEndCondition(new WarmupEndCondition(this));
-        this.timer.addRepeatingCallback(new GameSecondsCallback(this, "&6&l>> &eThe game begins in &b{time}&e."), TimeUnit.SECONDS, 1);
+        this.timer.addRepeatingCallback(new GameSecondsCallback(this, Sound.CLICK, "&6&l>> &eThe game begins in &b{time}&e."), TimeUnit.SECONDS, 1);
         this.timer.addRepeatingCallback(snapshot -> playSound(Sound.NOTE_BASS), TimeUnit.SECONDS, 1);
         List<MapSpawn> mapSpawns = gameMap.getSpawns();
         this.timer.addRepeatingCallback(snapshot -> {
@@ -804,7 +804,7 @@ public class Game implements Controllable, IHasState {
         };
         
         this.timer.addRepeatingCallback(new GameMinutesCallback(this, msg), TimeUnit.MINUTES, 1);
-        this.timer.addRepeatingCallback(new GameSecondsCallback(this, msg, false), TimeUnit.SECONDS, 1);
+        this.timer.addRepeatingCallback(new GameSecondsCallback(this, Sound.CLICK, msg, false), TimeUnit.SECONDS, 1);
         this.timer.addCallback(timerSnapshot -> {
             sendMessage("");
             sendMessage("&6&l>> &9&lWHAT DO YOU THINK OF &e&l" + getGameMap().getName().toUpperCase() + "&9&l?");
@@ -865,7 +865,7 @@ public class Game implements Controllable, IHasState {
         setSubState(SubState.SETUP_GRACE_PERIOD);
         if (this.settings.isGracePeriod()) {
             this.graceperiodTimer = plugin.getClockManager().createTimer(TimeUnit.SECONDS.toMillis(settings.getGracePeriodLength()) + 50L);
-            this.graceperiodTimer.addRepeatingCallback(new GameSecondsCallback(this, "&6&l>> &eThe &c&lGRACE PERIOD &eends in &b{time}&e."), TimeUnit.SECONDS, 1);
+            this.graceperiodTimer.addRepeatingCallback(new GameSecondsCallback(this, Sound.CLICK, "&6&l>> &eThe &c&lGRACE PERIOD &eends in &b{time}&e."), TimeUnit.SECONDS, 1);
             this.graceperiodTimer.setEndCondition(new GraceperiodEndCondition(this));
             this.graceperiodTimer.start();
             this.graceperiod = Graceperiod.ACTIVE;
@@ -987,8 +987,7 @@ public class Game implements Controllable, IHasState {
         }
         
         this.timer = plugin.getClockManager().createTimer(TimeUnit.SECONDS.toMillis(settings.getDeathmatchWarmupLength()) + 50L);
-        this.timer.addRepeatingCallback(new GameSecondsCallback(this, "&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b{time}&e."), TimeUnit.SECONDS, 1);
-        this.timer.addRepeatingCallback(timerSnapshot -> playSound(Sound.ENDERDRAGON_WINGS), TimeUnit.SECONDS, 1);
+        this.timer.addRepeatingCallback(new GameSecondsCallback(this, Sound.ENDERDRAGON_WINGS, "&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b{time}&e."), TimeUnit.SECONDS, 1);
         this.timer.setEndCondition(new DMWarmupEndCondition(this));
         this.timer.start();
         setSubState(SubState.UNDEFINED);
@@ -1026,7 +1025,7 @@ public class Game implements Controllable, IHasState {
         setSubState(SubState.TIMER_INIT);
         this.timer = plugin.getClockManager().createTimer(TimeUnit.MINUTES.toMillis(settings.getDeathmatchLength()) + 50L);
         this.timer.addRepeatingCallback(new GameMinutesCallback(this, "&6&l>> &eThe &c&lGAME &eends &ein &b{time}&e."), TimeUnit.MINUTES, 1);
-        this.timer.addRepeatingCallback(new GameSecondsCallback(this, "&6&l>> &eThe &c&lGAME &eends &ein &b{time}&e."), TimeUnit.SECONDS, 1);
+        this.timer.addRepeatingCallback(new GameSecondsCallback(this, Sound.CLICK, "&6&l>> &eThe &c&lGAME &eends &ein &b{time}&e."), TimeUnit.SECONDS, 1);
         this.timer.setEndCondition(new DeathmatchEndCondition(this));
         this.timer.start();
         setSubState(SubState.UNDEFINED);
@@ -1213,7 +1212,7 @@ public class Game implements Controllable, IHasState {
         
         if (!(this.players.isEmpty() || Bukkit.getOnlinePlayers().isEmpty())) {
             this.timer = plugin.getClockManager().createTimer(TimeUnit.SECONDS.toMillis(settings.getNextGameStart()));
-            this.timer.addRepeatingCallback(new GameSecondsCallback(this, "&6&l>> &eNext game starts in &b{time}&e."), TimeUnit.SECONDS, 1);
+            this.timer.addRepeatingCallback(new GameSecondsCallback(this, Sound.CLICK, "&6&l>> &eNext game starts in &b{time}&e."), TimeUnit.SECONDS, 1);
             FireworkItemBuilder fireworkBuilder = new FireworkItemBuilder(FireworkEffect.builder().with(FireworkEffect.Type.BALL).trail(true).withColor(SurvivalGames.COLORS).build(), 1);
             fireworkBuilder.material(XMaterial.FIREWORK_ROCKET);
             List<MapSpawn> spawns = gameMap.getSpawns();
@@ -1791,7 +1790,7 @@ public class Game implements Controllable, IHasState {
         sendMessage("&6&l>> &4&lTHE DEATHMATCH COUNTDOWN HAS STARTED");
         playSound(Sound.ENDERDRAGON_GROWL);
         this.timer = plugin.getClockManager().createTimer(TimeUnit.SECONDS.toMillis(settings.getDeathmatchTimerLength()) + 50L);
-        this.timer.addRepeatingCallback(new GameSecondsCallback(this, "&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b{time}&e."), TimeUnit.SECONDS, 1);
+        this.timer.addRepeatingCallback(new GameSecondsCallback(this, Sound.CLICK, "&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b{time}&e."), TimeUnit.SECONDS, 1);
         this.timer.setEndCondition(new DMTimerEndCondition(this));
         this.timer.start();
     }

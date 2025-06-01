@@ -17,21 +17,21 @@ public class GameSecondsCallback implements ClockCallback<TimerSnapshot> {
     private Game game;
     private Supplier<String> msgSupplier;
     private boolean announceMinute;
+    private Sound sound;
 
-    public GameSecondsCallback(Game game, String message) {
-        this(game, () -> message);
+    public GameSecondsCallback(Game game, Sound sound, String message) {
+        this(game, sound, () -> message);
     }
 
-    public GameSecondsCallback(Game game, String message, boolean announceMinute) {
-        this(game, () -> message, announceMinute);
+    public GameSecondsCallback(Game game, Sound sound, String message, boolean announceMinute) {
+        this(game, sound, () -> message, announceMinute);
     }
 
-    public GameSecondsCallback(Game game, Supplier<String> msgSupplier) {
-        this.game = game;
-        this.msgSupplier = msgSupplier;
+    public GameSecondsCallback(Game game, Sound sound, Supplier<String> msgSupplier) {
+        this(game, sound, msgSupplier, false);
     }
 
-    public GameSecondsCallback(Game game, Supplier<String> msgSupplier, boolean announceMinute) {
+    public GameSecondsCallback(Game game, Sound sound, Supplier<String> msgSupplier, boolean announceMinute) {
         this.game = game;
         this.msgSupplier = msgSupplier;
         this.announceMinute = announceMinute;
@@ -48,7 +48,7 @@ public class GameSecondsCallback implements ClockCallback<TimerSnapshot> {
             
             game.sendMessage(msgSupplier.get().replace("{time}", Game.LONG_TIME_FORMAT.format(timerSnapshot.getTime())));
             if (game.getSettings().isSounds()) {
-                game.playSound(Sound.CLICK);
+                game.playSound(sound);
             }
         }
     }
