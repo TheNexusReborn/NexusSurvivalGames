@@ -59,6 +59,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
@@ -384,18 +385,40 @@ public class Game implements Controllable, IHasState {
         setSubState(SubState.PLAYER_JOIN);
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId());
         GamePlayer gamePlayer = new GamePlayer(sgPlayer, this, stats);
-        sgPlayer.setGame(this, gamePlayer);
-        gamePlayer.setStatus(GamePlayer.Status.ADDING_TO_GAME);
-        gamePlayer.setTeam(GameTeam.SPECTATORS);
-        gamePlayer.sendMessage(GameTeam.SPECTATORS.getJoinMessage());
         this.players.put(nexusPlayer.getUniqueId(), gamePlayer);
         gamePlayer.setStatus(GamePlayer.Status.SETTING_UP_PLAYER);
+        sgPlayer.setGame(this, gamePlayer);
+        this.gameChatroom.addMember(gamePlayer.getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
+        gamePlayer.setStatus(GamePlayer.Status.ADDING_TO_GAME);
         Player player = Bukkit.getPlayer(nexusPlayer.getUniqueId());
-        this.gameChatroom.addMember(player.getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
-        GameTeam.SPECTATORS.getPlayerState().apply(player);
-        gamePlayer.giveSpectatorItems(this);
+        if ((this.getState() == WARMUP || this.getState() == WARMUP_DONE) && gamePlayer.getEffectiveRank().ordinal() <= Rank.DIAMOND.ordinal() && !gamePlayer.getToggleValue("vanish")) {
+            gamePlayer.setTeam(GameTeam.TRIBUTES);
+            boolean foundSpawn = false;
+            for (Entry<Integer, UUID> entry : this.spawns.entrySet()) {
+                if (entry.getValue() == null) {
+                    Location location = this.gameMap.getSpawn(entry.getKey()).toGameLocation(this.gameMap.getWorld(), this.getGameMap().getCenterLocation());
+                    teleportTribute(player, location);
+                    entry.setValue(player.getUniqueId());
+                    foundSpawn = true;
+                    break;
+                }
+            }
+            
+            if (!foundSpawn) {
+                gamePlayer.setTeam(GameTeam.SPECTATORS);
+                teleportSpectator(player, this.gameMap.getSpawnCenter().toLocation(this.gameMap.getWorld()));
+            }
+        } else {
+            gamePlayer.setTeam(GameTeam.SPECTATORS);
+            teleportSpectator(player, this.gameMap.getSpawnCenter().toLocation(this.gameMap.getWorld()));
+        }
+        
+        gamePlayer.sendMessage(gamePlayer.getTeam().getJoinMessage());
+        gamePlayer.getTeam().getPlayerState().apply(player);
+        if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
+            gamePlayer.giveSpectatorItems(this);
+        }
         gamePlayer.setStatus(GamePlayer.Status.TELEPORTING_TO_CENTER);
-        teleportSpectator(player, this.gameMap.getSpawnCenter().toLocation(this.gameMap.getWorld()));
         
         gamePlayer.setStatus(GamePlayer.Status.CALCULATING_VISIBILITY);
         if (nexusPlayer.getToggleValue("vanish") && !nexusPlayer.isNicked()) {
