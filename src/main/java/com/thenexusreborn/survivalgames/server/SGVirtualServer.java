@@ -63,7 +63,7 @@ public class SGVirtualServer extends VirtualServer {
             }
         } else {
             if (game.getState() == Game.State.ENDING) {
-                return true;
+                return !otherPlayerIsVanished;
             }
 
             GamePlayer gamePlayer = game.getPlayer(playerUUID);

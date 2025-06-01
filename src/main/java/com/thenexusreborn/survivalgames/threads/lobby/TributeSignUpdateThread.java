@@ -43,6 +43,8 @@ public class TributeSignUpdateThread extends StarThread<SurvivalGames> {
             }
 
             List<LobbyPlayer> players = lobby.getPlayers();
+            
+            players.removeIf(p -> p.getToggleValue("vanish"));
 
             for (TributeSign tributeSign : tributeSigns) {
                 if (tributeSign.getHeadLocation() == null) {
@@ -63,7 +65,7 @@ public class TributeSignUpdateThread extends StarThread<SurvivalGames> {
                     }
                     String[] lines = {"", "", "", ""};
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        if (p.getWorld() == tributeSign.getSignLocation().getWorld()) {
+                        if (p.getWorld().getName().equalsIgnoreCase(tributeSign.getSignLocation().getWorld().getName())) {
                             p.sendSignChange(tributeSign.getSignLocation(), lines);
                         }
                     }

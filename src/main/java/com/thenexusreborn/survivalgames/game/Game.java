@@ -1045,6 +1045,8 @@ public class Game implements Controllable, IHasState {
             this.timer = null;
         }
         
+        this.graceperiod = Graceperiod.INACTIVE;
+        
         if (this.graceperiodTimer != null) {
             graceperiodTimer.cancel();
             this.graceperiodTimer = null;
@@ -1059,11 +1061,7 @@ public class Game implements Controllable, IHasState {
             for (GamePlayer otherPlayer : this.players.values()) {
                 if (!otherPlayer.getToggleValue("vanish")) {
                     gamePlayer.showPlayer(otherPlayer);
-                }
-                
-                if (!gamePlayer.getToggleValue("vanish")) {
-                    otherPlayer.showPlayer(gamePlayer);
-                }
+                } 
             }
             
             gamePlayer.getCombatTag().setOther(null);
