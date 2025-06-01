@@ -44,7 +44,7 @@ public class TributeSignUpdateThread extends StarThread<SurvivalGames> {
 
             List<LobbyPlayer> players = lobby.getPlayers();
             
-            players.removeIf(p -> p.getToggleValue("vanish"));
+            players.removeIf(p -> p.getToggleValue("vanish") || p.isSpectating());
 
             for (TributeSign tributeSign : tributeSigns) {
                 if (tributeSign.getHeadLocation() == null) {
@@ -54,7 +54,7 @@ public class TributeSignUpdateThread extends StarThread<SurvivalGames> {
                     continue;
                 }
                 Skull skull = (Skull) tributeSign.getHeadLocation().getBlock().getState();
-                if (players.size() <= tributeSign.getIndex()) {
+                if (players.isEmpty() || players.size() <= tributeSign.getIndex()) {
                     try {
                         Field profileField = skull.getClass().getDeclaredField("profile");
                         profileField.setAccessible(true);
