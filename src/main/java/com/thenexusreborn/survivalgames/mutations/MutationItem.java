@@ -6,7 +6,7 @@ import com.stardevllc.staritems.model.CustomItem;
 import org.bukkit.inventory.ItemStack;
 
 public final class MutationItem {
-    public static final ItemBuilder UNBREAKABLE_GOLD_SWORD = ItemBuilder.of(XMaterial.GOLDEN_SWORD).displayName("&fUnbreakable Goldlen Sword").unbreakable(true);
+    public static final ItemBuilder UNBREAKABLE_GOLD_SWORD = ItemBuilder.of(XMaterial.GOLDEN_SWORD).displayName("&fUnbreakable Golden Sword").unbreakable(true);
     private final int slotOffset;
     private ItemBuilder itemBuilder;
     private CustomItem customItem;
