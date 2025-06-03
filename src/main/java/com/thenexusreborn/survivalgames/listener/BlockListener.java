@@ -86,13 +86,13 @@ public class BlockListener implements Listener {
         }
         
         if (game != null) {
+            GamePlayer player = game.getPlayer(e.getPlayer().getUniqueId());
+            if (!(player.getTeam() == GameTeam.TRIBUTES || player.getTeam() == GameTeam.MUTATIONS)) {
+                e.setCancelled(true);
+                return;
+            }
+            
             if (Stream.of(Game.State.INGAME, Game.State.INGAME_DEATHMATCH, Game.State.DEATHMATCH).anyMatch(gameState -> game.getState() == gameState)) {
-                GamePlayer player = game.getPlayer(e.getPlayer().getUniqueId());
-                if (!(player.getTeam() == GameTeam.TRIBUTES || player.getTeam() == GameTeam.MUTATIONS)) {
-                    e.setCancelled(true);
-                    return;
-                }
-
                 if (!ALLOWED_BREAK.contains(e.getBlock().getType())) {
                     e.setCancelled(true);
                 }
