@@ -152,6 +152,13 @@ public class PlayerListener implements Listener {
 
         Block block = e.getClickedBlock();
         if (block != null) {
+            if (game != null) {
+                if (sgPlayer.getGamePlayer().getTeam() == GameTeam.SPECTATORS) {
+                    e.setCancelled(true);
+                    return;
+                }
+            }
+            
             if (block.getType().name().contains("_DOOR") || block.getType().name().contains("_BUTTON") || block.getType() == Material.LEVER || block.getType().name().contains("_GATE")) {
                 return;
             }
