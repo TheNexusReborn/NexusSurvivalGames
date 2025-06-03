@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.cmd.sgadmin.game;
 
-import com.stardevllc.starcore.StarColors;
-import com.stardevllc.starcore.cmdflags.FlagResult;
+import com.stardevllc.starcore.api.StarColors;
+import com.stardevllc.starcore.api.cmdflags.FlagResult;
 import com.stardevllc.time.TimeFormat;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.nexuscore.api.command.ICommand;

@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.scoreboard;
 
-import com.stardevllc.starcore.StarColors;
+import com.stardevllc.starcore.api.StarColors;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.scoreboard.TablistHandler;

@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.cmd.sgadmin.settings;
 
-import com.stardevllc.starcore.cmdflags.FlagResult;
+import com.stardevllc.starcore.api.cmdflags.FlagResult;
 import com.stardevllc.starui.GuiManager;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.nexuscore.api.command.ICommand;

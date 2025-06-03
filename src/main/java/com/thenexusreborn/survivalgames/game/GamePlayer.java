@@ -2,7 +2,7 @@ package com.thenexusreborn.survivalgames.game;
 
 import com.stardevllc.helper.Pair;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
-import com.stardevllc.starcore.StarColors;
+import com.stardevllc.starcore.api.StarColors;
 import com.stardevllc.starcore.utils.ArmorSet;
 import com.stardevllc.starcore.utils.Position;
 import com.thenexusreborn.api.player.*;

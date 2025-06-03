@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.conversation;
 
-import com.stardevllc.starcore.StarColors;
+import com.stardevllc.starcore.api.StarColors;
 import com.stardevllc.starui.GuiManager;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SurvivalGames;

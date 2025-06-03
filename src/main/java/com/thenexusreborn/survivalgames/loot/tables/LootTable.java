@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.loot.tables;
 
-import com.stardevllc.starcore.StarColors;
+import com.stardevllc.starcore.api.StarColors;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.loot.category.LootCategory;
 import com.thenexusreborn.survivalgames.loot.item.LootItem;

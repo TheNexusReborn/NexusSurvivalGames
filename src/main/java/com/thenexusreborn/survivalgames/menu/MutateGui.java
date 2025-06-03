@@ -1,8 +1,8 @@
 package com.thenexusreborn.survivalgames.menu;
 
 import com.stardevllc.helper.*;
-import com.stardevllc.starcore.base.colors.ColorHandler;
-import com.stardevllc.starcore.base.itembuilder.ItemBuilder;
+import com.stardevllc.starcore.api.colors.ColorHandler;
+import com.stardevllc.starcore.api.itembuilder.ItemBuilder;
 import com.stardevllc.starcore.utils.MaterialNames;
 import com.stardevllc.starcore.utils.PotionNames;
 import com.stardevllc.starui.GuiManager;
