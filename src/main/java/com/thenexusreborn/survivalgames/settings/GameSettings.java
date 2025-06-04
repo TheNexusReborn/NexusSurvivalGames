@@ -118,6 +118,10 @@ public class GameSettings implements Cloneable, ISettings {
     protected boolean deathmatchPlayerCount = true;
     protected boolean automaticDeathmatchThreshold = true;
     
+    public void setAutomaticGraceperiod(boolean automaticGraceperiod) {
+        this.automaticGraceperiod = automaticGraceperiod;
+    }
+    
     public int getChickenMaxAmmo() {
         return chickenMaxAmmo;
     }
