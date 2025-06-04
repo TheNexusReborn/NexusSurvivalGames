@@ -57,7 +57,7 @@ public enum StandardMutations implements IMutationType {
             ArmorSet.LEATHER, //Armor
             UNBREAKABLE_GOLD_SWORD.build(), //Weapon 
             5000, //Unlock cost
-            20, //Health
+            30, //Health
             List.of(DamageCause.FALL, DamageCause.PROJECTILE), //Damage Immunities
             List.of(), //Potion Effects
             List.of(new MutationItem(1, new ItemStack(Material.ENDER_PEARL, 32))), //Additional Items
