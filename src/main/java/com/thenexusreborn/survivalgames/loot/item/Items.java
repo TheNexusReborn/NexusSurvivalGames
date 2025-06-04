@@ -51,7 +51,7 @@ public final class Items {
     public static final LootItem STONE_SWORD = REGISTRY.register(new LootItem(LootCategory.WEAPONS, Material.STONE_SWORD));
     public static final LootItem IRON_SWORD = REGISTRY.register(new LootItem(LootCategory.WEAPONS, Material.IRON_SWORD));
     public static final LootItem BOW = REGISTRY.register(new LootItem(LootCategory.WEAPONS, Material.BOW));
-    public static final LootItem ARROW = REGISTRY.register(new LootItem(LootCategory.WEAPONS, Material.ARROW, 5));
+    public static final LootItem ARROW = REGISTRY.register(new LootItem(LootCategory.WEAPONS, Material.ARROW, 3));
     
     public static final LootItem EGG_OF_DOOM = REGISTRY.register(new LootItem(LootCategory.THROWABLES, Material.EGG, "Egg of Doom &8- &7Hunger and Confusion"));
     public static final LootItem SLOWBALL = REGISTRY.register(new LootItem(LootCategory.THROWABLES, Material.SNOW_BALL, "Slowball &8- &7Slowness"));
