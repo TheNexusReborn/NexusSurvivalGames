@@ -76,6 +76,9 @@ public class GameSettings implements Cloneable, ISettings {
     //Loot
     protected boolean enderchestsEnabled = true;
     protected LootMode lootMode = LootMode.TIERED;
+    protected String cornucopiaTier = "tierTwo";
+    protected String regularTier = "tierOne";
+    protected String deathmatchTier = "tierFour";
     
     //Cosmetic
     protected ColorMode colorMode = ColorMode.RANK;
@@ -112,6 +115,30 @@ public class GameSettings implements Cloneable, ISettings {
     protected boolean allowDeathmatch = true;
     protected boolean deathmatchPlayerCount = true;
     protected boolean automaticDeathmatchThreshold = true;
+    
+    public String getDeathmatchTier() {
+        return deathmatchTier;
+    }
+    
+    public void setDeathmatchTier(String deathmatchTier) {
+        this.deathmatchTier = deathmatchTier;
+    }
+    
+    public String getCornucopiaTier() {
+        return cornucopiaTier;
+    }
+    
+    public void setCornucopiaTier(String cornucopiaTier) {
+        this.cornucopiaTier = cornucopiaTier;
+    }
+    
+    public String getRegularTier() {
+        return regularTier;
+    }
+    
+    public void setRegularTier(String regularTier) {
+        this.regularTier = regularTier;
+    }
     
     public boolean isAutomaticDeathmatchThreshold() {
         return automaticDeathmatchThreshold;

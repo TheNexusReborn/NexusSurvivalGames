@@ -845,6 +845,8 @@ public class Game implements Controllable, IHasState {
             }
             timedRestockCount++;
             restockChests();
+            getSettings().setCornucopiaTier("tierThree");
+            getSettings().setRegularTier("tierTwo");
             sendMessage("&6&l>> &a&lALL CHESTS HAVE BEEN RESTOCKED");
         }, TimeUnit.MINUTES, restockLength);
         

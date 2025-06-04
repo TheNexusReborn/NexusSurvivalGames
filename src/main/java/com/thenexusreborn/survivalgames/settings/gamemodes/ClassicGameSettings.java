@@ -77,6 +77,8 @@ public class ClassicGameSettings extends GameSettings {
         //Loot
         enderchestsEnabled = true;
         lootMode = LootMode.TIERED;
+        cornucopiaTier = "tierTwo";
+        regularTier = "tierOne";
         
         //Cosmetic
         colorMode = ColorMode.RANK;

@@ -49,7 +49,7 @@ public class PlayerListener implements Listener {
     private final GuiManager manager;
     
     private List<String> tableChancesFirstHalf = new ArrayList<>(), tableChancesSecondHalf = new ArrayList<>();
-
+    
     public PlayerListener(SurvivalGames plugin) {
         this.plugin = plugin;
         manager = plugin.getServer().getServicesManager().getRegistration(GuiManager.class).getProvider();
@@ -74,13 +74,13 @@ public class PlayerListener implements Listener {
             }
         }
     }
-
+    
     @EventHandler
     public void onItemDrop(PlayerDropItemEvent e) {
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(e.getPlayer().getUniqueId());
         Lobby lobby = sgPlayer.getLobby();
         Game game = sgPlayer.getGame();
-
+        
         if (lobby != null && lobby.checkMapEditing(e.getPlayer())) {
             return;
         }
@@ -93,24 +93,24 @@ public class PlayerListener implements Listener {
             }
         }
     }
-
+    
     @EventHandler
     public void onBucketFill(PlayerBucketFillEvent e) {
         e.setCancelled(true);
     }
-
+    
     @EventHandler
     public void onBucketPlace(PlayerBucketEmptyEvent e) {
         e.setCancelled(true);
     }
-
+    
     @EventHandler
     public void onPlayerFish(PlayerFishEvent e) {
         if (e.getState() == State.CAUGHT_FISH) {
             e.setCancelled(true);
         }
     }
-
+    
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent e) {
         Player player = e.getPlayer();
@@ -118,14 +118,14 @@ public class PlayerListener implements Listener {
         if (sgPlayer == null) {
             return;
         }
-
+        
         Lobby lobby = sgPlayer.getLobby();
         Game game = sgPlayer.getGame();
-
+        
         if (lobby == null && game == null) {
             return;
         }
-
+        
         if (lobby != null && lobby.checkMapEditing(e.getPlayer())) {
             return;
         }
@@ -149,7 +149,7 @@ public class PlayerListener implements Listener {
                 }
             }
         }
-
+        
         Block block = e.getClickedBlock();
         if (block != null) {
             if (game != null) {
@@ -163,7 +163,7 @@ public class PlayerListener implements Listener {
                 return;
             }
         }
-
+        
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
             if (e.getItem() != null && e.getItem().getType() == Material.FISHING_ROD) {
                 int uses = NBT.get(e.getItem(), nbt -> {
@@ -214,7 +214,7 @@ public class PlayerListener implements Listener {
                             e.setCancelled(true);
                             return;
                         }
-
+                        
                         Inventory inv;
                         if (block.getType() == Material.ENDER_CHEST) {
                             inv = game.getEnderchestInventories().get(block.getLocation());
@@ -229,15 +229,15 @@ public class PlayerListener implements Listener {
                         } else {
                             inv = ((Chest) block.getState()).getBlockInventory();
                         }
-
+                        
                         if (game.isLootedChest(block)) {
                             return;
                         }
-
+                        
                         game.getPlayer(player.getUniqueId()).getStats().addChestsLooted(1);
-
+                        
                         int maxAmount = 8;
-
+                        
                         Block secondHalf = null;
                         if (block.getType() != Material.ENDER_CHEST) {
                             Block north = block.getRelative(BlockFace.NORTH);
@@ -253,43 +253,35 @@ public class PlayerListener implements Listener {
                             } else if (west != null && west.getType() == Material.CHEST) {
                                 secondHalf = west;
                             }
-
+                            
                             if (secondHalf != null) {
                                 maxAmount += 3;
                             }
                         }
-
+                        
                         inv.clear();
-
+                        
                         SGLootTable lootTable = null;
-
+                        
                         if (game.getSettings().getLootMode() == LootMode.CLASSIC) {
-                            lootTable = lootManager.getLootTable("tierOne");
+                            lootTable = lootManager.getLootTable(game.getSettings().getRegularTier());
                         } else if (game.getSettings().getLootMode() == LootMode.TIERED) {
                             if (game.getState() == Game.State.DEATHMATCH) {
-                                lootTable = lootManager.getLootTable("tierFour");
+                                lootTable = lootManager.getLootTable(game.getSettings().getDeathmatchTier());
                             } else {
                                 boolean withinCenter = game.getGameMap().getDeathmatchRegion().contains(BukkitUtil.toVector(player.getLocation()));
                                 if (game.getState() == Game.State.INGAME || game.getState() == Game.State.INGAME_DEATHMATCH) {
                                     boolean afterRestock = game.getTimedRestockCount() > 0;
                                     if (withinCenter) {
-                                        if (afterRestock) {
-                                            lootTable = lootManager.getLootTable("tierThree");
-                                        } else {
-                                            lootTable = lootManager.getLootTable("tierTwo");
-                                        }
+                                        lootTable = lootManager.getLootTable(game.getSettings().getCornucopiaTier());
                                     } else {
-                                        if (afterRestock) {
-                                            lootTable = lootManager.getLootTable("tierTwo");
-                                        } else {
-                                            lootTable = lootManager.getLootTable("tierOne");
-                                        }
+                                        lootTable = lootManager.getLootTable(game.getSettings().getRegularTier());
                                     }
                                 }
                             }
                         } else if (game.getSettings().getLootMode() == LootMode.RANDOM) {
                             if (game.getState() == Game.State.DEATHMATCH) {
-                                lootTable = lootManager.getLootTable("tierFour");
+                                lootTable = lootManager.getLootTable(game.getSettings().getDeathmatchTier());
                             } else {
                                 List<String> chances;
                                 if (game.getTimer().getTime() < game.getTimer().getLength() / 2) {
@@ -301,21 +293,21 @@ public class PlayerListener implements Listener {
                                 lootTable = lootManager.getLootTable(chances.get(new Random().nextInt(chances.size())));
                             }
                         }
-
+                        
                         if (lootTable == null) {
                             player.sendMessage(StarColors.color(MsgType.ERROR + "Error while determining the loot table."));
                             return;
                         }
-
+                        
                         if (lootTable.isReloading()) {
                             player.sendMessage(MsgType.WARN.format("That loot table is being reloaded, try again in a few seconds."));
                             return;
                         }
                         
                         NexusReborn.sendDebugMessage(player, "Loot Table: " + lootTable.getName());
-
+                        
                         List<ItemStack> items = lootTable.generateLoot(new Random().nextInt(maxAmount - 2) + 2);
-
+                        
                         for (ItemStack item : items) {
                             int slot;
                             do {
@@ -323,7 +315,7 @@ public class PlayerListener implements Listener {
                             } while (inv.getItem(slot) != null);
                             inv.setItem(slot, item);
                         }
-
+                        
                         if (block.getType() == Material.ENDER_CHEST) {
                             Inventory finalInventory = inv;
                             new BukkitRunnable() {
@@ -333,7 +325,7 @@ public class PlayerListener implements Listener {
                                 }
                             }.runTaskLater(plugin, 1L);
                         }
-
+                        
                         game.addLootedChest(block.getLocation());
                         if (secondHalf != null) {
                             game.addLootedChest(secondHalf.getLocation());
@@ -353,19 +345,19 @@ public class PlayerListener implements Listener {
                         if (e.getItem() != null) {
                             return;
                         }
-
+                        
                         if (BlockListener.ALLOWED_PLACE.contains(block.getType())) {
                             return;
                         }
-
+                        
                         if (BlockListener.ALLOWED_BREAK.contains(block.getType())) {
                             return;
                         }
-
+                        
                         if (block.getState() instanceof Openable) {
                             return;
                         }
-
+                        
                         e.setCancelled(true);
                     }
                 }
@@ -378,23 +370,23 @@ public class PlayerListener implements Listener {
             }
         }
     }
-
+    
     @EventHandler
     public void onSpecchatToggleChange(ToggleChangeEvent e) {
         if (!e.getToggle().getInfo().getName().equalsIgnoreCase("spectatorchat")) {
             return;
         }
-
+        
         NexusPlayer nexusPlayer = e.getNexusPlayer();
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId());
         if (sgPlayer == null) {
             return;
         }
-
+        
         if (sgPlayer.getGame() == null) {
             return;
         }
-
+        
         GameTeamChatroom specatorChatroom = sgPlayer.getGame().getChatRooms().get(GameTeam.SPECTATORS);
         if (sgPlayer.getGame() != null) {
             if (!specatorChatroom.isMember(nexusPlayer.getUniqueId())) {
@@ -402,7 +394,7 @@ public class PlayerListener implements Listener {
             }
         }
     }
-
+    
     @EventHandler
     public void onToggleChange(ToggleChangeEvent e) {
         NexusPlayer nexusPlayer = e.getNexusPlayer();
@@ -412,11 +404,11 @@ public class PlayerListener implements Listener {
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
         Lobby lobby = sgPlayer.getLobby();
         Game game = sgPlayer.getGame();
-
+        
         if (lobby != null && lobby.checkMapEditing(player)) {
             return;
         }
-
+        
         if (toggle.getInfo().getName().equalsIgnoreCase("fly")) {
             if (game != null) {
                 e.setCancelled(true);
@@ -424,14 +416,14 @@ public class PlayerListener implements Listener {
             } else {
                 player.setAllowFlight(e.newValue());
             }
-
+            
             return;
         }
-
+        
         if (!toggle.getInfo().getName().equalsIgnoreCase("vanish")) {
             return;
         }
-
+        
         Collection<NexusPlayer> players = new ArrayList<>();
         if (game == null) {
             if (lobby != null) {
@@ -442,14 +434,14 @@ public class PlayerListener implements Listener {
                 players.add(value.getNexusPlayer());
             }
         }
-
+        
         String symbolColor = !e.newValue() ? "a" : "c";
         String symbol = !e.newValue() ? ">>" : "<<";
         String action = !e.newValue() ? "joined" : "left";
         String silent = incognito ? " &e&osilently" : "";
-
+        
         String message = "&" + symbolColor + "&l" + symbol + " " + nexusPlayer.getColoredName() + " &e" + action + silent + "&e.";
-
+        
         if (incognito) {
             for (NexusPlayer p : players) {
                 if (p.getRank().ordinal() <= Rank.HELPER.ordinal() || p.getUniqueId().equals(e.getNexusPlayer().getUniqueId())) {
@@ -472,14 +464,14 @@ public class PlayerListener implements Listener {
             }
         }
     }
-
+    
     @EventHandler
     public void onPlayerEntityInteract(PlayerInteractAtEntityEvent e) {
         Player player = e.getPlayer();
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
         Lobby lobby = sgPlayer.getLobby();
         Game game = sgPlayer.getGame();
-
+        
         if (lobby != null && lobby.checkMapEditing(player)) {
             return;
         }
@@ -487,7 +479,7 @@ public class PlayerListener implements Listener {
             e.setCancelled(true);
             return;
         }
-
+        
         if (e.getRightClicked() instanceof Villager villager) {
             e.setCancelled(true);
             if (villager.getCustomName() != null && villager.getCustomName().contains("Swag Shack")) {
@@ -495,12 +487,12 @@ public class PlayerListener implements Listener {
                     e.getPlayer().sendMessage(StarColors.color(MsgType.WARN + "You cannot open the Swag Shack when not in a game."));
                     return;
                 }
-
+                
                 if (!game.getSettings().isAllowSwagShack()) {
                     e.getPlayer().sendMessage(StarColors.color(MsgType.WARN + "The Swag Shack is disabled for this game."));
                     return;
                 }
-
+                
                 GamePlayer gamePlayer = game.getPlayer(e.getPlayer().getUniqueId());
                 if (gamePlayer.getTeam() != GameTeam.TRIBUTES) {
                     gamePlayer.sendMessage(MsgType.WARN + "You can only open the Swag Shack as a Tribute.");
@@ -511,7 +503,7 @@ public class PlayerListener implements Listener {
             }
         }
     }
-
+    
     @EventHandler
     public void onPrepareCraft(PrepareItemCraftEvent e) {
         CraftingInventory inv = e.getInventory();
@@ -543,47 +535,47 @@ public class PlayerListener implements Listener {
             inv.setResult(itemStack);
         }
     }
-
+    
     @EventHandler
     public void onPlayerOpenEnchant(InventoryOpenEvent e) {
         Player player = (Player) e.getPlayer();
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
         Lobby lobby = sgPlayer.getLobby();
         Game game = sgPlayer.getGame();
-
+        
         if (lobby != null && lobby.checkMapEditing(player)) {
             return;
         }
-
+        
         if (game != null) {
             if (e.getInventory() instanceof EnchantingInventory enchantingInventory) {
                 if (game.getPlayer(e.getPlayer().getUniqueId()).getTeam() != GameTeam.TRIBUTES) {
                     e.setCancelled(true);
                     return;
                 }
-
+                
                 enchantingInventory.setSecondary(new ItemStack(Material.INK_SACK, 64, (short) 4));
             }
         }
     }
-
+    
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
         Player player = (Player) e.getWhoClicked();
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
         Lobby lobby = sgPlayer.getLobby();
         Game game = sgPlayer.getGame();
-
+        
         if (lobby != null && lobby.checkMapEditing(player)) {
             return;
         }
-
+        
         if (game != null) {
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
             if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
                 e.setCancelled(true);
             }
-
+            
             if (e.getInventory() instanceof EnchantingInventory) {
                 if (e.getCurrentItem() != null && e.getCurrentItem().getType() == Material.INK_SACK) {
                     e.setCancelled(true);
@@ -591,7 +583,7 @@ public class PlayerListener implements Listener {
             }
         }
     }
-
+    
     @EventHandler
     public void onPlayerCloseEnchant(InventoryCloseEvent e) {
         try {
@@ -601,14 +593,14 @@ public class PlayerListener implements Listener {
         } catch (Exception ex) {
         }
     }
-
+    
     @EventHandler
     public void onItemPickup(PlayerPickupItemEvent e) {
         Player player = e.getPlayer();
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
         Lobby lobby = sgPlayer.getLobby();
         Game game = sgPlayer.getGame();
-
+        
         if (lobby != null && lobby.checkMapEditing(player)) {
             return;
         }
@@ -618,28 +610,28 @@ public class PlayerListener implements Listener {
             e.setCancelled(true);
         }
     }
-
+    
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent e) {
         Player player = e.getEntity();
         Location deathLocation = player.getLocation().clone();
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
         Game game = sgPlayer.getGame();
-
+        
         if (game == null) {
             return;
         }
-
+        
         e.setDeathMessage(null);
-
+        
         GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
         EntityDamageEvent lastDamageCause = player.getLastDamageCause();
-
+        
         if (gamePlayer.getTeam() != GameTeam.TRIBUTES && player.isOnline()) {
             e.getDrops().clear();
             e.setDroppedExp(0);
         }
-
+        
         DeathType deathType = switch (lastDamageCause.getCause()) {
             case CONTACT -> DeathType.CACTUS;
             case SUFFOCATION -> DeathType.SUFFOCATION;
@@ -661,9 +653,9 @@ public class PlayerListener implements Listener {
             case CUSTOM -> DeathType.UNKNOWN;
             default -> null;
         };
-
+        
         KillerInfo killerInfo = null;
-
+        
         if (deathType == null) {
             if (player.getKiller() != null) {
                 Player killer = player.getKiller();
@@ -687,14 +679,14 @@ public class PlayerListener implements Listener {
                 }
             }
         }
-
+        
         if (killerInfo == null) {
             CombatTag combatTag = gamePlayer.getCombatTag();
             if (combatTag.isInCombat()) {
                 killerInfo = KillerInfo.createPlayerKiller(game.getPlayer(combatTag.getOther()));
             }
         }
-
+        
         DeathInfo deathInfo = new DeathInfo(game, System.currentTimeMillis(), gamePlayer, deathType, deathLocation, killerInfo);
         
         new BukkitRunnable() {
@@ -711,7 +703,7 @@ public class PlayerListener implements Listener {
             }
         }.runTaskLater(plugin, 2L);
     }
-
+    
     @EventHandler
     public void onConsume(PlayerItemConsumeEvent e) {
         if (e.getItem().getType() == Material.ROTTEN_FLESH) {
@@ -721,13 +713,13 @@ public class PlayerListener implements Listener {
             }
         }
     }
-
+    
     @EventHandler
     public void onNexusPlayerLoad(NexusPlayerLoadEvent e) {
         NexusPlayer nexusPlayer = e.getNexusPlayer();
-
+        
         SGPlayer sgPlayer = new SGPlayer(nexusPlayer);
-
+        
         SGPlayerStats stats;
         try {
             stats = NexusReborn.getPrimaryDatabase().get(SGPlayerStats.class, "uniqueid", e.getNexusPlayer().getUniqueId()).getFirst();
@@ -746,21 +738,21 @@ public class PlayerListener implements Listener {
         } catch (Throwable ex) {
             fakeStats = null;
         }
-
+        
         sgPlayer.setStats(stats);
         sgPlayer.setNickSGPlayerStats(fakeStats);
-
+        
         plugin.getPlayerRegistry().register(sgPlayer);
         e.setJoinMessage(null);
     }
-
+    
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerQuit(PlayerQuitEvent e) {
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(e.getPlayer().getUniqueId());
         if (sgPlayer == null) {
             return;
         }
-
+        
         NexusPlayer nexusPlayer = sgPlayer.getNexusPlayer();
         if (nexusPlayer != null) {
             return;
@@ -768,11 +760,11 @@ public class PlayerListener implements Listener {
         if (sgPlayer.getGame() != null) {
             sgPlayer.getGame().quit(nexusPlayer);
         }
-
+        
         if (sgPlayer.getLobby() != null) {
             sgPlayer.getLobby().removePlayer(nexusPlayer);
         }
-
+        
         e.setQuitMessage(null);
         NexusReborn.getPrimaryDatabase().saveSilent(sgPlayer.getStats());
         NexusReborn.getPrimaryDatabase().saveSilent(sgPlayer.getTrueStats());
@@ -790,7 +782,7 @@ public class PlayerListener implements Listener {
         double toX = toBlock.getX();
         double toZ = toBlock.getZ();
         
-        if ((fromBlock.getType() == Material.WATER || fromBlock.getType() == Material.STATIONARY_WATER) && 
+        if ((fromBlock.getType() == Material.WATER || fromBlock.getType() == Material.STATIONARY_WATER) &&
                 toBlock.getType() == Material.WATER || toBlock.getType() == Material.STATIONARY_WATER) {
             
             if (fromX == toX && fromZ == toZ) {
@@ -805,7 +797,7 @@ public class PlayerListener implements Listener {
             if (sgPlayer.getGame() == null) {
                 return;
             }
-
+            
             GamePlayer gamePlayer = sgPlayer.getGamePlayer();
             if (gamePlayer == null) {
                 return;
