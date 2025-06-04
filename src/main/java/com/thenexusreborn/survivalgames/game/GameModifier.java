@@ -22,8 +22,8 @@ public enum GameModifier {
     SPONSORS(List.of("Allows you to sponsor another player", "The possible things are either good or bad"), 
             settings -> settings.setAllowSponsoring(true), settings -> settings.setAllowSponsoring(false), GameSettings::isAllowSponsoring), 
     DEATHMATCH(List.of("Teleports all tributes to", "the center with a smaller border"), 
-            settings -> settings.setAllowDeathmatch(true), settings -> settings.setAllowDeathmatch(false), GameSettings::isAllowDeathmatch)
-    
+            settings -> settings.setAllowDeathmatch(true), settings -> settings.setAllowDeathmatch(false), GameSettings::isAllowDeathmatch), 
+    MUTATION_MAYHEM(),
     
     ;
     

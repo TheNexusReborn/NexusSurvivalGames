@@ -63,14 +63,14 @@ public class SurvivalGames extends NexusSpigotPlugin {
     private NexusCore nexusCore;
     private StarChat starChat;
     private NexusHubHook nexusHubHook;
-
+    
     private MapManager mapManager;
-
+    
     private final Map<UUID, PlayerMutations> playerUnlockedMutations = new HashMap<>();
     private final Set<IMutationType> disabledMutations = new HashSet<>();
-
+    
     private UUIDRegistry<SGPlayer> playerRegistry = new UUIDRegistry<>(null, null, SGPlayer::getUniqueId, null, null);
-
+    
     private File deathMessagesFile;
     private FileConfiguration deathMessagesConfig;
     
@@ -110,14 +110,15 @@ public class SurvivalGames extends NexusSpigotPlugin {
         for (Field field : fields) {
             try {
                 COLORS.add((Color) field.get(null));
-            } catch (IllegalAccessException e) {}
+            } catch (IllegalAccessException e) {
+            }
         }
     }
     
     public static SurvivalGames getInstance() {
         return INSTANCE;
     }
-
+    
     @Override
     public void onLoad() {
         Plugin nexusCorePlugin = Bukkit.getPluginManager().getPlugin("NexusCore");
@@ -131,7 +132,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         nexusCore.addNexusPlugin(this);
         getLogger().info("Loaded NexusCore");
     }
-
+    
     @Override
     public void onEnable() {
         INSTANCE = this;
@@ -175,13 +176,13 @@ public class SurvivalGames extends NexusSpigotPlugin {
             pluginManager.disablePlugin(this);
             return;
         }
-
+        
         if (pluginManager.getPlugin("ProtocolLib") == null) {
             getLogger().severe("ProtocolLib not found, disabling SurvivalGames.");
             pluginManager.disablePlugin(this);
             return;
         }
-
+        
         if (pluginManager.getPlugin("NexusMaps") == null) {
             getLogger().severe("NexusMaps not found, disabling SurvivalGames.");
             pluginManager.disablePlugin(this);
@@ -189,7 +190,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         }
         
         this.clockManager = getServer().getServicesManager().getRegistration(ClockManager.class).getProvider();
-
+        
         this.starChat = (StarChat) getServer().getPluginManager().getPlugin("StarChat");
         
         this.starChat.addSelector(new ChatSelector("game") {
@@ -203,71 +204,71 @@ public class SurvivalGames extends NexusSpigotPlugin {
                 if (sgPlayer == null) {
                     return null;
                 }
-
+                
                 Game game = sgPlayer.getGame();
                 if (game == null) {
                     return null;
                 }
-
+                
                 ChatRoom chatroom = game.getChatRooms().get(sgPlayer.getGamePlayer().getTeam());
                 return new ChatSelection(chatroom, "game");
             }
         });
-
+        
         this.starChat.addSelector(new ChatSelector("lobby") {
             @Override
             public ChatSelection getSelection(Player player, String[] args) {
                 if (!getInstanceServer().getPlayers().contains(player.getUniqueId())) {
                     return null;
                 }
-
+                
                 SGPlayer sgPlayer = playerRegistry.get(player.getUniqueId());
                 if (sgPlayer == null) {
                     return null;
                 }
-
+                
                 Lobby lobby = sgPlayer.getLobby();
                 if (lobby == null) {
                     return null;
                 }
-
+                
                 ChatRoom chatroom = lobby.getLobbyChatRoom();
                 return new ChatSelection(chatroom, "lobby");
             }
         });
         
         getLogger().info("Hooked into StarChat");
-
+        
         new SGPAPIExpansion(this).register();
         getLogger().info("Hooked into PlaceholderAPI");
-
+        
         Plugin nexusHubPlugin = getServer().getPluginManager().getPlugin("NexusHub");
         if (nexusHubPlugin != null) {
             this.nexusHubHook = new NexusHubHook(this, nexusHubPlugin);
             getServer().getPluginManager().registerEvents(this.nexusHubHook, this);
             getLogger().info("Applied Hooks and Usages for NexusHub.");
         }
-
+        
         deathMessagesFile = new File(getDataFolder(), "deathmessages.yml");
-
+        
         if (!deathMessagesFile.exists()) {
             saveResource("deathmessages.yml", false);
         }
-
+        
         deathMessagesConfig = YamlConfiguration.loadConfiguration(deathMessagesFile);
-
+        
         String mapSource = getConfig().getString("map-source");
         if (mapSource == null || mapSource.equalsIgnoreCase("sql")) {
             mapManager = new SQLMapManager(this);
         } else if (mapSource != null && mapSource.equalsIgnoreCase("yml")) {
             mapManager = new YamlMapManager(this);
         }
-
+        
         mapManager.loadMaps();
         getCommand("sgmap").setExecutor(new SGMapCommand(this, mapManager));
-
+        
         getLogger().info("Loaded " + mapManager.getMaps().size() + " Maps");
-
+        
         for (SGMap sgMap : mapManager.getMaps()) {
             Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
                 getLogger().info("Downloading map " + sgMap.getName());
@@ -278,7 +279,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
                 }
             });
         }
-
+        
         getLogger().info("Loading all unlocked mutations");
         SQLDatabase database = NexusReborn.getPrimaryDatabase();
         try {
@@ -299,7 +300,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         
         this.lootManager = new LootManager(this);
         this.lootManager.loadData();
-
+        
         new VoteStartCommand(this);
         new StatsCommand(this);
         new SGAdminCmd(this);
@@ -313,12 +314,14 @@ public class SurvivalGames extends NexusSpigotPlugin {
         new GraceperiodCmd(this);
         new ProbabilityCmd(this);
         
+        new MutationMayhemCmd(this);
+        
         new GameTeamCmd(this, GameTeam.TRIBUTES);
         new GameTeamCmd(this, GameTeam.SPECTATORS);
         new GameTeamCmd(this, GameTeam.MUTATIONS);
-
+        
         getLogger().info("Registered commands");
-
+        
         new GameStateThread(this).start();
         new TimerCountdownCheckThread(this).start();
         new GameWorldThread(this).start();
@@ -336,14 +339,14 @@ public class SurvivalGames extends NexusSpigotPlugin {
         new PlayerScoreboardThread(this).start();
         new WarmupSpawnThread(this).start();
         new GameBoundsThread(this).start();
-
+        
         getLogger().info("Registered Tasks");
-
+        
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         getServer().getPluginManager().registerEvents(new EntityListener(this), this);
         getServer().getPluginManager().registerEvents(new BlockListener(this), this);
         getServer().getPluginManager().registerEvents(new ServerListener(this), this);
-
+        
         getLogger().info("Registered Listeners");
 
 //        nexusCore.setMotdSupplier(() -> {
@@ -397,15 +400,15 @@ public class SurvivalGames extends NexusSpigotPlugin {
         registry.register("spectatorchat", Rank.HELPER, "View Spectator Chat", "Allows you to see the spectator chat", false);
         registry.register("allowsponsors", Rank.MEMBER, "Allow Sponsors", "Allow other players to sponsor you", true);
     }
-
+    
     public int getGamesPlayed() {
         return gamesPlayed;
     }
-
+    
     public void incrementGamesPlayed() {
         this.gamesPlayed++;
     }
-
+    
     @Override
     public void onDisable() {
         for (SGVirtualServer server : this.servers) {
@@ -436,22 +439,22 @@ public class SurvivalGames extends NexusSpigotPlugin {
             
             getConfig().set("disabledmutations", rawDisabledMutations);
         }
-
+        
         saveConfig();
     }
-
+    
     public MapManager getMapManager() {
         return mapManager;
     }
-
+    
     public NexusCore getNexusCore() {
         return nexusCore;
     }
-
+    
     public LootManager getLootManager() {
         return lootManager;
     }
-
+    
     @Override
     public void registerDatabases(DatabaseRegistry registry) {
         for (SQLDatabase database : registry.getObjects().values()) {
@@ -465,47 +468,47 @@ public class SurvivalGames extends NexusSpigotPlugin {
             }
         }
     }
-
+    
     public PlayerMutations getUnlockedMutations(UUID uniqueId) {
         PlayerMutations playerMutations = this.playerUnlockedMutations.get(uniqueId);
         if (playerMutations == null) {
             playerMutations = new PlayerMutations(uniqueId);
             this.playerUnlockedMutations.put(uniqueId, playerMutations);
         }
-
+        
         return playerMutations;
     }
-
+    
     public FileConfiguration getDeathMessagesConfig() {
         return deathMessagesConfig;
     }
-
+    
     public StarChat getStarChat() {
         return starChat;
     }
-
+    
     public void setMapManager(MapManager mapManager) {
         this.mapManager = mapManager;
         getCommand("sgmap").setExecutor(new SGMapCommand(this, mapManager));
         this.mapManager.loadMaps();
     }
-
+    
     public NexusHubHook getNexusHubHook() {
         return nexusHubHook;
     }
-
+    
     public UUIDRegistry<SGPlayer> getPlayerRegistry() {
         return playerRegistry;
     }
-
+    
     public IntegerRegistry<SGVirtualServer> getServers() {
         return servers;
     }
-
+    
     public ClockManager getClockManager() {
         return clockManager;
     }
-
+    
     public InstanceServer getInstanceServer() {
         if (this.instanceServer == null) {
             this.instanceServer = ((NexusCore) Bukkit.getPluginManager().getPlugin("NexusCore")).getNexusServer();
