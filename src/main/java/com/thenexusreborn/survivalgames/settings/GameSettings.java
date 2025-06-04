@@ -58,6 +58,7 @@ public class GameSettings implements Cloneable, ISettings {
     protected boolean mutationsEnabled = true;
     protected boolean allowRecursiveMutations;
     protected long chickenEggLaunchCooldown = 100;
+    protected boolean allowRoddingMutations = true;
     
     //Player
     protected boolean earnNexites;
@@ -115,6 +116,10 @@ public class GameSettings implements Cloneable, ISettings {
     protected boolean allowDeathmatch = true;
     protected boolean deathmatchPlayerCount = true;
     protected boolean automaticDeathmatchThreshold = true;
+    
+    public boolean isAllowRoddingMutations() {
+        return allowRoddingMutations;
+    }
     
     public String getDeathmatchTier() {
         return deathmatchTier;

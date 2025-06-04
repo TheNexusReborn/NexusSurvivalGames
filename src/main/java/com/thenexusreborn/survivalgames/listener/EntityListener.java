@@ -11,8 +11,7 @@ import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.mutations.*;
 import com.thenexusreborn.survivalgames.mutations.impl.ChickenMutation;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -277,6 +276,15 @@ public class EntityListener implements Listener {
                         target.setLastDamageCause(new EntityDamageByEntityEvent(Bukkit.getPlayer(targetPlayer.getUniqueId()), e.getEntity(), DamageCause.ENTITY_ATTACK,  2.5));
                     } else {
                         e.setCancelled(true);
+                    }
+                }
+            } else if (e.getDamager() instanceof FishHook) {
+                if (!game.getSettings().isAllowRoddingMutations()) {
+                    if (targetPlayer.getTeam() == GameTeam.MUTATIONS) {
+                        Material blockType = damagerPlayer.getLocation().getBlock().getType();
+                        if (blockType == Material.WATER || blockType == Material.STATIONARY_WATER) {
+                            e.setCancelled(true);
+                        }
                     }
                 }
             }
