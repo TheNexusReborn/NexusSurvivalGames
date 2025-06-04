@@ -5,7 +5,7 @@ import com.stardevllc.helper.StringHelper;
 public enum MutationModifier {
     NO_HEALTH_REGEN, 
     ALLERGIC_TO_WATER, 
-    FIFTY_PERCENT_INCREASED_DAMAGE("+50% Incoming Damage");
+    FIFTY_PERCENT_INCREASED_DAMAGE("+50% Incoming Melee Damage");
     
     private final String displayName;
     

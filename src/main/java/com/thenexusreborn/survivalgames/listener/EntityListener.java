@@ -353,7 +353,9 @@ public class EntityListener implements Listener {
                 damagerPlayer.sendMessage("&4&l>> &cYou can only damage mutations that are after you.");
             } else {
                 if (mutation.getType().getModifiers().contains(MutationModifier.FIFTY_PERCENT_INCREASED_DAMAGE)) {
-                    e.setDamage(e.getDamage() * 1.5);
+                    if (e.getCause() == DamageCause.ENTITY_ATTACK) {
+                        e.setDamage(e.getDamage() * 1.5);
+                    }
                 }
             }
         }
