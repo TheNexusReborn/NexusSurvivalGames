@@ -44,7 +44,7 @@ public enum StandardMutations implements IMutationType {
             3000, //Unlock cost
             20, //Health
             List.of(), //Damage Immunities
-            List.of(), //Potion Effects
+            List.of(new MutationEffect(PotionEffectType.SLOW, 0)), //Potion Effects
             List.of(), //Additional Items
             List.of() //Modifiers
     ),
