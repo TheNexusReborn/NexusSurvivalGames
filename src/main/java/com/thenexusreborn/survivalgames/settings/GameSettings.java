@@ -59,6 +59,7 @@ public class GameSettings implements Cloneable, ISettings {
     protected boolean allowRecursiveMutations;
     protected long chickenEggLaunchCooldown = 100;
     protected boolean allowRoddingMutations;
+    protected int chickenMaxAmmo = -1; //Infinite
     
     //Player
     protected boolean earnNexites;
@@ -116,6 +117,14 @@ public class GameSettings implements Cloneable, ISettings {
     protected boolean allowDeathmatch = true;
     protected boolean deathmatchPlayerCount = true;
     protected boolean automaticDeathmatchThreshold = true;
+    
+    public int getChickenMaxAmmo() {
+        return chickenMaxAmmo;
+    }
+    
+    public void setChickenMaxAmmo(int chickenMaxAmmo) {
+        this.chickenMaxAmmo = chickenMaxAmmo;
+    }
     
     public boolean isAllowRoddingMutations() {
         return allowRoddingMutations;

@@ -48,7 +48,9 @@ public class ChickenMutationThread extends StarThread<SurvivalGames> {
         
             if (gamePlayer.getMutation() instanceof ChickenMutation chickenMutation) {
                 if (this.eggGain == 0) {
-                    chickenMutation.incrementAmmunition();
+                    if (game.getSettings().getChickenMaxAmmo() > 1 && chickenMutation.getAmmunition() >= game.getSettings().getChickenMaxAmmo()) {
+                        chickenMutation.incrementAmmunition();
+                    }
                 }
                 
                 ItemStack hand = sgPlayer.getItemInHand();
