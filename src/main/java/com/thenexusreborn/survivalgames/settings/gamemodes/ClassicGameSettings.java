@@ -60,6 +60,7 @@ public class ClassicGameSettings extends GameSettings {
         mutationsEnabled = true;
         allowRecursiveMutations = false;
         allowRoddingMutations = false;
+        chickenMaxAmmo = -1;
         
         //Player
         earnNexites = false;
