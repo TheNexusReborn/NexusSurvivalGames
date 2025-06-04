@@ -87,7 +87,7 @@ public enum StandardMutations implements IMutationType {
             ChickenMutation.class, //class 
             DisguiseType.CHICKEN, //Disguise Type
             XMaterial.FEATHER, //Icon
-            ArmorSet.LEATHER, //Armor
+            ArmorSet.GOLD, //Armor
             ItemBuilder.of(XMaterial.WOODEN_SWORD).displayName("&bEgg Launcher").addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS).addEnchant(Enchantment.ARROW_DAMAGE, 1).build(), //Weapon 
             5000, //Unlock cost
             4, //Health
