@@ -7,6 +7,7 @@ import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.Game.State;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.sponsoring.SponsorCategory;
 import com.thenexusreborn.survivalgames.sponsoring.SponsorManager;
@@ -45,6 +46,11 @@ public class SponsorMenu extends InventoryGUI {
             iconBuilder.setLore(lore);
             
             Button button = new Button().iconCreator(p -> iconBuilder.build()).consumer(e -> {
+                if (!(game.getState() == State.INGAME || game.getState() == State.INGAME_DEATHMATCH)) {
+                    actor.sendMessage(MsgType.WARN.format("You can only sponsor players in the game."));
+                    return;
+                }
+                
                 String currency;
                 int cost;
                 
