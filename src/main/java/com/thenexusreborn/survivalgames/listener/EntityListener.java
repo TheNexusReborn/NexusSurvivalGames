@@ -283,7 +283,9 @@ public class EntityListener implements Listener {
                 if (!game.getSettings().isAllowRoddingMutations()) {
                     if (targetPlayer.getTeam() == GameTeam.MUTATIONS) {
                         Material blockType = damagerPlayer.getLocation().getBlock().getType();
-                        e.setCancelled(true);
+                        if (blockType == Material.WATER || blockType == Material.STATIONARY_WATER) {
+                            e.setCancelled(true);
+                        }
                     }
                 }
             }
