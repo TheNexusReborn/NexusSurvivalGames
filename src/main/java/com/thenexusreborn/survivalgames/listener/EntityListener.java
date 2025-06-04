@@ -269,11 +269,12 @@ public class EntityListener implements Listener {
                         for (DamageModifier damageModifier : DamageModifier.values()) {
                             try {
                                 e.setDamage(damageModifier, 0);
-                            } catch (Exception ex) {} 
+                            } catch (Exception ex) {
+                            }
                         }
                         
                         e.setDamage(DamageModifier.BASE, 2.5);
-                        target.setLastDamageCause(new EntityDamageByEntityEvent(Bukkit.getPlayer(targetPlayer.getUniqueId()), e.getEntity(), DamageCause.ENTITY_ATTACK,  2.5));
+                        target.setLastDamageCause(new EntityDamageByEntityEvent(Bukkit.getPlayer(targetPlayer.getUniqueId()), e.getEntity(), DamageCause.ENTITY_ATTACK, 2.5));
                     } else {
                         e.setCancelled(true);
                     }
@@ -282,9 +283,7 @@ public class EntityListener implements Listener {
                 if (!game.getSettings().isAllowRoddingMutations()) {
                     if (targetPlayer.getTeam() == GameTeam.MUTATIONS) {
                         Material blockType = damagerPlayer.getLocation().getBlock().getType();
-                        if (blockType == Material.WATER || blockType == Material.STATIONARY_WATER) {
-                            e.setCancelled(true);
-                        }
+                        e.setCancelled(true);
                     }
                 }
             }

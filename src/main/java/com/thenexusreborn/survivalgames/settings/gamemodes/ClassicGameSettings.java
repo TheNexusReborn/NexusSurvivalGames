@@ -59,6 +59,7 @@ public class ClassicGameSettings extends GameSettings {
         maxMutationAmount = 1;
         mutationsEnabled = true;
         allowRecursiveMutations = false;
+        allowRoddingMutations = false;
         
         //Player
         earnNexites = false;

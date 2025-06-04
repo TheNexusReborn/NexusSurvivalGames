@@ -58,7 +58,7 @@ public class GameSettings implements Cloneable, ISettings {
     protected boolean mutationsEnabled = true;
     protected boolean allowRecursiveMutations;
     protected long chickenEggLaunchCooldown = 100;
-    protected boolean allowRoddingMutations = true;
+    protected boolean allowRoddingMutations;
     
     //Player
     protected boolean earnNexites;
