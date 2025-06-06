@@ -57,7 +57,7 @@ public class GameSettings implements Cloneable, ISettings {
     protected int maxMutationAmount = 1;
     protected boolean mutationsEnabled = true;
     protected boolean allowRecursiveMutations;
-    protected long chickenEggLaunchCooldown = 100;
+    protected long chickenEggLaunchCooldown = 200;
     protected boolean allowRoddingMutations;
     protected int chickenMaxAmmo = -1; //Infinite
     
