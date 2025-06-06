@@ -688,20 +688,7 @@ public class PlayerListener implements Listener {
         }
         
         DeathInfo deathInfo = new DeathInfo(game, System.currentTimeMillis(), gamePlayer, deathType, deathLocation, killerInfo);
-        
-        new BukkitRunnable() {
-            public void run() {
-                player.spigot().respawn();
-                if (e.getEntity().getLastDamageCause().getCause() == DamageCause.VOID) {
-                    player.teleport(game.getGameMap().getSpawnCenter().toLocation(game.getGameMap().getWorld()));
-                } else {
-                    player.teleport(deathLocation);
-                }
-                
-                gamePlayer.setPosition(player.getLocation());
-                game.killPlayer(gamePlayer, deathInfo);
-            }
-        }.runTaskLater(plugin, 2L);
+        game.killPlayer(gamePlayer, deathInfo);
     }
     
     @EventHandler

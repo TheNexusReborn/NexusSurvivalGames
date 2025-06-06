@@ -1350,6 +1350,14 @@ public class Game implements Controllable, IHasState {
             logDebug("  Applied SPECTATORS PlayerState");
             gamePlayer.giveSpectatorItems(this);
             logDebug("  Gave Spectator Items");
+            player.spigot().respawn();
+            if (deathInfo.getType() == DeathType.VOID) {
+                player.teleport(getGameMap().getSpawnCenter().toLocation(getGameMap().getWorld()));
+            } else {
+                player.teleport(deathInfo.getDeathLocation());
+            }
+            
+            gamePlayer.setPosition(player.getLocation());
             
             boolean deathByVanish = deathInfo.getType() == DeathType.VANISH;
             logDebug("  Death By Vanish: " + deathByVanish);
