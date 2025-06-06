@@ -97,6 +97,9 @@ public class DeathInfo {
             playerName = teamColor;
         } else {
             playerName = gamePlayer.getEffectiveRank().getColor();
+            if (gamePlayer.getEffectiveRank().isNameBold()) {
+                playerName += "&l";
+            }
         }
         
         playerName += gamePlayer.getName() + "&7";
