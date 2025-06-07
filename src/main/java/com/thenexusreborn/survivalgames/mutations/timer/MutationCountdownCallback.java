@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames.mutations.timer;
 
+import com.stardevllc.clock.callback.CallbackPeriod;
 import com.stardevllc.clock.callback.ClockCallback;
 import com.stardevllc.clock.snapshot.TimerSnapshot;
 import com.stardevllc.starcore.api.StarColors;
@@ -46,7 +47,7 @@ public class MutationCountdownCallback implements ClockCallback<TimerSnapshot> {
     }
 
     @Override
-    public long getPeriod() {
-        return 1000L;
+    public CallbackPeriod getPeriod() {
+        return () -> 1000L;
     }
 }

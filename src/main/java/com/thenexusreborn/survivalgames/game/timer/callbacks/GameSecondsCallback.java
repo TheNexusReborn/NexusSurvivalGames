@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames.game.timer.callbacks;
 
+import com.stardevllc.clock.callback.CallbackPeriod;
 import com.stardevllc.clock.callback.ClockCallback;
 import com.stardevllc.clock.snapshot.TimerSnapshot;
 import com.stardevllc.time.TimeUnit;
@@ -55,7 +56,7 @@ public class GameSecondsCallback implements ClockCallback<TimerSnapshot> {
     }
 
     @Override
-    public long getPeriod() {
-        return 1000L;
+    public CallbackPeriod getPeriod() {
+        return () -> 1000L;
     }
 }
