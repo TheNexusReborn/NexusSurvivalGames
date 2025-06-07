@@ -1,7 +1,10 @@
 package com.thenexusreborn.survivalgames.game;
 
 import com.sk89q.worldedit.regions.CuboidRegion;
+import com.stardevllc.clock.callback.CallbackPeriod;
+import com.stardevllc.clock.callback.ClockCallback;
 import com.stardevllc.clock.clocks.Timer;
+import com.stardevllc.clock.snapshot.TimerSnapshot;
 import com.stardevllc.converter.string.EnumStringConverter;
 import com.stardevllc.converter.string.StringConverters;
 import com.stardevllc.helper.StringHelper;
@@ -772,7 +775,7 @@ public class Game implements Controllable, IHasState {
     
     public void startGame() {
         setSubState(SubState.TIMER_INIT);
-        this.timer = plugin.getClockManager().createTimer(TimeUnit.MINUTES.toMillis(settings.getGameLength()) + 50);
+        this.timer = plugin.getClockManager().createTimer(TimeUnit.MINUTES.toMillis(settings.getGameLength())/* + 50*/);
         
         if (settings.isLightning()) {
             for (MapSpawn mapSpawn : gameMap.getSpawns()) {
@@ -832,23 +835,39 @@ public class Game implements Controllable, IHasState {
         }, TimeUnit.SECONDS, 90);
         
         setSubState(SubState.CALCULATE_RESTOCK);
-        long restockLength;
-        if (settings.isChestRestockRelative()) {
-            restockLength = settings.getGameLength() / settings.getChestRestockDenomination();
-        } else {
-            restockLength = settings.getChestRestockInterval();
-        }
-        this.totalTimedRestocks = (int) (settings.getGameLength() / restockLength - 1);
-        this.restockCallbackId = this.timer.addRepeatingCallback(timerSnapshot -> {
-            if (timerSnapshot.getTime() == timerSnapshot.getLength()) {
-                return;
+        
+        CallbackPeriod restockPeriod = ()  -> {
+            if (settings.isChestRestockRelative()) {
+                return timer.getLength() / settings.getChestRestockDenomination();
+            } else {
+                return settings.getChestRestockInterval() * TimeUnit.MINUTES.toMillis(1);
             }
-            timedRestockCount++;
-            restockChests();
-            getSettings().setCornucopiaTier("tierThree");
-            getSettings().setRegularTier("tierTwo");
-            sendMessage("&6&l>> &a&lALL CHESTS HAVE BEEN RESTOCKED");
-        }, TimeUnit.MINUTES, restockLength);
+        };
+        
+        this.totalTimedRestocks = (int) (timer.getLength() / restockPeriod.get() - 1);
+        this.restockCallbackId = this.timer.addRepeatingCallback(new ClockCallback<>() {
+            @Override
+            public void callback(TimerSnapshot timerSnapshot) {
+                if (timerSnapshot.getTime() == timerSnapshot.getLength()) {
+                    return;
+                }
+                timedRestockCount++;
+                Game.this.restockChests();
+                Game.this.getSettings().setCornucopiaTier("tierThree");
+                Game.this.getSettings().setRegularTier("tierTwo");
+                Game.this.sendMessage("&6&l>> &a&lALL CHESTS HAVE BEEN RESTOCKED");
+            }
+            
+            @Override
+            public CallbackPeriod getPeriod() {
+                return restockPeriod;
+            }
+            
+            @Override
+            public String getName() {
+                return "Restock Callback";
+            }
+        });
         
         this.timer.setEndCondition(new InGameEndCondition(this));
         this.timer.start();
@@ -1952,7 +1971,7 @@ public class Game implements Controllable, IHasState {
             return 0;
         }
         
-        return timer.getTime() - nextRun;
+        return nextRun;
     }
     
     public int getTimedRestockCount() {
