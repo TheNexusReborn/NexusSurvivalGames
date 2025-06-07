@@ -1312,6 +1312,16 @@ public class Game implements Controllable, IHasState {
             gamePlayer.addDeathInfo(deathInfo);
             gamePlayer.setTeam(GameTeam.SPECTATORS);
             Player player = Bukkit.getPlayer(gamePlayer.getUniqueId());
+            
+            player.spigot().respawn();
+            if (deathInfo.getType() == DeathType.VOID) {
+                player.teleport(getGameMap().getSpawnCenter().toLocation(getGameMap().getWorld()));
+            } else {
+                player.teleport(deathInfo.getDeathLocation());
+            }
+            
+            gamePlayer.setPosition(player.getLocation());
+            
             String strippedDeathMessage = ChatColor.stripColor(deathInfo.getDeathMessage());
             strippedDeathMessage = strippedDeathMessage.substring(3, strippedDeathMessage.length() - 1);
             GameAction deathAction = new GameAction(deathInfo.getTime(), "death");
@@ -1350,14 +1360,6 @@ public class Game implements Controllable, IHasState {
             logDebug("  Applied SPECTATORS PlayerState");
             gamePlayer.giveSpectatorItems(this);
             logDebug("  Gave Spectator Items");
-            player.spigot().respawn();
-            if (deathInfo.getType() == DeathType.VOID) {
-                player.teleport(getGameMap().getSpawnCenter().toLocation(getGameMap().getWorld()));
-            } else {
-                player.teleport(deathInfo.getDeathLocation());
-            }
-            
-            gamePlayer.setPosition(player.getLocation());
             
             boolean deathByVanish = deathInfo.getType() == DeathType.VANISH;
             logDebug("  Death By Vanish: " + deathByVanish);
