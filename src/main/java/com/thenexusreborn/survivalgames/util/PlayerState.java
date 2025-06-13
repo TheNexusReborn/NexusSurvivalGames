@@ -305,7 +305,9 @@ public class PlayerState {
         }
         
         if (this.disguises != null && !this.disguises.apply(sgPlayer)) {
-            DisguiseAPI.undisguiseToAll(Bukkit.getPlayer(sgPlayer.getUniqueId()));
+            if (DisguiseAPI.isDisguised(player)) {
+                DisguiseAPI.undisguiseToAll(player);
+            }
         }
     }
     
