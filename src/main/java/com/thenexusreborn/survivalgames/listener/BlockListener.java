@@ -27,6 +27,13 @@ public class BlockListener implements Listener {
     public BlockListener(SurvivalGames plugin) {
         this.plugin = plugin;
     }
+    
+    @EventHandler
+    public void onBlockPhysics(BlockPhysicsEvent e) {
+        if (e.getBlock().getType() == Material.LADDER) {
+            e.setCancelled(true);
+        }
+    }
 
     @EventHandler
     public void onBlockExplode(BlockExplodeEvent e) {
