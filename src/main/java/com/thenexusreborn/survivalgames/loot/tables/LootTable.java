@@ -57,7 +57,7 @@ public class LootTable {
             return;
         }
 
-        int targetLength = this.items.length + (weight * items.length);
+        int targetLength = this.items.length + weight * items.length;
         if (this.items.length < targetLength) {
             LootItem[] newItems = new LootItem[targetLength];
             System.arraycopy(this.items, 0, newItems, 0, this.items.length);
@@ -90,18 +90,20 @@ public class LootTable {
                     continue;
                 }
                 loot.add(lootitem.getItemStack());
-                categoryCounts.put(lootitem.getCategory(), categoryCounts.getOrDefault(lootitem.getCategory(), 0) + 1);
-                chances.removeIf(l -> {
-                    if (l.getCategory().getMaxAmountPerChest() > 0) {
-                        if (categoryCounts.containsKey(l.getCategory())) {
-                            if (categoryCounts.get(l.getCategory()) >= l.getCategory().getMaxAmountPerChest()) {
-                                return true;
+                for (LootCategory category : lootitem.getCategories()) {
+                    categoryCounts.put(category, categoryCounts.getOrDefault(category, 0) + 1);
+                    chances.removeIf(l -> {
+                        if (category.getMaxAmountPerChest() > 0) {
+                            if (categoryCounts.containsKey(category)) {
+                                if (categoryCounts.get(category) >= category.getMaxAmountPerChest()) {
+                                    return true;
+                                }
                             }
                         }
-                    }
-                    
-                    return l.getName().equals(lootitem.getName());
-                });
+                        
+                        return l.getName().equals(lootitem.getName());
+                    });
+                }
             } catch (Throwable t) {
                 t.printStackTrace();
             }

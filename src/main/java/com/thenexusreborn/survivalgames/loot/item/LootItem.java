@@ -11,38 +11,29 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.*;
 
 public class LootItem {
-    protected final LootCategory category;
+    protected final String id;
+    protected Set<LootCategory> categories = EnumSet.noneOf(LootCategory.class);
     protected final Material material;
     protected final String name;
-    protected final List<String> lore = new LinkedList<>();
-    protected final int amount;
+    protected List<String> lore = new LinkedList<>();
+    protected int amount;
     
-    public LootItem(LootCategory category, Material material, String name, int amount, List<String> lore) {
-        this.category = category;
-        this.material = material;
+    public LootItem(Material material) {
+        this(MaterialNames.getDefaultName(material), material);
+    }
+    
+    public LootItem(String name, Material material) {
+        this(StarColors.stripColor(name.toLowerCase().replace(" ", "_")), name, material);
+    }
+    
+    public LootItem(String id, String name, Material material) {
+        this.id = id;
         this.name = name;
-        this.lore.addAll(lore);
-        this.amount = amount;
+        this.material = material;
     }
     
-    public LootItem(LootCategory category, Material material, String name, int amount) {
-        this(category, material, name, amount, new ArrayList<>());
-    }
-    
-    public LootItem(LootCategory category, Material material, int amount) {
-        this(category, material, MaterialNames.getDefaultName(material), amount);
-    }
-    
-    public LootItem(LootCategory category, Material material, String name, List<String> lore) {
-        this(category, material, name, 1, lore);
-    }
-    
-    public LootItem(LootCategory category, Material material, String name) {
-        this(category, material, name, new ArrayList<>());
-    }
-    
-    public LootItem(LootCategory category, Material material) {
-        this(category, material, MaterialNames.getDefaultName(material));
+    public String getId() {
+        return id;
     }
     
     public Material getMaterial() {
@@ -55,6 +46,32 @@ public class LootItem {
     
     public List<String> getLore() {
         return new ArrayList<>(lore);
+    }
+    
+    public Set<LootCategory> getCategories() {
+        return categories;
+    }
+    
+    public LootItem setCategories(LootCategory category, LootCategory... categories) {
+        this.categories.clear();
+        this.categories.add(category);
+        if (categories != null) {
+            this.categories.addAll(Set.of(categories));
+        }
+        return this;
+    }
+    
+    public LootItem setLore(String... lore) {
+        this.lore.clear();
+        if (lore != null) {
+            this.lore.addAll(List.of(lore));
+        }
+        return this;
+    }
+    
+    public LootItem setAmount(int amount) {
+        this.amount = amount;
+        return this;
     }
     
     public ItemStack getItemStack() {
@@ -90,14 +107,6 @@ public class LootItem {
         return itemStack;
     }
     
-    public LootItem setAmount(int amount) {
-        return new LootItem(category, material, name, amount, lore);
-    }
-    
-    public LootCategory getCategory() {
-        return category;
-    }
-    
     @Override
     public boolean equals(Object object) {
         if (this == object) {
@@ -109,11 +118,11 @@ public class LootItem {
         }
         
         LootItem lootItem = (LootItem) object;
-        return Objects.equals(name, lootItem.name);
+        return Objects.equals(id, lootItem.id);
     }
     
     @Override
     public int hashCode() {
-        return Objects.hashCode(name);
+        return Objects.hashCode(id);
     }
 }
