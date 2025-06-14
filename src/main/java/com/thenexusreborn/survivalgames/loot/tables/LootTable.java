@@ -12,6 +12,7 @@ public class LootTable {
     protected final String name;
 
     private Map<String, TableItem> registeredItems = new HashMap<>();
+    private Map<LootCategory, Integer> categoryAmountOverrides = new EnumMap<>(LootCategory.class);
 
     public LootTable(String name) {
         this.name = name;
@@ -73,9 +74,10 @@ public class LootTable {
                 
                 chances.removeIf(l -> {
                     for (LootCategory category : l.getCategories()) {
-                        if (category.getMaxAmountPerChest() > 0) {
+                        int categoryMaxAmount = this.categoryAmountOverrides.getOrDefault(category, category.getMaxAmountPerChest());
+                        if (categoryMaxAmount > 0) {
                             if (categoryCounts.containsKey(category)) {
-                                if (categoryCounts.get(category) >= category.getMaxAmountPerChest()) {
+                                if (categoryCounts.get(category) >= categoryMaxAmount) {
                                     return true;
                                 }
                             }
@@ -94,6 +96,10 @@ public class LootTable {
 
     public String getName() {
         return name;
+    }
+    
+    public void addCategoryAmountOverride(LootCategory category, int amount) {
+        this.categoryAmountOverrides.put(category, Math.max(0, amount));
     }
 
     public double getItemWeight(String name) {
