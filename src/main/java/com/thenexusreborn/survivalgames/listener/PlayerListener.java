@@ -515,7 +515,9 @@ public class PlayerListener implements Listener {
         
         LootItem lootItem = Items.REGISTRY.getByMaterial(inv.getResult().getType());
         if (lootItem != null) {
-            inv.setResult(lootItem.getItemStack());
+            if (!lootItem.getId().startsWith("sacrificial")) {
+                inv.setResult(lootItem.getItemStack());
+            }
         }
     }
     
