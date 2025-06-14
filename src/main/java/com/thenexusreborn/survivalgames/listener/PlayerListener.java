@@ -648,6 +648,11 @@ public class PlayerListener implements Listener {
                 if (lastDamageCause.getCause() == DamageCause.ENTITY_ATTACK) {
                     killerInfo = KillerInfo.createPlayerKiller(killerGamePlayer);
                     deathType = DeathType.PLAYER;
+                    if (killerInfo.getHandItem() != null && killerInfo.getHandItem().getItemMeta().getDisplayName() != null) {
+                        if (killerInfo.getHandItem().getItemMeta().getDisplayName().contains("Sacrificial")) {
+                            deathType = DeathType.SACRIFICE;
+                        }
+                    }
                 } else if (lastDamageCause.getCause() == DamageCause.PROJECTILE) {
                     killerInfo = KillerInfo.createPlayerProjectileKiller(killerGamePlayer, player.getLocation().distance(killer.getLocation()));
                     deathType = DeathType.PLAYER_PROJECTILE;

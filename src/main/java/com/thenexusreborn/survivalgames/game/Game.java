@@ -836,7 +836,7 @@ public class Game implements Controllable, IHasState {
         
         setSubState(SubState.CALCULATE_RESTOCK);
         
-        CallbackPeriod restockPeriod = ()  -> {
+        CallbackPeriod restockPeriod = () -> {
             if (settings.isChestRestockRelative()) {
                 return timer.getLength() / settings.getChestRestockDenomination();
             } else {
@@ -1072,7 +1072,7 @@ public class Game implements Controllable, IHasState {
             for (GamePlayer otherPlayer : this.players.values()) {
                 if (!otherPlayer.getToggleValue("vanish")) {
                     gamePlayer.showPlayer(otherPlayer);
-                } 
+                }
             }
             
             gamePlayer.getCombatTag().setOther(null);
@@ -1256,7 +1256,7 @@ public class Game implements Controllable, IHasState {
                 }
                 
                 for (MapSpawn spawn : fireworkSpawns) {
-                    FireworkMeta fireworkMeta = (FireworkMeta) itemMeta; 
+                    FireworkMeta fireworkMeta = (FireworkMeta) itemMeta;
                     Location location = spawn.toBlockLocation(gameMap.getWorld());
                     Firework firework = location.getWorld().spawn(location, Firework.class);
                     firework.setFireworkMeta(fireworkMeta);
@@ -1307,7 +1307,7 @@ public class Game implements Controllable, IHasState {
         if (isDebugMode()) {
             getLogger().info(message);
         }
-    } 
+    }
     
     public void enableDebug() {
         this.debugMode = true;
@@ -1479,6 +1479,11 @@ public class Game implements Controllable, IHasState {
                     }
                     
                     killerPlayer.getStats().addKills(1);
+                    if (settings.isSacrifices()) {
+                        if (deathInfo.getType() == DeathType.SACRIFICE) {
+                            killerPlayer.getStats().addSouls(1);
+                        }
+                    }
                     
                     logDebug("  Updated Killer Stats");
                     
@@ -1604,8 +1609,7 @@ public class Game implements Controllable, IHasState {
                 killerPlayer.sendMessage("&6&l>> &f&lCurrent Streak: &a" + currentStreak + "  &f&lPersonal Best: &a" + personalBest);
                 killerPlayer.sendMessage("&2&l>> &a+" + scoreGain + " Score!" + (claimedScoreBounty ? " &e&lClaimed Bounty" : "") + (claimedFirstBlood ? " &c&lFirst Blood" : ""));
                 if (settings.isGiveXp()) {
-                    String xpMsg = "&2&l>> &a&l+" + xpGain + " &2&lXP&a&l!";
-                    killerPlayer.sendMessage(xpMsg);
+                    killerPlayer.sendMessage("&2&l>> &a&l+" + xpGain + " &2&lXP&a&l!");
                 }
                 
                 if (settings.isGiveCredits()) {
@@ -1618,8 +1622,16 @@ public class Game implements Controllable, IHasState {
                 }
                 
                 if (settings.isEarnNexites()) {
-                    String nexiteMsg = "&2&l>> &a&l" + nexiteGain + " &9&lNEXITES&a&l!";
-                    killerPlayer.sendMessage(nexiteMsg);
+                    killerPlayer.sendMessage("&2&l>> &a&l" + nexiteGain + " &9&lNEXITES&a&l!");
+                }
+                
+                if (settings.isSacrifices()) {
+                    if (deathInfo.getType() == DeathType.SACRIFICE) {
+                        killerPlayer.sendMessage("&2&l>> &a&l+1 &b&lSOUL&a&l!");
+                        if (settings.isLightning()) {
+                            getGameMap().getWorld().strikeLightningEffect(deathInfo.getDeathLocation());
+                        }
+                    }
                 }
             }
             

@@ -34,7 +34,9 @@ public enum DeathType {
     LEAVE(true), 
     VANISH(true),
     SPECTATE, 
-    CACTUS(true), LEAVE_ARENA;
+    CACTUS(true), 
+    LEAVE_ARENA, 
+    SACRIFICE;
     
     static {
         StringConverters.addConverter(DeathType.class, new EnumStringConverter<>(DeathType.class));
@@ -74,11 +76,13 @@ public enum DeathType {
         }
     
         for (DeathType deathType : DeathType.values()) {
-            if (deathType.hasPlayerSubtype()) {
-                config.set(deathType.name() + ".normal", "%playername%");
-                config.set(deathType.name() + ".player", "%playername% %killername%");
-            } else {
-                config.set(deathType.name(), "%playername%");
+            if (!config.contains(deathType.name())) {
+                if (deathType.hasPlayerSubtype()) {
+                    config.set(deathType.name() + ".normal", "%playername%");
+                    config.set(deathType.name() + ".player", "%playername% %killername%");
+                } else {
+                    config.set(deathType.name(), "%playername%");
+                }
             }
         }
     

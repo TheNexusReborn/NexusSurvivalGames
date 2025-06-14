@@ -27,6 +27,7 @@ import com.thenexusreborn.survivalgames.cmd.sgadmin.SGAdminCmd;
 import com.thenexusreborn.survivalgames.disguises.NexusDisguises;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GameTeam;
+import com.thenexusreborn.survivalgames.game.death.DeathType;
 import com.thenexusreborn.survivalgames.hooks.NexusHubHook;
 import com.thenexusreborn.survivalgames.hooks.SGPAPIExpansion;
 import com.thenexusreborn.survivalgames.items.*;
@@ -256,6 +257,8 @@ public class SurvivalGames extends NexusSpigotPlugin {
         }
         
         deathMessagesConfig = YamlConfiguration.loadConfiguration(deathMessagesFile);
+        
+        DeathType.generateDefaultDeathMessages(deathMessagesFile, deathMessagesConfig);
         
         String mapSource = getConfig().getString("map-source");
         if (mapSource == null || mapSource.equalsIgnoreCase("sql")) {

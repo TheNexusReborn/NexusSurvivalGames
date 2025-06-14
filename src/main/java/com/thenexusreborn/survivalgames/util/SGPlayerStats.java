@@ -23,7 +23,7 @@ public class SGPlayerStats {
     @PrimaryKey
     protected UUID uniqueId;
     protected int score = 100, kills, highestKillstreak, games, wins, winStreak, deaths, deathmatchesReached, chestsLooted, assists, mutationKills;
-    protected int mutationDeaths, mutationPasses, sponsoredOthers, sponsorsReceived, timesMutated;
+    protected int mutationDeaths, mutationPasses, sponsoredOthers, sponsorsReceived, timesMutated, souls;
     
     protected SGPlayerStats() {}
     
@@ -38,7 +38,15 @@ public class SGPlayerStats {
             return 0;
         }
     }
-
+    
+    public int getSouls() {
+        return souls;
+    }
+    
+    public void setSouls(int souls) {
+        this.souls = souls;
+    }
+    
     public void setTimesMutated(int timesMutated) {
         this.timesMutated = Math.max(0, timesMutated);
     }
@@ -165,6 +173,10 @@ public class SGPlayerStats {
 
     public int getSponsorsReceived() {
         return sponsorsReceived;
+    }
+    
+    public void addSouls(int i) {
+        setSouls(souls + i);
     }
 
     public void addScore(int i) {

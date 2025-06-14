@@ -108,6 +108,7 @@ public class GameSettings implements Cloneable, ISettings {
     protected int nextGameTimerLength = 10;
     protected boolean lightning;
     protected boolean fireworks;
+    protected boolean sacrifices = true;
     
     //Deathmatch
     protected int deathmatchThreshold = 2; //Default: 4
@@ -117,6 +118,10 @@ public class GameSettings implements Cloneable, ISettings {
     protected boolean allowDeathmatch = true;
     protected boolean deathmatchPlayerCount = true;
     protected boolean automaticDeathmatchThreshold = true;
+    
+    public boolean isSacrifices() {
+        return sacrifices;
+    }
     
     public void setAutomaticGraceperiod(boolean automaticGraceperiod) {
         this.automaticGraceperiod = automaticGraceperiod;
