@@ -33,7 +33,7 @@ public class LootManager {
         
         this.lootTables.forEach(table -> {
             table.loadData();
-            if (table.getItemWeights().isEmpty()) {
+            if (table.getItems().isEmpty()) {
                 table.loadDefaultData();
             }
         });

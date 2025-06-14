@@ -20,7 +20,7 @@ public class LoottableSetItemWeightSubCmd extends LoottableSubCommand {
         }
         
         String itemName = args[0].toLowerCase().replace("'", "");
-        if (!lootTable.getItemWeights().containsKey(itemName)) {
+        if (!lootTable.contains(itemName)) {
             sender.sendMessage(MsgType.WARN.format("The loot table %v does not contain an item entry with the id of %v", lootTable.getName(), itemName));
             return true;
         }
@@ -33,7 +33,7 @@ public class LoottableSetItemWeightSubCmd extends LoottableSubCommand {
             return true;
         }
         
-        lootTable.getItemWeights().put(itemName, weight);
+        lootTable.setItemWeight(itemName, weight);
         sender.sendMessage(MsgType.INFO.format("You set the item %v's weight to %v in loot table %v", itemName, weight, lootTable.getName()));
         sender.sendMessage(MsgType.INFO.format("You must use the /survivalgames loottable reload " + lootTable.getName() + " to apply your changes."));
         return true;

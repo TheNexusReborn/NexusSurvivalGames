@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.loot.tables;
 
-import com.stardevllc.starcore.api.StarColors;
+import com.stardevllc.random.RandomSelector;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.loot.category.LootCategory;
 import com.thenexusreborn.survivalgames.loot.item.LootItem;
@@ -11,45 +11,26 @@ import java.util.*;
 public class LootTable {
     protected final String name;
 
-    private LootItem[] items = new LootItem[0];
-    private int lastIndex;
+//    private LootItem[] items = new LootItem[0];
+//    private int lastIndex;
     
-    private Map<String, LootItem> registeredItems = new HashMap<>();
+    private Map<String, TableItem> registeredItems = new HashMap<>();
 
-    protected final Map<String, Integer> itemWeights = new HashMap<>();
+//    protected final Map<String, Integer> itemWeights = new HashMap<>();
 
     public LootTable(String name) {
         this.name = name;
     }
     
     protected void resetItems() {
-        this.items = new LootItem[0];
-        this.lastIndex = 0;
-        this.itemWeights.clear();
+//        this.items = new LootItem[0];
+//        this.lastIndex = 0;
+//        this.itemWeights.clear();
         this.registeredItems.clear();
     }
 
-    public void addItem(LootItem item, int weight) {
-        int targetLength = weight + items.length;
-        if (items.length < targetLength) {
-            LootItem[] newItems = new LootItem[targetLength];
-            System.arraycopy(items, 0, newItems, 0, items.length);
-            items = newItems;
-        }
-
-        for (int w = 0; w < weight; w++) {
-            items[lastIndex] = item;
-            lastIndex++;
-        }
-
-        String normalizedName = StarColors.stripColor(item.getName()).replace(" ", "_").replace("'", "").toLowerCase();
-        if (itemWeights.containsKey(normalizedName)) {
-            itemWeights.put(normalizedName, itemWeights.get(normalizedName) + weight);
-        } else {
-            itemWeights.put(normalizedName, weight);
-        }
-        
-        registeredItems.put(normalizedName, item);
+    public void addItem(LootItem item, double weight) {
+        registeredItems.put(item.getId(), new TableItem(item, weight));
     }
 
     public void addItems(int weight, LootItem... items) {
@@ -57,42 +38,49 @@ public class LootTable {
             return;
         }
 
-        int targetLength = this.items.length + weight * items.length;
-        if (this.items.length < targetLength) {
-            LootItem[] newItems = new LootItem[targetLength];
-            System.arraycopy(this.items, 0, newItems, 0, this.items.length);
-            this.items = newItems;
-        }
-
         for (LootItem item : items) {
             addItem(item, weight);
         }
     }
+    
+    public boolean contains(String itemId) {
+        return this.registeredItems.containsKey(itemId);
+    }
+    
+    public void setItemWeight(String itemId, double weight) {
+        TableItem tableItem = this.registeredItems.get(itemId);
+        if (tableItem != null) {
+            tableItem.setWeight(weight);
+        }
+    }
 
-    public LootItem[] getItems() {
-        LootItem[] items = new LootItem[this.items.length];
-        System.arraycopy(this.items, 0, items, 0, this.items.length);
-        return items;
+    public List<TableItem> getItems() {
+        return new ArrayList<>(this.registeredItems.values());
     }
 
     public List<ItemStack> generateLoot(int rolls) {
-        List<LootItem> chances = new ArrayList<>(Arrays.asList(this.items));
+        List<TableItem> chances = new ArrayList<>(this.registeredItems.values());
         Map<LootCategory, Integer> categoryCounts = new EnumMap<>(LootCategory.class);
         
         List<ItemStack> loot = new ArrayList<>();
-        Random random = new Random();
         for (int i = 0; i < rolls; i++) {
             try {
-                int index = random.nextInt(chances.size());
-                LootItem lootitem = chances.get(index);
+                if (chances.isEmpty()) {
+                    SurvivalGames.getInstance().getLogger().severe("Loot Chances are empty.");
+                    continue;
+                }
+                RandomSelector<TableItem> selector = RandomSelector.weighted(chances);
+                TableItem lootitem = selector.pick();
                 if (lootitem == null) {
-                    SurvivalGames.getInstance().getLogger().warning("Loot item was null for random index " + index);
                     continue;
                 }
                 loot.add(lootitem.getItemStack());
                 for (LootCategory category : lootitem.getCategories()) {
                     categoryCounts.put(category, categoryCounts.getOrDefault(category, 0) + 1);
-                    chances.removeIf(l -> {
+                }
+                
+                chances.removeIf(l -> {
+                    for (LootCategory category : l.getCategories()) {
                         if (category.getMaxAmountPerChest() > 0) {
                             if (categoryCounts.containsKey(category)) {
                                 if (categoryCounts.get(category) >= category.getMaxAmountPerChest()) {
@@ -100,10 +88,10 @@ public class LootTable {
                                 }
                             }
                         }
-                        
-                        return l.getName().equals(lootitem.getName());
-                    });
-                }
+                    }
+                    
+                    return l.getId().equals(lootitem.getId());
+                });
             } catch (Throwable t) {
                 t.printStackTrace();
             }
@@ -116,27 +104,18 @@ public class LootTable {
         return name;
     }
 
-    public Map<String, Integer> getItemWeights() {
-        return itemWeights;
-    }
-    
-    public LootItem getItem(String name) {
-        return registeredItems.get(StarColors.stripColor(name).replace(" ", "_").replace("'", "").toLowerCase());
-    }
-    
-    public int getItemWeight(String name) {
-        String normalizedName = StarColors.stripColor(name).replace(" ", "_").replace("'", "").toLowerCase();
-        if (itemWeights.containsKey(normalizedName)) {
-            return itemWeights.get(normalizedName);
+    public double getItemWeight(String name) {
+        if (registeredItems.containsKey(name)) {
+            return registeredItems.get(name).getWeight();
         }
         
         return 0;
     }
     
-    public int getWeightTotal() {
-        int total = 0;
-        for (Integer weight : itemWeights.values()) {
-            total += weight;
+    public double getWeightTotal() {
+        double total = 0;
+        for (TableItem item : registeredItems.values()) {
+            total += item.getWeight();
         }
         return total;
     }

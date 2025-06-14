@@ -16,7 +16,7 @@ public class LootItem {
     protected final Material material;
     protected final String name;
     protected List<String> lore = new LinkedList<>();
-    protected int amount;
+    protected int amount = 1;
     
     public LootItem(Material material) {
         this(MaterialNames.getDefaultName(material), material);

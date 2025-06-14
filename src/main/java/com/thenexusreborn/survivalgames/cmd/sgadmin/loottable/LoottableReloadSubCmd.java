@@ -18,7 +18,7 @@ public class LoottableReloadSubCmd extends LoottableSubCommand {
         try {
             lootTable.saveData();
             lootTable.loadData();
-            if (lootTable.getItemWeights().isEmpty()) {
+            if (lootTable.getItems().isEmpty()) {
                 lootTable.loadDefaultData();
             }
             sender.sendMessage(MsgType.INFO.format("Reload of loot table %v was successful.", lootTable.getName()));

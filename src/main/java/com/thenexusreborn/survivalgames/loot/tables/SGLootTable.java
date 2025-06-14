@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public abstract class SGLootTable extends LootTable {
     
@@ -53,11 +52,11 @@ public abstract class SGLootTable extends LootTable {
         }
         
         this.config = YamlConfiguration.loadConfiguration(this.file);
-
-        for (Map.Entry<String, Integer> entry : this.itemWeights.entrySet()) {
-            this.config.set(entry.getKey(), entry.getValue());
+        
+        for (TableItem item : this.getItems()) {
+            this.config.set(item.getId(), item.getWeight());
         }
-
+        
         try {
             this.config.save(this.file);
         } catch (IOException e) {
@@ -77,7 +76,7 @@ public abstract class SGLootTable extends LootTable {
         List<String> removeKeys = new ArrayList<>();
 
         for (String itemName : this.config.getKeys(false)) {
-            int weight = this.config.getInt(itemName);
+            double weight = this.config.getDouble(itemName);
             LootItem item = Items.REGISTRY.get(itemName);
             if (item == null) {
                 SurvivalGames.getInstance().getLogger().warning("Loot Table " + getName() + " had an invalid item entry " + itemName);

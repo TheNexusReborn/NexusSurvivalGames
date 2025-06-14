@@ -47,10 +47,10 @@ public class ProbabilityCmd extends NexusCommand<SurvivalGames> {
             return true;
         }
         
-        int weight = lootTable.getItemWeight(lootItem.getName());
-        int totalWeight = lootTable.getWeightTotal();
+        double weight = lootTable.getItemWeight(lootItem.getName());
+        double totalWeight = lootTable.getWeightTotal();
         
-        double probability = 1.0 * weight / totalWeight * 100;
+        double probability = weight / totalWeight * 100;
         
         DecimalFormat decimalFormat = new DecimalFormat("##0.###");
         
