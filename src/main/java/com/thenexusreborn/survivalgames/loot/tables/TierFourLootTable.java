@@ -1,5 +1,6 @@
 package com.thenexusreborn.survivalgames.loot.tables;
 
+import com.thenexusreborn.survivalgames.loot.category.LootCategory;
 import com.thenexusreborn.survivalgames.loot.item.Items;
 
 import java.io.File;
@@ -7,6 +8,10 @@ import java.io.File;
 public class TierFourLootTable extends SGLootTable {
     public TierFourLootTable(File folder) {
         super("tierFour", new File(folder, "tierFour.yml"));
+        
+        for (LootCategory category : LootCategory.values()) {
+            this.addCategoryAmountOverride(category, 0);
+        }
     }
 
     @Override
