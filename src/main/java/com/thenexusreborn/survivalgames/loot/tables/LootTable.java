@@ -56,7 +56,9 @@ public class LootTable {
         Map<LootCategory, Integer> categoryCounts = new EnumMap<>(LootCategory.class);
         
         List<ItemStack> loot = new ArrayList<>();
-        for (int i = 0; i < rolls; i++) {
+        int tries = 0;
+        while (loot.size() < rolls && tries < 10) {
+            tries++;
             try {
                 if (chances.isEmpty()) {
                     SurvivalGames.getInstance().getLogger().severe("Loot Chances are empty.");
@@ -68,6 +70,7 @@ public class LootTable {
                     continue;
                 }
                 loot.add(lootitem.getItemStack());
+                tries = 0;
                 for (LootCategory category : lootitem.getCategories()) {
                     categoryCounts.put(category, categoryCounts.getOrDefault(category, 0) + 1);
                 }
