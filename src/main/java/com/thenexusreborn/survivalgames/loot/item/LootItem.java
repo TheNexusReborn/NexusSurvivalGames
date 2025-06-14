@@ -5,6 +5,7 @@ import com.stardevllc.starcore.utils.MaterialNames;
 import com.thenexusreborn.survivalgames.loot.category.LootCategory;
 import de.tr7zw.nbtapi.NBT;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -17,6 +18,7 @@ public class LootItem {
     protected final String name;
     protected List<String> lore = new LinkedList<>();
     protected int amount = 1;
+    protected Map<Enchantment, Integer> enchantments = new HashMap<>();
     
     public LootItem(Material material) {
         this(MaterialNames.getDefaultName(material), material);
@@ -71,6 +73,11 @@ public class LootItem {
     
     public LootItem setAmount(int amount) {
         this.amount = amount;
+        return this;
+    }
+    
+    public LootItem addEnchantment(Enchantment enchantment, int level) {
+        this.enchantments.put(enchantment, level);
         return this;
     }
     
