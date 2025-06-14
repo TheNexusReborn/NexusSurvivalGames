@@ -16,6 +16,8 @@ import com.thenexusreborn.survivalgames.game.death.*;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
 import com.thenexusreborn.survivalgames.loot.LootManager;
+import com.thenexusreborn.survivalgames.loot.item.Items;
+import com.thenexusreborn.survivalgames.loot.item.LootItem;
 import com.thenexusreborn.survivalgames.loot.tables.SGLootTable;
 import com.thenexusreborn.survivalgames.menu.SwagShackMenu;
 import com.thenexusreborn.survivalgames.settings.enums.LootMode;
@@ -510,29 +512,10 @@ public class PlayerListener implements Listener {
         if (inv.getRecipe() == null) {
             return;
         }
-        if (inv.getRecipe().getResult().getType() == Material.FLINT_AND_STEEL) {
-            ItemStack itemStack = new ItemStack(Material.FLINT_AND_STEEL);
-            itemStack.setDurability((short) (Material.FLINT_AND_STEEL.getMaxDurability() - 4));
-            inv.setResult(itemStack);
-        } else if (inv.getRecipe().getResult().getType() == Material.DIAMOND_AXE) {
-            ItemStack itemStack = new ItemStack(Material.DIAMOND_AXE);
-            ItemMeta itemMeta = itemStack.getItemMeta();
-            itemMeta.setDisplayName(StarColors.color("&fBetty"));
-            itemStack.setItemMeta(itemMeta);
-            inv.setResult(itemStack);
-        } else if (inv.getRecipe().getResult().getType() == Material.IRON_AXE) {
-            ItemStack itemStack = new ItemStack(Material.IRON_AXE);
-            ItemMeta itemMeta = itemStack.getItemMeta();
-            itemMeta.setDisplayName(StarColors.color("&fFrederick"));
-            itemStack.setItemMeta(itemMeta);
-            inv.setResult(itemStack);
-        } else if (inv.getRecipe().getResult().getType() == Material.GOLD_AXE) {
-            ItemStack itemStack = new ItemStack(Material.GOLD_AXE);
-            ItemMeta itemMeta = itemStack.getItemMeta();
-            itemMeta.setDisplayName(StarColors.color("&fSacrificial Axe"));
-            itemMeta.setLore(List.of("", "&7In honor of TheDragonFox"));
-            itemStack.setItemMeta(itemMeta);
-            inv.setResult(itemStack);
+        
+        LootItem lootItem = Items.REGISTRY.getByMaterial(inv.getResult().getType());
+        if (lootItem != null) {
+            inv.setResult(lootItem.getItemStack());
         }
     }
     

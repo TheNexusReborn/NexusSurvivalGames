@@ -50,8 +50,8 @@ public final class Items {
     
     public static final LootItem WOOD_AXE = REGISTRY.register(Material.WOOD_AXE).setCategories(WEAPONS, WOODEN_WEAPONS, AXES);
     public static final LootItem WOOD_SWORD = REGISTRY.register(Material.WOOD_SWORD).setCategories(WEAPONS, WOODEN_WEAPONS, SWORDS);
-    public static final LootItem SACRIFICIAL_AXE = REGISTRY.register("&4Sacrificial Axe", Material.GOLD_AXE).setCategories(WEAPONS, GOLD_WEAPONS, AXES);
-    public static final LootItem SACRIFICIAL_SWORD = REGISTRY.register("&4Sacrificial Sword", Material.GOLD_SWORD).setCategories(WEAPONS, GOLD_WEAPONS, SWORDS);
+    public static final LootItem SACRIFICIAL_AXE = REGISTRY.register("&4Sacrificial Axe", Material.GOLD_AXE).setCategories(WEAPONS, GOLD_WEAPONS, AXES).setLore("", "&7In honor of TheDragonFox");
+    public static final LootItem SACRIFICIAL_SWORD = REGISTRY.register("&4Sacrificial Sword", Material.GOLD_SWORD).setCategories(WEAPONS, GOLD_WEAPONS, SWORDS).setLore("", "&7In honor of TheDragonFox");
     public static final LootItem STONE_AXE = REGISTRY.register(Material.STONE_AXE).setCategories(WEAPONS, STONE_WEAPONS, AXES);
     public static final LootItem STONE_SWORD = REGISTRY.register(Material.STONE_SWORD).setCategories(WEAPONS, STONE_WEAPONS, SWORDS);
     public static final LootItem FREDERICK = REGISTRY.register("Frederick", Material.IRON_AXE).setCategories(WEAPONS, IRON_WEAPONS, AXES);
