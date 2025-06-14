@@ -43,8 +43,8 @@ dependencies {
     compileOnly 'com.github.StarDevelopmentLLC:StarUI:0.1.4'
     compileOnly 'com.thenexusreborn:NexusMaps:0.2.0'
     compileOnly 'com.thenexusreborn:NexusHub:0.1.1'
-    compileOnly 'com.github.StarDevelopmentLLC:StarCore:0.5.2'
-    compileOnly 'com.github.StarDevelopmentLLC:StarChat:0.2.5'
+    compileOnly 'com.github.StarDevelopmentLLC:StarCore:0.5.4'
+    compileOnly 'com.github.StarDevelopmentLLC:StarChat:0.2.6'
     compileOnly 'com.github.StarDevelopmentLLC:StarItems:0.1.8'
     compileOnly 'me.clip:placeholderapi:2.11.5'
     compileOnly 'org.spigotmc:spigot:1.8.8-R0.1-SNAPSHOT'
@@ -58,7 +58,7 @@ group = 'com.thenexusreborn'
 version = '0.3.3'
 
 jar {
-    destinationDirectory = file(System.getProperty("user.home") + File.separator + "Documents" + File.separator + "JarOutput" + File.separator + "NexusReborn")
+//    destinationDirectory = file(System.getProperty("user.home") + File.separator + "Documents" + File.separator + "JarOutput" + File.separator + "NexusReborn")
 }
 
 java {
