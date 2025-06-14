@@ -51,7 +51,7 @@ public class MutationEndCondition implements ClockEndCondition<TimerSnapshot> {
 
         GamePlayer targetPlayer = game.getPlayer(mutation.getTarget());
         if (targetPlayer.getTeam() != GameTeam.TRIBUTES) {
-            if (game.getSettings().isAllowKillersKiller()) {
+            if (game.getSettings().mutations.recursiveKillers) {
                 GamePlayer mutationPlayer = game.getPlayer(mutation.getPlayer());
                 UUID killer = mutationPlayer.getMutationTarget();
                 mutation.setTarget(killer);

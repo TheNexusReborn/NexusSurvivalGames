@@ -68,9 +68,11 @@ public class PlayerMenu extends InventoryGUI implements UpdatingGUI {
                 addElement(viewInventoryButton);
             }
 
-            boolean sponsoringAllowed = sgPlayer.getGame().getSettings().isAllowSponsoring();
+            boolean sponsoringAllowed = sgPlayer.getGame().getSettings().sponsoring.enabled;
+            
+            boolean targetMaxSponsorsReached = game.getSettings().sponsoring.maxPerTribute > -1 && game.getSettings().sponsoring.maxPerTribute <= player.getTimesSponsoredByOthers();
 
-            if (sponsoringAllowed && player.getToggleValue("allowsponsors") && player.getTeam() == GameTeam.TRIBUTES) {
+            if (sponsoringAllowed && player.getToggleValue("allowsponsors") && player.getTeam() == GameTeam.TRIBUTES && !targetMaxSponsorsReached) {
                 Button sponsorButton = new Button().iconCreator(p -> ItemBuilder.of(XMaterial.CHEST).displayName("&e&lSponsor").build())
                         .consumer(e -> {
                             SGPlayer actor = plugin.getPlayerRegistry().get(e.getWhoClicked().getUniqueId());
@@ -80,7 +82,7 @@ public class PlayerMenu extends InventoryGUI implements UpdatingGUI {
                             }
 
                             GamePlayer gp = actor.getGamePlayer();
-                            if (!sgPlayer.getGame().getSettings().isAllowSponsoring()) {
+                            if (!sgPlayer.getGame().getSettings().sponsoring.enabled) {
                                 gp.sendMessage(MsgType.WARN + "Sponsoring is disabled for this game.");
                                 return;
                             }

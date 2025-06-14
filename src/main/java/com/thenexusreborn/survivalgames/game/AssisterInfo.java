@@ -2,20 +2,25 @@ package com.thenexusreborn.survivalgames.game;
 
 public class AssisterInfo {
     private GamePlayer gamePlayer;
-    private double credits, xp, nexites;
+    private double credits, xp;
+    private int score;
     
-    public AssisterInfo(Game game, GamePlayer player) {
+    public AssisterInfo(Game game, GamePlayer player, int scoreGain) {
         this.gamePlayer = player;
-        if (game.getSettings().isGiveCredits()) {
-            credits = game.getSettings().getAssistCreditGain();
+        if (game.getSettings().assists.credits.enabled) {
+            credits = game.getSettings().assists.credits.amount;
         }
         
-        if (game.getSettings().isGiveXp()) {
-            xp = game.getSettings().getAssistXPGain();
+        if (game.getSettings().assists.xp.enabled) {
+            xp = game.getSettings().assists.xp.amount;
         }
         
-        if (game.getSettings().isEarnNexites()) {
-            nexites = game.getSettings().getAssistNexiteGain();
+        if (game.getSettings().assists.score.enabled) {
+            if (game.getSettings().assists.score.relative) {
+                score = scoreGain / game.getSettings().assists.score.amount;
+            } else {
+                score = game.getSettings().assists.score.amount;
+            }
         }
     }
     
@@ -29,9 +34,5 @@ public class AssisterInfo {
     
     public double getXp() {
         return xp;
-    }
-    
-    public double getNexites() {
-        return nexites;
     }
 }

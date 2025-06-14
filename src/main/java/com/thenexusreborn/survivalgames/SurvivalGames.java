@@ -144,7 +144,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
         tpToMapCenterItem = itemRegistry.register(new TPToMapCenterItem(this));
         toHubItem = itemRegistry.register(new ToHubItem(this));
         mutateItem = itemRegistry.register(new MutateItem(this));
-        modifierItem = itemRegistry.register(new GameModifierItem(this));
         creeperBombItem = itemRegistry.register(new CreeperSuicideBomb(this));
         chickenLaunchItem = itemRegistry.register(new ChickenLaunchItem(this));
         chickenParachuteItem = itemRegistry.register(new ChickenChuteItem(this));

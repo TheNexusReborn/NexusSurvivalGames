@@ -1,7 +1,6 @@
 package com.thenexusreborn.survivalgames.game;
 
 import com.stardevllc.clock.clocks.Timer;
-import com.stardevllc.time.TimeUnit;
 
 import java.util.UUID;
 
@@ -13,7 +12,7 @@ public final class CombatTag {
     public CombatTag(Game game, UUID player) {
         this.game = game;
         this.player = player;
-        this.timer = Game.getPlugin().getClockManager().createTimer(TimeUnit.SECONDS.toMillis(game.getSettings().getCombatTagLength()));
+        this.timer = Game.getPlugin().getClockManager().createTimer(game.getSettings().combatTag.length.get());
         this.timer.addCallback(timerSnapshot -> {
             if (other != null) {
                 setOther(null);

@@ -23,7 +23,7 @@ public class GameStartDeathmatchCmd extends GameProgressSubCmd {
             return;
         }
 
-        if (!game.getSettings().isAllowDeathmatch()) {
+        if (!game.getSettings().deathmatch.enabled) {
             MsgType.WARN.send(player, "Deathmatch is disabled for this game.");
             return;
         }

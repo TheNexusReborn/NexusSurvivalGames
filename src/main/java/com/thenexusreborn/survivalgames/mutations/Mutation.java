@@ -86,10 +86,9 @@ public abstract class Mutation {
             return;
         }
         
-        this.countdownTimer = plugin.getClockManager().createTimer(TimeUnit.SECONDS.toMillis(game.getSettings().getMutationSpawnDelay()) + 50L);
+        this.countdownTimer = plugin.getClockManager().createTimer(game.getSettings().mutations.spawnDelay.get());
         this.countdownTimer.addRepeatingCallback(new MutationCountdownCallback(game, this), TimeUnit.SECONDS, 1);
         this.countdownTimer.setEndCondition(new MutationEndCondition(this, game));
-        this.countdownTimer.setLength(game.getSettings().getMutationSpawnDelay() * 1000L + 50);
         long seconds = (long) TimeUnit.MILLISECONDS.toSeconds(this.countdownTimer.getTime());
         p.sendMessage(StarColors.color("&6&l>> &eYou will mutate as a(n) " + getType().getDisplayName() + "!"));
         p.sendMessage(StarColors.color("&6&l>> &eYou will be mutated in &l" + seconds + " Seconds&e."));

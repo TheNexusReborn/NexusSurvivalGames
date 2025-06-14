@@ -3,10 +3,10 @@ package com.thenexusreborn.survivalgames.settings.enums;
 import com.stardevllc.converter.string.EnumStringConverter;
 import com.stardevllc.converter.string.StringConverters;
 
-public enum Weather {
+public enum WeatherType {
     RAIN, STORM, CLEAR;
     
     static {
-        StringConverters.addConverter(Weather.class, new EnumStringConverter<>(Weather.class));
+        StringConverters.addConverter(WeatherType.class, new EnumStringConverter<>(WeatherType.class));
     }
 }

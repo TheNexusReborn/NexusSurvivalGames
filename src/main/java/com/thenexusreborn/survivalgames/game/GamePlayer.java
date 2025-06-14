@@ -42,7 +42,7 @@ public class GamePlayer {
     private Mutation mutation;
     private boolean deathByMutation;
     private boolean sponsored;
-    private int timesSponsored;
+    private int timesSponsoredOthers, timesSponsoredByOthers;
     private Bounty bounty;
     private CombatTag combatTag;
     private DamageInfo damageInfo;
@@ -63,10 +63,18 @@ public class GamePlayer {
         return status;
     }
     
-    public int getTimesSponsored() {
-        return timesSponsored;
+    public int getTimesSponsoredOthers() {
+        return timesSponsoredOthers;
     }
-
+    
+    public int getTimesSponsoredByOthers() {
+        return timesSponsoredByOthers;
+    }
+    
+    public void setTimesSponsoredByOthers(int amount) {
+        this.timesSponsoredByOthers = amount;
+    }
+    
     public int getTimesMutated() {
         return timesMutated;
     }
@@ -163,7 +171,7 @@ public class GamePlayer {
         if (this.team == GameTeam.TRIBUTES) {
             mutationsRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
             zombiesRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
-            if (game.getSettings().canTributesSeeSpectatorChat()) {
+            if (game.getSettings().tributesSeeSpectatorChat) {
                 spectatorsRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
             }
         } else {
@@ -171,13 +179,13 @@ public class GamePlayer {
             if (this.team == GameTeam.MUTATIONS) {
                 tributesRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
                 zombiesRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
-                if (game.getSettings().canTributesSeeSpectatorChat()) {
+                if (game.getSettings().tributesSeeSpectatorChat) {
                     spectatorsRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
                 }
             } else if (this.team == GameTeam.ZOMBIES) {
                 tributesRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
                 mutationsRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
-                if (game.getSettings().canTributesSeeSpectatorChat()) {
+                if (game.getSettings().tributesSeeSpectatorChat) {
                     spectatorsRoom.addMember(getUniqueId(), DefaultPermissions.VIEW_MESSAGES);
                 }
             } else if (this.team == GameTeam.SPECTATORS) {
@@ -281,7 +289,7 @@ public class GamePlayer {
             return new Pair<>(false, "You cannot mutate in the current game state.");
         }
 
-        if (!game.getSettings().isAllowMutations()) {
+        if (!game.getSettings().mutations.enabled) {
             return new Pair<>(false, "You cannot mutate because mutations are disabled for this game.");
         }
         
@@ -289,25 +297,27 @@ public class GamePlayer {
             return new Pair<>(false, "You can only mutate if you are a spectator.");
         }
 
-        if (game.getTeamCount(GameTeam.MUTATIONS) >= game.getSettings().getMaxMutationsAllowed()) {
+        if (game.getTeamCount(GameTeam.MUTATIONS) >= game.getSettings().mutations.maxSimultaneous) {
             return new Pair<>(false, "You cannot mutate as there are too many mutations in the game already.");
         }
         
-        boolean timesMutatedExceedsMaxAmount = getTotalTimesMutated() >= game.getSettings().getMaxMutationAmount();
+        boolean timesMutatedExceedsMaxAmount = getTotalTimesMutated() >= game.getSettings().mutations.maxTimesPerPlayer;
 
         if (timesMutatedExceedsMaxAmount) {
-            return new Pair<>(false, "You cannot mutate more than " + game.getSettings().getMaxMutationAmount() + " times.");
+            return new Pair<>(false, "You cannot mutate more than " + game.getSettings().mutations.maxTimesPerPlayer + " time(s).");
         }
 
-        if (getStats().getMutationPasses() <= 0 && !game.getSettings().isUnlimitedPasses()) {
-            return new Pair<>(false, "You do not have any mutation passes.");
+        if (game.getSettings().mutations.passes.enabled) {
+            if (getStats().getMutationPasses() <= 0 && !game.getSettings().mutations.passes.unlimited) {
+                return new Pair<>(false, "You do not have any mutation passes.");
+            }
         }
 
-        if (deathByMutation && !game.getSettings().isAllowRecursiveMutations()) {
+        if (deathByMutation && !game.getSettings().mutations.recursiveRevenge) {
             return new Pair<>(false, "You cannot mutate because you were killed by a mutation.");
         }
 
-        if (mutated && timesMutatedExceedsMaxAmount) {
+        if (mutated) {
             return new Pair<>(false, "You have already mutated, you cannot mutate again.");
         }
 
@@ -349,7 +359,7 @@ public class GamePlayer {
             return;
         }
         
-        if (!getGame().getSettings().isAllowCombatTag()) {
+        if (!getGame().getSettings().combatTag.enabled) {
             return;
         }
 
@@ -387,11 +397,15 @@ public class GamePlayer {
     }
     
     public boolean canSponsor() {
-        return this.timesSponsored < this.getGame().getSettings().getMaxSponsorships();
+        return this.timesSponsoredOthers < this.getGame().getSettings().sponsoring.maxPerPlayer;
     }
     
-    public void incrementSponsors() {
-        this.timesSponsored++;
+    public void incrementSponsoredOthers() {
+        this.timesSponsoredOthers++;
+    }
+    
+    public void incrementSponsoredByOthers() {
+        this.timesSponsoredByOthers++;
     }
 
     public UUID getMutationTarget() {
@@ -414,7 +428,7 @@ public class GamePlayer {
             return killerInfo.getKiller();
         }
         
-        if (!game.getSettings().isAllowKillersKiller()) {
+        if (!game.getSettings().mutations.recursiveKillers) {
             return killerInfo.getKiller();
         }
         
@@ -513,12 +527,19 @@ public class GamePlayer {
         if (canMutateStatus.key()) {
             GamePlayer killer = game.getPlayer(getMutationTarget());
             String passes;
-            if (game.getSettings().isUnlimitedPasses()) {
+            if (game.getSettings().mutations.passes.unlimited) {
                 passes = "Unlimited";
             } else {
                 passes = getStats().getMutationPasses() + "";
             }
-            return "&c&lTAKE REVENGE   &eTarget: " + killer.getColoredName() + "   &ePasses: &b" + passes;
+            
+            String itemName = "&c&lTAKE REVENGE   &eTarget: " + killer.getColoredName();
+            
+            if (game.getSettings().mutations.passes.unlimited) {
+                itemName += "   &ePasses: &b" + passes;
+            }
+            
+            return itemName;
         } else {
             return "&c" + canMutateStatus.value();
         }

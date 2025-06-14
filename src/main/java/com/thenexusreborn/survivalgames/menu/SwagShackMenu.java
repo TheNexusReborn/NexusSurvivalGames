@@ -40,7 +40,7 @@ public class SwagShackMenu extends InventoryGUI {
     
     public SwagShackMenu(SurvivalGames plugin, Game game, GamePlayer player) {
         super(3, "&lSwag Shack");
-
+        
         for (ShopItem item : items) {
             ItemStack itemStack = item.getItem().getItemStack();
             itemStack.setAmount(item.getAmount());
@@ -48,28 +48,42 @@ public class SwagShackMenu extends InventoryGUI {
             List<String> lore = new LinkedList<>();
             lore.add("");
             lore.add(StarColors.color("&e&lPrice:"));
-            lore.add(StarColors.color("  &6SG Points: &b" + item.getPointsCost()));
-            lore.add(StarColors.color("  &6Credits: &b" + item.getCreditsCost()));
+            if (game.getSettings().swagShack.currency.score) {
+                lore.add(StarColors.color("  &6SG Points: &b" + item.getPointsCost()));
+            }
+            if (game.getSettings().swagShack.currency.credits) {
+                lore.add(StarColors.color("  &6Credits: &b" + item.getCreditsCost()));
+            }
             lore.add("");
-            lore.add(StarColors.color("&6&lLeft Click &7to buy with points."));
-            lore.add(StarColors.color("&6&lRight Click &7to buy with credits."));
+            if (game.getSettings().swagShack.currency.score) {
+                lore.add(StarColors.color("&6&lLeft Click &7to buy with points."));
+            }
+            if (game.getSettings().swagShack.currency.credits) {
+                lore.add(StarColors.color("&6&lRight Click &7to buy with credits."));
+            }
             itemMeta.setLore(lore);
             itemStack.setItemMeta(itemMeta);
             
             Button button = new Button().iconCreator(p -> itemStack).consumer(e -> {
                 String currency;
                 int cost;
-
+                
                 if (e.getClick() == ClickType.LEFT) {
+                    if (!game.getSettings().swagShack.currency.score) {
+                        return;
+                    }
                     currency = "sg_score";
                     cost = item.getCreditsCost();
                 } else if (e.getClick() == ClickType.RIGHT) {
+                    if (!game.getSettings().swagShack.currency.credits) {
+                        return;
+                    }
                     currency = "credits";
                     cost = item.getPointsCost();
                 } else {
                     return;
                 }
-
+                
                 int amount;
                 if (currency.equalsIgnoreCase("credits")) {
                     amount = (int) player.getBalance().getCredits();
@@ -80,7 +94,7 @@ public class SwagShackMenu extends InventoryGUI {
                     player.sendMessage(MsgType.WARN + "You do not have enough " + currency + " to buy this item.");
                     return;
                 }
-
+                
                 if (currency.equalsIgnoreCase("credits")) {
                     player.getBalance().addCredits(-cost);
                 } else {
@@ -99,7 +113,7 @@ public class SwagShackMenu extends InventoryGUI {
         private int position;
         private int pointsCost;
         private int creditsCost;
-    
+        
         public ShopItem(int position, LootItem item, int amount, int pointsCost, int creditsCost) {
             this.position = position;
             this.item = item;
@@ -107,23 +121,23 @@ public class SwagShackMenu extends InventoryGUI {
             this.pointsCost = pointsCost;
             this.creditsCost = creditsCost;
         }
-    
+        
         public LootItem getItem() {
             return item;
         }
-    
+        
         public int getAmount() {
             return amount;
         }
-    
+        
         public int getPosition() {
             return position;
         }
-    
+        
         public int getPointsCost() {
             return pointsCost;
         }
-    
+        
         public int getCreditsCost() {
             return creditsCost;
         }

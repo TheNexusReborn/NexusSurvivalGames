@@ -18,9 +18,9 @@ public enum GameTeam {
                     .allowFlight(false)
                     .flying(false)
                     .collisions(true)
-                    .maxHealth(p -> p.getGame().getSettings().getMaxHealth())
-                    .health(p -> p.getGame().getSettings().getMaxHealth())
-                    .saturation(p -> (int) p.getGame().getSettings().getStartingSaturation())
+                    .maxHealth(p -> p.getGame().getSettings().player.maxHealth)
+                    .health(p -> p.getGame().getSettings().player.maxHealth)
+                    .saturation(p -> (int) p.getGame().getSettings().player.startingSaturation)
                     .clearInventory(true)
                     .clearEffects(true)
                     .totalExperience(0)
@@ -65,7 +65,7 @@ public enum GameTeam {
                             return mutation.getType().getHealth();
                         } else {
                             SurvivalGames.getInstance().getLogger().warning("Mutations Team player state apply().maxHealth called and mutation is null");
-                            return p.getGame().getSettings().getMaxHealth();
+                            return p.getGame().getSettings().player.maxHealth;
                         }
                     })
                     .health(p -> {
@@ -74,7 +74,7 @@ public enum GameTeam {
                             return mutation.getType().getHealth();
                         } else {
                             SurvivalGames.getInstance().getLogger().warning("Mutations Team player state apply().health() called and mutation is null");
-                            return p.getGame().getSettings().getMaxHealth();
+                            return p.getGame().getSettings().player.maxHealth;
                         }
                     })
                     .food(20)

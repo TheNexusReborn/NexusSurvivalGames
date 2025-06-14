@@ -5,7 +5,7 @@ import com.thenexusreborn.survivalgames.game.Game;
 public class InGameEndCondition extends SGCallbackEndCondition {
     public InGameEndCondition(Game game) {
         super(game, g -> {
-            if (g.getSettings().isAllowDeathmatch()) {
+            if (g.getSettings().deathmatch.enabled) {
                 g.teleportDeathmatch();
             } else {
                 g.end();

@@ -19,7 +19,8 @@ import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.chat.LobbyChatRoom;
 import com.thenexusreborn.survivalgames.control.ControlType;
 import com.thenexusreborn.survivalgames.control.Controllable;
-import com.thenexusreborn.survivalgames.game.*;
+import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.game.SGMode;
 import com.thenexusreborn.survivalgames.lobby.timer.LobbyTimerCallback;
 import com.thenexusreborn.survivalgames.scoreboard.lobby.*;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
@@ -74,9 +75,6 @@ public class Lobby implements Controllable, IHasState {
     private final List<TributeSign> tributeSigns = new ArrayList<>();
     private boolean debugMode;
     
-    private Map<GameModifier, Set<UUID>> modifierYesVotes = new EnumMap<>(GameModifier.class);
-    private Map<GameModifier, Set<UUID>> modifierNoVotes = new EnumMap<>(GameModifier.class);
-    
     private SGMode mode;
 
     private World world;
@@ -104,30 +102,6 @@ public class Lobby implements Controllable, IHasState {
         }
 
         config = YamlConfiguration.loadConfiguration(file);
-    }
-    
-    public void addModifierYesVote(GameModifier gameModifier, UUID player) {
-        if (this.modifierYesVotes.containsKey(gameModifier)) {
-            this.modifierYesVotes.get(gameModifier).add(player);
-        } else {
-            this.modifierYesVotes.put(gameModifier, new HashSet<>(Set.of(player)));
-        }
-        
-        if (this.modifierNoVotes.containsKey(gameModifier)) {
-            this.modifierNoVotes.get(gameModifier).remove(player);
-        }
-    }
-    
-    public void addModifierNoVote(GameModifier gameModifier, UUID player) {
-        if (this.modifierNoVotes.containsKey(gameModifier)) {
-            this.modifierNoVotes.get(gameModifier).add(player);
-        } else {
-            this.modifierNoVotes.put(gameModifier, new HashSet<>(Set.of(player)));
-        }
-        
-        if (this.modifierYesVotes.containsKey(gameModifier)) {
-            this.modifierYesVotes.get(gameModifier).remove(player);
-        }
     }
     
     public SGMode getMode() {
@@ -530,24 +504,6 @@ public class Lobby implements Controllable, IHasState {
         sendMessage("");
         
         GameSettings settings = this.gameSettings.clone();
-        
-        this.mode.getModifiers().forEach((modifier, status) -> {
-            if (status != GameModifierStatus.ALLOWED) {
-                return;
-            }
-            
-            int yesVotes = getModifierYesVotes(modifier), noVotes = getModifierNoVotes(modifier);
-            
-            if (yesVotes == 0 && noVotes == 0) {
-                return;
-            }
-            
-            if (yesVotes > noVotes) {
-                modifier.getYesConsumer().accept(settings);
-            } else {
-                modifier.getNoConsumer().accept(settings);
-            }
-        });
         
         Game game = new Game(server, gameMap, this.mode, settings, getPlayers());
         this.players.clear();
@@ -1059,21 +1015,5 @@ public class Lobby implements Controllable, IHasState {
 
     public World getWorld() {
         return this.world;
-    }
-    
-    public int getModifierYesVotes(GameModifier modifier) {
-        if (this.modifierYesVotes.containsKey(modifier)) {
-            return this.modifierYesVotes.get(modifier).size();
-        }
-        
-        return 0;
-    }
-    
-    public int getModifierNoVotes(GameModifier modifier) {
-        if (this.modifierNoVotes.containsKey(modifier)) {
-            return this.modifierNoVotes.get(modifier).size();
-        }
-        
-        return 0;
     }
 }

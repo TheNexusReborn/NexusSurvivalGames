@@ -93,7 +93,7 @@ public class DeathInfo {
             deathMessage = deathMessagesConfig.getString(type.name());
         }
         String playerName;
-        if (game.getSettings().getColorMode() == ColorMode.GAME_TEAM) {
+        if (game.getSettings().cosmetics.colorMode == ColorMode.TEAM) {
             playerName = teamColor;
         } else {
             playerName = gamePlayer.getEffectiveRank().getColor();
@@ -110,7 +110,7 @@ public class DeathInfo {
                 String killerName;
                 GamePlayer killerPlayer = game.getPlayer(killer.getKiller());
                 if (killerPlayer != null) {
-                    if (game.getSettings().getColorMode() == ColorMode.GAME_TEAM) {
+                    if (game.getSettings().cosmetics.colorMode == ColorMode.TEAM) {
                         killerName = killer.getTeamColor() + killerPlayer.getName();
                     } else {
                         killerName = killerPlayer.getEffectiveRank().getColor() + killerPlayer.getName();

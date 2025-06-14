@@ -33,7 +33,7 @@ public class BountyCmd extends NexusCommand<SurvivalGames> {
             return true;
         }
 
-        if (!game.getSettings().isAllowBounties()) {
+        if (!game.getSettings().bounties.enabled) {
             MsgType.WARN.send(player, "Bounties are disabled for this game.");
             return true;
         }
@@ -86,7 +86,7 @@ public class BountyCmd extends NexusCommand<SurvivalGames> {
             } else {
                 senderPlayer.getStats().addScore(-amount);
             }
-            max = game.getSettings().getMaxScoreBounty();
+            max = game.getSettings().bounties.maxScore;
         } else if (type == Type.CREDITS) {
             if (senderPlayer.getBalance().getCredits() < amount) {
                 senderPlayer.sendMessage(MsgType.WARN.format("You do not have enough credits to set a bounty of %v.", amount));
@@ -94,7 +94,7 @@ public class BountyCmd extends NexusCommand<SurvivalGames> {
             } else {
                 senderPlayer.getBalance().addCredits(-amount);
             }
-            max = game.getSettings().getMaxCreditBounty();
+            max = game.getSettings().bounties.maxCredit;
         }
 
         Bounty bounty = gamePlayer.getBounty();

@@ -41,7 +41,7 @@ public class MutateGui extends InventoryGUI {
                 continue;
             }
             
-            if (unlockedMutations.isUnlocked(type.getId()) && !game.getSettings().isUseAllMutations()) {
+            if (!unlockedMutations.isUnlocked(type.getId()) && game.getSettings().mutations.typesLocked) {
                 continue;
             }
             
@@ -136,14 +136,18 @@ public class MutateGui extends InventoryGUI {
                             return;
                         }
                         
-                        if (builder.isUsePass()) {
-                            double passUseValue = new Random().nextDouble();
-                            if (passUseValue <= game.getSettings().getPassUseChance()) {
-                                if (!game.getSettings().isUnlimitedPasses()) {
-                                    player.getStats().addMutationPasses(-1);
+                        if (game.getSettings().mutations.passes.enabled) {
+                            if (builder.isUsePass()) {
+                                double passUseValue = new Random().nextDouble();
+                                if (passUseValue <= game.getSettings().mutations.passes.useChance) {
+                                    if (!game.getSettings().mutations.passes.unlimited) {
+                                        player.getStats().addMutationPasses(-1);
+                                    }
+                                } else {
+                                    if (!game.getSettings().mutations.passes.unlimited) {
+                                        player.sendMessage(MsgType.INFO + "&2&lLUCKY! &aYou did not use a pass for this mutation!");
+                                    }
                                 }
-                            } else {
-                                player.sendMessage(MsgType.INFO + "&2&lLUCKY! &aYou did not use a pass for this mutation!");
                             }
                         }
                         

@@ -87,7 +87,7 @@ public class GameBoard extends SpigotScoreboardView {
         createTeam(new TeamBuilder("assistsValue").entry("&fAssists: ").score(3).valueUpdater((player, team) -> {
             Game game = plugin.getPlayerRegistry().get(player.getUniqueId()).getGame();
             GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
-            if (game.getSettings().isAllowAssists()) {
+            if (game.getSettings().assists.enabled) {
                 team.setSuffix("&e" + gamePlayer.getAssists());
             } 
         }));

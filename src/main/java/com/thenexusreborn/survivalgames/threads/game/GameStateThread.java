@@ -28,7 +28,13 @@ public class GameStateThread extends StarThread<SurvivalGames> {
                 case TEAMS_ASSIGNED -> game.teleportStart();
                 case TELEPORT_START_DONE -> game.startWarmup();
                 case WARMUP_DONE -> game.startGame();
-                case TELEPORT_DEATHMATCH_DONE -> game.startDeathmatchWarmup();
+                case TELEPORT_DEATHMATCH_DONE -> {
+                    if (game.getSettings().deathmatch.warmup.enabled) {
+                        game.startDeathmatchWarmup();
+                    } else {
+                        game.startDeathmatch();
+                    }
+                }
                 case DEATHMATCH_WARMUP_DONE -> game.startDeathmatch();
                 case GAME_COMPLETE -> game.end();
                 case NEXT_GAME_READY -> game.nextGame();

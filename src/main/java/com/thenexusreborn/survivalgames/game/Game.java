@@ -673,9 +673,9 @@ public class Game implements Controllable, IHasState {
         
         setSubState(SubState.DEFINING_GAMERULES);
         try {
-            gameMap.getWorld().setGameRuleValue("naturalRegeneration", "" + settings.isRegeneration());
-            gameMap.getWorld().setGameRuleValue("doDaylightCycle", "" + settings.isTimeProgression());
-            gameMap.getWorld().setGameRuleValue("doWeatherCycle", "" + settings.isWeatherProgression());
+            gameMap.getWorld().setGameRuleValue("naturalRegeneration", "" + settings.player.regeneration);
+            gameMap.getWorld().setGameRuleValue("doDaylightCycle", "" + settings.world.time.progression);
+            gameMap.getWorld().setGameRuleValue("doWeatherCycle", "" + settings.world.weather.progression);
             gameMap.getWorld().setGameRuleValue("doMobSpawning", "false");
             gameMap.getWorld().setGameRuleValue("announceAdvancements", "false");
             gameMap.getWorld().setGameRuleValue("doFireTick", "false");
@@ -708,13 +708,13 @@ public class Game implements Controllable, IHasState {
     public void startWarmup() {
         setState(WARMUP);
         setSubState(SubState.TIMER_INIT);
-        this.timer = Game.getPlugin().getClockManager().createTimer(TimeUnit.SECONDS.toMillis(getSettings().getWarmupLength()) + 50L);
+        this.timer = Game.getPlugin().getClockManager().createTimer(TimeUnit.SECONDS.toMillis(getSettings().warmupLength) + 50L);
         this.timer.setEndCondition(new WarmupEndCondition(this));
         this.timer.addRepeatingCallback(new GameSecondsCallback(this, Sound.CLICK, "&6&l>> &eThe game begins in &b{time}&e."), TimeUnit.SECONDS, 1);
         this.timer.addRepeatingCallback(snapshot -> playSound(Sound.NOTE_BASS), TimeUnit.SECONDS, 1);
         List<MapSpawn> mapSpawns = gameMap.getSpawns();
         this.timer.addRepeatingCallback(snapshot -> {
-            if (!settings.isLightning()) {
+            if (!settings.cosmetics.lightning) {
                 return;
             }
             if (snapshot.getTime() > 0 && snapshot.getLength() >= TimeUnit.SECONDS.toMillis(spawns.size())) {
@@ -732,8 +732,8 @@ public class Game implements Controllable, IHasState {
             sendMessage("&6&lSurvival Games &7&oFree-for-all Deathmatch &8- &3Classic Mode");
             sendMessage("&8- &7Loot chests scattered around the map for gear.");
             sendMessage("&8- &7Outlast the other tributes and be the last one standing!");
-            if (settings.isAllowDeathmatch()) {
-                sendMessage("&8- &7Arena deathmatch begins after &e" + getSettings().getGameLength() + " minutes&7.");
+            if (settings.deathmatch.enabled) {
+                sendMessage("&8- &7Arena deathmatch begins after &e" + getSettings().gameLength + " minutes&7.");
             }
             sendMessage("");
             StringBuilder creatorBuilder = new StringBuilder();
@@ -746,26 +746,26 @@ public class Game implements Controllable, IHasState {
             }
             
             sendMessage("&d&l>> &7Playing on &a" + getGameMap().getName() + " &7created by " + creatorBuilder.substring(0, creatorBuilder.length() - 2));
-            if (getSettings().isGracePeriod()) {
-                sendMessage("&d&l>> &7There is a &e" + getSettings().getGracePeriodLength() + " second &7grace period.");
+            if (getSettings().graceperiod.enabled) {
+                sendMessage("&d&l>> &7There is a &e" + (int) getSettings().graceperiod.length.get(TimeUnit.SECONDS) + " second &7grace period.");
             }
-        }, TimeUnit.SECONDS.toMillis(getSettings().getWarmupLength()) / 2);
+        }, TimeUnit.SECONDS.toMillis(getSettings().warmupLength) / 2);
         
         setSubState(SubState.SETUP_GRACE_PERIOD);
-        if (settings.isAutomaticGraceperiod()) {
-            if (getTeamCount(GameTeam.TRIBUTES) <= settings.getGraceperiodThreshold()) {
-                settings.setGracePeriod(true);
-                settings.setGracePeriodLength(settings.getAutoGracePeriodLength());
+        if (settings.graceperiod.auto.enabled) {
+            if (getTeamCount(GameTeam.TRIBUTES) <= settings.graceperiod.auto.threshold) {
+                settings.graceperiod.enabled = true;
+                settings.graceperiod.length = settings.graceperiod.auto.length;
             }
         }
         
-        if (settings.isAutomaticDeathmatchThreshold()) {
+        if (settings.deathmatch.trigger.autoAdjust) {
             if (getTeamCount(GameTeam.TRIBUTES) < 6) {
-                settings.setDeathmatchThreshold(2);
+                settings.deathmatch.trigger.threshold = 2;
             } else if (getTeamCount(GameTeam.TRIBUTES) < 10) {
-                settings.setDeathmatchThreshold(3);
+                settings.deathmatch.trigger.threshold = 3;
             } else {
-                settings.setDeathmatchThreshold(4);
+                settings.deathmatch.trigger.threshold = 4;
             }
         }
         
@@ -775,9 +775,9 @@ public class Game implements Controllable, IHasState {
     
     public void startGame() {
         setSubState(SubState.TIMER_INIT);
-        this.timer = plugin.getClockManager().createTimer(TimeUnit.MINUTES.toMillis(settings.getGameLength())/* + 50*/);
+        this.timer = plugin.getClockManager().createTimer(TimeUnit.MINUTES.toMillis(settings.gameLength)/* + 50*/);
         
-        if (settings.isLightning()) {
+        if (settings.cosmetics.lightning) {
             for (MapSpawn mapSpawn : gameMap.getSpawns()) {
                 gameMap.getWorld().strikeLightningEffect(mapSpawn.toBlockLocation(gameMap.getWorld()));
             }
@@ -785,7 +785,7 @@ public class Game implements Controllable, IHasState {
         
         Supplier<String> msg = () -> {
             String type, action;
-            if (this.settings.isAllowDeathmatch()) {
+            if (this.settings.deathmatch.enabled) {
                 type = "DEATHMATCH";
                 action = "begins";
             } else {
@@ -803,7 +803,7 @@ public class Game implements Controllable, IHasState {
             sendMessage("&6&l>> &9&lWHAT DO YOU THINK OF &e&l" + getGameMap().getName().toUpperCase() + "&9&l?");
             sendMessage("&6&l>> &7Type &8[&6/ratemap &4&l1 &c&l2 &6&l3 &e&l4 &a&l5&8] &7to submit a rating!");
             sendMessage("");
-        }, TimeUnit.MINUTES.toMillis(settings.getGameLength() / 4));
+        }, TimeUnit.MINUTES.toMillis(settings.gameLength / 4));
         
         this.timer.addRepeatingCallback(timerSnapshot -> {
             for (GamePlayer player : getPlayers().values()) {
@@ -814,7 +814,7 @@ public class Game implements Controllable, IHasState {
                 player.sendMessage("");
                 player.sendMessage(MsgType.INFO.format("You might be out of the game, but &f&lDON'T QUIT&e!"));
                 player.sendMessage(MsgType.INFO.format("Another game will be &f&lSTARTING SOON&e!"));
-                if (getSettings().isAllowMutations() && player.canMutate().key()) {
+                if (getSettings().mutations.enabled && player.canMutate().key()) {
                     player.sendMessage(MsgType.INFO.format("You can &f&lMUTATE &eby using the &bRotten Flesh&e."));
                 }
 //                    TextComponent clickHere = new TextComponent("§f§lCLICK HERE");
@@ -837,10 +837,10 @@ public class Game implements Controllable, IHasState {
         setSubState(SubState.CALCULATE_RESTOCK);
         
         CallbackPeriod restockPeriod = ()  -> {
-            if (settings.isChestRestockRelative()) {
-                return timer.getLength() / settings.getChestRestockDenomination();
+            if (settings.chestRestock.relative) {
+                return timer.getLength() / settings.chestRestock.divisor;
             } else {
-                return settings.getChestRestockInterval() * TimeUnit.MINUTES.toMillis(1);
+                return settings.chestRestock.divisor * TimeUnit.MINUTES.toMillis(1);
             }
         };
         
@@ -851,10 +851,15 @@ public class Game implements Controllable, IHasState {
                 if (timerSnapshot.getTime() == timerSnapshot.getLength()) {
                     return;
                 }
+                
+                if (!settings.chestRestock.enabled) {
+                    return;
+                }
+                
                 timedRestockCount++;
                 Game.this.restockChests();
-                Game.this.getSettings().setCornucopiaTier("tierThree");
-                Game.this.getSettings().setRegularTier("tierTwo");
+                Game.this.getSettings().loot.tiers.cornucopia = "tierThree";
+                Game.this.getSettings().loot.tiers.regular = "tierTwo";
                 Game.this.sendMessage("&6&l>> &a&lALL CHESTS HAVE BEEN RESTOCKED");
             }
             
@@ -874,8 +879,8 @@ public class Game implements Controllable, IHasState {
         
         this.start = System.currentTimeMillis();
         setSubState(SubState.SETUP_GRACE_PERIOD);
-        if (this.settings.isGracePeriod()) {
-            this.graceperiodTimer = plugin.getClockManager().createTimer(TimeUnit.SECONDS.toMillis(settings.getGracePeriodLength()) + 50L);
+        if (this.settings.graceperiod.enabled) {
+            this.graceperiodTimer = plugin.getClockManager().createTimer(settings.graceperiod.length.get());
             this.graceperiodTimer.addRepeatingCallback(new GameSecondsCallback(this, Sound.CLICK, "&6&l>> &eThe &c&lGRACE PERIOD &eends in &b{time}&e."), TimeUnit.SECONDS, 1);
             this.graceperiodTimer.setEndCondition(new GraceperiodEndCondition(this));
             this.graceperiodTimer.start();
@@ -883,13 +888,13 @@ public class Game implements Controllable, IHasState {
         }
         setState(INGAME);
         sendMessage("&6&l>> &a&lMAY THE ODDS BE EVER IN YOUR FAVOR.");
-        if (this.settings.isTeamingAllowed()) {
-            sendMessage("&6&l>> &d&lTHERE IS A MAX OF " + this.settings.getMaxTeamAmount() + " PLAYER TEAMS.");
+        if (this.settings.player.teams.enabled) {
+            sendMessage("&6&l>> &d&lTHERE IS A MAX OF " + this.settings.player.teams.max + " PLAYER TEAMS.");
         } else {
             sendMessage("&6&l>> &d&lTEAMING IS NOT ALLOWED IN THIS GAME.");
         }
         
-        if (this.settings.isShowBorders()) {
+        if (this.settings.world.showBorders) {
             setSubState(SubState.SETUP_BORDER);
             this.gameMap.applyWorldBoarder("game");
             setSubState(SubState.UNDEFINED);
@@ -926,7 +931,7 @@ public class Game implements Controllable, IHasState {
     }
     
     public void playSound(Sound sound) {
-        if (!settings.isSounds()) {
+        if (!settings.cosmetics.sounds) {
             return;
         }
         
@@ -997,7 +1002,7 @@ public class Game implements Controllable, IHasState {
             timer.cancel();
         }
         
-        this.timer = plugin.getClockManager().createTimer(TimeUnit.SECONDS.toMillis(settings.getDeathmatchWarmupLength()) + 50L);
+        this.timer = plugin.getClockManager().createTimer(settings.deathmatch.warmup.length.get());
         this.timer.addRepeatingCallback(new GameSecondsCallback(this, Sound.ENDERDRAGON_WINGS, "&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b{time}&e."), TimeUnit.SECONDS, 1);
         this.timer.setEndCondition(new DMWarmupEndCondition(this));
         this.timer.start();
@@ -1028,13 +1033,13 @@ public class Game implements Controllable, IHasState {
         sendMessage("&6&l>> &d&lTHERE IS NO TEAMING ALLOWED IN DEATHMATCH.");
         restockChests();
         
-        if (this.settings.isShowBorders()) {
+        if (this.settings.world.showBorders) {
             setSubState(SubState.SETUP_BORDER);
-            this.gameMap.applyWorldBoarder("deathmatch", settings.getDeathmatchLength() * 60);
+            this.gameMap.applyWorldBoarder("deathmatch", (int) settings.deathmatch.length.get(TimeUnit.SECONDS));
         }
         
         setSubState(SubState.TIMER_INIT);
-        this.timer = plugin.getClockManager().createTimer(TimeUnit.MINUTES.toMillis(settings.getDeathmatchLength()) + 50L);
+        this.timer = plugin.getClockManager().createTimer(settings.deathmatch.length.get());
         this.timer.addRepeatingCallback(new GameMinutesCallback(this, "&6&l>> &eThe &c&lGAME &eends &ein &b{time}&e."), TimeUnit.MINUTES, 1);
         this.timer.addRepeatingCallback(new GameSecondsCallback(this, Sound.CLICK, "&6&l>> &eThe &c&lGAME &eends &ein &b{time}&e."), TimeUnit.SECONDS, 1);
         this.timer.setEndCondition(new DeathmatchEndCondition(this));
@@ -1103,49 +1108,46 @@ public class Game implements Controllable, IHasState {
         if (winner != null) {
             winner.getStats().addWins(1);
             winner.getStats().addWinStreak(1);
-            double winGain = settings.getWinScoreBaseGain();
-            int currentScore = winner.getStats().getScore();
-            if (currentScore < 100 && currentScore > 50) {
-                winGain *= 1.25;
-            } else if (currentScore <= 50 && currentScore > 25) {
-                winGain *= 1.5;
-            } else if (currentScore < 25) {
-                winGain *= 2;
-            } else if (currentScore < 1000 && currentScore > 500) {
-                winGain *= .75;
-            } else if (currentScore >= 1000) {
-                winGain *= .5;
+            if (settings.winner.score.enabled) {
+                double winGain = settings.winner.score.amount;
+                int currentScore = winner.getStats().getScore();
+                if (currentScore < 100 && currentScore > 50) {
+                    winGain *= 1.25;
+                } else if (currentScore <= 50 && currentScore > 25) {
+                    winGain *= 1.5;
+                } else if (currentScore < 25) {
+                    winGain *= 2;
+                } else if (currentScore < 1000 && currentScore > 500) {
+                    winGain *= .75;
+                } else if (currentScore >= 1000) {
+                    winGain *= .5;
+                }
+                winner.getStats().addScore((int) winGain);
+                winner.sendMessage("&2&l>> &a+" + (int) winGain + " Score!");
             }
-            winner.getStats().addScore((int) winGain);
-            winner.sendMessage("&2&l>> &a+" + (int) winGain + " Score!");
             Rank rank = winner.getRank();
-            if (settings.isGiveXp()) {
-                double xp = settings.getWinXPBaseGain();
+            if (settings.winner.xp.enabled) {
+                double xp = settings.winner.xp.amount;
                 winner.getNexusPlayer().addXp(xp);
                 String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(xp) + " &2&lXP&a&l!";
                 winner.sendMessage(baseMessage);
             }
             
-            if (settings.isGiveCredits()) {
-                double credits = settings.getWinCreditsBaseGain();
+            if (settings.winner.credits.enabled) {
+                double credits = settings.winner.credits.amount;
                 winner.getBalance().addCredits(credits);
                 String baseMessage = "&2&l>> &a&l+" + MCUtils.formatNumber(credits) + " &3&lCREDITS&a&l!";
                 winner.sendMessage(baseMessage);
             }
             
-            if (settings.isEarnNexites()) {
-                double nexites = settings.getWinNexiteBaseGain();
-                winner.getBalance().addNexites(nexites);
-                String baseMessage = "&2&l>> &a&l" + nexites + " &9&lNEXITES&a&l!";
-                winner.sendMessage(baseMessage);
-            }
-            
-            double passWinValue = new Random().nextDouble();
-            if (passWinValue <= getSettings().getPassRewardChance()) {
-                winner.getStats().addMutationPasses(1);
-                winner.sendMessage("&2&l>> &a&lYou won a mutation pass! Great job!");
-            } else {
-                winner.sendMessage(MsgType.INFO + "You did not win a mutation pass this time.");
+            if (settings.mutations.passes.enabled) {
+                double passWinValue = new Random().nextDouble();
+                if (passWinValue <= getSettings().mutations.passes.awardChance) {
+                    winner.getStats().addMutationPasses(1);
+                    winner.sendMessage("&2&l>> &a&lYou won a mutation pass! Great job!");
+                } else {
+                    winner.sendMessage(MsgType.INFO + "You did not win a mutation pass this time.");
+                }
             }
             
             Bounty bounty = winner.getBounty();
@@ -1220,7 +1222,7 @@ public class Game implements Controllable, IHasState {
         });
         
         if (!(this.players.isEmpty() || Bukkit.getOnlinePlayers().isEmpty())) {
-            this.timer = plugin.getClockManager().createTimer(TimeUnit.SECONDS.toMillis(settings.getNextGameStart()));
+            this.timer = plugin.getClockManager().createTimer(TimeUnit.SECONDS.toMillis(settings.nextGameTimerLength));
             this.timer.addRepeatingCallback(new GameSecondsCallback(this, Sound.CLICK, "&6&l>> &eNext game starts in &b{time}&e."), TimeUnit.SECONDS, 1);
             FireworkItemBuilder fireworkBuilder = new FireworkItemBuilder(FireworkEffect.builder().with(FireworkEffect.Type.BALL).trail(true).withColor(SurvivalGames.COLORS).build(), 1);
             fireworkBuilder.material(XMaterial.FIREWORK_ROCKET);
@@ -1239,7 +1241,7 @@ public class Game implements Controllable, IHasState {
             
             AtomicBoolean firstHalfRan = new AtomicBoolean(false);
             this.timer.addRepeatingCallback(timerSnapshot -> {
-                if (!getSettings().isFireworks()) {
+                if (!getSettings().cosmetics.fireworks) {
                     return;
                 }
                 
@@ -1384,8 +1386,14 @@ public class Game implements Controllable, IHasState {
             boolean deathByVanish = deathInfo.getType() == DeathType.VANISH;
             logDebug("  Death By Vanish: " + deathByVanish);
             int score = gamePlayer.getStats().getScore();
-            int lost = (int) Math.ceil(score / settings.getScoreDivisor());
-            if (score - lost < 0) {
+            int lost;
+            if (settings.killer.score.enabled) {
+                if (settings.killer.score.relative) {
+                    lost = (int) Math.floor((double) score / settings.killer.score.amount);
+                } else {
+                    lost = settings.killer.score.amount;
+                }
+            } else {
                 lost = 0;
             }
             
@@ -1428,25 +1436,24 @@ public class Game implements Controllable, IHasState {
                     sendMessage("");
                     deathInfo.setKiller(null);
                 } else {
-                    scoreGain = lost;
-                    
-                    if (this.firstBlood == null) {
-                        this.firstBlood = killerPlayer;
-                        claimedFirstBlood = true;
+                    if (settings.killer.score.enabled) {
+                        scoreGain = lost;
+                        
+                        if (this.firstBlood == null) {
+                            this.firstBlood = killerPlayer;
+                            claimedFirstBlood = true;
+                            scoreGain = (int) (scoreGain * settings.killer.score.firstBloodMultiplier);
+                        }
+                        
+                        if (scoreBounty > 0) {
+                            scoreGain += (int) scoreBounty;
+                            claimedScoreBounty = true;
+                            bounty.remove(Bounty.Type.SCORE);
+                        }
+                        
+                        logDebug("  Killer Score Gain: " + scoreGain);
+                        killerPlayer.getStats().addScore(scoreGain);
                     }
-                    
-                    if (claimedFirstBlood) {
-                        scoreGain = (int) (scoreGain * settings.getFirstBloodMultiplier());
-                    }
-                    
-                    if (scoreBounty > 0) {
-                        scoreGain += (int) scoreBounty;
-                        claimedScoreBounty = true;
-                        bounty.remove(Bounty.Type.SCORE);
-                    }
-                    
-                    logDebug("  Killer Score Gain: " + scoreGain);
-                    killerPlayer.getStats().addScore(scoreGain);
                     
                     killerPlayer.setKillStreak(killerPlayer.getKillStreak() + 1);
                     currentStreak = killerPlayer.getKillStreak();
@@ -1457,13 +1464,13 @@ public class Game implements Controllable, IHasState {
                         killerPlayer.getStats().setHighestKillstreak(currentStreak);
                     }
                     
-                    if (getSettings().isGiveXp()) {
-                        xpGain = settings.getKillXPGain();
+                    if (getSettings().killer.xp.enabled) {
+                        xpGain = settings.killer.xp.amount;
                         killerPlayer.getNexusPlayer().addXp(xpGain);
                     }
                     
-                    if (getSettings().isGiveCredits()) {
-                        creditGain = settings.getKillCreditGain();
+                    if (getSettings().killer.credits.enabled) {
+                        creditGain = settings.killer.credits.amount;
                         
                         if (creditBounty > 0) {
                             creditGain += (int) creditBounty;
@@ -1471,11 +1478,6 @@ public class Game implements Controllable, IHasState {
                             claimedCreditBounty = true;
                         }
                         killerPlayer.getBalance().addCredits(creditGain);
-                    }
-                    
-                    if (getSettings().isEarnNexites()) {
-                        nexiteGain = settings.getKillNexiteGain();
-                        killerPlayer.getBalance().addNexites(nexiteGain);
                     }
                     
                     killerPlayer.getStats().addKills(1);
@@ -1497,7 +1499,7 @@ public class Game implements Controllable, IHasState {
             logDebug("  Total Damagers: " + damagers);
             List<AssisterInfo> assistors = new ArrayList<>();
             List<String> assistorNames = new ArrayList<>();
-            if (settings.isAllowAssists()) {
+            if (settings.assists.enabled) {
                 if (!damagers.isEmpty()) {
                     for (UUID damager : damagers) {
                         if (killer != null && killer.getKiller().equals(damager)) {
@@ -1509,7 +1511,7 @@ public class Game implements Controllable, IHasState {
                             assistorNames.add(assisterPlayer.getName());
                             assisterPlayer.setAssists(assisterPlayer.getAssists() + 1);
                             assisterPlayer.getStats().addAssists(1);
-                            assistors.add(new AssisterInfo(this, assisterPlayer));
+                            assistors.add(new AssisterInfo(this, assisterPlayer, lost));
                         }
                     }
                 }
@@ -1602,13 +1604,15 @@ public class Game implements Controllable, IHasState {
                     personalBest = currentStreak;
                 }
                 killerPlayer.sendMessage("&6&l>> &f&lCurrent Streak: &a" + currentStreak + "  &f&lPersonal Best: &a" + personalBest);
-                killerPlayer.sendMessage("&2&l>> &a+" + scoreGain + " Score!" + (claimedScoreBounty ? " &e&lClaimed Bounty" : "") + (claimedFirstBlood ? " &c&lFirst Blood" : ""));
-                if (settings.isGiveXp()) {
-                    String xpMsg = "&2&l>> &a&l+" + xpGain + " &2&lXP&a&l!";
-                    killerPlayer.sendMessage(xpMsg);
+                if (settings.killer.score.enabled) {
+                    killerPlayer.sendMessage("&2&l>> &a+" + scoreGain + " Score!" + (claimedScoreBounty ? " &e&lClaimed Bounty" : "") + (claimedFirstBlood ? " &c&lFirst Blood" : ""));
                 }
                 
-                if (settings.isGiveCredits()) {
+                if (settings.killer.xp.enabled) {
+                    killerPlayer.sendMessage("&2&l>> &a&l+" + xpGain + " &2&lXP&a&l!");
+                }
+                
+                if (settings.killer.credits.enabled) {
                     String creditsMsg = "&2&l>> &a&l+" + creditGain + " &3&lCREDITS&a&l!";
                     if (claimedCreditBounty) {
                         creditsMsg += " &e&lClaimed Bounty";
@@ -1616,33 +1620,27 @@ public class Game implements Controllable, IHasState {
                     
                     killerPlayer.sendMessage(creditsMsg);
                 }
-                
-                if (settings.isEarnNexites()) {
-                    String nexiteMsg = "&2&l>> &a&l" + nexiteGain + " &9&lNEXITES&a&l!";
-                    killerPlayer.sendMessage(nexiteMsg);
+            }
+            
+            if (settings.assists.enabled) {
+                for (AssisterInfo assister : assistors) {
+                    GamePlayer assisterPlayer = assister.getGamePlayer();
+                    assisterPlayer.sendMessage("&2&l>> &a+1 &aAssist");
+                    String xpMsg = "&2&l>> &a&l+" + (int) assister.getXp() + " &2&lXP&a&l!";
+                    String creditsMsg = "&2&l>> &a&l+" + (int) assister.getCredits() + " &3&lCREDITS&a&l!";
+                    if (assister.getXp() > 0) {
+                        assisterPlayer.sendMessage(xpMsg);
+                    }
+                    
+                    if (assister.getCredits() > 0) {
+                        assisterPlayer.sendMessage(creditsMsg);
+                    }
                 }
             }
             
-            for (AssisterInfo assister : assistors) {
-                GamePlayer assisterPlayer = assister.getGamePlayer();
-                assisterPlayer.sendMessage("&2&l>> &a+1 &aAssist");
-                String xpMsg = "&2&l>> &a&l+" + (int) assister.getXp() + " &2&lXP&a&l!";
-                String creditsMsg = "&2&l>> &a&l+" + (int) assister.getCredits() + " &3&lCREDITS&a&l!";
-                String nexitesMsg = "&2&l>> &a&l" + (int) assister.getNexites() + " &9&lNEXITES&a&l!";
-                if (assister.getXp() > 0) {
-                    assisterPlayer.sendMessage(xpMsg);
-                }
-                
-                if (assister.getCredits() > 0) {
-                    assisterPlayer.sendMessage(creditsMsg);
-                }
-                
-                if (assister.getNexites() > 0) {
-                    assisterPlayer.sendMessage(nexitesMsg);
-                }
+            if (settings.killer.score.enabled) {
+                gamePlayer.sendMessage("&4&l>> &cYou lost " + lost + " Points for dying!");
             }
-            
-            gamePlayer.sendMessage("&4&l>> &cYou lost " + lost + " Points for dying!");
             sendMessage("&6&l>> " + oldTeam.getRemainColor() + "&l" + oldTeamRemaining + " " + oldTeam.name().toLowerCase() + " remain.");
             if (claimedFirstBlood) {
                 sendMessage("&6&l>> &c&l" + firstBlood.getName().toUpperCase() + " CLAIMED FIRST BLOOD!");
@@ -1657,11 +1655,11 @@ public class Game implements Controllable, IHasState {
             sendMessage(deathInfo.getDeathMessage());
             gamePlayer.sendMessage(GameTeam.SPECTATORS.getJoinMessage());
             
-            if (claimedScoreBounty) {
+            if (claimedScoreBounty && settings.killer.score.enabled) {
                 sendMessage("&6&l>> " + killerPlayer.getColoredName() + " &6&lhas claimed the &b&l" + scoreBounty + " Score &6&lbounty on " + gamePlayer.getColoredName());
             }
             
-            if (claimedCreditBounty && settings.isGiveCredits()) {
+            if (claimedCreditBounty && settings.killer.credits.enabled) {
                 sendMessage("&6&l>> " + killerPlayer.getColoredName() + " &6&lhas claimed the &b&l" + scoreBounty + " Credit &6&lbounty on " + gamePlayer.getColoredName());
             }
             
@@ -1691,11 +1689,11 @@ public class Game implements Controllable, IHasState {
             return;
         }
         
-        if (!settings.isAllowDeathmatch()) {
+        if (!settings.deathmatch.enabled) {
             return;
         }
         
-        if (!settings.isDeathmatchPlayerCount()) {
+        if (!settings.deathmatch.trigger.enabled) {
             return;
         }
         
@@ -1706,14 +1704,16 @@ public class Game implements Controllable, IHasState {
             }
         }
         
-        if (totalTributes <= settings.getDeathmatchThreshold()) {
-            if (totalTributes > 1) {
-                if (controlType == ControlType.AUTO) {
-                    if (this.timer.getTime() > 60000) {
-                        this.startDeathmatchTimer();
+        if (settings.deathmatch.trigger.enabled) {
+            if (totalTributes <= settings.deathmatch.trigger.threshold) {
+                if (totalTributes > 1) {
+                    if (controlType == ControlType.AUTO) {
+                        if (this.timer.getTime() > 60000) {
+                            this.startDeathmatchTimer();
+                        }
+                    } else {
+                        sendMessage("&eTribute count reached or went below the deathmatch threashold, but was not automatically started due to being in manual mode.");
                     }
-                } else {
-                    sendMessage("&eTribute count reached or went below the deathmatch threashold, but was not automatically started due to being in manual mode.");
                 }
             }
         }
@@ -1735,13 +1735,13 @@ public class Game implements Controllable, IHasState {
             } else if (totalTributes == 1) {
                 //TODO handle zombies for undead mode
                 boolean gameComplete = false;
-                if (!settings.isAllowSingleTribute()) {
+                if (!settings.allowSingleTribute) {
                     gameComplete = true;
                 } else {
-                    if (!settings.isAllowMutations() && this.mode != SGMode.UNDEAD) {
+                    if (!settings.mutations.enabled && this.mode != SGMode.UNDEAD) {
                         gameComplete = true;
                     } else {
-                        if (settings.isAllowDeathmatch()) {
+                        if (settings.deathmatch.enabled) {
                             gameComplete = true;
                         } else {
                             int totalMutations = getTeamCount(GameTeam.MUTATIONS);
@@ -1809,7 +1809,7 @@ public class Game implements Controllable, IHasState {
         
         sendMessage("&6&l>> &4&lTHE DEATHMATCH COUNTDOWN HAS STARTED");
         playSound(Sound.ENDERDRAGON_GROWL);
-        this.timer = plugin.getClockManager().createTimer(TimeUnit.SECONDS.toMillis(settings.getDeathmatchTimerLength()) + 50L);
+        this.timer = plugin.getClockManager().createTimer(settings.deathmatch.trigger.length.get());
         this.timer.addRepeatingCallback(new GameSecondsCallback(this, Sound.CLICK, "&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b{time}&e."), TimeUnit.SECONDS, 1);
         this.timer.setEndCondition(new DMTimerEndCondition(this));
         this.timer.start();
@@ -1853,7 +1853,9 @@ public class Game implements Controllable, IHasState {
         gamePlayer.sendMessage(gamePlayer.getTeam().getJoinMessage());
         DisguiseAPI.disguiseEntity(player, new MobDisguise(mutation.getType().getDisguiseType()));
         gamePlayer.incrementTimesMutated();
-        gamePlayer.sendMessage("&6&l>> &dYou have &b" + gamePlayer.getStats().getMutationPasses() + " Passes &dremaining.");
+        if (settings.mutations.passes.enabled) {
+            gamePlayer.sendMessage("&6&l>> &dYou have &b" + gamePlayer.getStats().getMutationPasses() + " Passes &dremaining.");
+        }
         gamePlayer.sendMessage("&d&l>> &7You're now disguised.");
         
         gamePlayer.setMutated(true);

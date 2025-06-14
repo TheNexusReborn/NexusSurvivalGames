@@ -19,9 +19,16 @@ import java.util.*;
 public class SponsorMenu extends InventoryGUI {
     public SponsorMenu(SurvivalGames plugin, GamePlayer actor, GamePlayer target) {
         super(1, "&lSponsor " + target.getName());
-
+        
         SGPlayer actorPlayer = plugin.getPlayerRegistry().get(actor.getUniqueId());
         SGPlayer targetPlayer = plugin.getPlayerRegistry().get(target.getUniqueId());
+        
+        if (target.getGame().getSettings().sponsoring.maxPerTribute > -1) {
+            if (target.getGame().getSettings().sponsoring.maxPerTribute <= target.getTimesSponsoredByOthers()) {
+                MsgType.WARN.send(actorPlayer.getSpigotPlayer(), "%v can not be sponsored any more.", target.getColoredName());
+                return;
+            }
+        }
 
         if (actorPlayer.getGame() != targetPlayer.getGame()) {
             actor.sendMessage(MsgType.WARN + "You and the target are not in the same game.");
@@ -30,8 +37,8 @@ public class SponsorMenu extends InventoryGUI {
         
         Game game = actorPlayer.getGame();
         
-        int creditCost = game.getSettings().getSponsorCreditCost();
-        int scoreCost = game.getSettings().getSponsorScoreCost();
+        int creditCost = game.getSettings().sponsoring.costs.credit;
+        int scoreCost = game.getSettings().sponsoring.costs.score;
     
         SponsorManager sponsorManager = game.getSponsorManager();
         for (SponsorCategory<?> category : sponsorManager.getCategories()) {
@@ -65,7 +72,7 @@ public class SponsorMenu extends InventoryGUI {
                 }
                 
                 if (!actor.canSponsor()) {
-                    actor.sendMessage(MsgType.WARN + "You can only sponsor " + game.getSettings().getMaxSponsorships() + " time(s).");
+                    actor.sendMessage(MsgType.WARN + "You can only sponsor " + game.getSettings().sponsoring.maxPerPlayer + " time(s).");
                     return;
                 }
 
@@ -91,7 +98,7 @@ public class SponsorMenu extends InventoryGUI {
                     actor.getStats().addScore(-cost);
                 }
                 actor.setSponsored(true);
-                actor.incrementSponsors();
+                actor.incrementSponsoredOthers();
 
                 Object chosen = category.getEntries().get(new Random().nextInt(category.getEntries().size()));
                 category.apply(Bukkit.getPlayer(target.getUniqueId()), chosen);

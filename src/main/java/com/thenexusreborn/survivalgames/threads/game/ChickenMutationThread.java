@@ -48,7 +48,7 @@ public class ChickenMutationThread extends StarThread<SurvivalGames> {
         
             if (gamePlayer.getMutation() instanceof ChickenMutation chickenMutation) {
                 if (this.eggGain == 0) {
-                    if (game.getSettings().getChickenMaxAmmo() == -1 || chickenMutation.getAmmunition() <= game.getSettings().getChickenMaxAmmo()) {
+                    if (game.getSettings().mutations.chicken.maxAmmo == -1 || chickenMutation.getAmmunition() <= game.getSettings().mutations.chicken.maxAmmo) {
                         chickenMutation.incrementAmmunition();
                     }
                 }
@@ -59,7 +59,7 @@ public class ChickenMutationThread extends StarThread<SurvivalGames> {
                         if (hand.getType() == Material.WOOD_SWORD) {
                             if (chickenMutation.getAmmunition() > 0) {
                                 if (chickenMutation.getLastEggLaunch() > 0) {
-                                    long nextLaunch = chickenMutation.getLastEggLaunch() + game.getSettings().getChickenEggLaunchCooldown();
+                                    long nextLaunch = chickenMutation.getLastEggLaunch() + game.getSettings().mutations.chicken.launchCooldown.get();
                                     if (nextLaunch <= System.currentTimeMillis()) {
                                         sgPlayer.launchProjectile(Egg.class);
                                         chickenMutation.decrementAmmunition();

@@ -2,7 +2,6 @@ package com.thenexusreborn.survivalgames.cmd;
 
 import com.stardevllc.starcore.api.cmdflags.FlagResult;
 import com.thenexusreborn.api.player.Rank;
-import com.thenexusreborn.nexuscore.NexusCore;
 import com.thenexusreborn.nexuscore.api.command.NexusCommand;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -21,17 +20,17 @@ public class MutationMayhemCmd extends NexusCommand<SurvivalGames> {
         Player player = (Player) sender;
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
         
-        GameSettings settings = null;
+        GameSettings settings;
         if (sgPlayer.getLobby() != null) {
             settings = sgPlayer.getLobby().getGameSettings();
         } else {
             settings = sgPlayer.getGame().getSettings();
         }
         
-        settings.setAllowSingleTribute(true);
-        settings.setAllowDeathmatch(false);
-        settings.setAllowRecursiveMutations(true);
-        settings.setAutomaticGraceperiod(false);
+        settings.allowSingleTribute = true;
+        settings.deathmatch.enabled = false;
+        settings.mutations.recursiveRevenge = true;
+        settings.graceperiod.auto.enabled = false;
         
         return true;
     }

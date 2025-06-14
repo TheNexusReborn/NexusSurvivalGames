@@ -280,7 +280,7 @@ public class EntityListener implements Listener {
                     }
                 }
             } else if (e.getDamager() instanceof FishHook) {
-                if (!game.getSettings().isAllowRoddingMutations()) {
+                if (!game.getSettings().mutations.waterMitigation) {
                     if (targetPlayer.getTeam() == GameTeam.MUTATIONS) {
                         Material blockType = damagerPlayer.getLocation().getBlock().getType();
                         if (blockType == Material.WATER || blockType == Material.STATIONARY_WATER) {
@@ -374,7 +374,7 @@ public class EntityListener implements Listener {
         if (game != null) {
             if (e.getEntity() instanceof Player) {
                 GamePlayer gamePlayer = game.getPlayer(e.getEntity().getUniqueId());
-                if (!game.getSettings().isRegeneration()) {
+                if (!game.getSettings().player.regeneration) {
                     if (gamePlayer.getTeam() == GameTeam.TRIBUTES) {
                         e.setCancelled(true);
                     }

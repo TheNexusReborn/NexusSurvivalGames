@@ -37,7 +37,7 @@ public class GamePlayerStatusSubCmd extends GamePlayerSubCmd {
         sendLine(sender, "Times Mutated", target.getTimesMutated());
         sendLine(sender, "Death By Mutation", target.deathByMutation());
         sendLine(sender, "Sponsored", target.hasSponsored());
-        sendLine(sender, "Times Sponsored", target.getTimesSponsored());
+        sendLine(sender, "Times Sponsored", target.getTimesSponsoredOthers());
         if (target.getCombatTag().isInCombat()) {
             String ctOther = game.getPlayer(target.getCombatTag().getOther()).getName();
             String ctTime = timeFormat.format(target.getCombatTag().getTimer().getTime());

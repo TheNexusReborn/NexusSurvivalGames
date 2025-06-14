@@ -244,7 +244,7 @@ public class SGPAPIExpansion extends PlaceholderExpansion {
                         int hks = gamePlayer.getStats().getHighestKillstreak();
                         return killStreak + "/" + hks;
                     } else if (playerOption.equalsIgnoreCase("assists")) {
-                        if (game.getSettings().isAllowAssists()) {
+                        if (game.getSettings().assists.enabled) {
                             return String.valueOf(gamePlayer.getAssists());
                         }
                     }

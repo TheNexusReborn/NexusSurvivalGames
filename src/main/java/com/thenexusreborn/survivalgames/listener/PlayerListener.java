@@ -263,25 +263,25 @@ public class PlayerListener implements Listener {
                         
                         SGLootTable lootTable = null;
                         
-                        if (game.getSettings().getLootMode() == LootMode.CLASSIC) {
-                            lootTable = lootManager.getLootTable(game.getSettings().getRegularTier());
-                        } else if (game.getSettings().getLootMode() == LootMode.TIERED) {
+                        if (game.getSettings().loot.mode == LootMode.CLASSIC) {
+                            lootTable = lootManager.getLootTable(game.getSettings().loot.tiers.regular);
+                        } else if (game.getSettings().loot.mode == LootMode.TIERED) {
                             if (game.getState() == Game.State.DEATHMATCH) {
-                                lootTable = lootManager.getLootTable(game.getSettings().getDeathmatchTier());
+                                lootTable = lootManager.getLootTable(game.getSettings().loot.tiers.deathmatch);
                             } else {
                                 boolean withinCenter = game.getGameMap().getDeathmatchRegion().contains(BukkitUtil.toVector(player.getLocation()));
                                 if (game.getState() == Game.State.INGAME || game.getState() == Game.State.INGAME_DEATHMATCH) {
                                     boolean afterRestock = game.getTimedRestockCount() > 0;
                                     if (withinCenter) {
-                                        lootTable = lootManager.getLootTable(game.getSettings().getCornucopiaTier());
+                                        lootTable = lootManager.getLootTable(game.getSettings().loot.tiers.cornucopia);
                                     } else {
-                                        lootTable = lootManager.getLootTable(game.getSettings().getRegularTier());
+                                        lootTable = lootManager.getLootTable(game.getSettings().loot.tiers.regular);
                                     }
                                 }
                             }
-                        } else if (game.getSettings().getLootMode() == LootMode.RANDOM) {
+                        } else if (game.getSettings().loot.mode == LootMode.RANDOM) {
                             if (game.getState() == Game.State.DEATHMATCH) {
-                                lootTable = lootManager.getLootTable(game.getSettings().getDeathmatchTier());
+                                lootTable = lootManager.getLootTable(game.getSettings().loot.tiers.deathmatch);
                             } else {
                                 List<String> chances;
                                 if (game.getTimer().getTime() < game.getTimer().getLength() / 2) {
@@ -488,7 +488,7 @@ public class PlayerListener implements Listener {
                     return;
                 }
                 
-                if (!game.getSettings().isAllowSwagShack()) {
+                if (!game.getSettings().swagShack.enabled) {
                     e.getPlayer().sendMessage(StarColors.color(MsgType.WARN + "The Swag Shack is disabled for this game."));
                     return;
                 }

@@ -4,7 +4,7 @@ import com.stardevllc.starcore.utils.StarThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
-import com.thenexusreborn.survivalgames.settings.enums.Weather;
+import com.thenexusreborn.survivalgames.settings.enums.WeatherType;
 import org.bukkit.World;
 
 public class GameWorldThread extends StarThread<SurvivalGames> {
@@ -30,19 +30,19 @@ public class GameWorldThread extends StarThread<SurvivalGames> {
                 continue;
             }
 
-            world.setTime(game.getSettings().getTime().getStart());
-            Weather weather = game.getSettings().getWeather();
-            if (weather == Weather.CLEAR) {
+            world.setTime(game.getSettings().world.time.value.getStart());
+            WeatherType weather = game.getSettings().world.weather.type;
+            if (weather == WeatherType.CLEAR) {
                 world.setStorm(false);
                 world.setThundering(false);
                 world.setWeatherDuration(Integer.MAX_VALUE);
                 world.setThunderDuration(Integer.MAX_VALUE);
-            } else if (weather == Weather.RAIN) {
+            } else if (weather == WeatherType.RAIN) {
                 world.setStorm(true);
                 world.setThundering(false);
                 world.setWeatherDuration(Integer.MAX_VALUE);
                 world.setThunderDuration(Integer.MAX_VALUE);
-            } else if (weather == Weather.STORM) {
+            } else if (weather == WeatherType.STORM) {
                 world.setStorm(true);
                 world.setThundering(true);
                 world.setWeatherDuration(Integer.MAX_VALUE);

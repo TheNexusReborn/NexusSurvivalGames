@@ -19,19 +19,19 @@ public class GameSecondsCallback implements ClockCallback<TimerSnapshot> {
     private Supplier<String> msgSupplier;
     private boolean announceMinute;
     private Sound sound;
-
+    
     public GameSecondsCallback(Game game, Sound sound, String message) {
         this(game, sound, () -> message);
     }
-
+    
     public GameSecondsCallback(Game game, Sound sound, String message, boolean announceMinute) {
         this(game, sound, () -> message, announceMinute);
     }
-
+    
     public GameSecondsCallback(Game game, Sound sound, Supplier<String> msgSupplier) {
         this(game, sound, msgSupplier, false);
     }
-
+    
     public GameSecondsCallback(Game game, Sound sound, Supplier<String> msgSupplier, boolean announceMinute) {
         this.game = game;
         this.msgSupplier = msgSupplier;
@@ -49,12 +49,10 @@ public class GameSecondsCallback implements ClockCallback<TimerSnapshot> {
             }
             
             game.sendMessage(msgSupplier.get().replace("{time}", Game.LONG_TIME_FORMAT.format(timerSnapshot.getTime())));
-            if (game.getSettings().isSounds()) {
-                game.playSound(sound);
-            }
+            game.playSound(sound);
         }
     }
-
+    
     @Override
     public CallbackPeriod getPeriod() {
         return () -> 1000L;
