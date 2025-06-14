@@ -87,7 +87,7 @@ public class SettingsSetSubCmd extends SubCommand<SurvivalGames> {
             return true;
         }
         if (!flagResults.isPresent(SILENT)) {
-            plugin.getNexusCore().getStaffChannel().sendMessage(new ChatContext(sgPlayer.getNexusPlayer().getColoredName() + " &fset the " + type + " setting " + field.getName() + " to " + value + "."));
+            plugin.getNexusCore().getStaffChannel().sendMessage(new ChatContext(sgPlayer.getTrueColoredName() + " &fset the setting &e" + type + "." + field.getName().toLowerCase() + " &fto &b" + value + "&f."));
         } else {
             MsgType.INFO.send(player, "You set the %v setting %v to %v.", type, field.getName(), value);
         }
