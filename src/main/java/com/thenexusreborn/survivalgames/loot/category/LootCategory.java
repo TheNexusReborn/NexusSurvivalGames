@@ -10,8 +10,8 @@ public enum LootCategory {
     ARMOR("armor"),
     LEATHER_ARMOR("leather_armor"),
     GOLD_ARMOR("gold_armor"),
-    IRON_ARMOR("iron_armor"),
     CHAINMAIL_ARMOR("chainmail_armor", 2),
+    IRON_ARMOR("iron_armor", 1),
     DIAMOND_ARMOR("diamond_armor"),
     
     HELMETS("helmets", 1),
