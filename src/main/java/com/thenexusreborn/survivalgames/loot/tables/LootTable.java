@@ -11,21 +11,13 @@ import java.util.*;
 public class LootTable {
     protected final String name;
 
-//    private LootItem[] items = new LootItem[0];
-//    private int lastIndex;
-    
     private Map<String, TableItem> registeredItems = new HashMap<>();
-
-//    protected final Map<String, Integer> itemWeights = new HashMap<>();
 
     public LootTable(String name) {
         this.name = name;
     }
     
     protected void resetItems() {
-//        this.items = new LootItem[0];
-//        this.lastIndex = 0;
-//        this.itemWeights.clear();
         this.registeredItems.clear();
     }
 
