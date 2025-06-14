@@ -111,6 +111,9 @@ public class LootItem {
         int amount = new Random().nextInt(1, this.amount + 1);
         
         itemStack.setAmount(amount);
+        
+        this.enchantments.forEach(itemStack::addUnsafeEnchantment);
+        
         return itemStack;
     }
     

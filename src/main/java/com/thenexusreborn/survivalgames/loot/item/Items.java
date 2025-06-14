@@ -1,7 +1,9 @@
 package com.thenexusreborn.survivalgames.loot.item;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.*;
 
 import static com.thenexusreborn.survivalgames.loot.category.LootCategory.*;
 
@@ -80,4 +82,16 @@ public final class Items {
     public static final LootItem FEATHER = REGISTRY.register(Material.FEATHER).setCategories(COMPONENTS, WEAPON_COMPONENT);
     public static final LootItem FLINT = REGISTRY.register(Material.FLINT).setCategories(COMPONENTS, TOOL_COMPONENT);
     public static final LootItem DIAMOND = REGISTRY.register(Material.DIAMOND).setCategories(COMPONENTS, WEAPON_COMPONENT, ARMOR_COMPONENT);
+    
+    static {
+        Recipe sacrificialAxeRecipe = new ShapelessRecipe(SACRIFICIAL_AXE.getItemStack())
+                .addIngredient(8, Material.GOLD_INGOT)
+                .addIngredient(Material.DIAMOND_AXE);
+        Bukkit.getServer().addRecipe(sacrificialAxeRecipe);
+        
+        Recipe sacrificialSwordRecipe = new ShapelessRecipe(SACRIFICIAL_SWORD.getItemStack())
+                .addIngredient(8, Material.GOLD_INGOT)
+                .addIngredient(Material.DIAMOND_SWORD);
+        Bukkit.getServer().addRecipe(sacrificialSwordRecipe);
+    }
 }
