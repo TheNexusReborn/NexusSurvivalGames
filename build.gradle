@@ -29,6 +29,9 @@ repositories {
     maven {
         url = 'https://repo.codemc.org/repository/maven-public/'
     }
+    maven {
+        url = "https://repo.gravemc.net/releases/"
+    }
 }
 
 processResources {
@@ -47,15 +50,16 @@ dependencies {
     compileOnly 'com.github.StarDevelopmentLLC:StarChat:0.2.6'
     compileOnly 'com.github.StarDevelopmentLLC:StarItems:0.1.8'
     compileOnly 'me.clip:placeholderapi:2.11.5'
-    compileOnly 'org.spigotmc:spigot:1.8.8-R0.1-SNAPSHOT'
+    compileOnly 'org.spigotmc:spigot:1.21.5-R0.1-SNAPSHOT'
     compileOnly 'com.comphenix.protocol:ProtocolLib:5.0.0'
-    compileOnly 'com.sk89q.worldedit:worldedit-core:6.1'
-    compileOnly 'com.sk89q.worldedit:worldedit-bukkit:6.1.5'
+    compileOnly 'com.sk89q.worldedit:worldedit-core:7.3.14'
+    compileOnly 'com.sk89q.worldedit:worldedit-bukkit:7.3.14'
+    compileOnly 'dev.iiahmed:ModernDisguise:3.6'
 }
 
 group = 'com.thenexusreborn'
 //version = '1.19.3-ALPHA'
-version = '0.3.3'
+version = '0.4.0'
 
 jar {
 //    destinationDirectory = file(System.getProperty("user.home") + File.separator + "Documents" + File.separator + "JarOutput" + File.separator + "NexusReborn")

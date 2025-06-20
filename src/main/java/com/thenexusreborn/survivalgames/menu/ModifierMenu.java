@@ -54,7 +54,7 @@ public class ModifierMenu extends InventoryGUI implements UpdatingGUI {
                 } else if (e.getClick() == ClickType.RIGHT) {
                     lobby.addModifierNoVote(modifier, playerUUID);
                 }
-            }, Sound.CLICK, 1.0F);
+            }, Sound.UI_BUTTON_CLICK, 1.0F);
             addElement(button);
         });
     }

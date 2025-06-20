@@ -1,23 +1,15 @@
 package com.thenexusreborn.survivalgames.threads.lobby;
 
-import com.mojang.authlib.GameProfile;
 import com.stardevllc.starcore.api.StarColors;
 import com.stardevllc.starcore.utils.StarThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.lobby.Lobby;
-import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
-import com.thenexusreborn.survivalgames.lobby.LobbyState;
-import com.thenexusreborn.survivalgames.lobby.TributeSign;
+import com.thenexusreborn.survivalgames.lobby.*;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Skull;
 import org.bukkit.entity.Player;
 
-import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.UUID;
+import java.util.*;
 
 public class TributeSignUpdateThread extends StarThread<SurvivalGames> {
     
@@ -54,15 +46,10 @@ public class TributeSignUpdateThread extends StarThread<SurvivalGames> {
                     continue;
                 }
                 Skull skull = (Skull) tributeSign.getHeadLocation().getBlock().getState();
+                
                 if (players.isEmpty() || players.size() <= tributeSign.getIndex()) {
-                    try {
-                        Field profileField = skull.getClass().getDeclaredField("profile");
-                        profileField.setAccessible(true);
-                        profileField.set(skull, new GameProfile(randomUUID, ""));
-                        skull.update();
-                    } catch (NoSuchFieldException | IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
+                    skull.setOwnerProfile(null);
+                    skull.update();
                     String[] lines = {"", "", "", ""};
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         if (p.getWorld().getName().equalsIgnoreCase(tributeSign.getSignLocation().getWorld().getName())) {
@@ -88,7 +75,7 @@ public class TributeSignUpdateThread extends StarThread<SurvivalGames> {
                 int score = lobbyPlayer.getStats().getScore();
                 int kills = lobbyPlayer.getStats().getKills();
                 int wins = lobbyPlayer.getStats().getWins();
-                skull.setOwner(player.getName());
+                skull.setOwnerProfile(player.getPlayerProfile());
                 skull.update();
 
                 String[] lines = {name, "Score: " + score, "Kills: " + kills, "Wins: " + wins};

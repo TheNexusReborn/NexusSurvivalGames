@@ -12,6 +12,7 @@ import com.thenexusreborn.survivalgames.mutations.*;
 import com.thenexusreborn.survivalgames.mutations.impl.ChickenMutation;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import org.bukkit.*;
+import org.bukkit.craftbukkit.v1_21_R4.entity.CraftPlayer;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -249,7 +250,7 @@ public class EntityListener implements Listener {
             
             if (e.getDamager() instanceof Snowball) {
                 if (targetPlayer.getTeam() == GameTeam.TRIBUTES) {
-                    target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 160, 0));
+                    target.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 160, 0));
                 } else {
                     e.setCancelled(true);
                 }
@@ -257,7 +258,7 @@ public class EntityListener implements Listener {
                 Mutation mutation = game.getPlayer(shooter.getUniqueId()).getMutation();
                 if (targetPlayer.getTeam() == GameTeam.TRIBUTES) {
                     target.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 160, 1));
-                    target.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 160, 1));
+                    target.addPotionEffect(new PotionEffect(PotionEffectType.NAUSEA, 160, 1));
                 } else {
                     if (!(mutation instanceof ChickenMutation)) {
                         e.setCancelled(true);
@@ -274,7 +275,7 @@ public class EntityListener implements Listener {
                         }
                         
                         e.setDamage(DamageModifier.BASE, 2.5);
-                        target.setLastDamageCause(new EntityDamageByEntityEvent(Bukkit.getPlayer(targetPlayer.getUniqueId()), e.getEntity(), DamageCause.ENTITY_ATTACK, 2.5));
+//                        target.setLastDamageCause(new EntityDamageByEntityEvent(Bukkit.getPlayer(targetPlayer.getUniqueId()), e.getEntity(), DamageCause.ENTITY_ATTACK, 2.5));
                     } else {
                         e.setCancelled(true);
                     }
@@ -283,7 +284,7 @@ public class EntityListener implements Listener {
                 if (!game.getSettings().isAllowRoddingMutations()) {
                     if (targetPlayer.getTeam() == GameTeam.MUTATIONS) {
                         Material blockType = damagerPlayer.getLocation().getBlock().getType();
-                        if (blockType == Material.WATER || blockType == Material.STATIONARY_WATER) {
+                        if (blockType == Material.WATER) {
                             e.setCancelled(true);
                         }
                     }

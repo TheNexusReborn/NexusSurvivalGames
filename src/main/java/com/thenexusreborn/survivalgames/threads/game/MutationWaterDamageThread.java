@@ -44,7 +44,7 @@ public class MutationWaterDamageThread extends StarThread<SurvivalGames> {
                 Player player = Bukkit.getPlayer(gamePlayer.getUniqueId());
                 Location loc = player.getLocation();
                 Block block = loc.getBlock();
-                if (block.getType() == Material.WATER || block.getType() == Material.STATIONARY_WATER) {
+                if (block.getType() == Material.WATER) {
                     player.damage(1);
                 }
             }

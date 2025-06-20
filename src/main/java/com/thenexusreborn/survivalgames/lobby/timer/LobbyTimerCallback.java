@@ -33,7 +33,7 @@ public class LobbyTimerCallback implements ClockCallback<TimerSnapshot> {
         if (ANNOUNCE.contains(remainingSeconds)) {
             lobby.sendMessage("&6&l>> &e&lVoting closes in &f&l" + remainingSeconds + "&f&ls&e&l.");
             if (lobby.getLobbySettings().isSounds()) {
-                lobby.playSound(Sound.CLICK);
+                lobby.playSound(Sound.UI_BUTTON_CLICK);
             }
         }
     }

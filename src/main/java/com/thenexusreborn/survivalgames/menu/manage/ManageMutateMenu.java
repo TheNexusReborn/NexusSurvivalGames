@@ -3,12 +3,12 @@ package com.thenexusreborn.survivalgames.menu.manage;
 import com.stardevllc.starcore.api.StarColors;
 import com.stardevllc.starcore.api.XMaterial;
 import com.stardevllc.starcore.api.itembuilder.ItemBuilder;
+import com.stardevllc.starcore.v1_8_R1.itembuilder.SkullItemBuilder;
 import com.stardevllc.starui.GuiManager;
 import com.stardevllc.starui.element.button.Button;
 import com.stardevllc.starui.gui.InventoryGUI;
 import com.stardevllc.starui.gui.UpdatingGUI;
 import com.thenexusreborn.nexuscore.util.MsgType;
-import com.thenexusreborn.nexuscore.util.SpigotUtils;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
@@ -49,13 +49,13 @@ public class ManageMutateMenu extends InventoryGUI implements UpdatingGUI {
                     }
 
                     GamePlayer targetPlayer = builder.getTarget();
+                    
+                    SkullItemBuilder skullItemBuilder = new SkullItemBuilder()
+                            .owner(targetPlayer.getName())
+                            .displayName("&e&lTARGET")
+                            .addLoreLine(targetPlayer.getDisplayName());;
 
-                    ItemStack skull = SpigotUtils.getPlayerSkull(Bukkit.getPlayer(targetPlayer.getUniqueId()));
-                    ItemMeta meta = skull.getItemMeta();
-                    meta.setDisplayName(StarColors.color("&e&lTARGET"));
-                    meta.setLore(List.of(StarColors.color(targetPlayer.getDisplayName())));
-                    skull.setItemMeta(meta);
-                    return skull;
+                    return skullItemBuilder.build();
                 })
                 .consumer(e -> manager.openGUI(new ManageMutateTargetMenu(plugin, actor, game, builder, this), e.getWhoClicked()));
         addElement(targetButton);

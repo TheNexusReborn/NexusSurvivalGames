@@ -1,26 +1,20 @@
 package com.thenexusreborn.survivalgames.menu;
 
 import com.stardevllc.starcore.api.StarColors;
+import com.stardevllc.starcore.v1_8_R1.itembuilder.SkullItemBuilder;
 import com.stardevllc.starui.GuiManager;
 import com.stardevllc.starui.element.button.Button;
 import com.stardevllc.starui.gui.InventoryGUI;
 import com.stardevllc.starui.gui.UpdatingGUI;
 import com.thenexusreborn.api.player.Rank;
-import com.thenexusreborn.nexuscore.reflection.impl.PlayerSkull;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.game.Game;
-import com.thenexusreborn.survivalgames.game.GamePlayer;
-import com.thenexusreborn.survivalgames.game.GameTeam;
+import com.thenexusreborn.survivalgames.game.*;
 import org.bukkit.Bukkit;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @SuppressWarnings("DuplicatedCode")
 public class TeamMenu extends InventoryGUI implements UpdatingGUI {
@@ -55,9 +49,10 @@ public class TeamMenu extends InventoryGUI implements UpdatingGUI {
                 boolean canViewVitalsAndTeleport = actorPlayer != null && (actorPlayer.getTeam() == GameTeam.SPECTATORS || actorPlayer.getRank().ordinal() <= Rank.ADMIN.ordinal());
 
                 Button button = new Button().iconCreator(p -> {
-                    ItemStack skull = new PlayerSkull().getSkull(Bukkit.getPlayer(gamePlayer.getUniqueId()));
-                    ItemMeta meta = skull.getItemMeta();
-                    meta.setDisplayName(StarColors.color(gamePlayer.getColoredName()));
+//                    ItemStack skull = new PlayerSkull().getSkull(Bukkit.getPlayer(gamePlayer.getUniqueId()));
+                    SkullItemBuilder skullItemBuilder = new SkullItemBuilder()
+                            .owner(gamePlayer.getName())
+                            .displayName(gamePlayer.getDisplayName());
 
                     
                     List<String> lore = new LinkedList<>();
@@ -74,12 +69,10 @@ public class TeamMenu extends InventoryGUI implements UpdatingGUI {
                     if (canViewVitalsAndTeleport) {
                         lore.add("&6&lRight Click &fto teleport");
                     }
+                    
+                    skullItemBuilder.setLore(lore);
 
-                    List<String> coloredLore = new LinkedList<>();
-                    lore.forEach(line -> coloredLore.add(StarColors.color(line)));
-                    meta.setLore(coloredLore);
-                    skull.setItemMeta(meta);
-                    return skull;
+                    return skullItemBuilder.build();
                 }).consumer(e -> {
                     if (e.getClick() == ClickType.LEFT) {
                         manager.openGUI(new PlayerMenu(plugin, this.playerUUID, gamePlayer), e.getWhoClicked());

@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.listener;
 
-import com.sk89q.worldedit.bukkit.BukkitUtil;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.starcore.api.StarColors;
 import com.stardevllc.starui.GuiManager;
@@ -43,6 +43,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.stream.Stream;
 
 @SuppressWarnings({"DuplicatedCode"})
@@ -52,9 +53,32 @@ public class PlayerListener implements Listener {
     
     private List<String> tableChancesFirstHalf = new ArrayList<>(), tableChancesSecondHalf = new ArrayList<>();
     
+    private final Map<UUID, Long> lastClickTimes = new HashMap<>();
+    private final long clickIntervalThreshold = 200;
+    
     public PlayerListener(SurvivalGames plugin) {
         this.plugin = plugin;
         manager = plugin.getServer().getServicesManager().getRegistration(GuiManager.class).getProvider();
+        
+        Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+            for (Entry<UUID, Long> entry : new HashSet<>(lastClickTimes.entrySet())) {
+                Player player = Bukkit.getPlayer(entry.getKey());
+                if (player == null) {
+                    lastClickTimes.remove(entry.getKey());
+                    continue;
+                }
+                
+                boolean timePassed = System.currentTimeMillis() > entry.getValue() + clickIntervalThreshold;
+                ItemStack item = player.getInventory().getItemInMainHand();
+                boolean noSword = item == null || !item.getType().name().contains("_SWORD");
+                
+                if (timePassed || noSword) {
+                    SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
+                    sgPlayer.setBlocking(false);
+                    lastClickTimes.remove(entry.getKey());
+                }
+            }
+        }, 1L, 0L);
         
         for (int i = 0; i < 100; i++) {
             if (i > 95) {
@@ -121,6 +145,20 @@ public class PlayerListener implements Listener {
             return;
         }
         
+        ItemStack itemStack = e.getItem();
+        if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
+            boolean hasSword = itemStack != null && itemStack.getType().name().contains("_SWORD");
+            sgPlayer.setBlocking(hasSword);
+            if (hasSword) {
+                this.lastClickTimes.put(sgPlayer.getUniqueId(), System.currentTimeMillis());
+            } else {
+                this.lastClickTimes.remove(sgPlayer.getUniqueId());
+            }
+        } else {
+            sgPlayer.setBlocking(false);
+            this.lastClickTimes.remove(sgPlayer.getUniqueId());
+        }
+        
         Lobby lobby = sgPlayer.getLobby();
         Game game = sgPlayer.getGame();
         
@@ -167,15 +205,15 @@ public class PlayerListener implements Listener {
         }
         
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
-            if (e.getItem() != null && e.getItem().getType() == Material.FISHING_ROD) {
-                int uses = NBT.get(e.getItem(), nbt -> {
+            if (itemStack != null && itemStack.getType() == Material.FISHING_ROD) {
+                int uses = NBT.get(itemStack, nbt -> {
                     if (!nbt.hasTag("sg_uses")) {
                         return 20;
                     }
                     return nbt.getInteger("sg_uses");
                 });
                 
-                int displayUses = NBT.get(e.getItem(), nbt -> {
+                int displayUses = NBT.get(itemStack, nbt -> {
                     if (!nbt.hasTag("sg_display_uses")) {
                         return 10;
                     }
@@ -189,16 +227,16 @@ public class PlayerListener implements Listener {
                 }
                 
                 if (uses <= 0) {
-                    e.getItem().setDurability((short) (e.getItem().getType().getMaxDurability() + 1));
-                    sgPlayer.playSound(Sound.ITEM_BREAK);
+                    itemStack.setDurability((short) (itemStack.getType().getMaxDurability() + 1));
+                    sgPlayer.playSound(Sound.ENTITY_ITEM_BREAK);
                 } else {
-                    ItemMeta itemMeta = e.getItem().getItemMeta();
+                    ItemMeta itemMeta = itemStack.getItemMeta();
                     List<String> lore = List.of("", StarColors.color("&fUses Left: &e" + displayUses));
                     itemMeta.setLore(lore);
-                    e.getItem().setItemMeta(itemMeta);
+                    itemStack.setItemMeta(itemMeta);
                     int finalUses = uses;
                     int finalDisplayUses = displayUses;
-                    NBT.modify(e.getItem(), nbt -> {
+                    NBT.modify(itemStack, nbt -> {
                         nbt.setInteger("sg_uses", finalUses);
                         nbt.setInteger("sg_display_uses", finalDisplayUses);
                     });
@@ -206,7 +244,7 @@ public class PlayerListener implements Listener {
             }
             
             if (e.getClickedBlock() != null) {
-                if (Stream.of(Material.DISPENSER, Material.FURNACE, Material.BURNING_FURNACE, Material.WORKBENCH, Material.ENCHANTMENT_TABLE, Material.ANVIL).noneMatch(material -> block.getType() == material)) {
+                if (Stream.of(Material.DISPENSER, Material.FURNACE, Material.FURNACE, Material.CRAFTING_TABLE, Material.ENCHANTING_TABLE, Material.ANVIL).noneMatch(material -> block.getType() == material)) {
                     LootManager lootManager = plugin.getLootManager();
                     if (Stream.of(Material.CHEST, Material.TRAPPED_CHEST, Material.ENDER_CHEST).anyMatch(material -> block.getType() == material)) {
                         if (game == null) {
@@ -271,7 +309,7 @@ public class PlayerListener implements Listener {
                             if (game.getState() == Game.State.DEATHMATCH) {
                                 lootTable = lootManager.getLootTable(game.getSettings().getDeathmatchTier());
                             } else {
-                                boolean withinCenter = game.getGameMap().getDeathmatchRegion().contains(BukkitUtil.toVector(player.getLocation()));
+                                boolean withinCenter = game.getGameMap().getDeathmatchRegion().contains(BukkitAdapter.asBlockVector(player.getLocation()));
                                 if (game.getState() == Game.State.INGAME || game.getState() == Game.State.INGAME_DEATHMATCH) {
                                     boolean afterRestock = game.getTimedRestockCount() > 0;
                                     if (withinCenter) {
@@ -333,6 +371,7 @@ public class PlayerListener implements Listener {
                             game.addLootedChest(secondHalf.getLocation());
                         }
                     } else if (block.getState() instanceof Sign) {
+                        e.setCancelled(true);
                         NexusPlayer nexusPlayer = NexusReborn.getPlayerManager().getNexusPlayer(player.getUniqueId());
                         if (nexusPlayer.getToggleValue("vanish")) {
                             nexusPlayer.sendMessage(MsgType.WARN + "You cannot vote for a map while in vanish.");
@@ -344,7 +383,7 @@ public class PlayerListener implements Listener {
                             }
                         }
                     } else {
-                        if (e.getItem() != null) {
+                        if (itemStack != null) {
                             return;
                         }
                         
@@ -539,7 +578,7 @@ public class PlayerListener implements Listener {
                     return;
                 }
                 
-                enchantingInventory.setSecondary(new ItemStack(Material.INK_SACK, 64, (short) 4));
+                enchantingInventory.setSecondary(new ItemStack(Material.LAPIS_LAZULI, 64));
             }
         }
     }
@@ -562,7 +601,7 @@ public class PlayerListener implements Listener {
             }
             
             if (e.getInventory() instanceof EnchantingInventory) {
-                if (e.getCurrentItem() != null && e.getCurrentItem().getType() == Material.INK_SACK) {
+                if (e.getCurrentItem() != null && e.getCurrentItem().getType() == Material.LAPIS_LAZULI) {
                     e.setCancelled(true);
                 }
             }
@@ -687,8 +726,8 @@ public class PlayerListener implements Listener {
     public void onConsume(PlayerItemConsumeEvent e) {
         if (e.getItem().getType() == Material.ROTTEN_FLESH) {
             if (new Random().nextInt(100) < 15) {
-                e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 300, 0));
-                e.getPlayer().getWorld().playSound(e.getPlayer().getLocation(), Sound.ENDERMAN_STARE, 1.0F, 1.0F);
+                e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, 300, 0));
+                e.getPlayer().getWorld().playSound(e.getPlayer().getLocation(), Sound.ENTITY_ENDERMAN_STARE, 1.0F, 1.0F);
             }
         }
     }
@@ -761,9 +800,7 @@ public class PlayerListener implements Listener {
         double toX = toBlock.getX();
         double toZ = toBlock.getZ();
         
-        if ((fromBlock.getType() == Material.WATER || fromBlock.getType() == Material.STATIONARY_WATER) &&
-                toBlock.getType() == Material.WATER || toBlock.getType() == Material.STATIONARY_WATER) {
-            
+        if (fromBlock.getType() == Material.WATER && toBlock.getType() == Material.WATER) {
             if (fromX == toX && fromZ == toZ) {
                 return;
             }

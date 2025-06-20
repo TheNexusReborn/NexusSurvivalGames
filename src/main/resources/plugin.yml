@@ -2,7 +2,8 @@ main: com.thenexusreborn.survivalgames.SurvivalGames
 version: ${version}
 name: SurvivalGames
 description: The Survival Games plugin for The Nexus Reborn
-depend: [NexusCore, NexusMaps, ProtocolLib, WorldEdit]
+api-version: 1.21
+depend: [NexusCore, NexusMaps, ProtocolLib, WorldEdit, OldCombatMechanics]
 softdepend: [Vulcan, NexusHub]
 author: Firestar311
 commands:

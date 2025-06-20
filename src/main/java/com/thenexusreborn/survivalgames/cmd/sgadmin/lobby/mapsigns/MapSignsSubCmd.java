@@ -37,7 +37,7 @@ public abstract class MapSignsSubCmd extends SubCommand<SurvivalGames> {
             return true;
         }
         
-        if (!(targetBlock.getType() == Material.SIGN || targetBlock.getType() == Material.WALL_SIGN)) {
+        if (!(targetBlock.getType() == Material.OAK_SIGN || targetBlock.getType() == Material.OAK_WALL_SIGN)) {
             player.sendMessage(MsgType.WARN.format("You are not looking at a sign."));
             return true;
         }

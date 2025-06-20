@@ -12,7 +12,7 @@ public enum GameTeam {
             "Tributes", 
             "&a", 
             "&c", 
-            Sound.WITHER_SPAWN, 
+            Sound.ENTITY_WITHER_SPAWN, 
             new PlayerState()
                     .gameMode(GameMode.SURVIVAL)
                     .allowFlight(false)
@@ -33,7 +33,7 @@ public enum GameTeam {
     SPECTATORS(
             "Spectators", 
             "&c", 
-            Sound.ARROW_HIT, 
+            Sound.ENTITY_ARROW_HIT, 
             new PlayerState()
                     .gameMode(GameMode.SURVIVAL)
                     .allowFlight(true)
@@ -53,7 +53,7 @@ public enum GameTeam {
     MUTATIONS(
             "Mutations", 
             "&d", 
-            Sound.ZOMBIE_PIG_DEATH, 
+            Sound.ENTITY_ZOMBIFIED_PIGLIN_DEATH, 
             new PlayerState()
                     .gameMode(GameMode.SURVIVAL)
                     .allowFlight(false)
@@ -89,7 +89,7 @@ public enum GameTeam {
     
     ZOMBIES(
             "Zombies", "&2", 
-            Sound.ZOMBIE_DEATH, 
+            Sound.ENTITY_ZOMBIE_DEATH, 
             new PlayerState(), 
             "%&8<&3nexussg_score%&8> &8(&2&l%nexuscore_level%&8) &r%nexussg_displayname%&8: %nexuscore_chatcolor%{message}"
     );

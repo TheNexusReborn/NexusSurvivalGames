@@ -1,6 +1,5 @@
 package com.thenexusreborn.survivalgames.scoreboard;
 
-import com.stardevllc.starcore.api.StarColors;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.scoreboard.TablistHandler;
@@ -9,6 +8,7 @@ import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -93,37 +93,29 @@ public class GameTablistHandler extends TablistHandler {
             beginChars = "x_";
         }
         
-        String name = beginChars + "_" + sgPlayer.getName();
-        if (name.length() > 15) {
-            return name.substring(0, 16);
-        }
-        
-        return name;
+        return beginChars + "_" + sgPlayer.getName();
     }
     
     @Override
     public void setDisplayOptions(NexusPlayer nexusPlayer, ITeam team) {
-        String color;
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(nexusPlayer.getUniqueId());
         if (sgPlayer == null) {
-            color = "&0";
+            team.setColor(ChatColor.BLACK);
         } else {
             Game game = sgPlayer.getGame();
             
             if (game == null) {
-                color = "&1";
+                team.setColor(ChatColor.DARK_BLUE);
             } else {
                 GamePlayer gamePlayer = game.getPlayer(nexusPlayer.getUniqueId());
                 
                 if (gamePlayer == null) {
-                    color = "&3";
+                    team.setColor(ChatColor.AQUA);
                 } else {
-                    color = gamePlayer.getTeam().getColor();
+                    team.setColor(ChatColor.getByChar(gamePlayer.getTeam().getColor().charAt(1)));
                 }
             }
         }
-        
-        team.setPrefix(StarColors.color(color));
     }
     
     @Override

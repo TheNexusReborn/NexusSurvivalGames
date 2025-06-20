@@ -5,10 +5,10 @@ import com.stardevllc.starcore.api.XMaterial;
 import com.stardevllc.starcore.api.itembuilder.ItemBuilder;
 import com.stardevllc.starcore.utils.ArmorSet;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.disguises.disguisetypes.DisguiseType;
 import com.thenexusreborn.survivalgames.mutations.impl.*;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityType;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -22,7 +22,7 @@ public enum StandardMutations implements IMutationType {
     PIG_ZOMBIE(
             "pig_zombie", //id
             PigZombieMutation.class, //class 
-            DisguiseType.PIG_ZOMBIE, //Disguise Type
+            EntityType.ZOMBIFIED_PIGLIN, //Disguise Type
             XMaterial.PORKCHOP, //Icon
             ArmorSet.CHAINMAIL, //Armor
             UNBREAKABLE_GOLD_SWORD.build(), //Weapon 
@@ -37,14 +37,14 @@ public enum StandardMutations implements IMutationType {
     ZOMBIE(
             "zombie", //id
             ZombieMutation.class, //class 
-            DisguiseType.ZOMBIE, //Disguise Type
+            EntityType.ZOMBIE, //Disguise Type
             XMaterial.ROTTEN_FLESH, //Icon
             ArmorSet.IRON, //Armor
             UNBREAKABLE_GOLD_SWORD.build(), //Weapon 
             3000, //Unlock cost
             20, //Health
             List.of(), //Damage Immunities
-            List.of(new MutationEffect(PotionEffectType.SLOW, 0)), //Potion Effects
+            List.of(new MutationEffect(PotionEffectType.SLOWNESS, 0)), //Potion Effects
             List.of(), //Additional Items
             List.of() //Modifiers
     ),
@@ -52,7 +52,7 @@ public enum StandardMutations implements IMutationType {
     ENDERMAN(
             "enderman", //id
             EndermanMutation.class, //class 
-            DisguiseType.ENDERMAN, //Disguise Type
+            EntityType.ENDERMAN, //Disguise Type
             XMaterial.ENDER_PEARL, //Icon
             ArmorSet.LEATHER, //Armor
             UNBREAKABLE_GOLD_SWORD.build(), //Weapon 
@@ -67,7 +67,7 @@ public enum StandardMutations implements IMutationType {
     SKELETON(
             "skeleton", //id
             SkeletonMutation.class, //class 
-            DisguiseType.SKELETON, //Disguise Type
+            EntityType.SKELETON, //Disguise Type
             XMaterial.BOW, //Icon
             ArmorSet.LEATHER, //Armor
             ItemBuilder.of(XMaterial.WOODEN_SWORD).displayName("&fWooden Sword").build(), //Weapon 
@@ -76,7 +76,7 @@ public enum StandardMutations implements IMutationType {
             List.of(), //Damage Immunities
             List.of(new MutationEffect(PotionEffectType.SPEED, 0)), //Potion Effects
             List.of(
-                    new MutationItem(1, ItemBuilder.of(XMaterial.BOW).addEnchant(Enchantment.ARROW_DAMAGE, 1).build()), 
+                    new MutationItem(1, ItemBuilder.of(XMaterial.BOW).addEnchant(Enchantment.POWER, 1).build()), 
                     new MutationItem(2, new ItemStack(Material.ARROW, 32))
             ), //Additional Items
             List.of(MutationModifier.FIFTY_PERCENT_INCREASED_DAMAGE) //Modifiers
@@ -85,10 +85,10 @@ public enum StandardMutations implements IMutationType {
     CHICKEN(
             "chicken", //id
             ChickenMutation.class, //class 
-            DisguiseType.CHICKEN, //Disguise Type
+            EntityType.CHICKEN, //Disguise Type
             XMaterial.FEATHER, //Icon
             ArmorSet.GOLD, //Armor
-            ItemBuilder.of(XMaterial.WOODEN_SWORD).displayName("&bEgg Launcher").addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS).addEnchant(Enchantment.ARROW_DAMAGE, 1).build(), //Weapon 
+            ItemBuilder.of(XMaterial.WOODEN_SWORD).displayName("&bEgg Launcher").addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS).addEnchant(Enchantment.POWER, 1).build(), //Weapon 
             5000, //Unlock cost
             4, //Health
             List.of(DamageCause.FALL), //Damage Immunities
@@ -103,10 +103,10 @@ public enum StandardMutations implements IMutationType {
     CREEPER(
             "creeper", //id
             CreeperMutation.class, //class 
-            DisguiseType.CREEPER, //Disguise Type
+            EntityType.CREEPER, //Disguise Type
             XMaterial.GUNPOWDER, //Icon
             ArmorSet.CHAINMAIL, //Armor
-            new ItemStack(Material.WOOD_AXE), //Weapon 
+            new ItemStack(Material.WOODEN_AXE), //Weapon 
             5000, //Unlock cost
             10, //Health
             List.of(DamageCause.BLOCK_EXPLOSION, DamageCause.ENTITY_EXPLOSION), //Damage Immunities
@@ -125,7 +125,7 @@ public enum StandardMutations implements IMutationType {
     private final String id;
     private final String displayName;
     private final Class<? extends Mutation> clazz;
-    private final DisguiseType disguiseType;
+    private final EntityType entityType;
     private final XMaterial icon;
     private final ArmorSet armorType;
     private final ItemStack weapon;
@@ -136,11 +136,11 @@ public enum StandardMutations implements IMutationType {
     private final List<MutationItem> items;
     private final List<MutationModifier> modifiers;
     
-    StandardMutations(String id, String displayName, Class<? extends Mutation> clazz, DisguiseType disguiseType, XMaterial icon, ArmorSet armorType, ItemStack weapon, int unlockCost, int health, List<DamageCause> damageImmunities, List<MutationEffect> effects, List<MutationItem> items, List<MutationModifier> modifiers) {
+    StandardMutations(String id, String displayName, Class<? extends Mutation> clazz, EntityType entityType, XMaterial icon, ArmorSet armorType, ItemStack weapon, int unlockCost, int health, List<DamageCause> damageImmunities, List<MutationEffect> effects, List<MutationItem> items, List<MutationModifier> modifiers) {
         this.id = id;
         this.displayName = displayName;
         this.clazz = clazz;
-        this.disguiseType = disguiseType;
+        this.entityType = entityType;
         this.icon = icon;
         this.armorType = armorType;
         this.weapon = weapon;
@@ -154,8 +154,8 @@ public enum StandardMutations implements IMutationType {
         IMutationType.REGISTRY.register(this);
     }
     
-    StandardMutations(String id, Class<? extends Mutation> clazz, DisguiseType disguiseType, XMaterial icon, ArmorSet armorType, ItemStack weapon, int unlockCost, int health, List<DamageCause> damageImmunities, List<MutationEffect> effects, List<MutationItem> items, List<MutationModifier> modifiers) {
-        this(id, StringHelper.titlize(id), clazz, disguiseType, icon, armorType, weapon, unlockCost, health, damageImmunities, effects, items, modifiers);
+    StandardMutations(String id, Class<? extends Mutation> clazz, EntityType entityType, XMaterial icon, ArmorSet armorType, ItemStack weapon, int unlockCost, int health, List<DamageCause> damageImmunities, List<MutationEffect> effects, List<MutationItem> items, List<MutationModifier> modifiers) {
+        this(id, StringHelper.titlize(id), clazz, entityType, icon, armorType, weapon, unlockCost, health, damageImmunities, effects, items, modifiers);
     }
     
     public static IMutationType getType(String name) {
@@ -198,8 +198,8 @@ public enum StandardMutations implements IMutationType {
     }
     
     @Override
-    public DisguiseType getDisguiseType() {
-        return disguiseType;
+    public EntityType getEntityType() {
+        return entityType;
     }
     
     @Override

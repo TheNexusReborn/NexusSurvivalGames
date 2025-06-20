@@ -34,9 +34,9 @@ public class TributeSignsSetSubCmd extends TributeSignsSubCmd {
         }
         
         Location signLocation = null, headLocation = null;
-        if (targetBlock.getType() == Material.SIGN || targetBlock.getType() == Material.WALL_SIGN) {
+        if (targetBlock.getType() == Material.OAK_SIGN || targetBlock.getType() == Material.OAK_WALL_SIGN) {
             signLocation = targetBlock.getLocation();
-        } else if (targetBlock.getType() == Material.SKULL) {
+        } else if (targetBlock.getType() == Material.PLAYER_HEAD) {
             headLocation = targetBlock.getLocation();
         }
         

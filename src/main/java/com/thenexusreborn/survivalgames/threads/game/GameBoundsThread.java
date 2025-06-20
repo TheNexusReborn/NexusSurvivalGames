@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.threads.game;
 
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.bukkit.BukkitUtil;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.stardevllc.starcore.utils.StarThread;
 import com.thenexusreborn.gamemaps.model.SGMap;
@@ -51,9 +51,9 @@ public class GameBoundsThread extends StarThread<SurvivalGames> {
             Player player = Bukkit.getPlayer(sgPlayer.getUniqueId());
             World world = map.getWorld();
             Location previousLoc = gamePlayer.getPosition().toLocation(world);
-            Vector previous = BukkitUtil.toVector(previousLoc);
+            BlockVector3 previous = BukkitAdapter.asBlockVector(previousLoc);
             gamePlayer.setPosition(player.getLocation());
-            Vector current = BukkitUtil.toVector(player.getLocation());
+            BlockVector3 current = BukkitAdapter.asBlockVector(player.getLocation());
             
             if (!region.contains(current)) {
                 if (gamePlayer.getTeam() != GameTeam.SPECTATORS) {

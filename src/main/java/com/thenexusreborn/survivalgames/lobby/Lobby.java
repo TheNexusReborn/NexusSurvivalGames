@@ -658,8 +658,8 @@ public class Lobby implements Controllable, IHasState {
             if (!this.players.containsKey(online.getUniqueId())) {
                 continue;
             }
-            online.showPlayer(player);
-            player.showPlayer(online);
+            online.showPlayer(plugin.getNexusCore(), player);
+            player.showPlayer(plugin.getNexusCore(), online);
         }
 
         if (nexusPlayer.getToggleValue("vanish") && !nexusPlayer.isNicked()) {
@@ -667,7 +667,7 @@ public class Lobby implements Controllable, IHasState {
                 LobbyPlayer psp = this.players.get(p.getUniqueId());
                 if (psp != null) {
                     if (psp.getRank().ordinal() > Rank.HELPER.ordinal()) {
-                        p.hidePlayer(player);
+                        p.hidePlayer(plugin.getNexusCore(), player);
                     } else {
                         psp.sendMessage("&a&l>> " + nexusPlayer.getRank().getColor() + nexusPlayer.getName() + " &ejoined &e&ovanished&e.");
                     }
@@ -690,7 +690,7 @@ public class Lobby implements Controllable, IHasState {
             LobbyPlayer psp = this.players.get(p.getUniqueId());
             if (psp != null) {
                 if (psp.getToggleValue("vanish") && !joiningPlayerStaff) {
-                    Bukkit.getPlayer(nexusPlayer.getUniqueId()).hidePlayer(p);
+                    Bukkit.getPlayer(nexusPlayer.getUniqueId()).hidePlayer(plugin.getNexusCore(), p);
                 }
             }
         }
@@ -960,7 +960,7 @@ public class Lobby implements Controllable, IHasState {
                     player.sendMessage("&6&l>> &eYou voted for&8: &b" + sgMap.getName() + " &7&oby &3" + creators + "&e.");
                 }
                 player.sendMessage("&6&l>> &eVoting Weight&8: &b" + VOTE_WEIGHTS.get(nexusPlayer.getEffectiveRank()) + " Vote(s)&e.");
-                player.playSound(Sound.NOTE_PLING);
+                player.playSound(Sound.BLOCK_NOTE_BLOCK_PLING);
 
                 player.setMapVote(entry.getKey());
                 return;

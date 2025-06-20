@@ -3,7 +3,6 @@ package com.thenexusreborn.survivalgames.util;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.disguises.DisguiseAPI;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
 import org.bukkit.Bukkit;
@@ -233,7 +232,7 @@ public class PlayerState {
         }
         
         if (this.collisions != null) {
-            player.spigot().setCollidesWithEntities(this.collisions.apply(sgPlayer));
+            player.setCollidable(this.collisions.apply(sgPlayer));
         }
         
         if (this.clearInventory != null) {
@@ -305,9 +304,9 @@ public class PlayerState {
         }
         
         if (this.disguises != null && !this.disguises.apply(sgPlayer)) {
-            if (DisguiseAPI.isDisguised(player)) {
-                DisguiseAPI.undisguiseToAll(player);
-            }
+//            if (DisguiseAPI.isDisguised(player)) {
+//                DisguiseAPI.undisguiseToAll(player);
+//            }
         }
     }
     

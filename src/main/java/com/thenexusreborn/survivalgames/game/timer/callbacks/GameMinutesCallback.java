@@ -24,7 +24,7 @@ public class GameMinutesCallback implements ClockCallback<TimerSnapshot> {
     public void callback(TimerSnapshot timerSnapshot) {
         game.sendMessage(msgSupplier.get().replace("{time}", Game.LONG_TIME_FORMAT.format(timerSnapshot.getTime())));
         if (game.getSettings().isSounds()) {
-            game.playSound(Sound.CLICK);
+            game.playSound(Sound.UI_BUTTON_CLICK);
         }
     }
 

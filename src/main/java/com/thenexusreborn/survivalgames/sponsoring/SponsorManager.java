@@ -29,7 +29,7 @@ public class SponsorManager {
         this.categories.add(armorCategory);
         
         this.potionCategory = new PotionSponsorCategory("Potion Effect", XMaterial.GLASS_BOTTLE);
-        this.potionCategory.addEntries(PotionEffectType.SPEED, PotionEffectType.SLOW, PotionEffectType.INCREASE_DAMAGE, PotionEffectType.CONFUSION, PotionEffectType.JUMP, PotionEffectType.REGENERATION, PotionEffectType.BLINDNESS, PotionEffectType.HUNGER, PotionEffectType.WEAKNESS, PotionEffectType.POISON);
+        this.potionCategory.addEntries(PotionEffectType.SPEED, PotionEffectType.SLOWNESS, PotionEffectType.STRENGTH, PotionEffectType.NAUSEA, PotionEffectType.JUMP_BOOST, PotionEffectType.REGENERATION, PotionEffectType.BLINDNESS, PotionEffectType.HUNGER, PotionEffectType.WEAKNESS, PotionEffectType.POISON);
         this.categories.add(potionCategory);
     }
     

@@ -12,13 +12,17 @@ import com.stardevllc.registry.StringRegistry;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
+import com.stardevllc.starcore.api.Skin;
 import com.stardevllc.starcore.api.StarColors;
 import com.stardevllc.starcore.api.XMaterial;
+import com.stardevllc.starcore.skins.SkinManager;
 import com.stardevllc.starcore.v1_8_R1.itembuilder.FireworkItemBuilder;
 import com.stardevllc.time.TimeFormat;
 import com.stardevllc.time.TimeUnit;
 import com.thenexusreborn.api.NexusReborn;
 import com.thenexusreborn.api.gamearchive.*;
+import com.thenexusreborn.api.gamearchive.PlayerInfo;
+import com.thenexusreborn.api.nickname.Nickname;
 import com.thenexusreborn.api.player.NexusPlayer;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.sql.objects.SQLDatabase;
@@ -33,8 +37,6 @@ import com.thenexusreborn.survivalgames.chat.GameChatRoom;
 import com.thenexusreborn.survivalgames.chat.GameTeamChatroom;
 import com.thenexusreborn.survivalgames.control.ControlType;
 import com.thenexusreborn.survivalgames.control.Controllable;
-import com.thenexusreborn.survivalgames.disguises.DisguiseAPI;
-import com.thenexusreborn.survivalgames.disguises.disguisetypes.MobDisguise;
 import com.thenexusreborn.survivalgames.game.Bounty.Type;
 import com.thenexusreborn.survivalgames.game.death.*;
 import com.thenexusreborn.survivalgames.game.timer.callbacks.GameMinutesCallback;
@@ -50,9 +52,11 @@ import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.sponsoring.SponsorManager;
 import com.thenexusreborn.survivalgames.state.*;
 import com.thenexusreborn.survivalgames.util.SGPlayerStats;
+import dev.iiahmed.disguise.*;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -710,8 +714,8 @@ public class Game implements Controllable, IHasState {
         setSubState(SubState.TIMER_INIT);
         this.timer = Game.getPlugin().getClockManager().createTimer(TimeUnit.SECONDS.toMillis(getSettings().getWarmupLength()) + 50L);
         this.timer.setEndCondition(new WarmupEndCondition(this));
-        this.timer.addRepeatingCallback(new GameSecondsCallback(this, Sound.CLICK, "&6&l>> &eThe game begins in &b{time}&e."), TimeUnit.SECONDS, 1);
-        this.timer.addRepeatingCallback(snapshot -> playSound(Sound.NOTE_BASS), TimeUnit.SECONDS, 1);
+        this.timer.addRepeatingCallback(new GameSecondsCallback(this, Sound.UI_BUTTON_CLICK, "&6&l>> &eThe game begins in &b{time}&e."), TimeUnit.SECONDS, 1);
+        this.timer.addRepeatingCallback(snapshot -> playSound(Sound.BLOCK_NOTE_BLOCK_BASS), TimeUnit.SECONDS, 1);
         List<MapSpawn> mapSpawns = gameMap.getSpawns();
         this.timer.addRepeatingCallback(snapshot -> {
             if (!settings.isLightning()) {
@@ -727,7 +731,7 @@ public class Game implements Controllable, IHasState {
             }
         }, TimeUnit.SECONDS, 1);
         this.timer.addCallback(timerSnapshot -> {
-            playSound(Sound.WOLF_HOWL);
+//            playSound(Sound.WOLF_HOWL); The howl sound effect doesnt exist as it was completely removed, need to find an alternative
             sendMessage("&5&l/ / / / / / &d&lTHE NEXUS REBORN &5&l/ / / / / /");
             sendMessage("&6&lSurvival Games &7&oFree-for-all Deathmatch &8- &3Classic Mode");
             sendMessage("&8- &7Loot chests scattered around the map for gear.");
@@ -797,7 +801,7 @@ public class Game implements Controllable, IHasState {
         };
         
         this.timer.addRepeatingCallback(new GameMinutesCallback(this, msg), TimeUnit.MINUTES, 1);
-        this.timer.addRepeatingCallback(new GameSecondsCallback(this, Sound.CLICK, msg, false), TimeUnit.SECONDS, 1);
+        this.timer.addRepeatingCallback(new GameSecondsCallback(this, Sound.UI_BUTTON_CLICK, msg, false), TimeUnit.SECONDS, 1);
         this.timer.addCallback(timerSnapshot -> {
             sendMessage("");
             sendMessage("&6&l>> &9&lWHAT DO YOU THINK OF &e&l" + getGameMap().getName().toUpperCase() + "&9&l?");
@@ -876,7 +880,7 @@ public class Game implements Controllable, IHasState {
         setSubState(SubState.SETUP_GRACE_PERIOD);
         if (this.settings.isGracePeriod()) {
             this.graceperiodTimer = plugin.getClockManager().createTimer(TimeUnit.SECONDS.toMillis(settings.getGracePeriodLength()) + 50L);
-            this.graceperiodTimer.addRepeatingCallback(new GameSecondsCallback(this, Sound.CLICK, "&6&l>> &eThe &c&lGRACE PERIOD &eends in &b{time}&e."), TimeUnit.SECONDS, 1);
+            this.graceperiodTimer.addRepeatingCallback(new GameSecondsCallback(this, Sound.UI_BUTTON_CLICK, "&6&l>> &eThe &c&lGRACE PERIOD &eends in &b{time}&e."), TimeUnit.SECONDS, 1);
             this.graceperiodTimer.setEndCondition(new GraceperiodEndCondition(this));
             this.graceperiodTimer.start();
             this.graceperiod = Graceperiod.ACTIVE;
@@ -900,7 +904,7 @@ public class Game implements Controllable, IHasState {
             Villager entity = (Villager) gameMap.getWorld().spawnEntity(gameMap.getSwagShack().toLocation(gameMap.getWorld()), EntityType.VILLAGER);
             entity.setCustomNameVisible(true);
             entity.setCustomName(StarColors.color("&e&lSwag Shack"));
-            entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 255, false, false));
+            entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, Integer.MAX_VALUE, 255, false, false));
         }
         
         setSubState(SubState.UNDEFINED);
@@ -909,7 +913,7 @@ public class Game implements Controllable, IHasState {
     public void restockChests() {
         setSubState(SubState.RESTOCKING_CHESTS);
         this.lootedChests.clear();
-        playSound(Sound.LEVEL_UP);
+        playSound(Sound.ENTITY_PLAYER_LEVELUP);
         setSubState(SubState.UNDEFINED);
     }
     
@@ -985,7 +989,7 @@ public class Game implements Controllable, IHasState {
     public void startDeathmatchWarmup() {
         setState(DEATHMATCH_WARMUP);
         
-        playSound(Sound.ENDERDRAGON_GROWL);
+        playSound(Sound.ENTITY_ENDER_DRAGON_GROWL);
         for (GamePlayer player : this.players.values()) {
             if (player.getTeam() == GameTeam.TRIBUTES) {
                 Bukkit.getPlayer(player.getUniqueId()).addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 0));
@@ -998,7 +1002,7 @@ public class Game implements Controllable, IHasState {
         }
         
         this.timer = plugin.getClockManager().createTimer(TimeUnit.SECONDS.toMillis(settings.getDeathmatchWarmupLength()) + 50L);
-        this.timer.addRepeatingCallback(new GameSecondsCallback(this, Sound.ENDERDRAGON_WINGS, "&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b{time}&e."), TimeUnit.SECONDS, 1);
+        this.timer.addRepeatingCallback(new GameSecondsCallback(this, Sound.ENTITY_ENDER_DRAGON_FLAP, "&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b{time}&e."), TimeUnit.SECONDS, 1);
         this.timer.setEndCondition(new DMWarmupEndCondition(this));
         this.timer.start();
         setSubState(SubState.UNDEFINED);
@@ -1036,7 +1040,7 @@ public class Game implements Controllable, IHasState {
         setSubState(SubState.TIMER_INIT);
         this.timer = plugin.getClockManager().createTimer(TimeUnit.MINUTES.toMillis(settings.getDeathmatchLength()) + 50L);
         this.timer.addRepeatingCallback(new GameMinutesCallback(this, "&6&l>> &eThe &c&lGAME &eends &ein &b{time}&e."), TimeUnit.MINUTES, 1);
-        this.timer.addRepeatingCallback(new GameSecondsCallback(this, Sound.CLICK, "&6&l>> &eThe &c&lGAME &eends &ein &b{time}&e."), TimeUnit.SECONDS, 1);
+        this.timer.addRepeatingCallback(new GameSecondsCallback(this, Sound.UI_BUTTON_CLICK, "&6&l>> &eThe &c&lGAME &eends &ein &b{time}&e."), TimeUnit.SECONDS, 1);
         this.timer.setEndCondition(new DeathmatchEndCondition(this));
         this.timer.start();
         setSubState(SubState.UNDEFINED);
@@ -1221,7 +1225,7 @@ public class Game implements Controllable, IHasState {
         
         if (!(this.players.isEmpty() || Bukkit.getOnlinePlayers().isEmpty())) {
             this.timer = plugin.getClockManager().createTimer(TimeUnit.SECONDS.toMillis(settings.getNextGameStart()));
-            this.timer.addRepeatingCallback(new GameSecondsCallback(this, Sound.CLICK, "&6&l>> &eNext game starts in &b{time}&e."), TimeUnit.SECONDS, 1);
+            this.timer.addRepeatingCallback(new GameSecondsCallback(this, Sound.UI_BUTTON_CLICK, "&6&l>> &eNext game starts in &b{time}&e."), TimeUnit.SECONDS, 1);
             FireworkItemBuilder fireworkBuilder = new FireworkItemBuilder(FireworkEffect.builder().with(FireworkEffect.Type.BALL).trail(true).withColor(SurvivalGames.COLORS).build(), 1);
             fireworkBuilder.material(XMaterial.FIREWORK_ROCKET);
             List<MapSpawn> spawns = gameMap.getSpawns();
@@ -1597,7 +1601,7 @@ public class Game implements Controllable, IHasState {
             if (killerPlayer != null) {
                 if (killer.isMutationKill()) {
                     sendMessage("&6&l>> " + killerPlayer.getColoredName() + " &ahas taken revenge and is back in the game!");
-                    playSound(Sound.ENDERDRAGON_GROWL);
+                    playSound(Sound.ENTITY_ENDER_DRAGON_GROWL);
                 }
                 if (currentStreak > personalBest) {
                     if (!killerPlayer.isNewPersonalBestNotified()) {
@@ -1820,9 +1824,9 @@ public class Game implements Controllable, IHasState {
         }
         
         sendMessage("&6&l>> &4&lTHE DEATHMATCH COUNTDOWN HAS STARTED");
-        playSound(Sound.ENDERDRAGON_GROWL);
+        playSound(Sound.ENTITY_ENDER_DRAGON_GROWL);
         this.timer = plugin.getClockManager().createTimer(TimeUnit.SECONDS.toMillis(settings.getDeathmatchTimerLength()) + 50L);
-        this.timer.addRepeatingCallback(new GameSecondsCallback(this, Sound.CLICK, "&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b{time}&e."), TimeUnit.SECONDS, 1);
+        this.timer.addRepeatingCallback(new GameSecondsCallback(this, Sound.UI_BUTTON_CLICK, "&6&l>> &eThe &c&lDEATHMATCH &ebegins in &b{time}&e."), TimeUnit.SECONDS, 1);
         this.timer.setEndCondition(new DMTimerEndCondition(this));
         this.timer.start();
     }
@@ -1863,7 +1867,25 @@ public class Game implements Controllable, IHasState {
         gamePlayer.sendMessage(gamePlayer.getTeam().getLeaveMessage());
         gamePlayer.setTeam(GameTeam.MUTATIONS);
         gamePlayer.sendMessage(gamePlayer.getTeam().getJoinMessage());
-        DisguiseAPI.disguiseEntity(player, new MobDisguise(mutation.getType().getDisguiseType()));
+        
+        DisguiseProvider disguiseProvider = plugin.getNexusCore().getDisguiseProvider();
+        Disguise.Builder builder = Disguise.builder().setEntity(b -> b.setType(mutation.getType().getEntityType()));
+        
+        NexusPlayer nexusPlayer = gamePlayer.getNexusPlayer();
+        if (nexusPlayer.isNicked()) {
+            Nickname nickname = nexusPlayer.getNickname();
+            builder.setName(nickname.getName());
+            SkinManager skinManager = Bukkit.getServicesManager().getRegistration(SkinManager.class).getProvider();
+            Skin skin = nickname.getSkin() != null && !nickname.getSkin().isBlank() ? skinManager.getFromMojang(nickname.getSkin()) : null;
+            
+            if (skin != null) {
+                builder.setSkin(skin.getValue(), skin.getSignature());
+            }
+        }
+        
+        Disguise disguise = builder.build();
+        disguiseProvider.disguise(player, disguise);
+        
         gamePlayer.incrementTimesMutated();
         gamePlayer.sendMessage("&6&l>> &dYou have &b" + gamePlayer.getStats().getMutationPasses() + " Passes &dremaining.");
         gamePlayer.sendMessage("&d&l>> &7You're now disguised.");
@@ -1886,6 +1908,10 @@ public class Game implements Controllable, IHasState {
         }
         
         getGameInfo().getActions().add(new GameMutateAction(gamePlayer.getName(), target.getName(), mutation.getType()));
+        if (mutation.getType() == StandardMutations.CHICKEN) {
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ocm reload");
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ocm mode oldchicken " + player.getName());
+        }
         setSubState(SubState.UNDEFINED);
     }
     
@@ -1895,14 +1921,37 @@ public class Game implements Controllable, IHasState {
         }
         
         Player player = Bukkit.getPlayer(mutation.getPlayer());
-        DisguiseAPI.undisguiseToAll(player);
         GamePlayer gamePlayer = getPlayer(player.getUniqueId());
+        
+        DisguiseProvider disguiseProvider = plugin.getNexusCore().getDisguiseProvider();
+        
+        NexusPlayer nexusPlayer = gamePlayer.getNexusPlayer();
+        if (nexusPlayer.isNicked()) {
+            Disguise.Builder builder = Disguise.builder();
+            Nickname nickname = nexusPlayer.getNickname();
+            builder.setName(nickname.getName());
+            SkinManager skinManager = Bukkit.getServicesManager().getRegistration(SkinManager.class).getProvider();
+            Skin skin = nickname.getSkin() != null && !nickname.getSkin().isBlank() ? skinManager.getFromMojang(nickname.getSkin()) : null;
+            
+            if (skin != null) {
+                builder.setSkin(skin.getValue(), skin.getSignature());
+            }
+            
+            Disguise disguise = builder.build();
+            disguiseProvider.disguise(player, disguise);
+        } else {
+            disguiseProvider.undisguise(player);
+        }
+        
         gamePlayer.setMutation(null);
         gamePlayer.sendMessage("&d&l>> &7You're no longer disguised.");
         gamePlayer.getTeam().getPlayerState().apply(player);
         if (gamePlayer.getTeam() == GameTeam.SPECTATORS) {
             gamePlayer.giveSpectatorItems(this);
         }
+        
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ocm reload");
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ocm mode old " + gamePlayer.getName());
     }
     
     public GamePlayer getPlayer(String name) {

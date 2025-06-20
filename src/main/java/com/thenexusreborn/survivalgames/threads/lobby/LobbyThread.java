@@ -73,7 +73,7 @@ public class LobbyThread extends StarThread<SurvivalGames> {
                     if (!lobby.getLobbySettings().isVoteForModifiers()) {
                         player.getInventory().setItem(1, null);
                     } else {
-                        if (player.getInventory().getItem(1) == null || player.getInventory().getItem(1).getType() != Material.REDSTONE_TORCH_ON) {
+                        if (player.getInventory().getItem(1) == null || player.getInventory().getItem(1).getType() != Material.REDSTONE_TORCH) {
                             player.getInventory().setItem(1, SurvivalGames.modifierItem.toItemStack());
                         }
                     }

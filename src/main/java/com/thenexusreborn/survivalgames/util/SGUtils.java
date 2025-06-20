@@ -5,12 +5,12 @@ import com.thenexusreborn.api.scoreboard.wrapper.ITeam;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import net.minecraft.server.v1_8_R3.EntityTNTPrimed;
+import net.minecraft.world.entity.item.EntityTNTPrimed;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftTNTPrimed;
+import org.bukkit.craftbukkit.v1_21_R4.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_21_R4.entity.CraftTNTPrimed;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
@@ -44,7 +44,7 @@ public final class SGUtils {
     }
     
     public static void spawnTNTWithSource(Location location, Player player, int fuseTicks, float yield) {
-        TNTPrimed entity = (TNTPrimed) location.getWorld().spawnEntity(location, EntityType.PRIMED_TNT);
+        TNTPrimed entity = (TNTPrimed) location.getWorld().spawnEntity(location, EntityType.TNT);
         entity.setFuseTicks(fuseTicks);
         entity.setYield(yield);
         EntityTNTPrimed nmsTnt = ((CraftTNTPrimed) entity).getHandle();

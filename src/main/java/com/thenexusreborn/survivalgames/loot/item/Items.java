@@ -10,34 +10,34 @@ import static com.thenexusreborn.survivalgames.loot.category.LootCategory.*;
 public final class Items {
     public static final ItemRegistry REGISTRY = new ItemRegistry();
     
-    public static final LootItem PORKCHOP = REGISTRY.register("Porkchop", Material.GRILLED_PORK).setCategories(FOOD, COOKED_FOOD);
+    public static final LootItem PORKCHOP = REGISTRY.register("Porkchop", Material.COOKED_PORKCHOP).setCategories(FOOD, COOKED_FOOD);
     public static final LootItem STEAK = REGISTRY.register("Steak", Material.COOKED_BEEF).setCategories(FOOD, COOKED_FOOD);
     public static final LootItem GRILLED_CHICKEN = REGISTRY.register("Grilled Chicken", Material.COOKED_CHICKEN).setCategories(FOOD, COOKED_FOOD);
-    public static final LootItem RAW_PORKCHOP = REGISTRY.register("Raw Porkchop", Material.PORK).setCategories(FOOD, COOKED_FOOD);
-    public static final LootItem RAW_BEEF = REGISTRY.register(Material.RAW_BEEF).setCategories(FOOD, RAW_FOOD);
-    public static final LootItem RAW_CHICKEN = REGISTRY.register(Material.RAW_CHICKEN).setCategories(FOOD, RAW_FOOD);
-    public static final LootItem CARROT = REGISTRY.register("Carrot", Material.CARROT_ITEM).setCategories(FOOD, MISC_FOOD);
-    public static final LootItem POTATO = REGISTRY.register(Material.POTATO_ITEM).setCategories(FOOD, MISC_FOOD);
+    public static final LootItem RAW_PORKCHOP = REGISTRY.register("Raw Porkchop", Material.PORKCHOP).setCategories(FOOD, COOKED_FOOD);
+    public static final LootItem RAW_BEEF = REGISTRY.register(Material.BEEF).setCategories(FOOD, RAW_FOOD);
+    public static final LootItem RAW_CHICKEN = REGISTRY.register(Material.CHICKEN).setCategories(FOOD, RAW_FOOD);
+    public static final LootItem CARROT = REGISTRY.register("Carrot", Material.CARROT).setCategories(FOOD, MISC_FOOD);
+    public static final LootItem POTATO = REGISTRY.register(Material.POTATO).setCategories(FOOD, MISC_FOOD);
     public static final LootItem BAKED_POTATO = REGISTRY.register(Material.BAKED_POTATO).setCategories(FOOD, COOKED_FOOD);
     public static final LootItem CAKE = REGISTRY.register(Material.CAKE).setCategories(FOOD, MISC_FOOD);
     public static final LootItem PUMPKIN_PIE = REGISTRY.register(Material.PUMPKIN_PIE).setCategories(FOOD, MISC_FOOD);
-    public static final LootItem RAW_FISH = REGISTRY.register(Material.RAW_FISH).setCategories(FOOD, RAW_FOOD);
-    public static final LootItem VILE_CREATURE = REGISTRY.register("Vile Creature", Material.COOKED_FISH).setCategories(FOOD, COOKED_FOOD);
+    public static final LootItem RAW_FISH = REGISTRY.register(Material.COD).setCategories(FOOD, RAW_FOOD);
+    public static final LootItem VILE_CREATURE = REGISTRY.register("Vile Creature", Material.COOKED_COD).setCategories(FOOD, COOKED_FOOD);
     public static final LootItem GOLDEN_CARROT = REGISTRY.register(Material.GOLDEN_CARROT).setCategories(FOOD, MISC_FOOD);
     public static final LootItem APPLE = REGISTRY.register(Material.APPLE).setCategories(FOOD, MISC_FOOD);
     public static final LootItem MELON = REGISTRY.register("turqMelon", Material.MELON).setCategories(FOOD, MISC_FOOD);
     public static final LootItem GOLDEN_MUNCHIE = REGISTRY.register("Golden Munchie", Material.GOLDEN_APPLE).setCategories(FOOD, COOKED_FOOD);
     public static final LootItem COOKIE = REGISTRY.register(Material.COOKIE).setCategories(FOOD, MISC_FOOD);
-    public static final LootItem MUSHROOM_SOUP = REGISTRY.register(Material.MUSHROOM_SOUP).setCategories(FOOD, COOKED_FOOD);
+    public static final LootItem MUSHROOM_SOUP = REGISTRY.register(Material.MUSHROOM_STEW).setCategories(FOOD, COOKED_FOOD);
     
     public static final LootItem LEATHER_HELMET = REGISTRY.register(Material.LEATHER_HELMET).setCategories(ARMOR, LEATHER_ARMOR, HELMETS);
     public static final LootItem LEATHER_CHESTPLATE = REGISTRY.register(Material.LEATHER_CHESTPLATE).setCategories(ARMOR, LEATHER_ARMOR, CHESTPLATES);
     public static final LootItem LEATHER_LEGGINGS = REGISTRY.register(Material.LEATHER_LEGGINGS).setCategories(ARMOR, LEATHER_ARMOR, LEGGINGS);
     public static final LootItem LEATHER_BOOTS = REGISTRY.register(Material.LEATHER_BOOTS).setCategories(ARMOR, LEATHER_ARMOR, BOOTS);
-    public static final LootItem THE_CROWN = REGISTRY.register("&6The Crown", Material.GOLD_HELMET).setCategories(ARMOR, GOLD_ARMOR, HELMETS);
-    public static final LootItem GOLD_CHESTPLATE = REGISTRY.register(Material.GOLD_CHESTPLATE).setCategories(ARMOR, GOLD_ARMOR, CHESTPLATES);
-    public static final LootItem GOLD_LEGGINGS = REGISTRY.register(Material.GOLD_LEGGINGS).setCategories(ARMOR, GOLD_ARMOR, LEGGINGS);
-    public static final LootItem GOLD_BOOTS = REGISTRY.register(Material.GOLD_BOOTS).setCategories(ARMOR, GOLD_ARMOR, BOOTS);
+    public static final LootItem THE_CROWN = REGISTRY.register("&6The Crown", Material.GOLDEN_HELMET).setCategories(ARMOR, GOLD_ARMOR, HELMETS);
+    public static final LootItem GOLD_CHESTPLATE = REGISTRY.register(Material.GOLDEN_CHESTPLATE).setCategories(ARMOR, GOLD_ARMOR, CHESTPLATES);
+    public static final LootItem GOLD_LEGGINGS = REGISTRY.register(Material.GOLDEN_LEGGINGS).setCategories(ARMOR, GOLD_ARMOR, LEGGINGS);
+    public static final LootItem GOLD_BOOTS = REGISTRY.register(Material.GOLDEN_BOOTS).setCategories(ARMOR, GOLD_ARMOR, BOOTS);
     public static final LootItem LINGERIE_HELMET = REGISTRY.register("Lingerie Helmet", Material.CHAINMAIL_HELMET).setCategories(ARMOR, CHAINMAIL_ARMOR, HELMETS);
     public static final LootItem LINGERIE_CHESTPLATE = REGISTRY.register("Lingerie Chestplate", Material.CHAINMAIL_CHESTPLATE).setCategories(ARMOR, CHAINMAIL_ARMOR, CHESTPLATES);
     public static final LootItem LINGERIE_LEGGINGS = REGISTRY.register("Lingerie Leggings", Material.CHAINMAIL_LEGGINGS).setCategories(ARMOR, CHAINMAIL_ARMOR, LEGGINGS);
@@ -51,10 +51,10 @@ public final class Items {
     public static final LootItem DIAMOND_LEGGINGS = REGISTRY.register(Material.DIAMOND_LEGGINGS).setCategories(ARMOR, DIAMOND_ARMOR, LEGGINGS);
     public static final LootItem DIAMOND_BOOTS = REGISTRY.register(Material.DIAMOND_BOOTS).setCategories(ARMOR, DIAMOND_ARMOR, BOOTS);
     
-    public static final LootItem WOOD_AXE = REGISTRY.register(Material.WOOD_AXE).setCategories(WEAPONS, WOODEN_WEAPONS, AXES);
-    public static final LootItem WOOD_SWORD = REGISTRY.register(Material.WOOD_SWORD).setCategories(WEAPONS, WOODEN_WEAPONS, SWORDS);
-    public static final LootItem SACRIFICIAL_AXE = REGISTRY.register("&4&l&oSacrificial Axe", Material.GOLD_AXE).setCategories(WEAPONS, GOLD_WEAPONS, AXES).setLore("", "&7In honor of TheDragonFox").addEnchantment(Enchantment.DURABILITY, 1);
-    public static final LootItem SACRIFICIAL_SWORD = REGISTRY.register("&4&l&oSacrificial Sword", Material.GOLD_SWORD).setCategories(WEAPONS, GOLD_WEAPONS, SWORDS).setLore("", "&7In honor of TheDragonFox").addEnchantment(Enchantment.DURABILITY, 1);
+    public static final LootItem WOOD_AXE = REGISTRY.register(Material.WOODEN_AXE).setCategories(WEAPONS, WOODEN_WEAPONS, AXES);
+    public static final LootItem WOOD_SWORD = REGISTRY.register(Material.WOODEN_SWORD).setCategories(WEAPONS, WOODEN_WEAPONS, SWORDS);
+    public static final LootItem SACRIFICIAL_AXE = REGISTRY.register("&4&l&oSacrificial Axe", Material.GOLDEN_AXE).setCategories(WEAPONS, GOLD_WEAPONS, AXES).setLore("", "&7In honor of TheDragonFox").addEnchantment(Enchantment.UNBREAKING, 1);
+    public static final LootItem SACRIFICIAL_SWORD = REGISTRY.register("&4&l&oSacrificial Sword", Material.GOLDEN_SWORD).setCategories(WEAPONS, GOLD_WEAPONS, SWORDS).setLore("", "&7In honor of TheDragonFox").addEnchantment(Enchantment.UNBREAKING, 1);
     public static final LootItem STONE_AXE = REGISTRY.register(Material.STONE_AXE).setCategories(WEAPONS, STONE_WEAPONS, AXES);
     public static final LootItem STONE_SWORD = REGISTRY.register(Material.STONE_SWORD).setCategories(WEAPONS, STONE_WEAPONS, SWORDS);
     public static final LootItem FREDERICK = REGISTRY.register("Frederick", Material.IRON_AXE).setCategories(WEAPONS, IRON_WEAPONS, AXES);
@@ -65,10 +65,10 @@ public final class Items {
     public static final LootItem ARROW = REGISTRY.register(Material.ARROW).setCategories(WEAPONS, RANGED).setAmount(3);
     
     public static final LootItem EGG_OF_DOOM = REGISTRY.register("Egg of Doom &8- &7Hunger and Confusion", Material.EGG).setCategories(THROWABLES);
-    public static final LootItem SLOWBALL = REGISTRY.register("Slowball &8- &7Slowness", Material.SNOW_BALL).setCategories(THROWABLES);
+    public static final LootItem SLOWBALL = REGISTRY.register("Slowball &8- &7Slowness", Material.SNOWBALL).setCategories(THROWABLES);
     public static final LootItem TNT = REGISTRY.register("TNT", Material.TNT).setCategories(PLACEABLES);
-    public static final LootItem COBWEB = REGISTRY.register("Cobweb", Material.WEB).setCategories(PLACEABLES);
-    public static final LootItem XP_BOTTLE = REGISTRY.register("XP Bottle", Material.EXP_BOTTLE).setCategories(PLACEABLES);
+    public static final LootItem COBWEB = REGISTRY.register(Material.COBWEB).setCategories(PLACEABLES);
+    public static final LootItem XP_BOTTLE = REGISTRY.register("XP Bottle", Material.EXPERIENCE_BOTTLE).setCategories(PLACEABLES);
     public static final LootItem WET_NODDLE = REGISTRY.register("Wet Noodle", Material.ROTTEN_FLESH).setCategories(FOOD, MISC_FOOD).setLore("&7&oEat this to get a 15% chance to get Strength II");
     public static final LootItem ENDER_PEARL = REGISTRY.register(Material.ENDER_PEARL).setCategories(THROWABLES);
     

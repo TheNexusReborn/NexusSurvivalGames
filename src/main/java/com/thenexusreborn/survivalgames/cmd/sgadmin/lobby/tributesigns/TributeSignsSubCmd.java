@@ -38,7 +38,7 @@ public abstract class TributeSignsSubCmd extends SubCommand<SurvivalGames> {
             return true;
         }
         
-        if (Stream.of(Material.SIGN, Material.WALL_SIGN, Material.SKULL).noneMatch(material -> targetBlock.getType() == material)) {
+        if (Stream.of(Material.OAK_SIGN, Material.OAK_WALL_SIGN, Material.PLAYER_HEAD, Material.PLAYER_WALL_HEAD).noneMatch(material -> targetBlock.getType() == material)) {
             player.sendMessage(MsgType.WARN.format("You are not looking at a sign or a head."));
             return true;
         }

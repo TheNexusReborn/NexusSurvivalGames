@@ -574,7 +574,7 @@ public class GamePlayer {
     }
 
     public void setCollisions(boolean collisions) {
-        callPlayerMethod(player -> player.spigot().setCollidesWithEntities(collisions));
+        callPlayerMethod(player -> player.setCollidable(collisions));
     }
 
     public void setFood(int food, float saturation) {

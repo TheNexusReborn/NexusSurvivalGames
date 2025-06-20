@@ -37,6 +37,7 @@ public class SGPlayer {
     
     //Fields for things related to SG and the Player
     private long joinTime;
+    private boolean blocking;
     
     public SGPlayer(NexusPlayer nexusPlayer, Player spigotPlayer) {
         this.nexusPlayer = nexusPlayer;
@@ -171,12 +172,7 @@ public class SGPlayer {
     }
     
     public boolean isBlocking() {
-        Player player = getSpigotPlayer();
-        if (player != null) {
-            return player.isBlocking();
-        }
-        
-        return false;
+        return blocking;
     }
     
     public void launchProjectile(Class<? extends Projectile> projectileClass) {
@@ -238,7 +234,7 @@ public class SGPlayer {
         if (player != null) {
             Player other = sgPlayer.getSpigotPlayer();
             if (other != null) {
-                player.showPlayer(other);
+                player.showPlayer(SurvivalGames.getInstance().getNexusCore(), other);
             }
         }
     }
@@ -248,8 +244,12 @@ public class SGPlayer {
         if (player != null) {
             Player other = sgPlayer.getSpigotPlayer();
             if (other != null) {
-                player.hidePlayer(other);
+                player.hidePlayer(SurvivalGames.getInstance().getNexusCore(), other);
             }
         }
+    }
+    
+    public void setBlocking(boolean b) {
+        this.blocking = b;
     }
 }

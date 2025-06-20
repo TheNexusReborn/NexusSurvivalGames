@@ -17,7 +17,7 @@ public class ChickenMutationThread extends StarThread<SurvivalGames> {
     private int eggGain = EGG_START_VALUE;
     
     public ChickenMutationThread(SurvivalGames plugin) {
-        super(plugin, 1L, 0L, false);
+        super(plugin, 1L, 2L, false);
     }
     
     @Override
@@ -56,7 +56,7 @@ public class ChickenMutationThread extends StarThread<SurvivalGames> {
                 ItemStack hand = sgPlayer.getItemInHand();
                 if (sgPlayer.isBlocking()) {
                     if (hand != null) {
-                        if (hand.getType() == Material.WOOD_SWORD) {
+                        if (hand.getType() == Material.WOODEN_SWORD) {
                             if (chickenMutation.getAmmunition() > 0) {
                                 if (chickenMutation.getLastEggLaunch() > 0) {
                                     long nextLaunch = chickenMutation.getLastEggLaunch() + game.getSettings().getChickenEggLaunchCooldown();
@@ -74,20 +74,6 @@ public class ChickenMutationThread extends StarThread<SurvivalGames> {
                         }
                     }
                 }
-                
-//                if (sgPlayer.isBlocking() && hand != null && hand.getType() == Material.WOOD_SWORD && chickenMutation.getAmmunition() > 0) {
-//                    if (chickenMutation.getLastEggLaunch() > 0) {
-//                        if (chickenMutation.getLastEggLaunch() + game.getSettings().getChickenEggLaunchCooldown() >= System.currentTimeMillis()) {
-//                            sgPlayer.launchProjectile(Egg.class);
-//                            chickenMutation.decrementAmmunition();
-//                            chickenMutation.setLastEggLaunch(System.currentTimeMillis());
-//                        }
-//                    } else {
-//                        sgPlayer.launchProjectile(Egg.class);
-//                        chickenMutation.decrementAmmunition();
-//                        chickenMutation.setLastEggLaunch(System.currentTimeMillis());
-//                    }
-//                }
                 
                 sgPlayer.setLevel(chickenMutation.getAmmunition());
                 

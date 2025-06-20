@@ -5,10 +5,10 @@ import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.CompassMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashSet;
@@ -28,10 +28,7 @@ public class PlayerTrackerThread extends StarThread<SurvivalGames> {
             }
 
             long start = System.currentTimeMillis();
-            if (game == null) {
-                continue;
-            }
-
+            
             if (!(game.getState().ordinal() >= Game.State.INGAME.ordinal() && game.getState().ordinal() <= Game.State.DEATHMATCH.ordinal())) {
                 continue;
             }
@@ -43,13 +40,10 @@ public class PlayerTrackerThread extends StarThread<SurvivalGames> {
                 if (player == null) {
                     continue;
                 }
-                boolean holdingTracker = false;
-
-                ItemStack hand = player.getInventory().getItemInHand();
-                if (hand != null) {
-                    holdingTracker = hand.getType() == Material.COMPASS;
-                }
-
+                
+                ItemStack hand = player.getInventory().getItemInMainHand();
+                boolean holdingTracker = hand.getType() == Material.COMPASS;
+                
                 if (!holdingTracker) {
                     gamePlayer.setTrackerInfo(null);
                     continue;
@@ -101,10 +95,13 @@ public class PlayerTrackerThread extends StarThread<SurvivalGames> {
                     continue;
                 }
 
-                Player finalClosest = target;
+                Location location = target.getLocation();
                 new BukkitRunnable() {
                     public void run() {
-                        player.setCompassTarget(finalClosest.getLocation());
+                        CompassMeta compassMeta = (CompassMeta) hand.getItemMeta();
+                        compassMeta.setLodestone(location);
+                        compassMeta.setLodestoneTracked(false);
+                        hand.setItemMeta(compassMeta);
                     }
                 }.runTask(plugin);
 

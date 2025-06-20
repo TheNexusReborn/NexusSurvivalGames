@@ -73,7 +73,7 @@ public class GameGiveSubCmd extends GameSubCommand {
             target = player;
             self = true;
         } else {
-            Bukkit.getPlayer(args[1]);
+            target = Bukkit.getPlayer(args[1]);
             if (target == null) {
                 player.sendMessage(MsgType.WARN.format("Unknown player %v", args[1]));
                 return true;
