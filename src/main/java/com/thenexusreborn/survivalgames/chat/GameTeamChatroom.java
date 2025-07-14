@@ -2,7 +2,7 @@ package com.thenexusreborn.survivalgames.chat;
 
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.rooms.ChatRoom;
-import com.stardevllc.starcore.api.actors.Actor;
+import com.stardevllc.starmclib.actors.Actor;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GameTeam;

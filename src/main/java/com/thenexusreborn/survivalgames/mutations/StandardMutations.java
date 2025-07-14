@@ -1,9 +1,9 @@
 package com.thenexusreborn.survivalgames.mutations;
 
 import com.stardevllc.helper.StringHelper;
-import com.stardevllc.starcore.api.XMaterial;
 import com.stardevllc.starcore.api.itembuilder.ItemBuilder;
-import com.stardevllc.starcore.utils.ArmorSet;
+import com.stardevllc.starmclib.XMaterial;
+import com.stardevllc.starmclib.materialset.ArmorSet;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.disguises.disguisetypes.DisguiseType;
 import com.thenexusreborn.survivalgames.mutations.impl.*;

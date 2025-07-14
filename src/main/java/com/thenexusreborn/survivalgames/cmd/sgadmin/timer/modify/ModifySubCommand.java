@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.cmd.sgadmin.timer.modify;
 
 import com.stardevllc.clock.clocks.Timer;
-import com.stardevllc.starcore.api.cmdflags.FlagResult;
+import com.stardevllc.starmclib.cmdflags.FlagResult;
 import com.stardevllc.time.TimeFormat;
 import com.stardevllc.time.TimeParser;
 import com.thenexusreborn.api.gamearchive.GameAction;

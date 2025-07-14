@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.scoreboard.lobby;
 
 import com.stardevllc.starcore.api.StarColors;
-import com.stardevllc.starcore.utils.Position;
+import com.stardevllc.starmclib.Position;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.scoreboard.TeamBuilder;
 import com.thenexusreborn.nexuscore.scoreboard.SpigotScoreboardView;

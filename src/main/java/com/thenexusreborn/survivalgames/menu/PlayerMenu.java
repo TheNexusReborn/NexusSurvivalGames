@@ -1,8 +1,8 @@
 package com.thenexusreborn.survivalgames.menu;
 
 import com.stardevllc.starcore.api.StarColors;
-import com.stardevllc.starcore.api.XMaterial;
 import com.stardevllc.starcore.api.itembuilder.ItemBuilder;
+import com.stardevllc.starmclib.XMaterial;
 import com.stardevllc.starui.GuiManager;
 import com.stardevllc.starui.element.Element;
 import com.stardevllc.starui.element.button.Button;

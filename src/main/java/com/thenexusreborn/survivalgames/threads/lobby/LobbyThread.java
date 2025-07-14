@@ -1,8 +1,8 @@
 package com.thenexusreborn.survivalgames.threads.lobby;
 
 import com.stardevllc.starcore.api.StarColors;
-import com.stardevllc.starcore.api.XMaterial;
 import com.stardevllc.starcore.utils.StarThread;
+import com.stardevllc.starmclib.XMaterial;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.*;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;

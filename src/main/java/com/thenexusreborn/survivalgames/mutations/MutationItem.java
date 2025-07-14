@@ -1,8 +1,8 @@
 package com.thenexusreborn.survivalgames.mutations;
 
-import com.stardevllc.starcore.api.XMaterial;
 import com.stardevllc.starcore.api.itembuilder.ItemBuilder;
 import com.stardevllc.staritems.model.CustomItem;
+import com.stardevllc.starmclib.XMaterial;
 import org.bukkit.inventory.ItemStack;
 
 public final class MutationItem {
