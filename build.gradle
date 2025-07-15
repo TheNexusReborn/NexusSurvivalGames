@@ -16,7 +16,11 @@ repositories {
     maven {
         url = uri('https://repo.stardevllc.com/releases')
     }
-
+    
+    maven {
+        url = uri('https://repo.gravemc.net/releases/')
+    }
+    
     maven {
         url = uri('https://hub.spigotmc.org/nexus/content/repositories/snapshots/')
     }
@@ -55,6 +59,7 @@ dependencies {
     compileOnly 'com.comphenix.protocol:ProtocolLib:5.0.0'
     compileOnly 'com.sk89q.worldedit:worldedit-core:6.1'
     compileOnly 'com.sk89q.worldedit:worldedit-bukkit:6.1.5'
+    compileOnly 'dev.iiahmed:ModernDisguise:4.0'
 }
 
 group = 'com.thenexusreborn'

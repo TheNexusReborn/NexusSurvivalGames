@@ -24,7 +24,6 @@ import com.thenexusreborn.nexuscore.cmds.ToggleCmd;
 import com.thenexusreborn.nexuscore.discord.NexusBot;
 import com.thenexusreborn.survivalgames.cmd.*;
 import com.thenexusreborn.survivalgames.cmd.sgadmin.SGAdminCmd;
-import com.thenexusreborn.survivalgames.disguises.NexusDisguises;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.game.death.DeathType;
@@ -263,7 +262,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         String mapSource = getConfig().getString("map-source");
         if (mapSource == null || mapSource.equalsIgnoreCase("sql")) {
             mapManager = new SQLMapManager(this);
-        } else if (mapSource != null && mapSource.equalsIgnoreCase("yml")) {
+        } else if (mapSource.equalsIgnoreCase("yml")) {
             mapManager = new YamlMapManager(this);
         }
         
@@ -364,9 +363,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
 //
 //            return line1 + "\n" + line2;
 //        });
-        
-        new NexusDisguises().init(this);
-        getLogger().info("Loaded the disguises for mutations.");
     }
     
     public Set<IMutationType> getDisabledMutations() {

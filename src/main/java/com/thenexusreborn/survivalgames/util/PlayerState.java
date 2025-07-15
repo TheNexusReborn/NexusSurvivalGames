@@ -1,9 +1,9 @@
 package com.thenexusreborn.survivalgames.util;
 
 import com.thenexusreborn.api.player.NexusPlayer;
+import com.thenexusreborn.nexuscore.nickname.DisguiseWrapper;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.disguises.DisguiseAPI;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
 import org.bukkit.Bukkit;
@@ -12,9 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 
 import java.util.UUID;
-import java.util.function.Function;
-import java.util.function.ToDoubleFunction;
-import java.util.function.ToIntFunction;
+import java.util.function.*;
 
 public class PlayerState {
     protected Function<SGPlayer, GameMode> gameMode;
@@ -305,9 +303,7 @@ public class PlayerState {
         }
         
         if (this.disguises != null && !this.disguises.apply(sgPlayer)) {
-            if (DisguiseAPI.isDisguised(player)) {
-                DisguiseAPI.undisguiseToAll(player);
-            }
+            Bukkit.getServicesManager().getRegistration(DisguiseWrapper.class).getProvider().resetEntity(player);
         }
     }
     
