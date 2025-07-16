@@ -1,8 +1,10 @@
 package com.thenexusreborn.survivalgames.cmd;
 
+import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starmclib.cmdflags.FlagResult;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.nexuscore.api.command.NexusCommand;
+import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
@@ -31,7 +33,10 @@ public class MutationMayhemCmd extends NexusCommand<SurvivalGames> {
         settings.setAllowDeathmatch(false);
         settings.setAllowRecursiveMutations(true);
         settings.setAutomaticGraceperiod(false);
-        
+        settings.setGameLength(15);
+        settings.setMaxMutationAmount(3);
+        MsgType.INFO.send(sender, "You have enabled Mutation Mayhem!");
+        plugin.getNexusCore().getStaffChannel().sendMessage(new ChatContext(sgPlayer.getTrueColoredName() + " &fturned &a&lON &eMutation Mayhem"));
         return true;
     }
 }
