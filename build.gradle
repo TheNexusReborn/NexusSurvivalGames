@@ -59,7 +59,6 @@ dependencies {
     compileOnly 'com.comphenix.protocol:ProtocolLib:5.0.0'
     compileOnly 'com.sk89q.worldedit:worldedit-core:6.1'
     compileOnly 'com.sk89q.worldedit:worldedit-bukkit:6.1.5'
-    compileOnly 'dev.iiahmed:ModernDisguise:4.0'
 }
 
 group = 'com.thenexusreborn'

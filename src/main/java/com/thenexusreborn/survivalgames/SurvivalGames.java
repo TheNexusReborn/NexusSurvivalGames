@@ -24,6 +24,7 @@ import com.thenexusreborn.nexuscore.cmds.ToggleCmd;
 import com.thenexusreborn.nexuscore.discord.NexusBot;
 import com.thenexusreborn.survivalgames.cmd.*;
 import com.thenexusreborn.survivalgames.cmd.sgadmin.SGAdminCmd;
+import com.thenexusreborn.survivalgames.disguises.NexusDisguises;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.game.death.DeathType;
@@ -350,6 +351,9 @@ public class SurvivalGames extends NexusSpigotPlugin {
         getServer().getPluginManager().registerEvents(new ServerListener(this), this);
         
         getLogger().info("Registered Listeners");
+        
+        new NexusDisguises().init(this);
+        getLogger().info("Loaded the disguises for mutations.");
 
 //        nexusCore.setMotdSupplier(() -> {
 //            String line1 = "&5&lNEXUS REBORN &aSurvival Games", line2;

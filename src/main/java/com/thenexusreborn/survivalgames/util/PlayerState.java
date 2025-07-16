@@ -1,9 +1,9 @@
 package com.thenexusreborn.survivalgames.util;
 
 import com.thenexusreborn.api.player.NexusPlayer;
-import com.thenexusreborn.nexuscore.nickname.DisguiseWrapper;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
+import com.thenexusreborn.survivalgames.disguises.DisguiseAPI;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
 import org.bukkit.Bukkit;
@@ -303,7 +303,9 @@ public class PlayerState {
         }
         
         if (this.disguises != null && !this.disguises.apply(sgPlayer)) {
-            Bukkit.getServicesManager().getRegistration(DisguiseWrapper.class).getProvider().resetEntity(player);
+            if (DisguiseAPI.isDisguised(player)) {
+                DisguiseAPI.undisguiseToAll(player);
+            }
         }
     }
     

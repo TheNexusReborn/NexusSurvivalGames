@@ -3,7 +3,7 @@ package com.thenexusreborn.survivalgames.mutations;
 import com.stardevllc.registry.StringRegistry;
 import com.stardevllc.starmclib.XMaterial;
 import com.stardevllc.starmclib.materialset.ArmorSet;
-import org.bukkit.entity.EntityType;
+import com.thenexusreborn.survivalgames.disguises.disguisetypes.DisguiseType;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 
@@ -30,7 +30,7 @@ public interface IMutationType {
     
     ItemStack getWeapon();
     
-    EntityType getDisguiseType();
+    DisguiseType getDisguiseType();
     
     int getUnlockCost();
     

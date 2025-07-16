@@ -25,7 +25,6 @@ import com.thenexusreborn.api.sql.objects.SQLDatabase;
 import com.thenexusreborn.api.tags.Tag;
 import com.thenexusreborn.gamemaps.model.MapSpawn;
 import com.thenexusreborn.gamemaps.model.SGMap;
-import com.thenexusreborn.nexuscore.nickname.DisguiseWrapper;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
@@ -34,6 +33,8 @@ import com.thenexusreborn.survivalgames.chat.GameChatRoom;
 import com.thenexusreborn.survivalgames.chat.GameTeamChatroom;
 import com.thenexusreborn.survivalgames.control.ControlType;
 import com.thenexusreborn.survivalgames.control.Controllable;
+import com.thenexusreborn.survivalgames.disguises.DisguiseAPI;
+import com.thenexusreborn.survivalgames.disguises.disguisetypes.MobDisguise;
 import com.thenexusreborn.survivalgames.game.Bounty.Type;
 import com.thenexusreborn.survivalgames.game.death.*;
 import com.thenexusreborn.survivalgames.game.timer.callbacks.GameMinutesCallback;
@@ -131,8 +132,6 @@ public class Game implements Controllable, IHasState {
     private int timedRestockCount;
     private int totalTimedRestocks;
     
-    private final DisguiseWrapper disguiseWrapper;
-    
     public Game(SGVirtualServer server, SGMap gameMap, SGMode mode, GameSettings settings, Collection<LobbyPlayer> players) {
         this.gameMap = gameMap;
         this.server = server;
@@ -178,7 +177,6 @@ public class Game implements Controllable, IHasState {
         }
         gameInfo.setPlayerCount(tributeCount);
         gameInfo.setPlayers(playerInfos);
-        disguiseWrapper = Bukkit.getServicesManager().getRegistration(DisguiseWrapper.class).getProvider();
     }
     
     public Graceperiod getGraceperiod() {
@@ -1865,7 +1863,7 @@ public class Game implements Controllable, IHasState {
         gamePlayer.sendMessage(gamePlayer.getTeam().getLeaveMessage());
         gamePlayer.setTeam(GameTeam.MUTATIONS);
         gamePlayer.sendMessage(gamePlayer.getTeam().getJoinMessage());
-        disguiseWrapper.setEntity(player, mutation.getType().getDisguiseType());
+        DisguiseAPI.disguiseEntity(player, new MobDisguise(mutation.getType().getDisguiseType()));
         gamePlayer.incrementTimesMutated();
         gamePlayer.sendMessage("&6&l>> &dYou have &b" + gamePlayer.getStats().getMutationPasses() + " Passes &dremaining.");
         gamePlayer.sendMessage("&d&l>> &7You're now disguised.");
@@ -1898,7 +1896,7 @@ public class Game implements Controllable, IHasState {
         
         Player player = Bukkit.getPlayer(mutation.getPlayer());
         
-        disguiseWrapper.resetEntity(player);
+        DisguiseAPI.undisguiseToAll(player);
         GamePlayer gamePlayer = getPlayer(player.getUniqueId());
         gamePlayer.setMutation(null);
         gamePlayer.sendMessage("&d&l>> &7You're no longer disguised.");
