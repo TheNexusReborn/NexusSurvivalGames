@@ -27,6 +27,12 @@ public class LobbySetMapCmd extends LobbySubCommand {
             return true;
         }
         
+        if (args[0].equalsIgnoreCase("voting") || args[0].equalsIgnoreCase("reset")) {
+            lobby.setGameMap(null);
+            sender.sendMessage(MsgType.INFO.format("You reset the map."));
+            return true;
+        }
+        
         SGMap gameMap = plugin.getMapManager().getMap(SGUtils.getMapNameFromCommand(args, 0));
         if (gameMap == null) {
             sender.sendMessage(MsgType.WARN.format("Could not find a map with that name."));
