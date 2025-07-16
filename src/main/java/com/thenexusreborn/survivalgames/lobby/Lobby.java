@@ -522,7 +522,7 @@ public class Lobby implements Controllable, IHasState {
             double ratingRatio = rating * 1.0 / totalRatings;
             int ratingPercent = (int) (ratingRatio * 100);
 
-            ratingMsg = "&7Rating: " + ProgressBar.of(ratingPercent, 100, 5, "* ", "&a", "&7") + " &7&o(Rating: " + (rating / totalRatings) + " star(s), based on: " + totalRatings + " vote(s))";
+            ratingMsg = "&7Rating: " + ProgressBar.of(ratingPercent, 5, "* ", "&a", "&7") + " &7&o(Rating: " + ratingRatio + " star(s), based on: " + totalRatings + " vote(s))";
         }
 
         sendMessage("&6&l> " + ratingMsg);

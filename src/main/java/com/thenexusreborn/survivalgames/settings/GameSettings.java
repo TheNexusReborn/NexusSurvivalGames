@@ -1,11 +1,14 @@
 package com.thenexusreborn.survivalgames.settings;
 
+import com.thenexusreborn.api.sql.annotations.column.PrimaryKey;
 import com.thenexusreborn.api.sql.annotations.table.TableName;
 import com.thenexusreborn.survivalgames.settings.enums.*;
 
 @TableName("sggamesettings")
 public class GameSettings implements Cloneable, ISettings {
-
+    @PrimaryKey
+    protected String name;
+    
     //Chest Restock
     protected int chestRestockInterval = 5;
     protected int chestRestockDenomination = 2;
@@ -813,5 +816,10 @@ public class GameSettings implements Cloneable, ISettings {
         } catch (CloneNotSupportedException e) {
             return new GameSettings();
         }
+    }
+    
+    @Override
+    public String getName() {
+        return this.name;
     }
 }
