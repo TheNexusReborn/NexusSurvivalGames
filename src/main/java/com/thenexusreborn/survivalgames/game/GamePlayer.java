@@ -548,15 +548,16 @@ public class GamePlayer {
     }
     
     public void giveSpectatorItems(Game game) {
-        Player p = Bukkit.getPlayer(getUniqueId());
-        PlayerInventory inv = p.getInventory();
-        inv.setItem(0, SurvivalGames.tributesBook.toItemStack());
-        inv.setItem(1, SurvivalGames.mutationsBook.toItemStack());
-        inv.setItem(2, SurvivalGames.spectatorsBook.toItemStack());
-        inv.setItem(5, SurvivalGames.mutateItem.toItemStack());
-        inv.setItem(6, SurvivalGames.playerTrackerItem.toItemStack());
-        inv.setItem(7, SurvivalGames.tpToMapCenterItem.toItemStack());
-        inv.setItem(8, SurvivalGames.toHubItem.toItemStack());
+        callPlayerMethod(p ->  {
+            PlayerInventory inv = p.getInventory();
+            inv.setItem(0, SurvivalGames.tributesBook.toItemStack());
+            inv.setItem(1, SurvivalGames.mutationsBook.toItemStack());
+            inv.setItem(2, SurvivalGames.spectatorsBook.toItemStack());
+            inv.setItem(5, SurvivalGames.mutateItem.toItemStack());
+            inv.setItem(6, SurvivalGames.playerTrackerItem.toItemStack());
+            inv.setItem(7, SurvivalGames.tpToMapCenterItem.toItemStack());
+            inv.setItem(8, SurvivalGames.toHubItem.toItemStack());
+        });
     }
     
     private void callPlayerMethod(Consumer<Player> consumer) {
