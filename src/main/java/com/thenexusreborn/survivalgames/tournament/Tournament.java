@@ -1,15 +1,17 @@
 package com.thenexusreborn.survivalgames.tournament;
 
+import com.thenexusreborn.survivalgames.mutations.IMutationType;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.settings.LobbySettings;
-import org.bukkit.entity.Player;
 
-import java.util.function.Consumer;
+import java.util.*;
 
-public abstract class Tournament {
+public class Tournament {
     protected String name;
-    protected String host;
-    protected Consumer<LobbySettings> lobbySettings;
-    protected Consumer<GameSettings> gameSettings;
-    protected Consumer<Player> winnerPrizes;
+    protected UUID host;
+    protected TournamentSettings tournamentSettings;
+    protected LobbySettings lobbySettings;
+    protected GameSettings gameSettings;
+    protected Set<IMutationType> disabledMutations = new HashSet<>(); //Exclusive to enabledMutations
+    protected Set<IMutationType> enabledMutations = new HashSet<>(); //Exclusive to disabledMutations
 }
