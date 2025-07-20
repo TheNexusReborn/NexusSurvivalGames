@@ -3,6 +3,8 @@ package com.thenexusreborn.survivalgames.chat;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starmclib.actors.Actor;
+import com.thenexusreborn.api.NexusReborn;
+import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GameTeam;
@@ -29,9 +31,13 @@ public class GameTeamChatroom extends ChatRoom {
         }
 
         String message = chatContext.getMessage();
-
+        
+        Rank playerRank = NexusReborn.getPlayerManager().getPlayerRank(player.getUniqueId());
+        
         if (game != null) {
-            game.getGameInfo().getActions().add(new GameChatAction(this, player.getName(), message.replace("'", "''")));
+            if (!(message.startsWith("@") && playerRank.ordinal() <= Rank.HELPER.ordinal())) {
+                game.getGameInfo().getActions().add(new GameChatAction(this, player.getName(), message.replace("'", "''")));
+            }
         }
 
         super.sendMessage(chatContext);
