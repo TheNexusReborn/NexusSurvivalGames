@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.mutations;
 
-import com.stardevllc.registry.StringRegistry;
+import com.stardevllc.starlib.registry.StringRegistry;
 import com.stardevllc.starmclib.XMaterial;
 import com.stardevllc.starmclib.materialset.ArmorSet;
 import com.thenexusreborn.survivalgames.disguises.disguisetypes.DisguiseType;

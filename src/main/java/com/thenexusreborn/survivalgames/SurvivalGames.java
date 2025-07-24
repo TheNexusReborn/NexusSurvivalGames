@@ -1,14 +1,14 @@
 package com.thenexusreborn.survivalgames;
 
-import com.stardevllc.clock.ClockManager;
-import com.stardevllc.helper.ReflectionHelper;
-import com.stardevllc.registry.IntegerRegistry;
-import com.stardevllc.registry.UUIDRegistry;
 import com.stardevllc.starchat.ChatSelector;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.staritems.model.CustomItem;
 import com.stardevllc.staritems.model.ItemRegistry;
+import com.stardevllc.starlib.clock.ClockManager;
+import com.stardevllc.starlib.helper.ReflectionHelper;
+import com.stardevllc.starlib.registry.IntegerRegistry;
+import com.stardevllc.starlib.registry.UUIDRegistry;
 import com.stardevllc.starui.GuiManager;
 import com.thenexusreborn.api.NexusReborn;
 import com.thenexusreborn.api.player.Rank;

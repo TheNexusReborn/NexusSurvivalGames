@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.mutations;
 
-import com.stardevllc.helper.StringHelper;
+import com.stardevllc.starlib.helper.StringHelper;
 
 public enum MutationModifier {
     NO_HEALTH_REGEN, 

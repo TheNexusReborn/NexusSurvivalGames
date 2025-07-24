@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.game;
 
-import com.stardevllc.time.TimeUnit;
+import com.stardevllc.starlib.time.TimeUnit;
 import com.thenexusreborn.api.player.IActionBar;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;

@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.cmd.sgadmin.settings;
 
-import com.stardevllc.converter.string.StringConverter;
+import com.stardevllc.starlib.converter.string.StringConverter;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starmclib.cmdflags.FlagResult;
 import com.stardevllc.starmclib.cmdflags.type.PresenceFlag;

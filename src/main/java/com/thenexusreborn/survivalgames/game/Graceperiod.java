@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.game;
 
-import com.stardevllc.converter.string.EnumStringConverter;
-import com.stardevllc.converter.string.StringConverters;
+import com.stardevllc.starlib.converter.string.EnumStringConverter;
+import com.stardevllc.starlib.converter.string.StringConverters;
 
 public enum Graceperiod {
     ACTIVE, TIMER_DONE, INACTIVE;

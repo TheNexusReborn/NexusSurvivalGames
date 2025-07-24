@@ -1,9 +1,9 @@
 package com.thenexusreborn.survivalgames.threads;
 
 import com.google.gson.*;
-import com.stardevllc.helper.StringHelper;
+import com.stardevllc.starlib.helper.StringHelper;
 import com.stardevllc.starcore.utils.StarThread;
-import com.stardevllc.time.TimeUnit;
+import com.stardevllc.starlib.time.TimeUnit;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.lobby.Lobby;

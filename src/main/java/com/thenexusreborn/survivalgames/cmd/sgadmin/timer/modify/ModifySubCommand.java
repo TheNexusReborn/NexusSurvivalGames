@@ -1,9 +1,9 @@
 package com.thenexusreborn.survivalgames.cmd.sgadmin.timer.modify;
 
-import com.stardevllc.clock.clocks.Timer;
+import com.stardevllc.starlib.clock.clocks.Timer;
 import com.stardevllc.starmclib.cmdflags.FlagResult;
-import com.stardevllc.time.TimeFormat;
-import com.stardevllc.time.TimeParser;
+import com.stardevllc.starlib.time.TimeFormat;
+import com.stardevllc.starlib.time.TimeParser;
 import com.thenexusreborn.api.gamearchive.GameAction;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.nexuscore.api.command.ICommand;

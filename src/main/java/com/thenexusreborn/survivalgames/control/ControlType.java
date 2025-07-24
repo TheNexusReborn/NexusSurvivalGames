@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.control;
 
-import com.stardevllc.converter.string.EnumStringConverter;
-import com.stardevllc.converter.string.StringConverters;
+import com.stardevllc.starlib.converter.string.EnumStringConverter;
+import com.stardevllc.starlib.converter.string.StringConverters;
 
 public enum ControlType {
     MANUAL("mnl", "m"), //No timers or progression logic is used. Progress triggered manually

@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.game.death;
 
-import com.stardevllc.converter.string.EnumStringConverter;
-import com.stardevllc.converter.string.StringConverters;
+import com.stardevllc.starlib.converter.string.EnumStringConverter;
+import com.stardevllc.starlib.converter.string.StringConverters;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 

@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.loot.tables;
 
-import com.stardevllc.random.Weighted;
+import com.stardevllc.starlib.random.Weighted;
 import com.thenexusreborn.survivalgames.loot.category.LootCategory;
 import com.thenexusreborn.survivalgames.loot.item.LootItem;
 import org.bukkit.inventory.ItemStack;

@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.settings.enums;
 
-import com.stardevllc.converter.string.EnumStringConverter;
-import com.stardevllc.converter.string.StringConverters;
+import com.stardevllc.starlib.converter.string.EnumStringConverter;
+import com.stardevllc.starlib.converter.string.StringConverters;
 
 public enum LootMode {
     CLASSIC, TIERED, RANDOM;

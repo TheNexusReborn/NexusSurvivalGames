@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.mutations;
 
-import com.stardevllc.helper.StringHelper;
+import com.stardevllc.starlib.helper.StringHelper;
 import com.stardevllc.starcore.api.itembuilder.ItemBuilder;
 import com.stardevllc.starmclib.XMaterial;
 import com.stardevllc.starmclib.materialset.ArmorSet;

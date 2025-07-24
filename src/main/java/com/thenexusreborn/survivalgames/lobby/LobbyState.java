@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.lobby;
 
-import com.stardevllc.converter.string.EnumStringConverter;
-import com.stardevllc.converter.string.StringConverters;
+import com.stardevllc.starlib.converter.string.EnumStringConverter;
+import com.stardevllc.starlib.converter.string.StringConverters;
 import com.thenexusreborn.survivalgames.state.IState;
 
 public enum LobbyState implements IState {

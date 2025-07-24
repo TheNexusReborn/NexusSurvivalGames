@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.game;
 
-import com.stardevllc.helper.Pair;
+import com.stardevllc.starlib.helper.Pair;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.starcore.api.StarColors;
 import com.stardevllc.starmclib.Position;

@@ -1,8 +1,8 @@
 package com.thenexusreborn.survivalgames.game.timer.callbacks;
 
-import com.stardevllc.clock.callback.CallbackPeriod;
-import com.stardevllc.clock.callback.ClockCallback;
-import com.stardevllc.clock.snapshot.TimerSnapshot;
+import com.stardevllc.starlib.clock.callback.CallbackPeriod;
+import com.stardevllc.starlib.clock.callback.ClockCallback;
+import com.stardevllc.starlib.clock.snapshot.TimerSnapshot;
 import com.thenexusreborn.survivalgames.game.Game;
 import org.bukkit.Sound;
 

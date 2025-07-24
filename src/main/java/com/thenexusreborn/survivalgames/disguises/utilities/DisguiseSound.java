@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.disguises.utilities;
 
-import com.stardevllc.converter.string.EnumStringConverter;
-import com.stardevllc.converter.string.StringConverters;
+import com.stardevllc.starlib.converter.string.EnumStringConverter;
+import com.stardevllc.starlib.converter.string.StringConverters;
 import org.bukkit.Sound;
 
 import java.util.HashMap;

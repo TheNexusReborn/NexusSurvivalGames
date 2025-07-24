@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.menu;
 
-import com.stardevllc.helper.*;
+import com.stardevllc.starlib.helper.*;
 import com.stardevllc.starcore.api.colors.ColorHandler;
 import com.stardevllc.starcore.api.itembuilder.ItemBuilder;
 import com.stardevllc.starmclib.names.MaterialNames;

@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.loot.item;
 
-import com.stardevllc.registry.StringRegistry;
+import com.stardevllc.starlib.registry.StringRegistry;
 import com.stardevllc.starcore.api.StarColors;
 import org.bukkit.Material;
 

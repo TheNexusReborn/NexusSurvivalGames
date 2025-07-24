@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.loot.tables;
 
-import com.stardevllc.random.RandomSelector;
+import com.stardevllc.starlib.random.RandomSelector;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.loot.category.LootCategory;
 import com.thenexusreborn.survivalgames.loot.item.LootItem;
