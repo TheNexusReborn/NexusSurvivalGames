@@ -2,7 +2,7 @@ package com.thenexusreborn.survivalgames.chat;
 
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.rooms.ChatRoom;
-import com.stardevllc.starmclib.actors.Actor;
+import com.stardevllc.starmclib.actors.Actors;
 import com.thenexusreborn.api.NexusReborn;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -16,7 +16,7 @@ public class GameTeamChatroom extends ChatRoom {
     private Game game;
 
     public GameTeamChatroom(SurvivalGames plugin, Game game, GameTeam team) {
-        super(plugin, Actor.of(plugin), "room-game-" + game.getServer().getName().toLowerCase().replace(" ", "_") + "-" + team.name().toLowerCase());
+        super(plugin, Actors.of(plugin), "room-game-" + game.getServer().getName().toLowerCase().replace(" ", "_") + "-" + team.name().toLowerCase());
         this.game = game;
         senderFormat.set(team.getChatFormat());
         systemFormat.set("{message}");

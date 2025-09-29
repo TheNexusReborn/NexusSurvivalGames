@@ -63,6 +63,15 @@ public class LootItem {
         return this;
     }
     
+    public LootItem setCategories(LootCategory[] categories) {
+        this.categories.clear();
+        if (categories != null) {
+            this.categories.addAll(Set.of(categories));
+        }
+        
+        return this;
+    }
+    
     public LootItem setLore(String... lore) {
         this.lore.clear();
         if (lore != null) {

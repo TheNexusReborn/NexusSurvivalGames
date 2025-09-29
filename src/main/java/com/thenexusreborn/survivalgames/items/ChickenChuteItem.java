@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.items;
 
-import com.stardevllc.starcore.api.itembuilder.ItemBuilder;
+import com.stardevllc.starcore.api.itembuilder.ItemBuilders;
 import com.stardevllc.staritems.model.CustomItem;
 import com.stardevllc.staritems.model.types.PlayerEvent;
 import com.stardevllc.starmclib.XMaterial;
@@ -14,7 +14,7 @@ import org.bukkit.event.block.Action;
 
 public class ChickenChuteItem extends CustomItem {
     public ChickenChuteItem(SurvivalGames plugin) {
-        super(plugin, "chicken_chute_item", ItemBuilder.of(XMaterial.FEATHER).displayName("&bChicken Chute")
+        super(plugin, "chicken_chute_item", ItemBuilders.of(XMaterial.FEATHER).displayName("&bChicken Chute")
                 .addLoreLine("&7Create a parachute of chickens (5s cooldown)"));
         
         addEventHandler(PlayerEvent.INTERACT, e -> {

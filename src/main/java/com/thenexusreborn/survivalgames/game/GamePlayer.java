@@ -510,7 +510,7 @@ public class GamePlayer {
     public String getMutateItemNameFromStatus() {
         Pair<Boolean, String> canMutateStatus = canMutate();
         
-        if (canMutateStatus.key()) {
+        if (canMutateStatus.first()) {
             GamePlayer killer = game.getPlayer(getMutationTarget());
             String passes;
             if (game.getSettings().isUnlimitedPasses()) {
@@ -520,7 +520,7 @@ public class GamePlayer {
             }
             return "&c&lTAKE REVENGE   &eTarget: " + killer.getColoredName() + "   &ePasses: &b" + passes;
         } else {
-            return "&c" + canMutateStatus.value();
+            return "&c" + canMutateStatus.second();
         }
     }
 
@@ -690,6 +690,20 @@ public class GamePlayer {
         sgPlayer.hidePlayer(otherPlayer.sgPlayer);
     }
     
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        
+        GamePlayer that = (GamePlayer) o;
+        return sgPlayer.equals(that.sgPlayer);
+    }
+    
+    @Override
+    public int hashCode() {
+        return sgPlayer.hashCode();
+    }
     
     public enum Status {
         SETTING_UP_PLAYER, TELEPORTING_TO_CENTER, CALCULATING_VISIBILITY, SETTING_UP_SCOREBOARD, READY, SETTING_UP_ACTIONBAR, ADDING_TO_GAME

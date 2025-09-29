@@ -1,10 +1,10 @@
 package com.thenexusreborn.survivalgames.menu;
 
 import com.stardevllc.starcore.api.StarColors;
-import com.stardevllc.starui.GuiManager;
-import com.stardevllc.starui.element.button.Button;
-import com.stardevllc.starui.gui.InventoryGUI;
-import com.stardevllc.starui.gui.UpdatingGUI;
+import com.stardevllc.starcore.api.ui.GuiManager;
+import com.stardevllc.starcore.api.ui.element.button.Button;
+import com.stardevllc.starcore.api.ui.gui.InventoryGUI;
+import com.stardevllc.starcore.api.ui.gui.UpdatingGUI;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.nexuscore.reflection.impl.PlayerSkull;
 import com.thenexusreborn.nexuscore.util.MsgType;
@@ -32,7 +32,8 @@ public class TeamMenu extends InventoryGUI implements UpdatingGUI {
     private GameTeam team;
 
     public TeamMenu(SurvivalGames plugin, GameTeam team, Game game, UUID player) {
-        super(3, StarColors.color(team.getColor() + team.getName()), player);
+        super(StarColors.color(team.getColor() + team.getName()), player, new String[]{"PPPPPPPPP", "PPPPPPPPP", "PPPPPPPPP"});
+        setDynamicChar('P');
         manager = plugin.getServer().getServicesManager().getRegistration(GuiManager.class).getProvider();
         this.plugin = plugin;
         this.game = game;
@@ -41,6 +42,7 @@ public class TeamMenu extends InventoryGUI implements UpdatingGUI {
 
     @Override
     public void createItems() {
+        this.dynamicElements.clear();
         if (game != null) {
             for (GamePlayer gamePlayer : game.getPlayers().values()) {
                 if (gamePlayer.getToggleValue("vanish")) {

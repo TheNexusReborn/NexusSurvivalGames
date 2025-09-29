@@ -1,11 +1,12 @@
 package com.thenexusreborn.survivalgames.items;
 
+import com.stardevllc.starcore.api.itembuilder.ItemBuilders;
+import com.stardevllc.starcore.api.ui.GuiManager;
 import com.stardevllc.starlib.helper.Pair;
 import com.stardevllc.starcore.api.itembuilder.ItemBuilder;
 import com.stardevllc.staritems.model.CustomItem;
 import com.stardevllc.staritems.model.types.PlayerEvent;
 import com.stardevllc.starmclib.XMaterial;
-import com.stardevllc.starui.GuiManager;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -21,7 +22,7 @@ public class MutateItem extends CustomItem {
     private GuiManager guiManager;
     
     public MutateItem(SurvivalGames plugin) {
-        super(plugin, "mutateitem", ItemBuilder.of(XMaterial.ROTTEN_FLESH));
+        super(plugin, "mutateitem", ItemBuilders.of(XMaterial.ROTTEN_FLESH));
         this.guiManager = plugin.getServer().getServicesManager().getRegistration(GuiManager.class).getProvider();
         
         addEventHandler(PlayerEvent.INTERACT, e -> {
@@ -52,12 +53,12 @@ public class MutateItem extends CustomItem {
             }
             
             Pair<Boolean, String> canMutateResult = gamePlayer.canMutate();
-            if (canMutateResult.key()) {
+            if (canMutateResult.first()) {
                 MutationBuilder mutationBuilder = new MutationBuilder(gamePlayer);
                 mutationBuilder.setUsePass(true);
                 Bukkit.getScheduler().runTaskLater(plugin, () -> guiManager.openGUI(new MutateGui(plugin, mutationBuilder), player), 1L);
             } else {
-                gamePlayer.sendMessage(MsgType.WARN + canMutateResult.value());
+                gamePlayer.sendMessage(MsgType.WARN + canMutateResult.second());
             }
         });
     }

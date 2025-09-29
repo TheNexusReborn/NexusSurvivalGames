@@ -1,7 +1,8 @@
 package com.thenexusreborn.survivalgames.mutations;
 
-import com.stardevllc.starlib.helper.StringHelper;
 import com.stardevllc.starcore.api.itembuilder.ItemBuilder;
+import com.stardevllc.starcore.api.itembuilder.ItemBuilders;
+import com.stardevllc.starlib.helper.StringHelper;
 import com.stardevllc.starmclib.XMaterial;
 import com.stardevllc.starmclib.materialset.ArmorSet;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -70,13 +71,13 @@ public enum StandardMutations implements IMutationType {
             DisguiseType.SKELETON, //Disguise Type
             XMaterial.BOW, //Icon
             ArmorSet.LEATHER, //Armor
-            ItemBuilder.of(XMaterial.WOODEN_SWORD).displayName("&fWooden Sword").build(), //Weapon 
+            ItemBuilders.of(XMaterial.WOODEN_SWORD).displayName("&fWooden Sword").build(), //Weapon 
             3000, //Unlock cost
             20, //Health
             List.of(), //Damage Immunities
             List.of(new MutationEffect(PotionEffectType.SPEED, 0)), //Potion Effects
             List.of(
-                    new MutationItem(1, ItemBuilder.of(XMaterial.BOW).addEnchant(Enchantment.ARROW_DAMAGE, 1).build()), 
+                    new MutationItem(1, ItemBuilders.of(XMaterial.BOW).addEnchant(Enchantment.ARROW_DAMAGE, 1).build()), 
                     new MutationItem(2, new ItemStack(Material.ARROW, 32))
             ), //Additional Items
             List.of(MutationModifier.FIFTY_PERCENT_INCREASED_DAMAGE) //Modifiers
@@ -88,7 +89,7 @@ public enum StandardMutations implements IMutationType {
             DisguiseType.CHICKEN, //Disguise Type
             XMaterial.FEATHER, //Icon
             ArmorSet.GOLD, //Armor
-            ItemBuilder.of(XMaterial.WOODEN_SWORD).displayName("&bEgg Launcher").addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS).addEnchant(Enchantment.ARROW_DAMAGE, 1).build(), //Weapon 
+            ItemBuilders.of(XMaterial.WOODEN_SWORD).displayName("&bEgg Launcher").addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS).addEnchant(Enchantment.ARROW_DAMAGE, 1).build(), //Weapon 
             5000, //Unlock cost
             4, //Health
             List.of(DamageCause.FALL), //Damage Immunities

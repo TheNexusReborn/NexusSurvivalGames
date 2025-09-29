@@ -15,6 +15,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class SGPlayer {
@@ -251,5 +252,20 @@ public class SGPlayer {
                 player.hidePlayer(other);
             }
         }
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        
+        SGPlayer sgPlayer = (SGPlayer) o;
+        return Objects.equals(nexusPlayer, sgPlayer.nexusPlayer);
+    }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(nexusPlayer);
     }
 }

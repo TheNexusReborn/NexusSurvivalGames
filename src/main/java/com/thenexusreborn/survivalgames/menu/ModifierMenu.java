@@ -1,11 +1,11 @@
 package com.thenexusreborn.survivalgames.menu;
 
+import com.stardevllc.starcore.api.itembuilder.ItemBuilders;
+import com.stardevllc.starcore.api.ui.element.button.Button;
+import com.stardevllc.starcore.api.ui.gui.InventoryGUI;
+import com.stardevllc.starcore.api.ui.gui.UpdatingGUI;
 import com.stardevllc.starlib.helper.StringHelper;
-import com.stardevllc.starcore.api.itembuilder.ItemBuilder;
 import com.stardevllc.starmclib.XMaterial;
-import com.stardevllc.starui.element.button.Button;
-import com.stardevllc.starui.gui.InventoryGUI;
-import com.stardevllc.starui.gui.UpdatingGUI;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.game.GameModifier;
 import com.thenexusreborn.survivalgames.game.GameModifierStatus;
@@ -13,22 +13,20 @@ import com.thenexusreborn.survivalgames.lobby.Lobby;
 import org.bukkit.Sound;
 import org.bukkit.event.inventory.ClickType;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class ModifierMenu extends InventoryGUI implements UpdatingGUI {
-    
-    private SGPlayer player;
-    private Lobby lobby;
-    
     public ModifierMenu(SGPlayer player, Lobby lobby) {
-        super(Math.min(6, GameModifier.values().length / 9 + 1), "Game Modifiers", player.getUniqueId());
-        this.player = player;
-        this.lobby = lobby;
-    }
-    
-    @Override
-    public void createItems() {
+        super("Game Modifiers", player.getUniqueId(), new String[0]);
+        setDynamicChar('M');
+        
+        String linePattern = "MMMMMMMMM";
+        
+        String[] slotPattern = new String[Math.min(6, GameModifier.values().length / 9 + 1)];
+        Arrays.fill(slotPattern, linePattern);
+        
+        setSlotPattern(slotPattern);
+        
         lobby.getMode().getModifiers().forEach((modifier, status) -> {
             if (status != GameModifierStatus.ALLOWED) {
                 return;
@@ -45,7 +43,7 @@ public class ModifierMenu extends InventoryGUI implements UpdatingGUI {
             loreLines.add("&6&lLeft Click &fto vote &aYES");
             loreLines.add("&6&lRight Click &fto vote &cNO");
             
-            Button button = new Button(p -> ItemBuilder.of(XMaterial.COAL)
+            Button button = new Button(p -> ItemBuilders.of(XMaterial.COAL)
                     .displayName("&e" + StringHelper.titlize(modifier.name()))
                     .setLore(loreLines)
                     .build(), e -> {

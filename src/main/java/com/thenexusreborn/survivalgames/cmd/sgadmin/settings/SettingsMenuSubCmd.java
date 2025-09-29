@@ -1,13 +1,13 @@
 package com.thenexusreborn.survivalgames.cmd.sgadmin.settings;
 
+import com.stardevllc.starcore.api.ui.GuiManager;
 import com.stardevllc.starmclib.cmdflags.FlagResult;
-import com.stardevllc.starui.GuiManager;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.nexuscore.api.command.ICommand;
 import com.thenexusreborn.nexuscore.api.command.SubCommand;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.menu.GameSettingsMenu;
+import com.thenexusreborn.survivalgames.menu.settings.GameSettingsMenu;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

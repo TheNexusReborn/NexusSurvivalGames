@@ -1,13 +1,13 @@
 package com.thenexusreborn.survivalgames.menu;
 
 import com.stardevllc.starcore.api.StarColors;
-import com.stardevllc.starcore.api.itembuilder.ItemBuilder;
+import com.stardevllc.starcore.api.itembuilder.ItemBuilders;
+import com.stardevllc.starcore.api.ui.GuiManager;
+import com.stardevllc.starcore.api.ui.element.Element;
+import com.stardevllc.starcore.api.ui.element.button.Button;
+import com.stardevllc.starcore.api.ui.gui.InventoryGUI;
+import com.stardevllc.starcore.api.ui.gui.UpdatingGUI;
 import com.stardevllc.starmclib.XMaterial;
-import com.stardevllc.starui.GuiManager;
-import com.stardevllc.starui.element.Element;
-import com.stardevllc.starui.element.button.Button;
-import com.stardevllc.starui.gui.InventoryGUI;
-import com.stardevllc.starui.gui.UpdatingGUI;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
@@ -26,13 +26,16 @@ public class PlayerMenu extends InventoryGUI implements UpdatingGUI {
     private GamePlayer player;
 
     public PlayerMenu(SurvivalGames plugin, UUID playerUUID, GamePlayer player) {
-        super(1, "&lMenu " + player.getName(), playerUUID);
+        super("&lMenu " + player.getName(), playerUUID, new String[] {"IIIIIIIII"});
         this.plugin = plugin;
         this.player = player;
+        
+        setDynamicChar('I');
     }
 
     @Override
     public void createItems() {
+        this.dynamicElements.clear();
         SGPlayer actorPlayer = plugin.getPlayerRegistry().get(this.playerUUID);
         Game game = actorPlayer.getGame();
         GamePlayer actorGamePlayer = actorPlayer.getGamePlayer();
@@ -49,7 +52,7 @@ public class PlayerMenu extends InventoryGUI implements UpdatingGUI {
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
 
         if (actorGamePlayer.getTeam() == GameTeam.SPECTATORS || actorGamePlayer.getRank().ordinal() <= Rank.ADMIN.ordinal()) {
-            Button teleportButton = new Button().iconCreator(p -> ItemBuilder.of(XMaterial.ENDER_PEARL).displayName("&e&lTeleport").build())
+            Button teleportButton = new Button().iconCreator(p -> ItemBuilders.of(XMaterial.ENDER_PEARL).displayName("&e&lTeleport").build())
                     .consumer(e -> {
                         e.getWhoClicked().teleport(Bukkit.getPlayer(player.getUniqueId()).getLocation());
                         SGPlayer actor = plugin.getPlayerRegistry().get(e.getWhoClicked().getUniqueId());
@@ -60,10 +63,10 @@ public class PlayerMenu extends InventoryGUI implements UpdatingGUI {
 
             if (player.getTeam() != GameTeam.SPECTATORS) {
                 List<String> vitalsLore = player.getMenuVitals().stream().map(line -> "  " + line).collect(Collectors.toCollection(LinkedList::new));
-                Element vitalsElement = new Element().iconCreator(p -> ItemBuilder.of(XMaterial.GLASS_BOTTLE).displayName("&e&lVitals").setLore(vitalsLore).build());
+                Element vitalsElement = new Element().iconCreator(p -> ItemBuilders.of(XMaterial.GLASS_BOTTLE).displayName("&e&lVitals").setLore(vitalsLore).build());
                 addElement(vitalsElement);
 
-                Button viewInventoryButton = new Button().iconCreator(p -> ItemBuilder.of(XMaterial.ENDER_CHEST).displayName("Inventory").addLoreLine("&c&lNOT YET IMPLEMENTED").build())
+                Button viewInventoryButton = new Button().iconCreator(p -> ItemBuilders.of(XMaterial.ENDER_CHEST).displayName("Inventory").addLoreLine("&c&lNOT YET IMPLEMENTED").build())
                         .consumer(e -> e.getWhoClicked().sendMessage(StarColors.color(MsgType.WARN + "This feature is not yet implemented.")));
                 addElement(viewInventoryButton);
             }
@@ -71,7 +74,7 @@ public class PlayerMenu extends InventoryGUI implements UpdatingGUI {
             boolean sponsoringAllowed = sgPlayer.getGame().getSettings().isAllowSponsoring();
 
             if (sponsoringAllowed && player.getToggleValue("allowsponsors") && player.getTeam() == GameTeam.TRIBUTES) {
-                Button sponsorButton = new Button().iconCreator(p -> ItemBuilder.of(XMaterial.CHEST).displayName("&e&lSponsor").build())
+                Button sponsorButton = new Button().iconCreator(p -> ItemBuilders.of(XMaterial.CHEST).displayName("&e&lSponsor").build())
                         .consumer(e -> {
                             SGPlayer actor = plugin.getPlayerRegistry().get(e.getWhoClicked().getUniqueId());
                             if (actor.getGame() == null) {
@@ -98,17 +101,17 @@ public class PlayerMenu extends InventoryGUI implements UpdatingGUI {
         }
 
         List<String> statsLore = player.getMenuStats().stream().map(line -> "  " + line).collect(Collectors.toCollection(LinkedList::new));
-        Element statsElement = new Element().iconCreator(p -> ItemBuilder.of(XMaterial.PAPER).displayName("&e&lStats").setLore(statsLore).build());
+        Element statsElement = new Element().iconCreator(p -> ItemBuilders.of(XMaterial.PAPER).displayName("&e&lStats").setLore(statsLore).build());
         addElement(statsElement);
 
-        Element typeElement = new Element().iconCreator(p -> ItemBuilder.of(XMaterial.PLAYER_HEAD).displayName(player.getTeam().getColor() + "&l" + player.getTeam().name().substring(0, player.getTeam().name().length() - 1)).build());
+        Element typeElement = new Element().iconCreator(p -> ItemBuilders.of(XMaterial.PLAYER_HEAD).displayName(player.getTeam().getColor() + "&l" + player.getTeam().name().substring(0, player.getTeam().name().length() - 1)).build());
         addElement(typeElement);
 
         if (actorPlayer.getNexusPlayer().getRank().ordinal() > Rank.ADMIN.ordinal()) {
             return;
         }
         
-        Button manageButton = new Button().iconCreator(p -> ItemBuilder.of(XMaterial.REDSTONE_BLOCK).displayName("&c&lMANAGE").build()).consumer(e -> manager.openGUI(new PlayerManageMenu(plugin, actorPlayer.getGame(), new PlayerManageBuilder(actorPlayer, player)), e.getWhoClicked()));
+        Button manageButton = new Button().iconCreator(p -> ItemBuilders.of(XMaterial.REDSTONE_BLOCK).displayName("&c&lMANAGE").build()).consumer(e -> manager.openGUI(new PlayerManageMenu(plugin, actorPlayer.getGame(), new PlayerManageBuilder(actorPlayer, player)), e.getWhoClicked()));
         addElement(manageButton);
     }
 }

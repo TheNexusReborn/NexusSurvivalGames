@@ -3,7 +3,7 @@ package com.thenexusreborn.survivalgames.listener;
 import com.sk89q.worldedit.bukkit.BukkitUtil;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.starcore.api.StarColors;
-import com.stardevllc.starui.GuiManager;
+import com.stardevllc.starcore.api.ui.GuiManager;
 import com.thenexusreborn.api.NexusReborn;
 import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.nexuscore.api.events.*;

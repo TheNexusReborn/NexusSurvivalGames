@@ -1,20 +1,18 @@
 package com.thenexusreborn.survivalgames.menu;
 
-import com.stardevllc.starlib.helper.*;
 import com.stardevllc.starcore.api.colors.ColorHandler;
-import com.stardevllc.starcore.api.itembuilder.ItemBuilder;
+import com.stardevllc.starcore.api.itembuilder.ItemBuilders;
+import com.stardevllc.starcore.api.ui.element.button.Button;
+import com.stardevllc.starcore.api.ui.gui.InventoryGUI;
+import com.stardevllc.starlib.helper.*;
 import com.stardevllc.starmclib.names.MaterialNames;
 import com.stardevllc.starmclib.names.PotionNames;
-import com.stardevllc.starui.GuiManager;
-import com.stardevllc.starui.element.button.Button;
-import com.stardevllc.starui.gui.InventoryGUI;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.mutations.*;
-import org.bukkit.Bukkit;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -23,7 +21,16 @@ import java.util.*;
 
 public class MutateGui extends InventoryGUI {
     public MutateGui(SurvivalGames plugin, MutationBuilder builder) {
-        super(Math.min(6, StandardMutations.values().length / 9 + 1), "&lMutate on " + builder.getTarget().getName() + " as...", builder.getPlayer().getUniqueId());
+        super("&lMutate on " + builder.getTarget().getName() + " as...", builder.getPlayer().getUniqueId(), new String[0]);
+        setDynamicChar('M');
+        
+        String linePattern = "MMMMMMMMM";
+        
+        String[] slotPattern = new String[Math.min(6, StandardMutations.values().length / 9 + 1)];
+        Arrays.fill(slotPattern, linePattern);
+        
+        setSlotPattern(slotPattern);
+        
         GamePlayer player = builder.getPlayer();
         
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());
@@ -35,7 +42,6 @@ public class MutateGui extends InventoryGUI {
             unlockedMutations.add(new UnlockedMutation(player.getUniqueId(), "pig_zombie", player.getNexusPlayer().getPlayerTime().getFirstJoined()));
         }
         
-        GuiManager manager = Bukkit.getServicesManager().getRegistration(GuiManager.class).getProvider();
         for (IMutationType type : StandardMutations.values()) {
             if (plugin.getDisabledMutations().contains(type)) {
                 continue;
@@ -119,7 +125,7 @@ public class MutateGui extends InventoryGUI {
             
             Button button = new Button()
                     .iconCreator(p ->
-                            ItemBuilder.of(type.getIcon())
+                            ItemBuilders.of(type.getIcon())
                                     .displayName("&e&l" + type.getDisplayName())
                                     .setLore(lore)
                                     .build()
@@ -131,8 +137,8 @@ public class MutateGui extends InventoryGUI {
                         }
                         
                         Pair<Boolean, String> canMutateResult = player.canMutate();
-                        if (!canMutateResult.key()) {
-                            player.sendMessage(MsgType.WARN + canMutateResult.value());
+                        if (!canMutateResult.first()) {
+                            player.sendMessage(MsgType.WARN + canMutateResult.second());
                             return;
                         }
                         

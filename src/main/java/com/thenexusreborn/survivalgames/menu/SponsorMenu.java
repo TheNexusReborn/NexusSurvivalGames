@@ -1,8 +1,9 @@
 package com.thenexusreborn.survivalgames.menu;
 
 import com.stardevllc.starcore.api.itembuilder.ItemBuilder;
-import com.stardevllc.starui.element.button.Button;
-import com.stardevllc.starui.gui.InventoryGUI;
+import com.stardevllc.starcore.api.itembuilder.ItemBuilders;
+import com.stardevllc.starcore.api.ui.element.button.Button;
+import com.stardevllc.starcore.api.ui.gui.InventoryGUI;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -18,8 +19,8 @@ import java.util.*;
 
 public class SponsorMenu extends InventoryGUI {
     public SponsorMenu(SurvivalGames plugin, GamePlayer actor, GamePlayer target) {
-        super(1, "&lSponsor " + target.getName());
-
+        super("&lSponsor " + target.getName(), actor.getUniqueId(), new String[]{"CCCCCCCCC"});
+        setDynamicChar('C');
         SGPlayer actorPlayer = plugin.getPlayerRegistry().get(actor.getUniqueId());
         SGPlayer targetPlayer = plugin.getPlayerRegistry().get(target.getUniqueId());
 
@@ -35,7 +36,7 @@ public class SponsorMenu extends InventoryGUI {
     
         SponsorManager sponsorManager = game.getSponsorManager();
         for (SponsorCategory<?> category : sponsorManager.getCategories()) {
-            ItemBuilder iconBuilder = ItemBuilder.of(category.getIcon());
+            ItemBuilder iconBuilder = ItemBuilders.of(category.getIcon());
             iconBuilder.displayName("&a&l" + category.getName());
             List<String> lore = new LinkedList<>();
             lore.add("&ePossible Items");

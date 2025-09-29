@@ -1,7 +1,9 @@
 package com.thenexusreborn.survivalgames.loot.item;
 
+import com.stardevllc.starlib.registry.RegistryObject;
 import com.stardevllc.starlib.registry.StringRegistry;
 import com.stardevllc.starcore.api.StarColors;
+import com.thenexusreborn.survivalgames.loot.category.LootCategory;
 import org.bukkit.Material;
 
 import java.util.EnumSet;
@@ -16,16 +18,22 @@ public class ItemRegistry extends StringRegistry<LootItem> {
         addRegisterListener((s, lootItem) -> materials.add(lootItem.getMaterial()));
     }
     
-    public LootItem register(Material material) {
-        return register(new LootItem(material));
+    public RegistryObject<String, LootItem> register(Material material, LootCategory... categories) {
+        LootItem object = new LootItem(material);
+        object.setCategories(categories);
+        return register(object);
     }
     
-    public LootItem register(String name, Material material) {
-        return register(new LootItem(name, material));
+    public RegistryObject<String, LootItem> register(String name, Material material, LootCategory... categories) {
+        LootItem object = new LootItem(name, material);
+        object.setCategories(categories);
+        return register(object);
     }
     
-    public LootItem register(String id, String name, Material material) {
-        return register(new LootItem(id, name, material));
+    public RegistryObject<String, LootItem> register(String id, String name, Material material, LootCategory... categories) {
+        LootItem object = new LootItem(id, name, material);
+        object.setCategories(categories);
+        return register(object);
     }
     
     public Set<Material> getMaterials() {

@@ -1,8 +1,8 @@
 package com.thenexusreborn.survivalgames.menu;
 
 import com.stardevllc.starcore.api.StarColors;
-import com.stardevllc.starui.element.button.Button;
-import com.stardevllc.starui.gui.InventoryGUI;
+import com.stardevllc.starcore.api.ui.element.button.Button;
+import com.stardevllc.starcore.api.ui.gui.InventoryGUI;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
@@ -23,23 +23,23 @@ public class SwagShackMenu extends InventoryGUI {
     public static Set<ShopItem> items = new HashSet<>();
     
     static {
-        items.add(new ShopItem(0, Items.WOOD_SWORD, 1, 25, 15));
-        items.add(new ShopItem(1, Items.GOLD_CHESTPLATE, 1, 75, 100));
-        items.add(new ShopItem(2, Items.GOLD_LEGGINGS, 1, 50, 80));
-        items.add(new ShopItem(3, Items.BOW, 1, 100, 250));
-        items.add(new ShopItem(5, Items.FISHING_ROD, 5, 100, 300));
-        items.add(new ShopItem(6, Items.RAW_FISH, 5, 30, 50));
-        items.add(new ShopItem(7, Items.MUSHROOM_SOUP, 1, 30, 50));
-        items.add(new ShopItem(8, Items.CAKE, 1, 30, 50));
-        items.add(new ShopItem(9, Items.STONE_AXE, 1, 35, 25));
-        items.add(new ShopItem(12, Items.ARROW, 5, 50, 100));
-        items.add(new ShopItem(24, Items.PLAYER_TRACKER, 1, 50, 100));
-        items.add(new ShopItem(25, Items.XP_BOTTLE, 1, 75, 150));
-        items.add(new ShopItem(26, Items.TNT, 1, 100, 200));
+        items.add(new ShopItem('0', Items.WOOD_SWORD, 1, 25, 15));
+        items.add(new ShopItem('1', Items.GOLD_CHESTPLATE, 1, 75, 100));
+        items.add(new ShopItem('2', Items.GOLD_LEGGINGS, 1, 50, 80));
+        items.add(new ShopItem('3', Items.BOW, 1, 100, 250));
+        items.add(new ShopItem('5', Items.FISHING_ROD, 5, 100, 300));
+        items.add(new ShopItem('6', Items.RAW_FISH, 5, 30, 50));
+        items.add(new ShopItem('7', Items.MUSHROOM_SOUP, 1, 30, 50));
+        items.add(new ShopItem('8', Items.CAKE, 1, 30, 50));
+        items.add(new ShopItem('9', Items.STONE_AXE, 1, 35, 25));
+        items.add(new ShopItem('C', Items.ARROW, 5, 50, 100));
+        items.add(new ShopItem('O', Items.PLAYER_TRACKER, 1, 50, 100));
+        items.add(new ShopItem('P', Items.XP_BOTTLE, 1, 75, 150));
+        items.add(new ShopItem('Q', Items.TNT, 1, 100, 200));
     }
     
     public SwagShackMenu(SurvivalGames plugin, Game game, GamePlayer player) {
-        super(3, "&lSwag Shack");
+        super("&lSwag Shack", player.getUniqueId(), new String[]{"123456789", "ABCDEFGHI", "JKLMNOPQR"});
 
         for (ShopItem item : items) {
             ItemStack itemStack = item.getItem().getItemStack();
@@ -96,11 +96,11 @@ public class SwagShackMenu extends InventoryGUI {
     public static class ShopItem {
         private LootItem item;
         private int amount;
-        private int position;
+        private char position;
         private int pointsCost;
         private int creditsCost;
     
-        public ShopItem(int position, LootItem item, int amount, int pointsCost, int creditsCost) {
+        public ShopItem(char position, LootItem item, int amount, int pointsCost, int creditsCost) {
             this.position = position;
             this.item = item;
             this.amount = amount;
@@ -116,7 +116,7 @@ public class SwagShackMenu extends InventoryGUI {
             return amount;
         }
     
-        public int getPosition() {
+        public char getPosition() {
             return position;
         }
     
