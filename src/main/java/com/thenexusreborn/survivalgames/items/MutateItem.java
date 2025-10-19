@@ -1,12 +1,10 @@
 package com.thenexusreborn.survivalgames.items;
 
-import com.stardevllc.starcore.api.itembuilder.ItemBuilders;
+import com.stardevllc.itembuilder.ItemBuilders;
+import com.stardevllc.smaterial.SMaterial;
 import com.stardevllc.starcore.api.ui.GuiManager;
-import com.stardevllc.starlib.helper.Pair;
-import com.stardevllc.starcore.api.itembuilder.ItemBuilder;
 import com.stardevllc.staritems.model.CustomItem;
-import com.stardevllc.staritems.model.types.PlayerEvent;
-import com.stardevllc.starmclib.XMaterial;
+import com.stardevllc.starlib.helper.Pair;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -16,16 +14,17 @@ import com.thenexusreborn.survivalgames.mutations.MutationBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 public class MutateItem extends CustomItem {
     
     private GuiManager guiManager;
     
     public MutateItem(SurvivalGames plugin) {
-        super(plugin, "mutateitem", ItemBuilders.of(XMaterial.ROTTEN_FLESH));
+        super(plugin, "mutateitem", ItemBuilders.of(SMaterial.ROTTEN_FLESH));
         this.guiManager = plugin.getServer().getServicesManager().getRegistration(GuiManager.class).getProvider();
         
-        addEventHandler(PlayerEvent.INTERACT, e -> {
+        addEventHandler(PlayerInteractEvent.class, e -> {
             if (e.getAction() != Action.RIGHT_CLICK_BLOCK && e.getAction() != Action.RIGHT_CLICK_AIR) {
                 return;
             }

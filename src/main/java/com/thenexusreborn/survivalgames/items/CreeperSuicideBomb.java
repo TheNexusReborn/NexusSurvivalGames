@@ -1,10 +1,8 @@
 package com.thenexusreborn.survivalgames.items;
 
-import com.stardevllc.starcore.api.itembuilder.ItemBuilder;
-import com.stardevllc.starcore.api.itembuilder.ItemBuilders;
+import com.stardevllc.itembuilder.ItemBuilders;
+import com.stardevllc.smaterial.SMaterial;
 import com.stardevllc.staritems.model.CustomItem;
-import com.stardevllc.staritems.model.types.PlayerEvent;
-import com.stardevllc.starmclib.XMaterial;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
@@ -15,19 +13,20 @@ import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.List;
 
 public class CreeperSuicideBomb extends CustomItem {
     public CreeperSuicideBomb(SurvivalGames plugin) {
-        super(plugin, "creeper_suicide_bomb", ItemBuilders.of(XMaterial.GUNPOWDER).displayName("&cSuicide Bomb")
+        super(plugin, "creeper_suicide_bomb", ItemBuilders.of(SMaterial.GUNPOWDER).displayName("&cSuicide Bomb")
                 .setLore(List.of(
                         "&7Explode yourself for higher damage",
                         "&7If you kill your target, you take revenge",
                         "&7If you don't, you become a spectator again"
                 )));
         
-        addEventHandler(PlayerEvent.INTERACT, e -> {
+        addEventHandler(PlayerInteractEvent.class, e -> {
             Action action = e.getAction();
             if (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK) {
                 return;

@@ -31,7 +31,7 @@ public class SettingsListSubCmd extends SubCommand<SurvivalGames> {
     
     @Override
     public boolean execute(CommandSender sender, Rank senderRank, String label, String[] args, FlagResult flagResults) {
-        Map<Field, StringConverter<?>> fields = SGASettingsCmd.settingsFields.get(this.type);
+        Map<Field, StringConverter<Object>> fields = SGASettingsCmd.settingsFields.get(this.type);
         
         Player player = (Player) sender; 
         SGPlayer sgPlayer = plugin.getPlayerRegistry().get(player.getUniqueId());

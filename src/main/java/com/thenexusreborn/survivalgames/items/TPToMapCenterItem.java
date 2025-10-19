@@ -1,20 +1,20 @@
 package com.thenexusreborn.survivalgames.items;
 
-import com.stardevllc.starcore.api.itembuilder.ItemBuilders;
+import com.stardevllc.itembuilder.ItemBuilders;
+import com.stardevllc.smaterial.SMaterial;
 import com.stardevllc.staritems.model.CustomItem;
-import com.stardevllc.staritems.model.types.PlayerEvent;
-import com.stardevllc.starmclib.XMaterial;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 public class TPToMapCenterItem extends CustomItem {
     public TPToMapCenterItem(SurvivalGames plugin) {
-        super(plugin, "tptomapcenter", ItemBuilders.of(XMaterial.CLOCK).displayName("&e&lTeleport to Map Center &7&o(Right Click)"));
+        super(plugin, "tptomapcenter", ItemBuilders.of(SMaterial.CLOCK).displayName("&e&lTeleport to Map Center &7&o(Right Click)"));
         
-        addEventHandler(PlayerEvent.INTERACT, e -> {
+        addEventHandler(PlayerInteractEvent.class, e -> {
             if (!(e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR)) {
                 return;
             }

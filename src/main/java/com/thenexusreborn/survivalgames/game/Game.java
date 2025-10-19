@@ -1,11 +1,12 @@
 package com.thenexusreborn.survivalgames.game;
 
 import com.sk89q.worldedit.regions.CuboidRegion;
+import com.stardevllc.itembuilder.v1_8.FireworkItemBuilder;
+import com.stardevllc.smaterial.SMaterial;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.starcore.api.StarColors;
-import com.stardevllc.starcore.v1_8.itembuilder.FireworkItemBuilder;
 import com.stardevllc.starlib.clock.callback.CallbackPeriod;
 import com.stardevllc.starlib.clock.callback.ClockCallback;
 import com.stardevllc.starlib.clock.snapshot.TimerSnapshot;
@@ -16,7 +17,6 @@ import com.stardevllc.starlib.helper.StringHelper;
 import com.stardevllc.starlib.registry.StringRegistry;
 import com.stardevllc.starlib.time.TimeFormat;
 import com.stardevllc.starlib.time.TimeUnit;
-import com.stardevllc.starmclib.XMaterial;
 import com.thenexusreborn.api.NexusReborn;
 import com.thenexusreborn.api.gamearchive.*;
 import com.thenexusreborn.api.player.NexusPlayer;
@@ -1224,7 +1224,7 @@ public class Game implements Controllable, IHasState {
             this.timer = plugin.getClockManager().createTimer(TimeUnit.SECONDS.toMillis(settings.getNextGameStart()));
             this.timer.addRepeatingCallback(new GameSecondsCallback(this, Sound.CLICK, "&6&l>> &eNext game starts in &b{time}&e."), TimeUnit.SECONDS, 1);
             FireworkItemBuilder fireworkBuilder = new FireworkItemBuilder(FireworkEffect.builder().with(FireworkEffect.Type.BALL).trail(true).withColor(SurvivalGames.COLORS).build(), 1);
-            fireworkBuilder.material(XMaterial.FIREWORK_ROCKET);
+            fireworkBuilder.material(SMaterial.FIREWORK_ROCKET);
             List<MapSpawn> spawns = gameMap.getSpawns();
             
             List<MapSpawn> firstHalfSpawns = new ArrayList<>();

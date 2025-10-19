@@ -1,9 +1,8 @@
 package com.thenexusreborn.survivalgames.items;
 
-import com.stardevllc.starcore.api.itembuilder.ItemBuilders;
+import com.stardevllc.itembuilder.ItemBuilders;
+import com.stardevllc.smaterial.SMaterial;
 import com.stardevllc.staritems.model.CustomItem;
-import com.stardevllc.staritems.model.types.PlayerEvent;
-import com.stardevllc.starmclib.XMaterial;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -11,13 +10,14 @@ import com.thenexusreborn.survivalgames.game.GamePlayer;
 import com.thenexusreborn.survivalgames.game.GameTeam;
 import com.thenexusreborn.survivalgames.mutations.impl.ChickenMutation;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 public class ChickenChuteItem extends CustomItem {
     public ChickenChuteItem(SurvivalGames plugin) {
-        super(plugin, "chicken_chute_item", ItemBuilders.of(XMaterial.FEATHER).displayName("&bChicken Chute")
+        super(plugin, "chicken_chute_item", ItemBuilders.of(SMaterial.FEATHER).displayName("&bChicken Chute")
                 .addLoreLine("&7Create a parachute of chickens (5s cooldown)"));
         
-        addEventHandler(PlayerEvent.INTERACT, e -> {
+        addEventHandler(PlayerInteractEvent.class, e -> {
             Action action = e.getAction();
             if (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK) {
                 return;

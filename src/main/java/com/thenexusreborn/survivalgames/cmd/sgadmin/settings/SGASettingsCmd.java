@@ -17,7 +17,7 @@ import java.util.*;
 
 public class SGASettingsCmd extends SubCommand<SurvivalGames> {
     
-    public static final Map<String, Map<Field, StringConverter<?>>> settingsFields = new HashMap<>();
+    public static final Map<String, Map<Field, StringConverter<Object>>> settingsFields = new HashMap<>();
     
     static {
         settingsFields.put("game", getFieldsFromSettingsClass(GameSettings.class));
@@ -31,10 +31,10 @@ public class SGASettingsCmd extends SubCommand<SurvivalGames> {
         this.subCommands.add(new SettingsLobbySubCmd(plugin, this));
     }
     
-    private static Map<Field, StringConverter<?>> getFieldsFromSettingsClass(Class<?> settingsClass) {
+    private static Map<Field, StringConverter<Object>> getFieldsFromSettingsClass(Class<?> settingsClass) {
         Field[] declaredFields = settingsClass.getDeclaredFields();
         
-        Map<Field, StringConverter<?>> fields = new TreeMap<>(Comparator.comparing(Field::getName));
+        Map<Field, StringConverter<Object>> fields = new TreeMap<>(Comparator.comparing(Field::getName));
         for (Field declaredField : declaredFields) {
             if (Modifier.isStatic(declaredField.getModifiers())) {
                 continue;
@@ -44,7 +44,7 @@ public class SGASettingsCmd extends SubCommand<SurvivalGames> {
                 continue;
             }
             
-            StringConverter<?> converter = StringConverters.getConverter(declaredField.getType());
+            StringConverter<Object> converter = (StringConverter<Object>) StringConverters.getConverter(declaredField.getType());
             if (converter != null) {
                 declaredField.setAccessible(true);
                 fields.put(declaredField, converter);

@@ -1,11 +1,11 @@
 package com.thenexusreborn.survivalgames.menu;
 
-import com.stardevllc.starcore.api.itembuilder.ItemBuilders;
+import com.stardevllc.itembuilder.ItemBuilders;
+import com.stardevllc.smaterial.SMaterial;
 import com.stardevllc.starcore.api.ui.element.button.Button;
 import com.stardevllc.starcore.api.ui.gui.InventoryGUI;
 import com.stardevllc.starcore.api.ui.gui.UpdatingGUI;
 import com.stardevllc.starlib.helper.StringHelper;
-import com.stardevllc.starmclib.XMaterial;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.game.GameModifier;
 import com.thenexusreborn.survivalgames.game.GameModifierStatus;
@@ -43,7 +43,7 @@ public class ModifierMenu extends InventoryGUI implements UpdatingGUI {
             loreLines.add("&6&lLeft Click &fto vote &aYES");
             loreLines.add("&6&lRight Click &fto vote &cNO");
             
-            Button button = new Button(p -> ItemBuilders.of(XMaterial.COAL)
+            Button button = new Button(p -> ItemBuilders.of(SMaterial.COAL)
                     .displayName("&e" + StringHelper.titlize(modifier.name()))
                     .setLore(loreLines)
                     .build(), e -> {

@@ -47,12 +47,11 @@ processResources {
 
 dependencies {
     compileOnly 'de.tr7zw:item-nbt-api-plugin:2.15.1'
-    compileOnly 'com.thenexusreborn:NexusCore:0.4.1'
-    compileOnly 'com.thenexusreborn:NexusMaps:0.3.1'
-    compileOnly 'com.thenexusreborn:NexusHub:0.2.1'
-    compileOnly 'com.stardevllc:StarCore:0.10.1'
-    compileOnly 'com.stardevllc:StarChat:0.5.1'
-    compileOnly 'com.stardevllc:StarItems:0.2.1'
+    compileOnly 'com.thenexusreborn:NexusCore:0.5.0'
+    compileOnly 'com.thenexusreborn:NexusMaps:0.4.0'
+    compileOnly 'com.thenexusreborn:NexusHub:0.3.0'
+    compileOnly 'com.stardevllc:StarCore:0.13.3'
+    compileOnly 'com.stardevllc:StarChat:0.5.5'
     compileOnly 'me.clip:placeholderapi:2.11.5'
     compileOnly 'org.spigotmc:spigot:1.8.8-R0.1-SNAPSHOT'
     compileOnly 'net.dmulloy2:ProtocolLib:5.4.0'
@@ -62,7 +61,7 @@ dependencies {
 
 group = 'com.thenexusreborn'
 //version = '1.19.3-ALPHA'
-version = '0.4.1'
+version = '0.5.0'
 
 jar {
 //    destinationDirectory = file(System.getProperty("user.home") + File.separator + "Documents" + File.separator + "JarOutput" + File.separator + "NexusReborn")

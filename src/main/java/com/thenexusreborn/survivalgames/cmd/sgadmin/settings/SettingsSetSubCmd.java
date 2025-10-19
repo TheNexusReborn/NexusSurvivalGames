@@ -39,13 +39,13 @@ public class SettingsSetSubCmd extends SubCommand<SurvivalGames> {
             return true;
         }
         
-        Map<Field, StringConverter<?>> fields = SGASettingsCmd.settingsFields.get(this.type);
+        Map<Field, StringConverter<Object>> fields = SGASettingsCmd.settingsFields.get(this.type);
         
         String setting = args[0].toLowerCase();
         Field field = null;
         StringConverter<?> converter = null;
         
-        for (Entry<Field, StringConverter<?>> entry : fields.entrySet()) {
+        for (Entry<Field, StringConverter<Object>> entry : fields.entrySet()) {
             if (entry.getKey().getName().equalsIgnoreCase(setting)) {
                 field = entry.getKey();
                 converter = entry.getValue();

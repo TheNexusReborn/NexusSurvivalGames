@@ -106,7 +106,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
     public static final List<Color> COLORS = new ArrayList<>();
     
     static {
-        Set<Field> fields = ReflectionHelper.getClassFields(Color.class);
+        Set<Field> fields = new HashSet<>(ReflectionHelper.getClassFields(Color.class).values());
         fields.removeIf(field -> !Color.class.isAssignableFrom(field.getType()));
         for (Field field : fields) {
             try {

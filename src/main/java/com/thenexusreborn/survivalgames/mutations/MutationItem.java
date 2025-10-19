@@ -1,13 +1,13 @@
 package com.thenexusreborn.survivalgames.mutations;
 
-import com.stardevllc.starcore.api.itembuilder.ItemBuilder;
-import com.stardevllc.starcore.api.itembuilder.ItemBuilders;
+import com.stardevllc.itembuilder.ItemBuilders;
+import com.stardevllc.itembuilder.common.ItemBuilder;
+import com.stardevllc.smaterial.SMaterial;
 import com.stardevllc.staritems.model.CustomItem;
-import com.stardevllc.starmclib.XMaterial;
 import org.bukkit.inventory.ItemStack;
 
 public final class MutationItem {
-    public static final ItemBuilder UNBREAKABLE_GOLD_SWORD = ItemBuilders.of(XMaterial.GOLDEN_SWORD).displayName("&fUnbreakable Golden Sword").unbreakable(true);
+    public static final ItemBuilder UNBREAKABLE_GOLD_SWORD = ItemBuilders.of(SMaterial.GOLDEN_SWORD).displayName("&fUnbreakable Golden Sword").unbreakable(true);
     private final int slotOffset;
     private ItemBuilder itemBuilder;
     private CustomItem customItem;

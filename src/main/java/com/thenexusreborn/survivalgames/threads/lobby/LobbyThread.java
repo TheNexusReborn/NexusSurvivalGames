@@ -1,8 +1,8 @@
 package com.thenexusreborn.survivalgames.threads.lobby;
 
+import com.stardevllc.smaterial.SMaterial;
 import com.stardevllc.starcore.api.StarColors;
 import com.stardevllc.starcore.utils.StarThread;
-import com.stardevllc.starmclib.XMaterial;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.*;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
@@ -48,7 +48,7 @@ public class LobbyThread extends StarThread<SurvivalGames> {
                 SGUtils.updatePlayerHealthAndFood(Bukkit.getPlayer(player.getUniqueId()));
                 
                 boolean sponsorsValue = lobbyPlayer.getToggleValue("allowsponsors");
-                XMaterial sponsorsItemMaterial = sponsorsValue ? XMaterial.GLOWSTONE_DUST : XMaterial.GUNPOWDER;
+                SMaterial sponsorsItemMaterial = sponsorsValue ? SMaterial.GLOWSTONE_DUST : SMaterial.GUNPOWDER;
                 String statusMessage = sponsorsValue ? "&a&lENABLED" : "&c&lDISABLED";
                 
                 for (ItemStack itemStack : player.getInventory()) {

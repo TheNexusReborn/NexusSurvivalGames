@@ -1,12 +1,12 @@
 package com.thenexusreborn.survivalgames.menu.manage;
 
+import com.stardevllc.itembuilder.ItemBuilders;
+import com.stardevllc.smaterial.SMaterial;
 import com.stardevllc.starcore.api.StarColors;
-import com.stardevllc.starcore.api.itembuilder.ItemBuilders;
 import com.stardevllc.starcore.api.ui.GuiManager;
 import com.stardevllc.starcore.api.ui.element.button.Button;
 import com.stardevllc.starcore.api.ui.gui.InventoryGUI;
 import com.stardevllc.starcore.api.ui.gui.UpdatingGUI;
-import com.stardevllc.starmclib.XMaterial;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.SpigotUtils;
 import com.thenexusreborn.survivalgames.SGPlayer;
@@ -49,18 +49,18 @@ public class ManageMutateMenu extends InventoryGUI implements UpdatingGUI {
         setElement('P', targetButton);
         
         Button bypassTimer = new Button().iconCreator(p ->
-                        ItemBuilders.of(builder.isBypassTimer() ? XMaterial.GREEN_WOOL : XMaterial.RED_WOOL)
+                        ItemBuilders.of(builder.isBypassTimer() ? SMaterial.GREEN_WOOL : SMaterial.RED_WOOL)
                                 .displayName("&e&lBYPASS TIMER")
                                 .setLore(List.of("", "&2&lGREEN WOOL &fmeans true", "&c&lRED WOOL &fmeans false", "", "&cfalse &fis the default"))
                                 .build())
                 .consumer(e -> builder.setBypassTimer(!builder.isBypassTimer()));
         addElement(bypassTimer);
         
-        Button cancelButton = new Button().iconCreator(p -> ItemBuilders.of(XMaterial.REDSTONE_BLOCK).displayName("&4&lCANCEL").build())
+        Button cancelButton = new Button().iconCreator(p -> ItemBuilders.of(SMaterial.REDSTONE_BLOCK).displayName("&4&lCANCEL").build())
                 .consumer(e -> manager.openGUI(new PlayerManageMenu(plugin, game, new PlayerManageBuilder(actor, builder.getPlayer())), e.getWhoClicked()));
         setElement('C', cancelButton);
         
-        Button confirmButton = new Button().iconCreator(p -> ItemBuilders.of(XMaterial.EMERALD_BLOCK).displayName("&a&lCONFIRM").build())
+        Button confirmButton = new Button().iconCreator(p -> ItemBuilders.of(SMaterial.EMERALD_BLOCK).displayName("&a&lCONFIRM").build())
                 .consumer(e -> {
                     if (builder.getTarget() == null) {
                         actor.sendMessage(MsgType.WARN.format("The target is invalid"));

@@ -1,8 +1,8 @@
 package com.thenexusreborn.survivalgames.mutations;
 
+import com.stardevllc.smaterial.ArmorSet;
+import com.stardevllc.smaterial.SMaterial;
 import com.stardevllc.starlib.registry.StringRegistry;
-import com.stardevllc.starmclib.XMaterial;
-import com.stardevllc.starmclib.materialset.ArmorSet;
 import com.thenexusreborn.survivalgames.disguises.disguisetypes.DisguiseType;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
@@ -24,7 +24,7 @@ public interface IMutationType {
     
     ArmorSet getArmorType();
     
-    XMaterial getIcon();
+    SMaterial getIcon();
     
     Class<? extends Mutation> getClazz();
     

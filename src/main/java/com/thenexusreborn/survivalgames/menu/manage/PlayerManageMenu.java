@@ -1,12 +1,12 @@
 package com.thenexusreborn.survivalgames.menu.manage;
 
-import com.stardevllc.starcore.api.itembuilder.ItemBuilder;
-import com.stardevllc.starcore.api.itembuilder.ItemBuilders;
+import com.stardevllc.itembuilder.ItemBuilders;
+import com.stardevllc.itembuilder.common.ItemBuilder;
+import com.stardevllc.smaterial.SMaterial;
 import com.stardevllc.starcore.api.ui.GuiManager;
 import com.stardevllc.starcore.api.ui.element.button.Button;
 import com.stardevllc.starcore.api.ui.gui.InventoryGUI;
 import com.stardevllc.starcore.api.ui.gui.UpdatingGUI;
-import com.stardevllc.starmclib.XMaterial;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.conversation.SelectLootTablePrompt;
@@ -41,7 +41,7 @@ public class PlayerManageMenu extends InventoryGUI implements UpdatingGUI {
         SGPlayer actor = manageBuilder.getActor();
         if (target.getTeam() == GameTeam.SPECTATORS) {
             Button addButton = new Button().iconCreator(p -> {
-                        ItemBuilder ib = ItemBuilders.of(XMaterial.LIME_WOOL)
+                        ItemBuilder ib = ItemBuilders.of(SMaterial.LIME_WOOL)
                                 .displayName("&a&lADD")
                                 .addLoreLine("&d&oAdds the player to the game");
                         if (this.manageBuilder.getLootTable() == null) {
@@ -71,7 +71,7 @@ public class PlayerManageMenu extends InventoryGUI implements UpdatingGUI {
 
         if (target.getTeam() != GameTeam.SPECTATORS) {
             Button removeButton = new Button().iconCreator(p ->
-                            ItemBuilders.of(XMaterial.RED_WOOL)
+                            ItemBuilders.of(SMaterial.RED_WOOL)
                                     .displayName("&c&lREMOVE")
                                     .addLoreLine("&7&oRemoves the player from the game")
                                     .build())
@@ -84,7 +84,7 @@ public class PlayerManageMenu extends InventoryGUI implements UpdatingGUI {
 
         if (target.getTeam() == GameTeam.SPECTATORS && target.isSpectatorByDeath() && target.getMostRecentDeath() != null) {
             Button reviveButton = new Button().iconCreator(p -> {
-                        ItemBuilder ib = ItemBuilders.of(XMaterial.NETHER_STAR)
+                        ItemBuilder ib = ItemBuilders.of(SMaterial.NETHER_STAR)
                                 .displayName("&e&lREVIVE")
                                 .addLoreLine("&d&oRevives the player");
                         if (this.manageBuilder.getLootTable() == null) {
@@ -114,7 +114,7 @@ public class PlayerManageMenu extends InventoryGUI implements UpdatingGUI {
 
         if (target.getTeam() == GameTeam.SPECTATORS) {
             Button mutateButton = new Button().iconCreator(p ->
-                            ItemBuilders.of(XMaterial.ROTTEN_FLESH)
+                            ItemBuilders.of(SMaterial.ROTTEN_FLESH)
                                     .displayName("&d&lMUTATE")
                                     .addLoreLine("&7&oMutate the player based on settings")
                                     .build())

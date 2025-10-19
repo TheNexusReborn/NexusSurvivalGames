@@ -1,10 +1,10 @@
 package com.thenexusreborn.survivalgames.game;
 
+import com.stardevllc.smaterial.ArmorSet;
 import com.stardevllc.starlib.helper.Pair;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.starcore.api.StarColors;
 import com.stardevllc.starmclib.Position;
-import com.stardevllc.starmclib.materialset.ArmorSet;
 import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.tags.Tag;

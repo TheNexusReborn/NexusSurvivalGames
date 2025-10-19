@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.sponsoring;
 
+import com.stardevllc.smaterial.SMaterial;
 import com.stardevllc.starcore.api.StarColors;
-import com.stardevllc.starmclib.XMaterial;
 import com.thenexusreborn.survivalgames.loot.item.LootItem;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -10,7 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ItemSponsorCategory extends SponsorCategory<LootItem> {
-    public ItemSponsorCategory(String name, XMaterial icon) {
+    public ItemSponsorCategory(String name, SMaterial icon) {
         super(name, icon);
     }
     
