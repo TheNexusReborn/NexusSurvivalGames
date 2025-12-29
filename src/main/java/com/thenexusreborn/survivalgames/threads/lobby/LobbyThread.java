@@ -69,14 +69,6 @@ public class LobbyThread extends StarThread<SurvivalGames> {
                     if (player.getLocation().getBlockY() < lobby.getSpawnpoint().getBlockY() - 20) {
                         player.teleport(lobby.getSpawnpoint());
                     }
-                    
-                    if (!lobby.getLobbySettings().isVoteForModifiers()) {
-                        player.getInventory().setItem(1, null);
-                    } else {
-                        if (player.getInventory().getItem(1) == null || player.getInventory().getItem(1).getType() != Material.REDSTONE_TORCH_ON) {
-                            player.getInventory().setItem(1, SurvivalGames.modifierItem.toItemStack());
-                        }
-                    }
                 }
             }
             

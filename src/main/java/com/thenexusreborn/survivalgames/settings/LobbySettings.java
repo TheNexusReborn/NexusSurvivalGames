@@ -17,11 +17,6 @@ public class LobbySettings implements Cloneable, ISettings {
     private int maxGames = 10;
     private int minPlayers = 4;
     private int maxPlayers = 24;
-    private boolean voteForModifiers;
-    
-    public boolean isVoteForModifiers() {
-        return voteForModifiers;
-    }
     
     public int getMaxPlayers() {
         return maxPlayers;

@@ -74,9 +74,6 @@ public class Lobby implements Controllable, IHasState {
     private final List<TributeSign> tributeSigns = new ArrayList<>();
     private boolean debugMode;
     
-    private Map<GameModifier, Set<UUID>> modifierYesVotes = new EnumMap<>(GameModifier.class);
-    private Map<GameModifier, Set<UUID>> modifierNoVotes = new EnumMap<>(GameModifier.class);
-    
     private SGMode mode;
 
     private World world;
@@ -109,30 +106,6 @@ public class Lobby implements Controllable, IHasState {
     public void setMode(SGMode mode) {
         this.mode = mode;
         this.gameSettings = mode.getSettingsSupplier().get();
-    }
-    
-    public void addModifierYesVote(GameModifier gameModifier, UUID player) {
-        if (this.modifierYesVotes.containsKey(gameModifier)) {
-            this.modifierYesVotes.get(gameModifier).add(player);
-        } else {
-            this.modifierYesVotes.put(gameModifier, new HashSet<>(Set.of(player)));
-        }
-        
-        if (this.modifierNoVotes.containsKey(gameModifier)) {
-            this.modifierNoVotes.get(gameModifier).remove(player);
-        }
-    }
-    
-    public void addModifierNoVote(GameModifier gameModifier, UUID player) {
-        if (this.modifierNoVotes.containsKey(gameModifier)) {
-            this.modifierNoVotes.get(gameModifier).add(player);
-        } else {
-            this.modifierNoVotes.put(gameModifier, new HashSet<>(Set.of(player)));
-        }
-        
-        if (this.modifierYesVotes.containsKey(gameModifier)) {
-            this.modifierYesVotes.get(gameModifier).remove(player);
-        }
     }
     
     public SGMode getMode() {
@@ -701,9 +674,6 @@ public class Lobby implements Controllable, IHasState {
         }
 
         player.getInventory().setItem(0, SurvivalGames.sponsorsItem.toItemStack());
-        if (lobbySettings.isVoteForModifiers()) {
-            player.getInventory().setItem(1, SurvivalGames.modifierItem.toItemStack());
-        }
         player.getInventory().setItem(8, SurvivalGames.toHubItem.toItemStack());
 
         if (nexusPlayer.getRank().ordinal() <= Rank.DIAMOND.ordinal()) {
@@ -1064,21 +1034,5 @@ public class Lobby implements Controllable, IHasState {
 
     public World getWorld() {
         return this.world;
-    }
-    
-    public int getModifierYesVotes(GameModifier modifier) {
-        if (this.modifierYesVotes.containsKey(modifier)) {
-            return this.modifierYesVotes.get(modifier).size();
-        }
-        
-        return 0;
-    }
-    
-    public int getModifierNoVotes(GameModifier modifier) {
-        if (this.modifierNoVotes.containsKey(modifier)) {
-            return this.modifierNoVotes.get(modifier).size();
-        }
-        
-        return 0;
     }
 }
