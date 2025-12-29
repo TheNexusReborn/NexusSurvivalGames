@@ -680,7 +680,7 @@ public class Game implements Controllable, IHasState {
             gameMap.getWorld().setGameRuleValue("announceAdvancements", "false");
             gameMap.getWorld().setGameRuleValue("doFireTick", "false");
             gameMap.getWorld().setGameRuleValue("keepInventory", "false");
-            gameMap.getWorld().setDifficulty(Difficulty.EASY);
+            gameMap.getWorld().setDifficulty(Difficulty.NORMAL);
         } catch (Exception e) {
             e.printStackTrace();
             handleError("Could not setup the world settings..");
