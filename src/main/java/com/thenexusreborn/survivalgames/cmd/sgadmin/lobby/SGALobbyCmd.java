@@ -26,5 +26,6 @@ public class SGALobbyCmd extends SubCommand<SurvivalGames> {
         this.subCommands.add(new LobbyMapSignsCmd(plugin, this));
         this.subCommands.add(new LobbyStatSignsCmd(plugin, this));
         this.subCommands.add(new LobbyTributeSignsCmd(plugin, this));
+        this.subCommands.add(new LobbyModeCmd(plugin, this));
     }
 }

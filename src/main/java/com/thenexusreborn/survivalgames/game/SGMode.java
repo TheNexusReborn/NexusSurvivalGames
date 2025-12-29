@@ -4,43 +4,44 @@ import com.stardevllc.starlib.converter.string.EnumStringConverter;
 import com.stardevllc.starlib.converter.string.StringConverters;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 import com.thenexusreborn.survivalgames.settings.gamemodes.ClassicGameSettings;
+import com.thenexusreborn.survivalgames.settings.gamemodes.MutationMayhemGameSettings;
 
-import java.util.*;
+import java.util.function.Supplier;
 
 public enum SGMode {
-    CLASSIC(new ClassicGameSettings(),
-            Map.of(
-                    GameModifier.MUTATIONS, GameModifierStatus.ALLOWED,
-                    GameModifier.UNLIMITED_PASSES, GameModifierStatus.ALLOWED,
-                    GameModifier.ALL_MUTATIONS, GameModifierStatus.ALLOWED,
-                    GameModifier.ASSISTS, GameModifierStatus.ALLOWED,
-                    GameModifier.BOUNTIES, GameModifierStatus.ALLOWED,
-                    GameModifier.SPONSORS, GameModifierStatus.ALLOWED,
-                    GameModifier.DEATHMATCH, GameModifierStatus.ALLOWED
-            )),
-    UNDEAD, INFECTED, SOLO;
+    CLASSIC(ClassicGameSettings::new, 
+            "Loot chests scattered around the map for gear.", 
+            "Outlast the other tributes and be the last one standing!"
+    ),
+    MUTATION_MAYHEM(MutationMayhemGameSettings::new, 
+            "Loot chests to gear up, but be careful about killing others", 
+            "Dead tributes may come back up to three times to seek revenge", 
+            "The last Tribute standing wins.", 
+            "Either kill everyone enough times, or be the only Tribute when time runs out."
+    )/*, 
+    UNDEAD, INFECTED, SOLO*/;
     
     static {
         StringConverters.addConverter(SGMode.class, new EnumStringConverter<>(SGMode.class));
     }
     
-    private final Map<GameModifier, GameModifierStatus> modifiers = new EnumMap<>(GameModifier.class);
-    private final GameSettings defaultSettings;
+    private final Supplier<GameSettings> settingsSupplier;
+    private final String[] description;
     
     SGMode() {
-        this(new GameSettings(), Map.of());
+        this(GameSettings::new);
     }
     
-    SGMode(GameSettings gameSettings, Map<GameModifier, GameModifierStatus> modifiers) {
-        this.defaultSettings = gameSettings;
-        this.modifiers.putAll(modifiers);
+    SGMode(Supplier<GameSettings> settingsSupplier, String... description) {
+        this.settingsSupplier = settingsSupplier;
+        this.description = description;
     }
     
-    public Map<GameModifier, GameModifierStatus> getModifiers() {
-        return new EnumMap<>(modifiers);
+    public Supplier<GameSettings> getSettingsSupplier() {
+        return settingsSupplier;
     }
     
-    public GameSettings getDefaultSettings() {
-        return defaultSettings;
+    public String[] getDescription() {
+        return description;
     }
 }

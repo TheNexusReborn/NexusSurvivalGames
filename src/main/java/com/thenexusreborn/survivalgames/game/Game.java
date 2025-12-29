@@ -686,7 +686,6 @@ public class Game implements Controllable, IHasState {
             handleError("Could not setup the world settings..");
         }
         
-        
         setState(SETUP_COMPLETE);
     }
     
@@ -729,11 +728,14 @@ public class Game implements Controllable, IHasState {
         this.timer.addCallback(timerSnapshot -> {
             playSound(Sound.WOLF_HOWL);
             sendMessage("&5&l/ / / / / / &d&lTHE NEXUS REBORN &5&l/ / / / / /");
-            sendMessage("&6&lSurvival Games &7&oFree-for-all Deathmatch &8- &3Classic Mode");
-            sendMessage("&8- &7Loot chests scattered around the map for gear.");
-            sendMessage("&8- &7Outlast the other tributes and be the last one standing!");
+            sendMessage("&6&lSurvival Games &7&oFree-for-all Deathmatch &8- &3" + StringHelper.titlize(mode.name()));
+            for (String line : getMode().getDescription()) {
+                sendMessage("&8- &7" + line);
+            }
             if (settings.isAllowDeathmatch()) {
                 sendMessage("&8- &7Arena deathmatch begins after &e" + getSettings().getGameLength() + " minutes&7.");
+            } else {
+                sendMessage("&8- &7Game ends after &e" + getSettings().getGameLength() + " minutes&7.");
             }
             sendMessage("");
             StringBuilder creatorBuilder = new StringBuilder();
@@ -1753,7 +1755,7 @@ public class Game implements Controllable, IHasState {
                 if (!settings.isAllowSingleTribute()) {
                     gameComplete = true;
                 } else {
-                    if (!settings.isAllowMutations() && this.mode != SGMode.UNDEAD) {
+                    if (!settings.isAllowMutations()/* && this.mode != SGMode.UNDEAD*/) {
                         gameComplete = true;
                     } else {
                         if (settings.isAllowDeathmatch()) {

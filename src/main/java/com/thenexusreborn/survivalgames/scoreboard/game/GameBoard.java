@@ -62,13 +62,13 @@ public class GameBoard extends SpigotScoreboardView {
             Game game = plugin.getPlayerRegistry().get(player.getUniqueId()).getGame();
             int mutations = game.getTeamCount(GameTeam.MUTATIONS);
             int zombies = game.getTeamCount(GameTeam.ZOMBIES);
-            if (game.getMode() == SGMode.CLASSIC) {
+            if (game.getMode() == SGMode.CLASSIC || game.getMode() == SGMode.MUTATION_MAYHEM) {
                 team.setPrefix("&fMutations: ");
                 team.setSuffix("&d" + mutations);
-            } else if (game.getMode() == SGMode.UNDEAD) {
+            }/* else if (game.getMode() == SGMode.UNDEAD) {
                 team.setPrefix("&fZombies: ");
                 team.setSuffix("&2" + zombies);
-            } 
+            } */
         };
         
         createTeam(new TeamBuilder("tributesValue").entry("&fTributes: ").score(10).valueUpdater(playerCountUpdater));

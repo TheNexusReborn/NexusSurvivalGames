@@ -1,11 +1,11 @@
 package com.thenexusreborn.survivalgames.lobby;
 
-import com.stardevllc.starlib.clock.clocks.Timer;
-import com.stardevllc.starlib.helper.*;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.starcore.utils.ProgressBar;
+import com.stardevllc.starlib.clock.clocks.Timer;
+import com.stardevllc.starlib.helper.*;
 import com.stardevllc.starlib.time.TimeUnit;
 import com.thenexusreborn.api.NexusReborn;
 import com.thenexusreborn.api.player.NexusPlayer;
@@ -91,7 +91,7 @@ public class Lobby implements Controllable, IHasState {
         this.server = server;
         
         this.mode = SGMode.CLASSIC;
-        this.gameSettings = this.mode.getDefaultSettings().clone();
+        this.gameSettings = this.mode.getSettingsSupplier().get();
 
         this.file = new File(plugin.getDataFolder() + File.separator + "lobby" + File.separator + type.name().toLowerCase() + ".yml");
         if (!file.exists()) {
@@ -104,6 +104,11 @@ public class Lobby implements Controllable, IHasState {
         }
 
         config = YamlConfiguration.loadConfiguration(file);
+    }
+    
+    public void setMode(SGMode mode) {
+        this.mode = mode;
+        this.gameSettings = mode.getSettingsSupplier().get();
     }
     
     public void addModifierYesVote(GameModifier gameModifier, UUID player) {
@@ -531,23 +536,23 @@ public class Lobby implements Controllable, IHasState {
         
         GameSettings settings = this.gameSettings.clone();
         
-        this.mode.getModifiers().forEach((modifier, status) -> {
-            if (status != GameModifierStatus.ALLOWED) {
-                return;
-            }
-            
-            int yesVotes = getModifierYesVotes(modifier), noVotes = getModifierNoVotes(modifier);
-            
-            if (yesVotes == 0 && noVotes == 0) {
-                return;
-            }
-            
-            if (yesVotes > noVotes) {
-                modifier.getYesConsumer().accept(settings);
-            } else {
-                modifier.getNoConsumer().accept(settings);
-            }
-        });
+//        this.mode.getModifiers().forEach((modifier, status) -> {
+//            if (status != GameModifierStatus.ALLOWED) {
+//                return;
+//            }
+//            
+//            int yesVotes = getModifierYesVotes(modifier), noVotes = getModifierNoVotes(modifier);
+//            
+//            if (yesVotes == 0 && noVotes == 0) {
+//                return;
+//            }
+//            
+//            if (yesVotes > noVotes) {
+//                modifier.getYesConsumer().accept(settings);
+//            } else {
+//                modifier.getNoConsumer().accept(settings);
+//            }
+//        });
         
         Game game = new Game(server, gameMap, this.mode, settings, getPlayers());
         this.players.clear();
@@ -582,7 +587,7 @@ public class Lobby implements Controllable, IHasState {
 
     public GameSettings getGameSettings() {
         if (this.gameSettings == null) {
-            this.gameSettings = mode.getDefaultSettings();
+            this.gameSettings = mode.getSettingsSupplier().get();
         }
 
         return gameSettings;
@@ -840,7 +845,7 @@ public class Lobby implements Controllable, IHasState {
         if (this.lobbySettings.isKeepPreviousGameSettings()) {
             this.gameSettings = game.getSettings();
         } else {
-            this.gameSettings = this.mode.getDefaultSettings();
+            this.gameSettings = this.mode.getSettingsSupplier().get();
         }
 
         for (UUID player : game.getPlayers().keySet()) {

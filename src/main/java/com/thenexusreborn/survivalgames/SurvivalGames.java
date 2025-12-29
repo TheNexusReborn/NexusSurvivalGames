@@ -316,8 +316,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
         new GraceperiodCmd(this);
         new ProbabilityCmd(this);
         
-        new MutationMayhemCmd(this);
-        
         new GameTeamCmd(this, GameTeam.TRIBUTES);
         new GameTeamCmd(this, GameTeam.SPECTATORS);
         new GameTeamCmd(this, GameTeam.MUTATIONS);
