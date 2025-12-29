@@ -7,9 +7,8 @@ import com.stardevllc.starcore.api.ui.GuiManager;
 import com.stardevllc.staritems.model.CustomItem;
 import com.stardevllc.staritems.model.ItemRegistry;
 import com.stardevllc.starlib.clock.ClockManager;
-import com.stardevllc.starlib.helper.ReflectionHelper;
-import com.stardevllc.starlib.registry.IntegerRegistry;
-import com.stardevllc.starlib.registry.UUIDRegistry;
+import com.stardevllc.starlib.objects.registry.Registry;
+import com.stardevllc.starlib.reflection.ReflectionHelper;
 import com.thenexusreborn.api.NexusReborn;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.registry.ToggleRegistry;
@@ -70,13 +69,13 @@ public class SurvivalGames extends NexusSpigotPlugin {
     private final Map<UUID, PlayerMutations> playerUnlockedMutations = new HashMap<>();
     private final Set<IMutationType> disabledMutations = new HashSet<>();
     
-    private UUIDRegistry<SGPlayer> playerRegistry = new UUIDRegistry<>(null, null, SGPlayer::getUniqueId, null, null);
+    private Registry<UUID, SGPlayer> playerRegistry = new Registry<>(null, null, SGPlayer::getUniqueId, null, null);
     
     private File deathMessagesFile;
     private FileConfiguration deathMessagesConfig;
     
     private InstanceServer instanceServer;
-    private IntegerRegistry<SGVirtualServer> servers = new IntegerRegistry<>();
+    private Registry<Integer, SGVirtualServer> servers = new Registry<>();
     
     private int gamesPlayed;
     
@@ -138,18 +137,18 @@ public class SurvivalGames extends NexusSpigotPlugin {
     public void onEnable() {
         INSTANCE = this;
         ItemRegistry itemRegistry = Bukkit.getServicesManager().getRegistration(ItemRegistry.class).getProvider();
-        tributesBook = itemRegistry.register(new GameTeamBook(this, GameTeam.TRIBUTES)).getObject();
-        mutationsBook = itemRegistry.register(new GameTeamBook(this, GameTeam.MUTATIONS)).getObject();
-        spectatorsBook = itemRegistry.register(new GameTeamBook(this, GameTeam.SPECTATORS)).getObject();
-        playerTrackerItem = itemRegistry.register(new PlayerTrackerItem(this)).getObject();
-        tpToMapCenterItem = itemRegistry.register(new TPToMapCenterItem(this)).getObject();
-        toHubItem = itemRegistry.register(new ToHubItem(this)).getObject();
-        mutateItem = itemRegistry.register(new MutateItem(this)).getObject();
-        modifierItem = itemRegistry.register(new GameModifierItem(this)).getObject();
-        creeperBombItem = itemRegistry.register(new CreeperSuicideBomb(this)).getObject();
-        chickenLaunchItem = itemRegistry.register(new ChickenLaunchItem(this)).getObject();
-        chickenParachuteItem = itemRegistry.register(new ChickenChuteItem(this)).getObject();
-        sponsorsItem = itemRegistry.register(new SponsorsItem(this)).getObject();
+        tributesBook = itemRegistry.register(new GameTeamBook(this, GameTeam.TRIBUTES)).get();
+        mutationsBook = itemRegistry.register(new GameTeamBook(this, GameTeam.MUTATIONS)).get();
+        spectatorsBook = itemRegistry.register(new GameTeamBook(this, GameTeam.SPECTATORS)).get();
+        playerTrackerItem = itemRegistry.register(new PlayerTrackerItem(this)).get();
+        tpToMapCenterItem = itemRegistry.register(new TPToMapCenterItem(this)).get();
+        toHubItem = itemRegistry.register(new ToHubItem(this)).get();
+        mutateItem = itemRegistry.register(new MutateItem(this)).get();
+        modifierItem = itemRegistry.register(new GameModifierItem(this)).get();
+        creeperBombItem = itemRegistry.register(new CreeperSuicideBomb(this)).get();
+        chickenLaunchItem = itemRegistry.register(new ChickenLaunchItem(this)).get();
+        chickenParachuteItem = itemRegistry.register(new ChickenChuteItem(this)).get();
+        sponsorsItem = itemRegistry.register(new SponsorsItem(this)).get();
         
         this.defaultMutationType = StandardMutations.PIG_ZOMBIE;
         getLogger().info("Loading NexusSurvivalGames v" + getDescription().getVersion());
@@ -414,7 +413,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
     @Override
     public void onDisable() {
-        for (SGVirtualServer server : this.servers) {
+        for (SGVirtualServer server : this.servers.values()) {
             server.onStop();
         }
         
@@ -460,7 +459,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
     @Override
     public void registerDatabases(DatabaseRegistry registry) {
-        for (SQLDatabase database : registry.getObjects().values()) {
+        for (SQLDatabase database : registry.values()) {
             if (database.getName().toLowerCase().contains("nexus")) {
                 database.registerClass(SGPlayerStats.class);
                 database.registerClass(NickSGPlayerStats.class);
@@ -500,11 +499,11 @@ public class SurvivalGames extends NexusSpigotPlugin {
         return nexusHubHook;
     }
     
-    public UUIDRegistry<SGPlayer> getPlayerRegistry() {
+    public Registry<UUID, SGPlayer> getPlayerRegistry() {
         return playerRegistry;
     }
     
-    public IntegerRegistry<SGVirtualServer> getServers() {
+    public Registry<Integer, SGVirtualServer> getServers() {
         return servers;
     }
     

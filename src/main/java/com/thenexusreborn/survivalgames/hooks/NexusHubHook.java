@@ -38,7 +38,7 @@ public class NexusHubHook implements Listener {
             return;
         }
         
-        for (SGVirtualServer server : survivalGames.getServers()) {
+        for (SGVirtualServer server : survivalGames.getServers().values()) {
             if (server.getName().equalsIgnoreCase(serverName)) {
                 server.join(e.getNexusPlayer());
                 break;

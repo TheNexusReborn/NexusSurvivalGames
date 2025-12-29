@@ -1,21 +1,27 @@
 package com.thenexusreborn.survivalgames.loot.item;
 
-import com.stardevllc.starlib.registry.RegistryObject;
-import com.stardevllc.starlib.registry.StringRegistry;
+import com.stardevllc.starlib.objects.registry.Registry;
 import com.stardevllc.starcore.api.StarColors;
+import com.stardevllc.starlib.objects.registry.RegistryObject;
 import com.thenexusreborn.survivalgames.loot.category.LootCategory;
 import org.bukkit.Material;
 
 import java.util.EnumSet;
 import java.util.Set;
 
-public class ItemRegistry extends StringRegistry<LootItem> {
+public class ItemRegistry extends Registry<String, LootItem> {
     
     private Set<Material> materials = EnumSet.noneOf(Material.class);
     
     public ItemRegistry() {
         super(null, string -> StarColors.stripColor(string.toLowerCase().replace(" ", "_").replace("'", "")), LootItem::getId, null, null);
-        addRegisterListener((s, lootItem) -> materials.add(lootItem.getMaterial()));
+        addListener(c -> {
+            if (c.added() != null) {
+                materials.add(c.added().getMaterial());
+            } else if (c.removed() != null) {
+                materials.remove(c.removed().getMaterial());
+            }
+        });
     }
     
     public RegistryObject<String, LootItem> register(Material material, LootCategory... categories) {
@@ -41,7 +47,7 @@ public class ItemRegistry extends StringRegistry<LootItem> {
     }
     
     public LootItem getByMaterial(Material material) {
-        for (LootItem item : this.getObjects().values()) {
+        for (LootItem item : this.values()) {
             if (item.getMaterial() == material) {
                 return item;
             }

@@ -19,7 +19,7 @@ public class ServerStatusThread extends StarThread<SurvivalGames> {
     }
     
     public void onRun() {
-        for (SGVirtualServer server : plugin.getServers()) {
+        for (SGVirtualServer server : plugin.getServers().values()) {
             server.setStatus("online");
             JsonObject stateObject = new JsonObject();
             Game game = server.getGame();

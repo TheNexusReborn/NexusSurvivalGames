@@ -22,7 +22,7 @@ public class GameBoundsThread extends StarThread<SurvivalGames> {
     
     @Override
     public void onRun() {
-        for (SGPlayer sgPlayer : plugin.getPlayerRegistry()) {
+        for (SGPlayer sgPlayer : plugin.getPlayerRegistry().values()) {
             Game game = sgPlayer.getGame();
             if (game == null) {
                 continue;

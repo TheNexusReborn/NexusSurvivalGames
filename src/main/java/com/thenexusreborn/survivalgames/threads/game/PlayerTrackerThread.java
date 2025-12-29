@@ -21,7 +21,7 @@ public class PlayerTrackerThread extends StarThread<SurvivalGames> {
     }
 
     public void onRun() {
-        for (SGVirtualServer server : plugin.getServers()) {
+        for (SGVirtualServer server : plugin.getServers().values()) {
             Game game = server.getGame();
             if (game == null) {
                 continue;

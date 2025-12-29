@@ -2,7 +2,7 @@ package com.thenexusreborn.survivalgames.mutations;
 
 import com.stardevllc.smaterial.ArmorSet;
 import com.stardevllc.smaterial.SMaterial;
-import com.stardevllc.starlib.registry.StringRegistry;
+import com.stardevllc.starlib.objects.registry.Registry;
 import com.thenexusreborn.survivalgames.disguises.disguisetypes.DisguiseType;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.List;
 
 public interface IMutationType {
-    StringRegistry<IMutationType> REGISTRY = new StringRegistry<>(null, String::toLowerCase, IMutationType::getId, null, null);
+    Registry<String, IMutationType> REGISTRY = new Registry<>(null, String::toLowerCase, IMutationType::getId, null, null);
     
     static IMutationType valueOf(String str) {
         return REGISTRY.get(str);

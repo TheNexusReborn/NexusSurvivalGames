@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.cmd.sgadmin.maps;
 
 import com.stardevllc.starcore.api.StarColors;
-import com.stardevllc.starmclib.cmdflags.FlagResult;
+import com.stardevllc.starmclib.command.flags.FlagResult;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.api.command.ICommand;

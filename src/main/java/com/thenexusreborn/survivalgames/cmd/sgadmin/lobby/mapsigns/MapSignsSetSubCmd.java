@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.cmd.sgadmin.lobby.mapsigns;
 
-import com.stardevllc.starmclib.cmdflags.FlagResult;
+import com.stardevllc.starmclib.command.flags.FlagResult;
 import com.thenexusreborn.nexuscore.api.command.ICommand;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;

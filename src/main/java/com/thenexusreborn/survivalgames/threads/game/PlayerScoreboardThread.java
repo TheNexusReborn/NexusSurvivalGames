@@ -18,7 +18,7 @@ public class PlayerScoreboardThread extends StarThread<SurvivalGames> {
     
     @Override
     public void onRun() {
-        for (SGVirtualServer server : plugin.getServers()) {
+        for (SGVirtualServer server : plugin.getServers().values()) {
 
             Set<UUID> players = server.getPlayers();
 

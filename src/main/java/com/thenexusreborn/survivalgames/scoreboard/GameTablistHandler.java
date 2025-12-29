@@ -35,7 +35,7 @@ public class GameTablistHandler extends TablistHandler {
     public void update() {
         removeDisconnectedPlayers();
         
-        for (SGPlayer sgPlayer : plugin.getPlayerRegistry()) {
+        for (SGPlayer sgPlayer : plugin.getPlayerRegistry().values()) {
             
             if (sgPlayer.getGame() != null) {
                 GamePlayer gamePlayer = sgPlayer.getGamePlayer();

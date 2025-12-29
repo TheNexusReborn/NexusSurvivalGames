@@ -4,6 +4,7 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.stardevllc.itembuilder.v1_8.FireworkItemBuilder;
 import com.stardevllc.smaterial.SMaterial;
 import com.stardevllc.starchat.context.ChatContext;
+import com.stardevllc.starchat.registry.RoomRegistry;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.starcore.api.StarColors;
@@ -14,7 +15,6 @@ import com.stardevllc.starlib.clock.clocks.Timer;
 import com.stardevllc.starlib.converter.string.EnumStringConverter;
 import com.stardevllc.starlib.converter.string.StringConverters;
 import com.stardevllc.starlib.helper.StringHelper;
-import com.stardevllc.starlib.registry.StringRegistry;
 import com.stardevllc.starlib.time.TimeFormat;
 import com.stardevllc.starlib.time.TimeUnit;
 import com.thenexusreborn.api.NexusReborn;
@@ -708,7 +708,7 @@ public class Game implements Controllable, IHasState {
     public void startWarmup() {
         setState(WARMUP);
         setSubState(SubState.TIMER_INIT);
-        this.timer = Game.getPlugin().getClockManager().createTimer(TimeUnit.SECONDS.toMillis(getSettings().getWarmupLength()) + 50L);
+        this.timer = NexusReborn.getClockManager().createTimer(TimeUnit.SECONDS.toMillis(getSettings().getWarmupLength()) + 50L);
         this.timer.setEndCondition(new WarmupEndCondition(this));
         this.timer.addRepeatingCallback(new GameSecondsCallback(this, Sound.CLICK, "&6&l>> &eThe game begins in &b{time}&e."), TimeUnit.SECONDS, 1);
         this.timer.addRepeatingCallback(snapshot -> playSound(Sound.NOTE_BASS), TimeUnit.SECONDS, 1);
@@ -770,6 +770,8 @@ public class Game implements Controllable, IHasState {
         }
         
         this.timer.start();
+        plugin.getLogger().info("Timer Paused: " + this.timer.isPaused());
+        plugin.getLogger().info("Timer Cancelled: " + this.timer.isCancelled());
         setSubState(SubState.UNDEFINED);
     }
     
@@ -1290,7 +1292,7 @@ public class Game implements Controllable, IHasState {
             Lobby.PLAYER_STATE.apply(player);
         }
         
-        StringRegistry<ChatRoom> roomRegistry = plugin.getStarChat().getRoomRegistry();
+        RoomRegistry roomRegistry = plugin.getStarChat().getRoomRegistry();
         roomRegistry.unregister(this.gameChatroom.getName());
         for (GameTeamChatroom chatroom : this.getChatRooms().values()) {
             roomRegistry.unregister(chatroom.getName());

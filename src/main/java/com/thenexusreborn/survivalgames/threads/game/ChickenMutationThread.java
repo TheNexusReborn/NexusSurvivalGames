@@ -22,7 +22,7 @@ public class ChickenMutationThread extends StarThread<SurvivalGames> {
     
     @Override
     public void onRun() {
-        for (SGPlayer sgPlayer : plugin.getPlayerRegistry()) {
+        for (SGPlayer sgPlayer : plugin.getPlayerRegistry().values()) {
             if (sgPlayer == null) {
                 continue;
             }

@@ -160,7 +160,7 @@ public class EntityListener implements Listener {
         Game game = null;
         Lobby lobby = null;
         
-        for (SGVirtualServer server : plugin.getServers().getObjects().values()) {
+        for (SGVirtualServer server : plugin.getServers().values()) {
             if (server.getGame() != null) {
                 if (server.getGame().getGameMap().getWorld().equals(eventWorld)) {
                     game = server.getGame();

@@ -24,7 +24,7 @@ public class MapSignUpdateThread extends StarThread<SurvivalGames> {
     }
     
     public void onRun() {
-        for (SGVirtualServer server : plugin.getServers()) {
+        for (SGVirtualServer server : plugin.getServers().values()) {
             Lobby lobby = server.getLobby();
             if (lobby == null) {
                 continue;
