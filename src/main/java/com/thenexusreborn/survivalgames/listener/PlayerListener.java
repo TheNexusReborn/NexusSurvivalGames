@@ -614,7 +614,8 @@ public class PlayerListener implements Listener {
         
         if (gamePlayer.getTeam() != GameTeam.TRIBUTES && player.isOnline()) {
             e.getDrops().clear();
-            e.setDroppedExp(0);
+            e.setDroppedExp(e.getDroppedExp() / 2);
+//            e.setDroppedExp(0);
         }
         
         DeathType deathType = switch (lastDamageCause.getCause()) {
