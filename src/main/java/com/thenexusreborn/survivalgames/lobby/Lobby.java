@@ -934,7 +934,13 @@ public class Lobby implements Controllable, IHasState {
                 } else {
                     player.sendMessage("&6&l>> &eYou voted for&8: &b" + sgMap.getName() + " &7&oby &3" + creators + "&e.");
                 }
-                player.sendMessage("&6&l>> &eVoting Weight&8: &b" + VOTE_WEIGHTS.get(nexusPlayer.getEffectiveRank()) + " Vote(s)&e.");
+                int voteWeight;
+                if (getLobbySettings().isVoteWeight()) {
+                    voteWeight = VOTE_WEIGHTS.get(nexusPlayer.getEffectiveRank());
+                } else {
+                    voteWeight = 1;
+                }
+                player.sendMessage("&6&l>> &eVoting Weight&8: &b" + voteWeight + " Vote(s)&e.");
                 player.playSound(Sound.NOTE_PLING);
 
                 player.setMapVote(entry.getKey());
