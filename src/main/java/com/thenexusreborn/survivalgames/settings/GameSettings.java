@@ -77,6 +77,7 @@ public class GameSettings implements Cloneable, ISettings {
     protected boolean allowTeaming = true;
     protected boolean tributesSeeSpectatorChat = true;
     protected boolean allowSingleTribute;
+    protected int droppedExpPercent = 50;
     
     //Loot
     protected boolean enderchestsEnabled = true;
@@ -121,6 +122,14 @@ public class GameSettings implements Cloneable, ISettings {
     protected boolean allowDeathmatch = true;
     protected boolean deathmatchPlayerCount = true;
     protected boolean automaticDeathmatchThreshold = true;
+    
+    public void setDroppedExpPercent(int droppedExpPercent) {
+        this.droppedExpPercent = droppedExpPercent;
+    }
+    
+    public int getDroppedExpPercent() {
+        return droppedExpPercent;
+    }
     
     public boolean isSacrifices() {
         return sacrifices;

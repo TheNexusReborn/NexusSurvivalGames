@@ -273,7 +273,6 @@ public class PlayerListener implements Listener {
                             } else {
                                 boolean withinCenter = game.getGameMap().getDeathmatchRegion().contains(BukkitUtil.toVector(player.getLocation()));
                                 if (game.getState() == Game.State.INGAME || game.getState() == Game.State.INGAME_DEATHMATCH) {
-                                    boolean afterRestock = game.getTimedRestockCount() > 0;
                                     if (withinCenter) {
                                         lootTable = lootManager.getLootTable(game.getSettings().getCornucopiaTier());
                                     } else {
@@ -612,10 +611,15 @@ public class PlayerListener implements Listener {
         GamePlayer gamePlayer = game.getPlayer(player.getUniqueId());
         EntityDamageEvent lastDamageCause = player.getLastDamageCause();
         
+        int totalExperience = player.getTotalExperience();
+        int dropExperience = (int) (totalExperience * (game.getSettings().getDroppedExpPercent() / 100.0));
+        
+        ExperienceOrb orb = (ExperienceOrb) player.getWorld().spawnEntity(player.getLocation(), EntityType.EXPERIENCE_ORB);
+        orb.setExperience(dropExperience);
+        
         if (gamePlayer.getTeam() != GameTeam.TRIBUTES && player.isOnline()) {
             e.getDrops().clear();
-            e.setDroppedExp(e.getDroppedExp() / 2);
-//            e.setDroppedExp(0);
+            e.setDroppedExp(0);
         }
         
         DeathType deathType = switch (lastDamageCause.getCause()) {
