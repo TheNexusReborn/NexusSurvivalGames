@@ -84,8 +84,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
     
     private boolean sgGlobalDebug;
     
-    private IMutationType defaultMutationType;
-    
     public static final GameSettings globalGameSettings = new GameSettings();
     public static final LobbySettings globalLobbySettings = new LobbySettings();
     
@@ -148,7 +146,6 @@ public class SurvivalGames extends NexusSpigotPlugin {
         chickenParachuteItem = itemRegistry.register(new ChickenChuteItem(this)).get();
         sponsorsItem = itemRegistry.register(new SponsorsItem(this)).get();
         
-        this.defaultMutationType = StandardMutations.PIG_ZOMBIE;
         getLogger().info("Loading NexusSurvivalGames v" + getDescription().getVersion());
         saveDefaultConfig();
         

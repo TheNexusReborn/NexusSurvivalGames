@@ -40,6 +40,6 @@ public class SGInstanceServer extends InstanceServer {
 
     @Override
     public void onStop() {
-        this.primaryVirtualServer.get().onStart();
+        this.primaryVirtualServer.get().onStop();
     }
 }

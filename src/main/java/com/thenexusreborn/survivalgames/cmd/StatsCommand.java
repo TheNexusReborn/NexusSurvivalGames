@@ -16,7 +16,7 @@ public class StatsCommand extends NexusCommand<SurvivalGames> {
     @Override
     public boolean execute(CommandSender sender, Rank senderRank, String label, String[] args, FlagResult flagResults) {
         //TODO Reimplement this command
-        sender.sendMessage(MsgType.WARN + "This command is being reworked.");
+        MsgType.WARN.send(sender, "This command is being reworked.");
         return true;
     }
 }

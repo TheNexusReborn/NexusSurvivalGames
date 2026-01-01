@@ -52,6 +52,7 @@ public class ServerStatusThread extends StarThread<SurvivalGames> {
                 }
             } else if (lobby != null) {
                 stateObject.addProperty("type", "lobby");
+                stateObject.addProperty("mode", lobby.getMode().name());
                 stateObject.addProperty("map", lobby.getGameMap() != null ? lobby.getGameMap().getName() : "Voting");
                 stateObject.addProperty("control", lobby.getControlType().name());
                 stateObject.addProperty("state", lobby.getState().name());
