@@ -98,6 +98,7 @@ public class GameSettings implements Cloneable, ISettings {
     protected boolean showBorders = true;
     protected float tntYield = 3.0F;
     protected int tntFuseTicks = 20;
+    protected boolean enableEnchanting = true;
     
     //Graceperiod
     protected boolean gracePeriod;
@@ -122,6 +123,14 @@ public class GameSettings implements Cloneable, ISettings {
     protected boolean allowDeathmatch = true;
     protected boolean deathmatchPlayerCount = true;
     protected boolean automaticDeathmatchThreshold = true;
+    
+    public boolean isEnableEnchanting() {
+        return enableEnchanting;
+    }
+    
+    public void setEnableEnchanting(boolean enableEnchanting) {
+        this.enableEnchanting = enableEnchanting;
+    }
     
     public void setDroppedExpPercent(int droppedExpPercent) {
         this.droppedExpPercent = droppedExpPercent;

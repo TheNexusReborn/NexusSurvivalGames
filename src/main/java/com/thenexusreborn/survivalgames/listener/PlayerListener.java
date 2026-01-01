@@ -533,6 +533,12 @@ public class PlayerListener implements Listener {
         
         if (game != null) {
             if (e.getInventory() instanceof EnchantingInventory enchantingInventory) {
+                if (!game.getSettings().isEnableEnchanting()) {
+                    e.setCancelled(true);
+                    sgPlayer.sendMessage(MsgType.WARN + "Enchanting is disabled for this game.");
+                    return;
+                }
+                
                 if (game.getPlayer(e.getPlayer().getUniqueId()).getTeam() != GameTeam.TRIBUTES) {
                     e.setCancelled(true);
                     return;

@@ -94,6 +94,7 @@ public class MutationMayhemGameSettings extends GameSettings {
         showBorders = true;
         tntYield = 3.0F;
         tntFuseTicks = 20;
+        enableEnchanting = false;
         
         //Graceperiod
         gracePeriod = true;
@@ -104,7 +105,7 @@ public class MutationMayhemGameSettings extends GameSettings {
         
         //Game
         warmupLength = 10;
-        gameLength = 15;
+        gameLength = 20;
         nextGameTimerLength = 10;
         lightning = true;
         fireworks = true;
