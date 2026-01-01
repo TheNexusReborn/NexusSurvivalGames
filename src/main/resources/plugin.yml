@@ -29,5 +29,3 @@ commands:
     aliases: [sga, sgadmin]
   probability:
     aliases: [prob]
-  mutationmayhem: 
-    aliases: [mm]
