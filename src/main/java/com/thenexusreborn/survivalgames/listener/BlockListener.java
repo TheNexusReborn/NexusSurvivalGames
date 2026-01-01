@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 import static org.bukkit.Material.*;
 
 public class BlockListener implements Listener {
-    public static final Set<Material> ALLOWED_BREAK = EnumSet.of(LONG_GRASS, RED_ROSE, YELLOW_FLOWER, LEAVES, FIRE, WEB, MELON_BLOCK, CROPS, CARROT, POTATO, LEAVES_2, CAKE_BLOCK, DOUBLE_PLANT), 
+    public static final Set<Material> ALLOWED_BREAK = EnumSet.of(LONG_GRASS, RED_ROSE, YELLOW_FLOWER, LEAVES, FIRE, WEB, MELON_BLOCK, CROPS, CARROT, POTATO, LEAVES_2, CAKE_BLOCK, DOUBLE_PLANT, VINE), 
             NO_DROPS = EnumSet.of(YELLOW_FLOWER, LONG_GRASS, COCOA, RED_ROSE), 
             ALLOWED_PLACE = EnumSet.of(CAKE_BLOCK, WEB, FIRE, TNT);
     
