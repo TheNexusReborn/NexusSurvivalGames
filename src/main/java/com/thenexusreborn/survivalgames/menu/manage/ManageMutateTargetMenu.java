@@ -24,10 +24,11 @@ public class ManageMutateTargetMenu extends InventoryGUI implements UpdatingGUI 
     
     public ManageMutateTargetMenu(SurvivalGames plugin, SGPlayer actor, Game game, MutationBuilder builder, ManageMutateMenu previousMenu) {
         super("&lSelect " + builder.getPlayer().getName() + "'s target", actor.getUniqueId(), new String[]{
-                "",
-                "",
-                ""
+                "TTTTTTTTT",
+                "TTTTTTTTT",
+                "TTTTTTTTT"
         });
+        setDynamicChar('T');
         manager = plugin.getServer().getServicesManager().getRegistration(GuiManager.class).getProvider();
         this.game = game;
         this.builder = builder;
