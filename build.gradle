@@ -57,6 +57,7 @@ dependencies {
     compileOnly 'net.dmulloy2:ProtocolLib:5.4.0'
     compileOnly 'com.sk89q.worldedit:worldedit-core:6.1'
     compileOnly 'com.sk89q.worldedit:worldedit-bukkit:6.1.5'
+    compileOnly 'com.github.decentsoftware-eu:decentholograms:2.8.17'
 }
 
 group = 'com.thenexusreborn'

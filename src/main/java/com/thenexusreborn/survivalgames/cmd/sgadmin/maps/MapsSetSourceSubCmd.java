@@ -2,12 +2,12 @@ package com.thenexusreborn.survivalgames.cmd.sgadmin.maps;
 
 import com.stardevllc.starmclib.command.flags.FlagResult;
 import com.thenexusreborn.api.player.Rank;
-import com.thenexusreborn.gamemaps.YamlMapManager;
 import com.thenexusreborn.nexuscore.api.command.ICommand;
 import com.thenexusreborn.nexuscore.api.command.SubCommand;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.map.SQLMapManager;
+import com.thenexusreborn.survivalgames.map.YamlMapManager;
 import org.bukkit.command.CommandSender;
 
 public class MapsSetSourceSubCmd extends SubCommand<SurvivalGames> {

@@ -1,16 +1,12 @@
-package com.thenexusreborn.survivalgames.data.handler;
+package com.thenexusreborn.survivalgames.map;
 
-import com.thenexusreborn.api.NexusReborn;
-import com.thenexusreborn.api.sql.objects.ObjectHandler;
-import com.thenexusreborn.api.sql.objects.SQLDatabase;
-import com.thenexusreborn.api.sql.objects.Table;
-import com.thenexusreborn.survivalgames.map.*;
+import com.thenexusreborn.api.sql.objects.*;
 
 import java.sql.SQLException;
 import java.util.List;
 
-public class GameMapObjectHandler extends ObjectHandler {
-    public GameMapObjectHandler(Object object, SQLDatabase database, Table table) {
+public class SGMapObjectHandler extends ObjectHandler {
+    public SGMapObjectHandler(Object object, SQLDatabase database, Table table) {
         super(object, database, table);
     }
     
@@ -22,7 +18,7 @@ public class GameMapObjectHandler extends ObjectHandler {
             gameMap.setSpawns(mapSpawns);
             gameMap.recalculateSpawns();
             
-            List<MapRating> ratings = NexusReborn.getPrimaryDatabase().get(MapRating.class, "mapName", gameMap.getName().toLowerCase().replace("'", "''"));
+            List<MapRating> ratings = database.get(MapRating.class, "mapName", gameMap.getName().toLowerCase().replace("'", "''"));
             if (ratings != null) {
                 gameMap.setRatings(ratings);
             }
@@ -47,7 +43,7 @@ public class GameMapObjectHandler extends ObjectHandler {
             }
     
             for (MapRating rating : gameMap.getRatings().values()) {
-                NexusReborn.getPrimaryDatabase().save(rating);
+                database.save(rating);
             }
         } catch (SQLException e) {
             e.printStackTrace();

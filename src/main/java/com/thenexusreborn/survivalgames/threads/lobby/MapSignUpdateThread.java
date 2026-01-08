@@ -2,11 +2,11 @@ package com.thenexusreborn.survivalgames.threads.lobby;
 
 import com.stardevllc.starcore.api.StarColors;
 import com.stardevllc.starcore.utils.StarThread;
-import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;
 import com.thenexusreborn.survivalgames.lobby.LobbyState;
+import com.thenexusreborn.survivalgames.map.SGMap;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

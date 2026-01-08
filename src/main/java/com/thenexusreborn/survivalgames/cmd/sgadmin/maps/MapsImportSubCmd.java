@@ -3,13 +3,11 @@ package com.thenexusreborn.survivalgames.cmd.sgadmin.maps;
 import com.stardevllc.starmclib.command.flags.FlagResult;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.gamemaps.MapManager;
-import com.thenexusreborn.gamemaps.YamlMapManager;
-import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.api.command.ICommand;
 import com.thenexusreborn.nexuscore.api.command.SubCommand;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
-import com.thenexusreborn.survivalgames.map.SQLMapManager;
+import com.thenexusreborn.survivalgames.map.*;
 import org.bukkit.command.CommandSender;
 
 public class MapsImportSubCmd extends SubCommand<SurvivalGames> {
@@ -30,7 +28,7 @@ public class MapsImportSubCmd extends SubCommand<SurvivalGames> {
             return true;
         }
         
-        MapManager importManager;
+        MapManager<SGMap> importManager;
         
         if (option.equalsIgnoreCase("sql")) {
             importManager = new SQLMapManager(plugin);

@@ -4,13 +4,13 @@ import com.stardevllc.starlib.time.TimeUnit;
 import com.stardevllc.starmclib.command.flags.FlagResult;
 import com.thenexusreborn.api.NexusReborn;
 import com.thenexusreborn.api.player.Rank;
-import com.thenexusreborn.gamemaps.model.MapRating;
-import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.api.command.NexusCommand;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
+import com.thenexusreborn.survivalgames.map.MapRating;
+import com.thenexusreborn.survivalgames.map.SGMap;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 

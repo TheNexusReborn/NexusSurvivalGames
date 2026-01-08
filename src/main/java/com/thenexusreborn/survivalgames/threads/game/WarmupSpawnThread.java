@@ -1,10 +1,10 @@
 package com.thenexusreborn.survivalgames.threads.game;
 
 import com.stardevllc.starcore.utils.StarThread;
-import com.thenexusreborn.gamemaps.model.MapSpawn;
-import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
+import com.thenexusreborn.survivalgames.map.MapSpawn;
+import com.thenexusreborn.survivalgames.map.SGMap;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

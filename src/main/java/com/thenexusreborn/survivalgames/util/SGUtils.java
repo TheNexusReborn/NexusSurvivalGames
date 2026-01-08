@@ -2,9 +2,9 @@ package com.thenexusreborn.survivalgames.util;
 
 import com.stardevllc.starcore.api.StarColors;
 import com.thenexusreborn.api.scoreboard.wrapper.ITeam;
-import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
+import com.thenexusreborn.survivalgames.map.SGMap;
 import net.minecraft.server.v1_8_R3.EntityTNTPrimed;
 import org.bukkit.Location;
 import org.bukkit.Material;

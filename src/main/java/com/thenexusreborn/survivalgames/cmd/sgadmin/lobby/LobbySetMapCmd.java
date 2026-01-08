@@ -1,12 +1,12 @@
 package com.thenexusreborn.survivalgames.cmd.sgadmin.lobby;
 
 import com.stardevllc.starmclib.command.flags.FlagResult;
-import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.nexuscore.api.command.ICommand;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
+import com.thenexusreborn.survivalgames.map.SGMap;
 import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.entity.Player;
 

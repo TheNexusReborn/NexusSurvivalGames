@@ -2,13 +2,12 @@ package com.thenexusreborn.survivalgames.map;
 
 import com.thenexusreborn.api.NexusReborn;
 import com.thenexusreborn.gamemaps.MapManager;
-import com.thenexusreborn.gamemaps.model.SGMap;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 
 import java.sql.SQLException;
 import java.util.logging.Level;
 
-public class SQLMapManager extends MapManager {
+public class SQLMapManager extends MapManager<SGMap> {
     public SQLMapManager(SurvivalGames plugin) {
         super(plugin);
     }

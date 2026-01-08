@@ -33,7 +33,7 @@ import com.thenexusreborn.survivalgames.items.*;
 import com.thenexusreborn.survivalgames.listener.*;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.loot.LootManager;
-import com.thenexusreborn.survivalgames.map.SQLMapManager;
+import com.thenexusreborn.survivalgames.map.*;
 import com.thenexusreborn.survivalgames.mutations.*;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
@@ -64,7 +64,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
     private StarChat starChat;
     private NexusHubHook nexusHubHook;
     
-    private MapManager mapManager;
+    private MapManager<SGMap> mapManager;
     
     private final Map<UUID, PlayerMutations> playerUnlockedMutations = new HashMap<>();
     private final Set<IMutationType> disabledMutations = new HashSet<>();
@@ -438,7 +438,7 @@ public class SurvivalGames extends NexusSpigotPlugin {
         saveConfig();
     }
     
-    public MapManager getMapManager() {
+    public MapManager<SGMap> getMapManager() {
         return mapManager;
     }
     
