@@ -59,7 +59,7 @@ public class ChickenMutationThread extends StarThread<SurvivalGames> {
                         if (hand.getType() == Material.WOOD_SWORD) {
                             if (chickenMutation.getAmmunition() > 0) {
                                 if (chickenMutation.getLastEggLaunch() > 0) {
-                                    long nextLaunch = chickenMutation.getLastEggLaunch() + game.getSettings().getChickenEggLaunchCooldown();
+                                    long nextLaunch = chickenMutation.getLastEggLaunch() + game.getSettings().getChickenEggCooldown();
                                     if (nextLaunch <= System.currentTimeMillis()) {
                                         sgPlayer.launchProjectile(Egg.class);
                                         chickenMutation.decrementAmmunition();

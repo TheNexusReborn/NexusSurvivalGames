@@ -60,9 +60,11 @@ public class GameSettings implements Cloneable, ISettings {
     protected int maxMutationAmount = 1;
     protected boolean mutationsEnabled = true;
     protected boolean allowRecursiveMutations;
-    protected long chickenEggLaunchCooldown = 200;
+    protected long chickenEggCooldown = 200;
     protected boolean allowRoddingMutations;
     protected int chickenMaxAmmo = -1; //Infinite
+    protected long chickenLaunchCooldown = 5;
+    protected long chickenChuteCooldown = 5;
     
     //Player
     protected boolean earnNexites;
@@ -123,6 +125,26 @@ public class GameSettings implements Cloneable, ISettings {
     protected boolean allowDeathmatch = true;
     protected boolean deathmatchPlayerCount = true;
     protected boolean automaticDeathmatchThreshold = true;
+    
+    public long getChickenChuteCooldown() {
+        return chickenChuteCooldown;
+    }
+    
+    public void setChickenChuteCooldown(long chickenChuteCooldown) {
+        this.chickenChuteCooldown = chickenChuteCooldown;
+    }
+    
+    public void setChickenLaunchCooldown(long chickenLaunchCooldown) {
+        this.chickenLaunchCooldown = chickenLaunchCooldown;
+    }
+    
+    public void setChickenEggCooldown(long chickenEggCooldown) {
+        this.chickenEggCooldown = chickenEggCooldown;
+    }
+    
+    public long getChickenLaunchCooldown() {
+        return chickenLaunchCooldown;
+    }
     
     public boolean isEnableEnchanting() {
         return enableEnchanting;
@@ -218,8 +240,8 @@ public class GameSettings implements Cloneable, ISettings {
         return this;
     }
     
-    public long getChickenEggLaunchCooldown() {
-        return chickenEggLaunchCooldown;
+    public long getChickenEggCooldown() {
+        return chickenEggCooldown;
     }
     
     public boolean isFireworks() {

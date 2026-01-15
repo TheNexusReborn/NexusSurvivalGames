@@ -81,12 +81,12 @@ public class ChickenMutation extends Mutation {
     
     public void startLaunchCooldown() {
         if (launchCooldownTimer == null) {
-            launchCooldownTimer = Game.getPlugin().getClockManager().createTimer(5000L);
+            launchCooldownTimer = Game.getPlugin().getClockManager().createTimer(game.getSettings().getChickenLaunchCooldown() * 1000);
             launchCooldownTimer.addCallback(timerSnapshot -> Bukkit.getPlayer(getPlayer()).sendMessage(StarColors.color(MsgType.INFO + "Chicken Launch is ready!")), 0L);
-            launchCooldownTimer.start();
         } else {
-            launchCooldownTimer.reset();
+            launchCooldownTimer.setLengthAndReset(game.getSettings().getChickenLaunchCooldown() * 1000);
         }
+        launchCooldownTimer.start();
     }
     
     public Timer getParachuteCooldownTimer() {
@@ -95,12 +95,12 @@ public class ChickenMutation extends Mutation {
     
     public void startParachuteCooldown() {
         if (parachuteCooldownTimer == null) {
-            parachuteCooldownTimer = Game.getPlugin().getClockManager().createTimer(5000L);
+            parachuteCooldownTimer = Game.getPlugin().getClockManager().createTimer(game.getSettings().getChickenChuteCooldown() * 1000);
             parachuteCooldownTimer.addCallback(timerSnapshot -> Bukkit.getPlayer(getPlayer()).sendMessage(StarColors.color(MsgType.INFO + "Chicken Chute is ready!")), 0L);
-            parachuteCooldownTimer.start();
         } else {
-            parachuteCooldownTimer.reset();
+            parachuteCooldownTimer.setLengthAndReset(game.getSettings().getChickenChuteCooldown() * 1000);
         }
+        parachuteCooldownTimer.start();
     }
     
     public int getAmmunition() {
