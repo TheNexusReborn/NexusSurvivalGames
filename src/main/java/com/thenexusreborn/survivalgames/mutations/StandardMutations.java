@@ -76,7 +76,7 @@ public enum StandardMutations implements IMutationType {
             List.of(), //Damage Immunities
             List.of(new MutationEffect(PotionEffectType.SPEED, 0)), //Potion Effects
             List.of(
-                    new MutationItem(1, ItemBuilders.of(SMaterial.BOW).addEnchant(Enchantment.ARROW_DAMAGE, 1).build()), 
+                    new MutationItem(1, ItemBuilders.of(SMaterial.BOW).addEnchant(Enchantment.ARROW_DAMAGE, 1).build()),
                     new MutationItem(2, new ItemStack(Material.ARROW, 32))
             ), //Additional Items
             List.of(MutationModifier.FIFTY_PERCENT_INCREASED_DAMAGE) //Modifiers
@@ -110,7 +110,7 @@ public enum StandardMutations implements IMutationType {
             5000, //Unlock cost
             10, //Health
             List.of(DamageCause.BLOCK_EXPLOSION, DamageCause.ENTITY_EXPLOSION), //Damage Immunities
-            List.of(new MutationEffect(PotionEffectType.SPEED, 1)), //Potion Effects
+            List.of(new MutationEffect(PotionEffectType.SPEED, 0)), //Potion Effects
             List.of(
                     new MutationItem(1, new ItemStack(Material.TNT, 32)),
                     new MutationItem(2, SurvivalGames.creeperBombItem
@@ -119,7 +119,7 @@ public enum StandardMutations implements IMutationType {
             List.of() //Modifiers
     ),
     ;
-    
+
 //  Blaze, Spider, Witch and Wither Skeleton
     
     private final String id;
