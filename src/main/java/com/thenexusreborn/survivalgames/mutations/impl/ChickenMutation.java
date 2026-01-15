@@ -104,6 +104,13 @@ public class ChickenMutation extends Mutation {
     }
     
     public int getAmmunition() {
+        int maxAmmo = game.getSettings().getChickenMaxAmmo();
+        if (maxAmmo > -1) {
+            if (maxAmmo < ammunition) {
+                return maxAmmo;
+            }
+        }
+        
         return ammunition;
     }
     
