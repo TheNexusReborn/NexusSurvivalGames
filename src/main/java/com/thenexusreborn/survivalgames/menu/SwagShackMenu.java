@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.menu;
 
-import com.stardevllc.starcore.api.StarColors;
+import com.stardevllc.StarColors;
 import com.stardevllc.starcore.api.ui.element.button.Button;
 import com.stardevllc.starcore.api.ui.gui.InventoryGUI;
 import com.thenexusreborn.nexuscore.util.MsgType;

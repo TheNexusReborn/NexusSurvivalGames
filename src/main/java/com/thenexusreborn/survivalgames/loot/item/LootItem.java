@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.loot.item;
 
-import com.stardevllc.starcore.api.StarColors;
+import com.stardevllc.StarColors;
 import com.stardevllc.starmclib.names.MaterialNames;
 import com.thenexusreborn.survivalgames.loot.category.LootCategory;
 import de.tr7zw.nbtapi.NBT;

@@ -6,7 +6,7 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.stardevllc.smaterial.SMaterial;
-import com.stardevllc.starcore.api.StarColors;
+import com.stardevllc.StarColors;
 import com.stardevllc.staritems.model.CustomItem;
 import com.stardevllc.starmclib.Position;
 import com.thenexusreborn.gamemaps.MapManager;

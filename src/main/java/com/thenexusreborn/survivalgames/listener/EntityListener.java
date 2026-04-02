@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.listener;
 
-import com.stardevllc.starcore.api.StarColors;
+import com.stardevllc.StarColors;
 import com.thenexusreborn.api.NexusReborn;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;

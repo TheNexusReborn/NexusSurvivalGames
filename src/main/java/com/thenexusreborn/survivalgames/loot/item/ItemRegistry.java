@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.loot.item;
 
 import com.stardevllc.starlib.objects.registry.Registry;
-import com.stardevllc.starcore.api.StarColors;
+import com.stardevllc.StarColors;
 import com.stardevllc.starlib.objects.registry.RegistryObject;
 import com.thenexusreborn.survivalgames.loot.category.LootCategory;
 import org.bukkit.Material;

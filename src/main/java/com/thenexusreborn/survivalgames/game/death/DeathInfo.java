@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.game.death;
 
-import com.stardevllc.starcore.api.StarColors;
+import com.stardevllc.StarColors;
 import com.stardevllc.starmclib.names.EntityNames;
 import com.thenexusreborn.nexuscore.util.MCUtils;
 import com.thenexusreborn.survivalgames.SurvivalGames;

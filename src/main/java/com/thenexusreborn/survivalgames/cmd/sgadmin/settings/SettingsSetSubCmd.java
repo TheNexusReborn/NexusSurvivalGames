@@ -2,7 +2,7 @@ package com.thenexusreborn.survivalgames.cmd.sgadmin.settings;
 
 import com.stardevllc.starlib.converter.string.StringConverter;
 import com.stardevllc.starchat.context.ChatContext;
-import com.stardevllc.starmclib.command.flags.FlagResult;
+import com.stardevllc.command.flags.FlagResult;
 import com.stardevllc.starmclib.command.flags.type.PresenceFlag;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.nexuscore.api.command.ICommand;

@@ -7,7 +7,7 @@ import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.registry.RoomRegistry;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
-import com.stardevllc.starcore.api.StarColors;
+import com.stardevllc.StarColors;
 import com.stardevllc.starlib.clock.callback.CallbackPeriod;
 import com.stardevllc.starlib.clock.callback.ClockCallback;
 import com.stardevllc.starlib.clock.snapshot.TimerSnapshot;

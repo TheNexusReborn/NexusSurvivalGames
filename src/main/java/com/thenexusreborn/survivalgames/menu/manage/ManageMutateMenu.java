@@ -2,7 +2,7 @@ package com.thenexusreborn.survivalgames.menu.manage;
 
 import com.stardevllc.itembuilder.ItemBuilders;
 import com.stardevllc.smaterial.SMaterial;
-import com.stardevllc.starcore.api.StarColors;
+import com.stardevllc.StarColors;
 import com.stardevllc.starcore.api.ui.GuiManager;
 import com.stardevllc.starcore.api.ui.element.button.Button;
 import com.stardevllc.starcore.api.ui.gui.InventoryGUI;
