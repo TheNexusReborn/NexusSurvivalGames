@@ -2,7 +2,7 @@ package com.thenexusreborn.survivalgames.chat;
 
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starmclib.actors.Actor;
-import com.stardevllc.starmclib.actors.Actors;
+import com.stardevllc.actors.Actors;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 
 public class LobbyChatRoom extends ChatRoom {
