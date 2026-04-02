@@ -5,13 +5,14 @@ import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
 import com.sk89q.worldedit.bukkit.selections.Selection;
-import com.stardevllc.smaterial.SMaterial;
+import com.stardevllc.Position;
 import com.stardevllc.StarColors;
+import com.stardevllc.smaterial.SMaterial;
 import com.stardevllc.staritems.model.CustomItem;
-import com.stardevllc.starmclib.Position;
 import com.thenexusreborn.gamemaps.MapManager;
 import com.thenexusreborn.gamemaps.items.CmdItem;
 import com.thenexusreborn.nexuscore.util.MsgType;
+import com.thenexusreborn.survivalgames.util.SGUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.command.*;
@@ -620,11 +621,7 @@ public class SGMapCommand implements CommandExecutor {
     }
 
     public static String getMapNameFromCommand(String[] args, int startIndex) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = startIndex; i < args.length; i++) {
-            sb.append(args[i]).append(" ");
-        }
-        return sb.toString().trim();
+        return SGUtils.getMapNameFromCommand(args, startIndex);
     }
     
     private static String validatePosition(Position position) {

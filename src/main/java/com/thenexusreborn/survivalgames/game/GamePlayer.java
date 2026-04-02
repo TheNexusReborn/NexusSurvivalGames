@@ -1,10 +1,11 @@
 package com.thenexusreborn.survivalgames.game;
 
 import com.stardevllc.smaterial.ArmorSet;
-import com.stardevllc.starlib.helper.Pair;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.StarColors;
-import com.stardevllc.starmclib.Position;
+import com.stardevllc.Position;
+import com.stardevllc.starlib.tuple.pair.ImmutablePair;
+import com.stardevllc.starlib.tuple.pair.Pair;
 import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.tags.Tag;
@@ -274,66 +275,66 @@ public class GamePlayer {
     
     public Pair<Boolean, String> canMutate() {
         if (game == null) {
-            return new Pair<>(false, "You cannot mutate because there is no game running.");
+            return ImmutablePair.of(false, "You cannot mutate because there is no game running.");
         }
 
         if (!(game.getState() == Game.State.INGAME || game.getState() == Game.State.INGAME_DEATHMATCH)) {
-            return new Pair<>(false, "You cannot mutate in the current game state.");
+            return ImmutablePair.of(false, "You cannot mutate in the current game state.");
         }
 
         if (!game.getSettings().isAllowMutations()) {
-            return new Pair<>(false, "You cannot mutate because mutations are disabled for this game.");
+            return ImmutablePair.of(false, "You cannot mutate because mutations are disabled for this game.");
         }
         
         if (team != GameTeam.SPECTATORS) {
-            return new Pair<>(false, "You can only mutate if you are a spectator.");
+            return ImmutablePair.of(false, "You can only mutate if you are a spectator.");
         }
 
         if (game.getTeamCount(GameTeam.MUTATIONS) >= game.getSettings().getMaxMutationsAllowed()) {
-            return new Pair<>(false, "You cannot mutate as there are too many mutations in the game already.");
+            return ImmutablePair.of(false, "You cannot mutate as there are too many mutations in the game already.");
         }
         
         boolean timesMutatedExceedsMaxAmount = getTotalTimesMutated() >= game.getSettings().getMaxMutationAmount();
 
         if (timesMutatedExceedsMaxAmount) {
-            return new Pair<>(false, "You cannot mutate more than " + game.getSettings().getMaxMutationAmount() + " times.");
+            return ImmutablePair.of(false, "You cannot mutate more than " + game.getSettings().getMaxMutationAmount() + " times.");
         }
 
         if (getStats().getMutationPasses() <= 0 && !game.getSettings().isUnlimitedPasses()) {
-            return new Pair<>(false, "You do not have any mutation passes.");
+            return ImmutablePair.of(false, "You do not have any mutation passes.");
         }
 
         if (deathByMutation && !game.getSettings().isAllowRecursiveMutations()) {
-            return new Pair<>(false, "You cannot mutate because you were killed by a mutation.");
+            return ImmutablePair.of(false, "You cannot mutate because you were killed by a mutation.");
         }
 
         if (mutated && timesMutatedExceedsMaxAmount) {
-            return new Pair<>(false, "You have already mutated, you cannot mutate again.");
+            return ImmutablePair.of(false, "You have already mutated, you cannot mutate again.");
         }
 
         if (mutation != null) {
-            return new Pair<>(false, "You have already selected your mutation type.");
+            return ImmutablePair.of(false, "You have already selected your mutation type.");
         }
 
         if (getTeam() != GameTeam.SPECTATORS) {
-            return new Pair<>(false, "You must be a spectator to mutate.");
+            return ImmutablePair.of(false, "You must be a spectator to mutate.");
         }
         
         if (!killedByPlayer()) {
-            return new Pair<>(false, "You can only mutate if you died to a player.");
+            return ImmutablePair.of(false, "You can only mutate if you died to a player.");
         }
 
         UUID killerUUID = getMutationTarget();
         GamePlayer killer = game.getPlayer(killerUUID);
         if (killer == null) {
-            return new Pair<>(false, "Your killer left, you cannot mutate.");
+            return ImmutablePair.of(false, "Your killer left, you cannot mutate.");
         }
 
         if (killer.getTeam() != GameTeam.TRIBUTES) {
-            return new Pair<>(false, "Your killer has died, you cannot mutate.");
+            return ImmutablePair.of(false, "Your killer has died, you cannot mutate.");
         }
         
-        return new Pair<>(true, "");
+        return ImmutablePair.of(true, "");
     }
     
     public void setCombat(GamePlayer other) {
@@ -510,7 +511,7 @@ public class GamePlayer {
     public String getMutateItemNameFromStatus() {
         Pair<Boolean, String> canMutateStatus = canMutate();
         
-        if (canMutateStatus.first()) {
+        if (canMutateStatus.getLeft()) {
             GamePlayer killer = game.getPlayer(getMutationTarget());
             String passes;
             if (game.getSettings().isUnlimitedPasses()) {
@@ -520,7 +521,7 @@ public class GamePlayer {
             }
             return "&c&lTAKE REVENGE   &eTarget: " + killer.getColoredName() + "   &ePasses: &b" + passes;
         } else {
-            return "&c" + canMutateStatus.second();
+            return "&c" + canMutateStatus.getRight();
         }
     }
 

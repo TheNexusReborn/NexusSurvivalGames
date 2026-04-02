@@ -15,7 +15,7 @@ public class SGInstanceServer extends InstanceServer {
         this.plugin = plugin;
         
         this.primaryVirtualServer.set(new SGVirtualServer(plugin, this, name));
-        plugin.getServers().register(1, (SGVirtualServer) this.primaryVirtualServer.get());
+        plugin.getServers().put(1, (SGVirtualServer) this.primaryVirtualServer.get());
     }
 
     @Override

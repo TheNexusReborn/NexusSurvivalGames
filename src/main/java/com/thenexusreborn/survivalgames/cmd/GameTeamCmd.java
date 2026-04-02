@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.cmd;
 
-import com.stardevllc.starcore.api.ui.GuiManager;
+import com.stardevllc.ui.GuiManager;
 import com.stardevllc.command.flags.FlagResult;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.nexuscore.api.command.NexusCommand;

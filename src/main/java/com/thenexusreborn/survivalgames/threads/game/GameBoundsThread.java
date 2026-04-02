@@ -3,7 +3,7 @@ package com.thenexusreborn.survivalgames.threads.game;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.BukkitUtil;
 import com.sk89q.worldedit.regions.Region;
-import com.stardevllc.starcore.utils.StarThread;
+import com.stardevllc.StarThread;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;

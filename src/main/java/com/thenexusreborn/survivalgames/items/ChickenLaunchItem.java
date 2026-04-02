@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.items;
 
-import com.stardevllc.itembuilder.ItemBuilders;
 import com.stardevllc.smaterial.SMaterial;
+import com.stardevllc.staritems.ItemBuilders;
 import com.stardevllc.staritems.model.CustomItem;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
@@ -15,7 +15,7 @@ import org.bukkit.util.Vector;
 
 public class ChickenLaunchItem extends CustomItem {
     public ChickenLaunchItem(SurvivalGames plugin) {
-        super(plugin, "chicken_launch_item", ItemBuilders.of(SMaterial.SLIME_BALL).displayName("&bChicken Launch")
+        super(plugin, ItemBuilders.of(SMaterial.SLIME_BALL).displayName("&bChicken Launch")
                 .addLoreLine("&7Launch yourself into the air. (5s cooldown)"));
         
         addEventHandler(PlayerInteractEvent.class, e -> {

@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.items;
 
-import com.stardevllc.itembuilder.ItemBuilders;
 import com.stardevllc.smaterial.SMaterial;
+import com.stardevllc.staritems.ItemBuilders;
 import com.stardevllc.staritems.model.CustomItem;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -13,7 +13,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 public class SponsorsItem extends CustomItem {
     public SponsorsItem(SurvivalGames plugin) {
-        super(plugin, "sponsors_item", ItemBuilders.of(SMaterial.GLOWSTONE_DUST).displayName("Sponsors"));
+        super(plugin, ItemBuilders.of(SMaterial.GLOWSTONE_DUST).displayName("Sponsors"));
         
         addEventHandler(PlayerInteractEvent.class, e -> {
             if (!(e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK)) {

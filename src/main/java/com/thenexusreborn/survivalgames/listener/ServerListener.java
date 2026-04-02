@@ -34,11 +34,11 @@ public class ServerListener implements Listener {
             SGVirtualServer sg1 = new SGVirtualServer(plugin, "SG1");
             e.setPrimaryVirtualServer(sg1);
             e.addVirtualServer(sg1);
-            plugin.getServers().register(1, sg1);
+            plugin.getServers().put(1, sg1);
             for (int i = 1; i < numberOfServers; i++) {
                 SGVirtualServer server = new SGVirtualServer(plugin, "SG" + (i + 1));
                 e.addVirtualServer(server);
-                plugin.getServers().register(i + 1, server);
+                plugin.getServers().put(i + 1, server);
             }
         }
     }

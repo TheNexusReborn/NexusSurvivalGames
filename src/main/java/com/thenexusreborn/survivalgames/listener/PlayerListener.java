@@ -3,7 +3,7 @@ package com.thenexusreborn.survivalgames.listener;
 import com.sk89q.worldedit.bukkit.BukkitUtil;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
 import com.stardevllc.StarColors;
-import com.stardevllc.starcore.api.ui.GuiManager;
+import com.stardevllc.ui.GuiManager;
 import com.thenexusreborn.api.NexusReborn;
 import com.thenexusreborn.api.player.*;
 import com.thenexusreborn.nexuscore.api.events.*;
@@ -732,7 +732,7 @@ public class PlayerListener implements Listener {
         sgPlayer.setStats(stats);
         sgPlayer.setNickSGPlayerStats(fakeStats);
         
-        plugin.getPlayerRegistry().register(sgPlayer);
+        plugin.getPlayerRegistry().put(sgPlayer.getUniqueId(), sgPlayer);
         e.setJoinMessage(null);
     }
     
@@ -758,7 +758,7 @@ public class PlayerListener implements Listener {
         e.setQuitMessage(null);
         NexusReborn.getPrimaryDatabase().saveSilent(sgPlayer.getStats());
         NexusReborn.getPrimaryDatabase().saveSilent(sgPlayer.getTrueStats());
-        plugin.getPlayerRegistry().unregister(e.getPlayer().getUniqueId());
+        plugin.getPlayerRegistry().remove(e.getPlayer().getUniqueId());
     }
     
     @EventHandler

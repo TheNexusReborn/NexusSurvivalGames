@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.threads.game;
 
-import com.stardevllc.starcore.utils.StarThread;
+import com.stardevllc.StarThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;
 import com.thenexusreborn.survivalgames.server.SGVirtualServer;

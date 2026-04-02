@@ -1,8 +1,8 @@
 package com.thenexusreborn.survivalgames.mutations;
 
-import com.stardevllc.itembuilder.ItemBuilders;
 import com.stardevllc.smaterial.ArmorSet;
 import com.stardevllc.smaterial.SMaterial;
+import com.stardevllc.staritems.ItemBuilders;
 import com.stardevllc.starlib.helper.StringHelper;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.disguises.disguisetypes.DisguiseType;
@@ -151,7 +151,7 @@ public enum StandardMutations implements IMutationType {
         this.items = items;
         this.modifiers = modifiers;
         
-        IMutationType.REGISTRY.register(this);
+        IMutationType.REGISTRY.put(id, this);
     }
     
     StandardMutations(String id, Class<? extends Mutation> clazz, DisguiseType disguiseType, SMaterial icon, ArmorSet armorType, ItemStack weapon, int unlockCost, int health, List<DamageCause> damageImmunities, List<MutationEffect> effects, List<MutationItem> items, List<MutationModifier> modifiers) {

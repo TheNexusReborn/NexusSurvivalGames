@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.sponsoring;
 
 import com.stardevllc.smaterial.SMaterial;
-import com.stardevllc.starmclib.names.PotionNames;
+import com.stardevllc.names.PotionNames;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;

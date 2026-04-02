@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.threads.lobby;
 
-import com.stardevllc.starcore.utils.StarThread;
+import com.stardevllc.StarThread;
 import com.thenexusreborn.survivalgames.control.ControlType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.Lobby;

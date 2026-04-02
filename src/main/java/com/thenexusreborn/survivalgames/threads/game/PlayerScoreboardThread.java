@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.threads.game;
 
-import com.stardevllc.starcore.utils.StarThread;
+import com.stardevllc.StarThread;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.scoreboard.ScoreboardView;
 import com.thenexusreborn.survivalgames.SGPlayer;

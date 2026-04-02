@@ -772,8 +772,6 @@ public class Game implements Controllable, IHasState {
         }
         
         this.timer.start();
-        plugin.getLogger().info("Timer Paused: " + this.timer.isPaused());
-        plugin.getLogger().info("Timer Cancelled: " + this.timer.isCancelled());
         setSubState(SubState.UNDEFINED);
     }
     
@@ -818,7 +816,7 @@ public class Game implements Controllable, IHasState {
                 player.sendMessage("");
                 player.sendMessage(MsgType.INFO.format("You might be out of the game, but &f&lDON'T QUIT&e!"));
                 player.sendMessage(MsgType.INFO.format("Another game will be &f&lSTARTING SOON&e!"));
-                if (getSettings().isAllowMutations() && player.canMutate().first()) {
+                if (getSettings().isAllowMutations() && player.canMutate().getLeft()) {
                     player.sendMessage(MsgType.INFO.format("You can &f&lMUTATE &eby using the &bRotten Flesh&e."));
                 }
 //                    TextComponent clickHere = new TextComponent("§f§lCLICK HERE");
@@ -1295,9 +1293,9 @@ public class Game implements Controllable, IHasState {
         }
         
         RoomRegistry roomRegistry = plugin.getStarChat().getRoomRegistry();
-        roomRegistry.unregister(this.gameChatroom.getName());
+        roomRegistry.remove(this.gameChatroom.getName());
         for (GameTeamChatroom chatroom : this.getChatRooms().values()) {
-            roomRegistry.unregister(chatroom.getName());
+            roomRegistry.remove(chatroom.getName());
         }
         
         setState(ENDED);
@@ -1767,7 +1765,7 @@ public class Game implements Controllable, IHasState {
                                 int totalCanMutate = 0;
                                 for (GamePlayer player : this.players.values()) {
                                     if (player.getTeam() == GameTeam.SPECTATORS) {
-                                        if (player.canMutate().first()) {
+                                        if (player.canMutate().getLeft()) {
                                             totalCanMutate++;
                                         }
                                     }

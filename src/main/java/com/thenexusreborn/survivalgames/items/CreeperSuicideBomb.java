@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.items;
 
-import com.stardevllc.itembuilder.ItemBuilders;
 import com.stardevllc.smaterial.SMaterial;
+import com.stardevllc.staritems.ItemBuilders;
 import com.stardevllc.staritems.model.CustomItem;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
@@ -19,7 +19,7 @@ import java.util.List;
 
 public class CreeperSuicideBomb extends CustomItem {
     public CreeperSuicideBomb(SurvivalGames plugin) {
-        super(plugin, "creeper_suicide_bomb", ItemBuilders.of(SMaterial.GUNPOWDER).displayName("&cSuicide Bomb")
+        super(plugin, ItemBuilders.of(SMaterial.GUNPOWDER).displayName("&cSuicide Bomb")
                 .setLore(List.of(
                         "&7Explode yourself for higher damage",
                         "&7If you kill your target, you take revenge",

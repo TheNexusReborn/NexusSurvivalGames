@@ -2,7 +2,7 @@ package com.thenexusreborn.survivalgames.map;
 
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.regions.CuboidRegion;
-import com.stardevllc.starmclib.Position;
+import com.stardevllc.Position;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import org.bukkit.Material;
 import org.bukkit.block.Block;

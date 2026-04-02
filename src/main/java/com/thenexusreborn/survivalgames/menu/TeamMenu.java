@@ -1,10 +1,10 @@
 package com.thenexusreborn.survivalgames.menu;
 
 import com.stardevllc.StarColors;
-import com.stardevllc.starcore.api.ui.GuiManager;
-import com.stardevllc.starcore.api.ui.element.button.Button;
-import com.stardevllc.starcore.api.ui.gui.InventoryGUI;
-import com.stardevllc.starcore.api.ui.gui.UpdatingGUI;
+import com.stardevllc.ui.GuiManager;
+import com.stardevllc.ui.element.button.Button;
+import com.stardevllc.ui.gui.InventoryGUI;
+import com.stardevllc.ui.gui.UpdatingGUI;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.nexuscore.reflection.impl.PlayerSkull;
 import com.thenexusreborn.nexuscore.util.MsgType;

@@ -1,45 +1,21 @@
 package com.thenexusreborn.survivalgames.loot.item;
 
-import com.stardevllc.starlib.objects.registry.Registry;
-import com.stardevllc.StarColors;
-import com.stardevllc.starlib.objects.registry.RegistryObject;
-import com.thenexusreborn.survivalgames.loot.category.LootCategory;
+import com.stardevllc.starlib.objects.key.Keys;
+import com.stardevllc.starlib.registry.HashRegistry;
 import org.bukkit.Material;
 
 import java.util.EnumSet;
 import java.util.Set;
 
-public class ItemRegistry extends Registry<String, LootItem> {
+public class ItemRegistry extends HashRegistry<LootItem> {
     
-    private Set<Material> materials = EnumSet.noneOf(Material.class);
+    private final Set<Material> materials = EnumSet.noneOf(Material.class);
     
     public ItemRegistry() {
-        super(null, string -> StarColors.stripColor(string.toLowerCase().replace(" ", "_").replace("'", "")), LootItem::getId, null, null);
-        addListener(c -> {
-            if (c.added() != null) {
-                materials.add(c.added().getMaterial());
-            } else if (c.removed() != null) {
-                materials.remove(c.removed().getMaterial());
-            }
-        });
-    }
-    
-    public RegistryObject<String, LootItem> register(Material material, LootCategory... categories) {
-        LootItem object = new LootItem(material);
-        object.setCategories(categories);
-        return register(object);
-    }
-    
-    public RegistryObject<String, LootItem> register(String name, Material material, LootCategory... categories) {
-        LootItem object = new LootItem(name, material);
-        object.setCategories(categories);
-        return register(object);
-    }
-    
-    public RegistryObject<String, LootItem> register(String id, String name, Material material, LootCategory... categories) {
-        LootItem object = new LootItem(id, name, material);
-        object.setCategories(categories);
-        return register(object);
+        super(LootItem.class, Keys.of("sg_loot"), "SG Loot", null, false, null, null);
+        
+        addRegisterListener(e -> materials.add(e.value().getMaterial()));
+        addRemoveListener(e -> materials.remove(e.value().getMaterial()));
     }
     
     public Set<Material> getMaterials() {
