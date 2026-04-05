@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.cmd.sgadmin.game.progress;
 
-import com.stardevllc.command.flags.FlagResult;
+import com.stardevllc.minecraft.command.flags.FlagResult;
 import com.thenexusreborn.nexuscore.api.command.ICommand;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;

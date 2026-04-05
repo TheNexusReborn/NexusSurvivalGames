@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.loot.item;
 
-import com.stardevllc.StarColors;
-import com.stardevllc.names.MaterialNames;
+import com.stardevllc.minecraft.StarColors;
+import com.stardevllc.minecraft.names.MaterialNames;
 import com.thenexusreborn.survivalgames.loot.category.LootCategory;
 import de.tr7zw.nbtapi.NBT;
 import org.bukkit.Material;

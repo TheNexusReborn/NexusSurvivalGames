@@ -1,12 +1,12 @@
 package com.thenexusreborn.survivalgames.menu.manage;
 
-import com.stardevllc.smaterial.SMaterial;
-import com.stardevllc.StarColors;
-import com.stardevllc.staritems.ItemBuilders;
-import com.stardevllc.ui.GuiManager;
-import com.stardevllc.ui.element.button.Button;
-import com.stardevllc.ui.gui.InventoryGUI;
-import com.stardevllc.ui.gui.UpdatingGUI;
+import com.stardevllc.minecraft.smaterial.SMaterial;
+import com.stardevllc.minecraft.StarColors;
+import com.stardevllc.starcore.ItemBuilders;
+import com.stardevllc.minecraft.ui.GuiManager;
+import com.stardevllc.minecraft.ui.element.button.Button;
+import com.stardevllc.minecraft.ui.gui.InventoryGUI;
+import com.stardevllc.minecraft.ui.gui.UpdatingGUI;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.nexuscore.util.SpigotUtils;
 import com.thenexusreborn.survivalgames.SGPlayer;

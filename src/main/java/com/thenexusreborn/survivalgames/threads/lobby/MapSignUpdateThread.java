@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.threads.lobby;
 
-import com.stardevllc.StarColors;
-import com.stardevllc.StarThread;
+import com.stardevllc.minecraft.StarColors;
+import com.stardevllc.minecraft.StarThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.lobby.Lobby;
 import com.thenexusreborn.survivalgames.lobby.LobbyPlayer;

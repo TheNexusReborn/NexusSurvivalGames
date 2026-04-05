@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.threads.game;
 
-import com.stardevllc.StarThread;
+import com.stardevllc.minecraft.StarThread;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;
 import com.thenexusreborn.survivalgames.mutations.MutationModifier;

@@ -1,13 +1,13 @@
 package com.thenexusreborn.survivalgames.game;
 
 import com.sk89q.worldedit.regions.CuboidRegion;
-import com.stardevllc.itembuilder.v1_8.FireworkItemBuilder;
-import com.stardevllc.smaterial.SMaterial;
+import com.stardevllc.minecraft.v1_8.FireworkItemBuilder;
+import com.stardevllc.minecraft.smaterial.SMaterial;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.registry.RoomRegistry;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
-import com.stardevllc.StarColors;
+import com.stardevllc.minecraft.StarColors;
 import com.stardevllc.starlib.clock.callback.CallbackPeriod;
 import com.stardevllc.starlib.clock.callback.ClockCallback;
 import com.stardevllc.starlib.clock.snapshot.TimerSnapshot;

@@ -1,8 +1,8 @@
 package com.thenexusreborn.survivalgames.mutations;
 
-import com.stardevllc.itembuilder.common.ItemBuilder;
-import com.stardevllc.smaterial.SMaterial;
-import com.stardevllc.staritems.ItemBuilders;
+import com.stardevllc.minecraft.itembuilder.ItemBuilder;
+import com.stardevllc.minecraft.smaterial.SMaterial;
+import com.stardevllc.starcore.ItemBuilders;
 import com.stardevllc.staritems.model.CustomItem;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;

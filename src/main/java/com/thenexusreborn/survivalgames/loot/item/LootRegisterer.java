@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.loot.item;
 
-import com.stardevllc.colors.ColorHandler;
+import com.stardevllc.minecraft.colors.ColorHandler;
 import com.stardevllc.starlib.objects.key.Keys;
 import com.stardevllc.starlib.registry.*;
 import com.thenexusreborn.survivalgames.loot.category.LootCategory;

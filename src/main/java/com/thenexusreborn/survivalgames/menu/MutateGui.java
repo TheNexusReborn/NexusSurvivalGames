@@ -1,13 +1,13 @@
 package com.thenexusreborn.survivalgames.menu;
 
-import com.stardevllc.colors.ColorHandler;
-import com.stardevllc.names.MaterialNames;
-import com.stardevllc.names.PotionNames;
-import com.stardevllc.staritems.ItemBuilders;
+import com.stardevllc.minecraft.colors.ColorHandler;
+import com.stardevllc.minecraft.names.MaterialNames;
+import com.stardevllc.minecraft.names.PotionNames;
+import com.stardevllc.starcore.ItemBuilders;
 import com.stardevllc.starlib.helper.*;
 import com.stardevllc.starlib.tuple.pair.Pair;
-import com.stardevllc.ui.element.button.Button;
-import com.stardevllc.ui.gui.InventoryGUI;
+import com.stardevllc.minecraft.ui.element.button.Button;
+import com.stardevllc.minecraft.ui.gui.InventoryGUI;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;

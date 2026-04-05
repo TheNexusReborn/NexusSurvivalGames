@@ -3,7 +3,7 @@ package com.thenexusreborn.survivalgames.lobby;
 import com.stardevllc.starchat.context.ChatContext;
 import com.stardevllc.starchat.rooms.ChatRoom;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
-import com.stardevllc.ProgressBar;
+import com.stardevllc.minecraft.ProgressBar;
 import com.stardevllc.starlib.clock.clocks.Timer;
 import com.stardevllc.starlib.helper.*;
 import com.stardevllc.starlib.time.TimeUnit;

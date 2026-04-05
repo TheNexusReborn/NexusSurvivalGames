@@ -1,10 +1,10 @@
 package com.thenexusreborn.survivalgames.menu.settings;
 
-import com.stardevllc.staritems.ItemBuilders;
-import com.stardevllc.smaterial.SMaterial;
-import com.stardevllc.ui.element.button.Button;
-import com.stardevllc.ui.gui.InventoryGUI;
-import com.stardevllc.ui.gui.UpdatingGUI;
+import com.stardevllc.starcore.ItemBuilders;
+import com.stardevllc.minecraft.smaterial.SMaterial;
+import com.stardevllc.minecraft.ui.element.button.Button;
+import com.stardevllc.minecraft.ui.gui.InventoryGUI;
+import com.stardevllc.minecraft.ui.gui.UpdatingGUI;
 import com.thenexusreborn.survivalgames.settings.GameSettings;
 
 import java.util.UUID;

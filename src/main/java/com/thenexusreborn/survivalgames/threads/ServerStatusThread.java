@@ -2,7 +2,7 @@ package com.thenexusreborn.survivalgames.threads;
 
 import com.google.gson.*;
 import com.stardevllc.starlib.helper.StringHelper;
-import com.stardevllc.StarThread;
+import com.stardevllc.minecraft.StarThread;
 import com.stardevllc.starlib.time.TimeUnit;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;

@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.mutations;
 
-import com.stardevllc.smaterial.ArmorSet;
-import com.stardevllc.smaterial.SMaterial;
+import com.stardevllc.minecraft.smaterial.ArmorSet;
+import com.stardevllc.minecraft.smaterial.SMaterial;
 import com.thenexusreborn.survivalgames.disguises.disguisetypes.DisguiseType;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;

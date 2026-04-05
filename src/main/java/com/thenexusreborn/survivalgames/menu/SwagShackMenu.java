@@ -1,8 +1,8 @@
 package com.thenexusreborn.survivalgames.menu;
 
-import com.stardevllc.StarColors;
-import com.stardevllc.ui.element.button.Button;
-import com.stardevllc.ui.gui.InventoryGUI;
+import com.stardevllc.minecraft.StarColors;
+import com.stardevllc.minecraft.ui.element.button.Button;
+import com.stardevllc.minecraft.ui.gui.InventoryGUI;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.Game;

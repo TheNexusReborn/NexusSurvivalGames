@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.items;
 
-import com.stardevllc.smaterial.SMaterial;
-import com.stardevllc.staritems.ItemBuilders;
+import com.stardevllc.minecraft.smaterial.SMaterial;
+import com.stardevllc.starcore.ItemBuilders;
 import com.stardevllc.staritems.model.CustomItem;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;

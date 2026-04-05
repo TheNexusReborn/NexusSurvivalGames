@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.scoreboard.game;
 
-import com.stardevllc.StarColors;
+import com.stardevllc.minecraft.StarColors;
 import com.stardevllc.starlib.time.TimeFormat;
 import com.thenexusreborn.api.scoreboard.NexusScoreboard;
 import com.thenexusreborn.api.scoreboard.TeamBuilder;

@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.hooks;
 
 import com.stardevllc.starlib.clock.clocks.Timer;
-import com.stardevllc.Position;
+import com.stardevllc.minecraft.Position;
 import com.stardevllc.starlib.time.TimeFormat;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.nexuscore.util.MCUtils;

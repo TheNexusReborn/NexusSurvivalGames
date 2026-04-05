@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.cmd.sgadmin.game;
 
-import com.stardevllc.command.flags.FlagResult;
-import com.stardevllc.command.flags.type.PresenceFlag;
+import com.stardevllc.minecraft.command.flags.FlagResult;
+import com.stardevllc.minecraft.command.flags.type.PresenceFlag;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.nexuscore.api.command.ICommand;
 import com.thenexusreborn.nexuscore.util.MsgType;

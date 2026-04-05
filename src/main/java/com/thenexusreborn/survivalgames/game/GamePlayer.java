@@ -1,9 +1,9 @@
 package com.thenexusreborn.survivalgames.game;
 
-import com.stardevllc.smaterial.ArmorSet;
+import com.stardevllc.minecraft.smaterial.ArmorSet;
 import com.stardevllc.starchat.rooms.DefaultPermissions;
-import com.stardevllc.StarColors;
-import com.stardevllc.Position;
+import com.stardevllc.minecraft.StarColors;
+import com.stardevllc.minecraft.Position;
 import com.stardevllc.starlib.tuple.pair.ImmutablePair;
 import com.stardevllc.starlib.tuple.pair.Pair;
 import com.thenexusreborn.api.player.*;

@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.util;
 
-import com.stardevllc.StarColors;
+import com.stardevllc.minecraft.StarColors;
 import com.thenexusreborn.api.scoreboard.wrapper.ITeam;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SurvivalGames;

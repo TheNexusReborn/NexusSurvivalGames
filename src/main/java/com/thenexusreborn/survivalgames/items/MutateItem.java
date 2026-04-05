@@ -1,10 +1,10 @@
 package com.thenexusreborn.survivalgames.items;
 
-import com.stardevllc.smaterial.SMaterial;
-import com.stardevllc.staritems.ItemBuilders;
+import com.stardevllc.minecraft.smaterial.SMaterial;
+import com.stardevllc.starcore.ItemBuilders;
 import com.stardevllc.staritems.model.CustomItem;
 import com.stardevllc.starlib.tuple.pair.Pair;
-import com.stardevllc.ui.GuiManager;
+import com.stardevllc.minecraft.ui.GuiManager;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;

@@ -1,7 +1,7 @@
 package com.thenexusreborn.survivalgames.cmd.sgadmin.lobby;
 
 import com.stardevllc.starlib.helper.StringHelper;
-import com.stardevllc.command.flags.FlagResult;
+import com.stardevllc.minecraft.command.flags.FlagResult;
 import com.thenexusreborn.nexuscore.api.command.ICommand;
 import com.thenexusreborn.nexuscore.util.MsgType;
 import com.thenexusreborn.survivalgames.SGPlayer;

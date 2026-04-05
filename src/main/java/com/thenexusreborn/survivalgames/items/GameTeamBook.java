@@ -1,9 +1,9 @@
 package com.thenexusreborn.survivalgames.items;
 
-import com.stardevllc.smaterial.SMaterial;
-import com.stardevllc.staritems.ItemBuilders;
+import com.stardevllc.minecraft.smaterial.SMaterial;
+import com.stardevllc.starcore.ItemBuilders;
 import com.stardevllc.staritems.model.CustomItem;
-import com.stardevllc.ui.GuiManager;
+import com.stardevllc.minecraft.ui.GuiManager;
 import com.thenexusreborn.survivalgames.SGPlayer;
 import com.thenexusreborn.survivalgames.SurvivalGames;
 import com.thenexusreborn.survivalgames.game.*;

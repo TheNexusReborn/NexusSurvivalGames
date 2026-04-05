@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames;
 
-import com.stardevllc.registry.PluginRegisterer;
+import com.stardevllc.minecraft.registry.PluginRegisterer;
 import com.stardevllc.starchat.ChatSelector;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.rooms.ChatRoom;
@@ -11,7 +11,7 @@ import com.stardevllc.starlib.objects.key.Keys;
 import com.stardevllc.starlib.reflection.ReflectionHelper;
 import com.stardevllc.starlib.repository.IRepository;
 import com.stardevllc.starlib.repository.Repositories;
-import com.stardevllc.ui.GuiManager;
+import com.stardevllc.minecraft.ui.GuiManager;
 import com.thenexusreborn.api.NexusReborn;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.registry.ToggleRegistry;

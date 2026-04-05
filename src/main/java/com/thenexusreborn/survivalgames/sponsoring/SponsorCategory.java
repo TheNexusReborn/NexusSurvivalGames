@@ -1,6 +1,6 @@
 package com.thenexusreborn.survivalgames.sponsoring;
 
-import com.stardevllc.smaterial.SMaterial;
+import com.stardevllc.minecraft.smaterial.SMaterial;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;

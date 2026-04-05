@@ -1,8 +1,8 @@
 package com.thenexusreborn.survivalgames.cmd.sgadmin.settings;
 
 import com.stardevllc.starlib.converter.string.StringConverter;
-import com.stardevllc.StarColors;
-import com.stardevllc.command.flags.FlagResult;
+import com.stardevllc.minecraft.StarColors;
+import com.stardevllc.minecraft.command.flags.FlagResult;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.nexuscore.api.command.ICommand;
 import com.thenexusreborn.nexuscore.api.command.SubCommand;
