@@ -27,7 +27,7 @@ public class SwagShackMenu extends InventoryGUI {
         items.add(new ShopItem('1', Items.GOLD_CHESTPLATE, 1, 75, 100));
         items.add(new ShopItem('2', Items.GOLD_LEGGINGS, 1, 50, 80));
         items.add(new ShopItem('3', Items.BOW, 1, 100, 250));
-        items.add(new ShopItem('5', Items.FISHING_ROD, 5, 100, 300));
+        items.add(new ShopItem('5', Items.FISHING_ROD, 1, 100, 300));
         items.add(new ShopItem('6', Items.RAW_FISH, 5, 30, 50));
         items.add(new ShopItem('7', Items.MUSHROOM_SOUP, 1, 30, 50));
         items.add(new ShopItem('8', Items.CAKE, 1, 30, 50));
