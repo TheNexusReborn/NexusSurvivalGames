@@ -8,12 +8,8 @@ import java.util.UUID;
 
 public class SGInstanceServer extends InstanceServer {
     
-    private SurvivalGames plugin;
-    
     public SGInstanceServer(SurvivalGames plugin, String name) {
         super(name, "survivalgames", 24);
-        this.plugin = plugin;
-        
         this.primaryVirtualServer.set(new SGVirtualServer(plugin, this, name));
         plugin.getServers().put(1, (SGVirtualServer) this.primaryVirtualServer.get());
     }
