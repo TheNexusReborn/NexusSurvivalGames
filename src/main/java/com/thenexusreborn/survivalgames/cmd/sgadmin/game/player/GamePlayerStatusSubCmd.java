@@ -32,6 +32,7 @@ public class GamePlayerStatusSubCmd extends GamePlayerSubCmd {
         sendLine(sender, "Kills", target.getKills());
         sendLine(sender, "Kill Streak", target.getKillStreak());
         sendLine(sender, "Assists", target.getAssists());
+        sendLine(sender, "Deaths", target.getDeaths().size());
         sendLine(sender, "Spectator By Death", target.isSpectatorByDeath());
         sendLine(sender, "Mutated", target.hasMutated());
         sendLine(sender, "Times Mutated", target.getTimesMutated());
