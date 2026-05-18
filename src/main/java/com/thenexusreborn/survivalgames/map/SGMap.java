@@ -4,7 +4,6 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.stardevllc.starlib.helper.FileHelper;
 import com.stardevllc.minecraft.Position;
 import com.thenexusreborn.api.sql.annotations.column.ColumnIgnored;
 import com.thenexusreborn.api.sql.annotations.table.TableHandler;
@@ -15,7 +14,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.nio.file.*;
 import java.util.*;
 
 @SuppressWarnings("unused")
@@ -171,25 +169,6 @@ public class SGMap extends GameMap {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public boolean download(JavaPlugin plugin) {
-        if (downloadedZip == null || !Files.exists(downloadedZip)) {
-            Path downloadFolder = FileHelper.subPath(plugin.getDataFolder().toPath(), "mapdownloads");
-            FileHelper.createDirectoryIfNotExists(downloadFolder);
-
-            String fileName = getName().toLowerCase().replace("'", "").replace(" ", "_") + ".zip";
-
-            Path existing = FileSystems.getDefault().getPath(downloadFolder.toString(), fileName);
-            if (Files.exists(existing)) {
-                plugin.getLogger().info("Found existing zip for " + name);
-                this.downloadedZip = existing;
-                return true;
-            }
-
-            downloadedZip = FileHelper.downloadFile(url, downloadFolder, fileName, true);
-        }
-        return downloadedZip != null && Files.exists(downloadedZip);
     }
     
     public void setSpawns(Collection<MapSpawn> spawns) {

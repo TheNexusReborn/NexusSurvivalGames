@@ -1,6 +1,7 @@
 package com.thenexusreborn.survivalgames;
 
 import com.stardevllc.minecraft.registry.PluginRegisterer;
+import com.stardevllc.minecraft.ui.GuiManager;
 import com.stardevllc.starchat.ChatSelector;
 import com.stardevllc.starchat.StarChat;
 import com.stardevllc.starchat.rooms.ChatRoom;
@@ -9,17 +10,15 @@ import com.stardevllc.staritems.model.ItemRegistry;
 import com.stardevllc.starlib.clock.ClockManager;
 import com.stardevllc.starlib.objects.key.Keys;
 import com.stardevllc.starlib.reflection.ReflectionHelper;
+import com.stardevllc.starlib.repository.HashRepository;
 import com.stardevllc.starlib.repository.IRepository;
-import com.stardevllc.starlib.repository.Repositories;
-import com.stardevllc.minecraft.ui.GuiManager;
 import com.thenexusreborn.api.NexusReborn;
 import com.thenexusreborn.api.player.Rank;
 import com.thenexusreborn.api.registry.ToggleRegistry;
 import com.thenexusreborn.api.server.InstanceServer;
 import com.thenexusreborn.api.sql.DatabaseRegistry;
 import com.thenexusreborn.api.sql.objects.SQLDatabase;
-import com.thenexusreborn.gamemaps.*;
-import com.thenexusreborn.gamemaps.model.*;
+import com.thenexusreborn.gamemaps.MapManager;
 import com.thenexusreborn.nexuscore.NexusCore;
 import com.thenexusreborn.nexuscore.api.NexusSpigotPlugin;
 import com.thenexusreborn.nexuscore.cmds.ToggleCmd;
@@ -72,8 +71,8 @@ public class SurvivalGames extends NexusSpigotPlugin {
     private final Map<UUID, PlayerMutations> playerUnlockedMutations = new HashMap<>();
     private final Set<IMutationType> disabledMutations = new HashSet<>();
     
-    private IRepository<UUID, SGPlayer> playerRegistry = Repositories.create(UUID.class, SGPlayer.class, HashMap::new)
-            .withId(Keys.of("sg:players"))
+    private IRepository<UUID, SGPlayer> playerRegistry = HashRepository.newBuilder(UUID.class, SGPlayer.class)
+            .withKey(Keys.of("sg:players"))
             .withName("SG Players")
             .build();
     
