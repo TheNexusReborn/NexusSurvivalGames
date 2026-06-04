@@ -106,8 +106,10 @@ public class LootTable {
     }
 
     public double getItemWeight(String name) {
-        if (registeredItems.containsKey(name)) {
-            return registeredItems.get(name).getWeight();
+        for (Map.Entry<String, TableItem> entry : registeredItems.entrySet()) {
+            if (entry.getKey().equalsIgnoreCase(name)) {
+                return entry.getValue().getWeight();
+            }
         }
         
         return 0;

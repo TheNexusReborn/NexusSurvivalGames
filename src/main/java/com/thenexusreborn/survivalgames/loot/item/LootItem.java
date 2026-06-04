@@ -2,6 +2,7 @@ package com.thenexusreborn.survivalgames.loot.item;
 
 import com.stardevllc.minecraft.StarColors;
 import com.stardevllc.minecraft.names.MaterialNames;
+import com.stardevllc.starlib.objects.builder.AbstractBuilder;
 import com.thenexusreborn.survivalgames.loot.category.LootCategory;
 import de.tr7zw.nbtapi.NBT;
 import org.bukkit.Material;
@@ -13,12 +14,12 @@ import java.util.*;
 
 public class LootItem {
     protected final String id;
-    protected Set<LootCategory> categories = EnumSet.noneOf(LootCategory.class);
+    protected final Set<LootCategory> categories = EnumSet.noneOf(LootCategory.class);
     protected final Material material;
     protected final String name;
-    protected List<String> lore = new LinkedList<>();
+    protected final List<String> lore = new LinkedList<>();
     protected int amount = 1;
-    protected Map<Enchantment, Integer> enchantments = new HashMap<>();
+    protected final Map<Enchantment, Integer> enchantments = new HashMap<>();
     
     public LootItem(Material material) {
         this(MaterialNames.getDefaultName(material), material);
@@ -32,6 +33,20 @@ public class LootItem {
         this.id = id;
         this.name = name;
         this.material = material;
+    }
+    
+    public LootItem(Builder builder) {
+        this.id = builder.id;
+        this.categories.addAll(builder.categories);
+        this.material = builder.material;
+        if (builder.name != null) {
+            this.name = builder.name;
+        } else {
+            this.name = MaterialNames.getDefaultName(material);
+        }
+        this.lore.addAll(builder.lore);
+        this.amount = builder.amount;
+        this.enchantments.putAll(builder.enchantments);
     }
     
     public String getId() {
@@ -143,5 +158,118 @@ public class LootItem {
     @Override
     public int hashCode() {
         return Objects.hashCode(id);
+    }
+    
+    public static class Builder extends AbstractBuilder<LootItem, Builder> {
+        
+        protected String id;
+        protected final Set<LootCategory> categories = EnumSet.noneOf(LootCategory.class);
+        protected Material material;
+        protected String name;
+        protected final List<String> lore = new LinkedList<>();
+        protected int amount = 1;
+        protected final Map<Enchantment, Integer> enchantments = new HashMap<>();
+        
+        public Builder() {
+        }
+        
+        public Builder(Builder builder) {
+            super(builder);
+            this.id = builder.id;
+            this.categories.addAll(builder.categories);
+            this.material = builder.material;
+            this.name = builder.name;
+            this.lore.addAll(builder.lore);
+            this.amount = builder.amount;
+            this.enchantments.putAll(builder.enchantments);
+        }
+        
+        public Builder id(String id) {
+            this.id = id;
+            return self();
+        }
+        
+        public Builder categories(LootCategory category, LootCategory... categories) {
+            this.categories.add(category);
+            if (categories != null) {
+                this.categories.addAll(List.of(categories));
+            }
+            
+            return self();
+        }
+        
+        public Builder material(Material material) {
+            this.material = material;
+            return self();
+        }
+        
+        public Builder name(String name) {
+            this.name = name;
+            return self();
+        }
+        
+        public Builder lore(List<String> lore) {
+            this.lore.addAll(lore);
+            return self();
+        }
+        
+        public Builder lore(String firstLine, String... otherLines) {
+            this.lore.add(firstLine);
+            if (otherLines != null) {
+                this.lore.addAll(List.of(otherLines));
+            }
+            return self();
+        }
+        
+        public Builder amount(int amount) {
+            if (amount > 1) {
+                this.amount = amount;
+            }
+            
+            return self();
+        }
+        
+        public Builder addEnchantment(Enchantment enchantment, int level) {
+            this.enchantments.put(enchantment, level);
+            return self();
+        }
+        
+        public String getId() {
+            return id;
+        }
+        
+        public Set<LootCategory> getCategories() {
+            return new HashSet<>(categories);
+        }
+        
+        public Material getMaterial() {
+            return material;
+        }
+        
+        public String getName() {
+            return name;
+        }
+        
+        public List<String> getLore() {
+            return new LinkedList<>(lore);
+        }
+        
+        public int getAmount() {
+            return amount;
+        }
+        
+        public Map<Enchantment, Integer> getEnchantments() {
+            return new HashMap<>(enchantments);
+        }
+        
+        @Override
+        public LootItem build() {
+            return new LootItem(self());
+        }
+        
+        @Override
+        public Builder clone() {
+            return new Builder(self());
+        }
     }
 }

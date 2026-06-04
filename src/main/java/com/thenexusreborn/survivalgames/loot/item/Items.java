@@ -55,8 +55,8 @@ public final class Items {
     
     public static final LootItem WOOD_AXE = REGISTERER.register(Material.WOOD_AXE, WEAPONS, WOODEN_WEAPONS, AXES).get();
     public static final LootItem WOOD_SWORD = REGISTERER.register(Material.WOOD_SWORD, WEAPONS, WOODEN_WEAPONS, SWORDS).get();
-    public static final LootItem SACRIFICIAL_AXE = REGISTERER.register("&4&l&oSacrificial Axe", Material.GOLD_AXE, WEAPONS, GOLD_WEAPONS, AXES).get().setLore("", "&7In honor of TheDragonFox").addEnchantment(Enchantment.DURABILITY, 1);
-    public static final LootItem SACRIFICIAL_SWORD = REGISTERER.register("&4&l&oSacrificial Sword", Material.GOLD_SWORD, WEAPONS, GOLD_WEAPONS, SWORDS).get().setLore("", "&7In honor of TheDragonFox").addEnchantment(Enchantment.DURABILITY, 1);
+    public static final LootItem SACRIFICIAL_AXE = REGISTERER.register("&4&l&oSacrificial Axe", Material.GOLD_AXE, WEAPONS, GOLD_WEAPONS, AXES).get().setLore("", "&7In honor of TheDragonFox").addEnchantment(Enchantment.DURABILITY, 1).addEnchantment(Enchantment.DAMAGE_ALL, 1);
+    public static final LootItem SACRIFICIAL_SWORD = REGISTERER.register("&4&l&oSacrificial Sword", Material.GOLD_SWORD, WEAPONS, GOLD_WEAPONS, SWORDS).get().setLore("", "&7In honor of TheDragonFox").addEnchantment(Enchantment.DURABILITY, 1).addEnchantment(Enchantment.DAMAGE_ALL, 1);
     public static final LootItem STONE_AXE = REGISTERER.register(Material.STONE_AXE, WEAPONS, STONE_WEAPONS, AXES).get();
     public static final LootItem STONE_SWORD = REGISTERER.register(Material.STONE_SWORD, WEAPONS, STONE_WEAPONS, SWORDS).get();
     public static final LootItem FREDERICK = REGISTERER.register("Frederick", Material.IRON_AXE, WEAPONS, IRON_WEAPONS, AXES).get();

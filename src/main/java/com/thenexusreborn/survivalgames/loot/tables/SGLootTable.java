@@ -40,7 +40,7 @@ public abstract class SGLootTable extends LootTable {
     }
     
     public void saveData() {
-        if (this.file == null || this.config == null) {
+        if (this.file == null) {
             return;
         }
         

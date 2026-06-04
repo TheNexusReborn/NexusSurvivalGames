@@ -50,11 +50,15 @@ public class ProbabilityCmd extends NexusCommand<SurvivalGames> {
         double weight = lootTable.getItemWeight(lootItem.getName());
         double totalWeight = lootTable.getWeightTotal();
         
-        double probability = weight / totalWeight * 100;
+        double probability = (weight / totalWeight) * 100;
         
         DecimalFormat decimalFormat = new DecimalFormat("##0.###");
         
         MsgType.INFO.send(player, "The probability of %v is %v% for the loot table %v.", StarColors.stripColor(lootItem.getName()), decimalFormat.format(probability), lootTable.getName());
+        if (senderRank.ordinal() <= Rank.ADMIN.ordinal()) {
+            MsgType.VERBOSE.send(player, "Weight: %v", weight);
+            MsgType.VERBOSE.send(player, "Total Weight: %v", totalWeight);
+        }
         return true;
     }
 }
